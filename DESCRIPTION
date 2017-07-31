@@ -1,0 +1,19 @@
+Package: cytolib
+Type: Package
+Title: C++ infrastructure for representing and interacting with the gated cytometry
+Version: 0.99.0
+Date: 2011-06-10
+Author: Greg Finak, Mike Jiang
+Maintainer: Greg Finak <gfinak@fhcrc.org>,Mike Jiang <wjiang2@fhcrc.org>
+Description: This package provides the core data structure and API to represent and interact with the gated cytometry data.
+License: Artistic-2.0
+LazyLoad: yes
+Collate:
+    'zzz.R'
+Depends:
+    R (>= 2.16.0)
+biocViews: FlowCytometry, DataImport, Preprocessing, DataRepresentation
+LinkingTo: BH(>= 1.62.0-1), RProtoBufLib
+VignetteBuilder: knitr
+SystemRequirements: xml2, GNU make, C++11
+RoxygenNote: 6.0.1

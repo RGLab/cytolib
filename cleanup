@@ -1,0 +1,9 @@
+for f in ./config.*; do
+	rm -f $f
+done
+for f in ./autom4*; do
+	rm -rf $f
+done
+if [ -e src/Makevars ]; then
+	rm -f src/Makevars
+fi
