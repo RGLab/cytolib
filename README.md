@@ -1,21 +1,4 @@
----
-title: 'Using cytolib'
-output:
-  html_document:
-    fig_height: 2
-    fig_width: 2
-    keep_md: yes
-    toc: yes
-    toc_float: true
-vignette: >    
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Using cytolib}
----
-
-```{r, echo=FALSE}
-library(knitr)
-opts_chunk$set(message = FALSE, warning = FALSE, fig.height= 3, fig.width= 5)
-```
+# C++ library for the gated cytometry data
 
 `cytolib` provides the c++ headers and library file for users to use and interact with the `GatingSet` (the gated cytometry data structure) at c++ level.
 
