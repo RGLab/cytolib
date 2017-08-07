@@ -2,6 +2,7 @@
 #' Generate linker flags
 #' This function prints the absolute path to the protobuf library file that is shipped with the package.
 #' So that user package can use it in their Makevar file.
+#' @export
 #' @examples 
 #' LdFlags()
 #' @return nothing.

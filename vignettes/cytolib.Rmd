@@ -33,7 +33,7 @@ LinkingTo: cytolib
 - set **PKG_LIBS** in **src/Makevars** file so that linker can find and linked to the **libcytolib.a** file 
 e.g.
 ```bash
-PKG_LIBS =`${R_HOME}/bin/Rscript -e "cytolib:::LdFlags()"`
+PKG_LIBS =`${R_HOME}/bin/Rscript -e "cytolib::LdFlags()"`
 ```
 
 See **flowWorkspace** package for the example of using `cytolib`.
