@@ -56,7 +56,7 @@ private:
 //	void freeWorkspace();//this is private because it is not supposed to be called anywhere other than destructor
 public:
 	~GatingSet();
-	GatingSet();
+	GatingSet(){};
 	void setSample(string oldName, string newName);
 	GatingSet(string,bool,unsigned short,int,unsigned short wsType);
 	GatingSet(GatingHierarchy *,vector<string>);
@@ -70,13 +70,16 @@ public:
 	vector<string> getSamples(void);
 
 	GatingSet * clone(vector<string> samples);
-
+	void addGatingHierarchy(GatingHierarchy *, string sn);
 	void serialize_pb(string filename);
 	void add(GatingSet & gs,vector<string> sampleNames);
 	void addTransMap(string gName,trans_map tm);
 	void convertToPb(pb::GatingSet & gs_pb,string path);
 	void updateChannels(const CHANNEL_MAP & chnl_map);
 	void set_gTrans(const trans_global_vec & _gTrans){gTrans = _gTrans;};
+	biexpTrans * get_globalBiExpTrans(){return &globalBiExpTrans;};
+	linTrans * get_globalLinTrans(){return &globalLinTrans;};
+
 };
 
 

@@ -506,3 +506,9 @@ void GatingSet::addTransMap(string gName,trans_map tm){
 		throw(domain_error("transformation group already exists!Can't add the second one."));
 
 }
+
+void GatingSet::addGatingHierarchy(GatingHierarchy * gh, string sn){
+		if(ghs.find(sn)!=ghs.end())
+			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sn));
+		ghs[sn] = gh;
+}

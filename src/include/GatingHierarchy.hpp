@@ -110,6 +110,7 @@ public:
 	void removeNode(VertexID nodeID);
 	VertexID addRoot();
 	GatingHierarchy();
+	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans);
 	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *>& trans_tbl);
 
 	flowData getData(VertexID nodeID);//from memory
@@ -153,7 +154,7 @@ public:
 	VertexID_vec getDescendants(VertexID u,string name);
 	VertexID_vec getChildren(VertexID);
 	nodeProperties & getNodeProperty(VertexID);
-
+	populationTree & getTree(){return tree;};
 	GatingHierarchy * clone(const trans_map & _trans,trans_global_vec * _gTrans);
 	GatingHierarchy * clone();
 	void addTransMap(trans_map tm);

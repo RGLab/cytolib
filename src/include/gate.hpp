@@ -437,7 +437,7 @@ class CurlyGuadGate:public polygonGate{
 	bool interpolated;
 	QUAD quadrant;
 public:
-	CurlyGuadGate(paramPoly _inter, QUAD _quad):polygonGate(),quadrant(_quad),interpolated(false){
+	CurlyGuadGate(paramPoly _inter, QUAD _quad):polygonGate(),interpolated(false),quadrant(_quad){
 		param = _inter;
 	};
 	void transforming(trans_local & trans){

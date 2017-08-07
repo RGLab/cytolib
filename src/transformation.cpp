@@ -275,14 +275,14 @@ logTrans::logTrans():transformation(false,LOG),offset(0),decade(1),T(262144), sc
 }
 
 
-logTrans::logTrans(double _offset,double _decade, unsigned _T, unsigned _scale):transformation(false,LOG),offset(_offset),decade(_decade),T(_T), scale(_scale){
+logTrans::logTrans(double _offset,double _decade, unsigned _scale, unsigned _T):transformation(false,LOG),offset(_offset),decade(_decade), scale(_scale),T(_T){
 	calTbl.setInterpolated(true);
 }
 fasinhTrans::fasinhTrans():transformation(false,FASINH),length(256),maxRange(262144), T(262144),A(0),M(4.5){
 	calTbl.setInterpolated(true);
 }
 
-fasinhTrans::fasinhTrans(double _length, double _maxRange, double _T, double _A, double _M):transformation(false, FASINH),length(_length),maxRange(_maxRange), T(_T),A(_A),M(_M){
+fasinhTrans::fasinhTrans(double _maxRange, double _length, double _T, double _A, double _M):transformation(false, FASINH),maxRange(_maxRange),length(_length), T(_T),A(_A),M(_M){
 	calTbl.setInterpolated(true);
 }
 boost::shared_ptr<transformation>  fasinhTrans::getInverseTransformation(){
@@ -428,7 +428,7 @@ void logInverseTrans::transforming(valarray<double> & input){
 
 
 //		double thisMax=input.max();
-		double thisMin=0;//input.min();
+//		double thisMin=0;//input.min();
 
 		for(unsigned i=0;i<input.size();i++){
 			input[i]= pow(10, (input[i]/scale - 1) * decade) * T;
@@ -583,7 +583,7 @@ void biexpTrans::computCalTbl(){
 	double negativeRange = logRoot(positiveRange, width);
 
 	double maxChannlVal = channelRange + 1;
-	unsigned int nPoints = maxChannlVal;//4097;//fix the number of points so that it won't lost the precision when scale is set to 256 (i.e. channelRange = 256)
+	int nPoints = maxChannlVal;//4097;//fix the number of points so that it won't lost the precision when scale is set to 256 (i.e. channelRange = 256)
 
 	valarray<double> positive(nPoints), negative(nPoints), vals(nPoints);
 	double step = (maxChannlVal-1)/(double)(nPoints -1);

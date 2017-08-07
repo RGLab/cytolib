@@ -1093,7 +1093,7 @@ void CurlyGuadGate::interpolate(trans_local & trans){
 	/*
 	 * interpolate two curves
 	 */
-	unsigned nLen = 40;
+	int nLen = 40;
 	vector<coordinate> curve1(nLen), curve2(nLen);
 	//curve1: round(multiplier * (x - x.mu) ^ 2) + y.mu (horizontal)
 	double x_max = displayScale;//xdata.max();

@@ -229,7 +229,7 @@ public:
 		unsigned T; //top value; derived from keyword $PnR for each channel
 public:
 	logTrans();//deprecated
-	logTrans(double _offset,double _decade, unsigned T, unsigned _scale);
+	logTrans(double _offset,double _decade, unsigned _scale, unsigned T);
 	double flog(double x,double _max,double _min);
 	void transforming(valarray<double> & input);
 	logTrans * clone(){return new logTrans(*this);};
@@ -244,7 +244,7 @@ public:
 
 class logInverseTrans:public logTrans{
 public:
-	logInverseTrans(double _offset,double _decade, unsigned _T, unsigned _scale):logTrans(_offset, _decade, _T, _scale){};
+	logInverseTrans(double _offset,double _decade, unsigned _scale, unsigned _T):logTrans(_offset, _decade, _scale, _T){};
 	void transforming(valarray<double> & input);
 
 };

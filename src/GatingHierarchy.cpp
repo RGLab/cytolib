@@ -19,12 +19,8 @@
  * 	GatingHierarchy *curGh=new GatingHierarchy();
  * \endcode
  */
-GatingHierarchy::GatingHierarchy()
-{
-
-	isLoaded=false;
-}
-
+GatingHierarchy::GatingHierarchy():isLoaded(false){}
+GatingHierarchy::GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp),isLoaded(false), transFlag(_transFlag),trans(_trans) {};
 void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb){
 	pb::populationTree * ptree = gh_pb.mutable_tree();
 	/*
