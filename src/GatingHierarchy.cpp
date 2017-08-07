@@ -85,69 +85,6 @@ GatingHierarchy::GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, tran
 	trans = trans_local(pb_gh.trans(), trans_tbl);
 }
 
-/*
- * Constructor that starts from a particular sampleNode from workspace to build a tree
- */
-GatingHierarchy::GatingHierarchy(wsSampleNode curSampleNode,workspace & ws,bool isParseGate,trans_global_vec * _gTrans,biexpTrans * _globalBiExpTrans,linTrans * _globalLinTrans)
-{
-
-
-	isLoaded=false;
-
-	wsRootNode root=ws.getRoot(curSampleNode);
-	if(isParseGate)
-	{
-
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"parsing compensation..."<<endl;
-		comp=ws.getCompensation(curSampleNode);
-
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"parsing trans flags..."<<endl;
-		transFlag=ws.getTransFlag(curSampleNode);
-
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"parsing transformation..."<<endl;
-		//prefixed version
-		trans = ws.getTransformation(root,comp,transFlag,_gTrans,_globalBiExpTrans,_globalLinTrans, true);
-
-		/*
-		 * unprefixed version. Both version of trans are added (sometime they are identical)
-		 * so that the trans defined on uncompensated channel (e.g. SSC-A) can still be valid
-		 * without being necessarily adding comp prefix.
-		 * It is mainly to patch the legacy workspace of mac or win where the implicit trans is added for channel
-		 * when its 'log' keyword is 1.
-		 * vX doesn't have this issue since trans for each parameter/channel
-		 * is explicitly defined in transform node.
-		 */
-		trans_local trans_raw=ws.getTransformation(root,comp,transFlag,_gTrans,_globalBiExpTrans,_globalLinTrans, false);
-		//merge raw version of trans map to theprefixed version
-		trans_map tp = trans_raw.getTransMap();
-		for(trans_map::iterator it=tp.begin();it!=tp.end();it++)
-		{
-			trans.addTrans(it->first, it->second);
-		}
-
-	}
-	if(g_loglevel>=POPULATION_LEVEL)
-		COUT<<endl<<"parsing populations..."<<endl;
-	VertexID pVerID=addRoot(root,ws);
-	addPopulation(pVerID,ws,&root,isParseGate);
-
-}
-/*
- * add root node first before recursively add the other nodes
- * since root node does not have gates as the others do
- */
-VertexID GatingHierarchy::addRoot(wsRootNode root, workspace & ws)
-{
-	// Create  vertices in that graph
-	VertexID u = boost::add_vertex(tree);
-	nodeProperties& rootNode=tree[u];
-	ws.to_popNode(root,rootNode);
-
-	return(u);
-}
 /**
  * add empty root node to the gating tree with the name set to 'root'
  *
@@ -173,64 +110,6 @@ VertexID GatingHierarchy::addRoot(){
 	return(u);
 }
 
-/*
- * recursively append the populations to the tree
- * when the boolean gates are encountered before its reference nodes
- * we still can add it as it is because gating path is stored as population names instead of actual VertexID.
- * Thus we will deal with the the boolean gate in the actual gating process
- */
-void GatingHierarchy::addPopulation(VertexID parentID,workspace & ws,wsNode * parentNode,bool isParseGate)
-{
-
-
-	wsPopNodeSet children =ws.getSubPop(parentNode);
-	wsPopNodeSet::iterator it;
-		for(it=children.begin();it!=children.end();it++)
-		{
-			//add boost node
-			VertexID curChildID = boost::add_vertex(tree);
-			wsPopNode curChildNode=(*it);
-			//convert to the node format that GatingHierarchy understands
-			nodeProperties &curChild=tree[curChildID];
-			//attach the populationNode to the boost node as property
-			try
-			{
-				ws.to_popNode(curChildNode,curChild,isParseGate);
-			}
-			catch(logic_error & e){
-				if(my_throw_on_error){
-					throw(e);
-				}
-				else
-				{
-					//remove the failed node
-					boost::remove_vertex(curChildID,tree);
-					COUT << e.what()<< endl;
-					break;
-				}
-
-			}
-			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"node created:"<<curChild.getName()<<endl;
-
-//			//interpolate curlyquad gate here since it needs the access to comp
-//			gate * g = curChild.getGate();
-//			if(g->getType() == CURLYQUADGATE)
-//			{
-//				CurlyGuadGate * curlyGate = dynamic_cast<CurlyGuadGate *>(g);
-//				curlyGate->interpolate(comp);
-//			}
-
-			//add relation between current node and parent node
-			boost::add_edge(parentID,curChildID,tree);
-			//update the node map for the easy query by pop name
-
-			//recursively add its descendants
-			addPopulation(curChildID,ws,&curChildNode,isParseGate);
-		}
-
-
-}
 /*
  * this is for semi-automated pipeline to add population node associated with gate
  * assuming gate split the parent population into two subpops, one of which is to keep

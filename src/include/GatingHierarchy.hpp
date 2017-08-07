@@ -11,8 +11,6 @@
 #include <string>
 #include <vector>
 #include "populationTree.hpp"
-#include "workspace.hpp"
-#include <libxml/xpath.h>
 #include <fstream>
 #include <algorithm>
 #include <boost/graph/graphviz.hpp>
@@ -110,18 +108,12 @@ public:
 	void moveNode(string node, string parent);
 	VertexID addGate(gate* g,VertexID parentID,string popName);
 	void removeNode(VertexID nodeID);
-	void addPopulation(VertexID parentID,workspace & ws,wsNode * parentNode,bool isGating);
-	VertexID addRoot(wsRootNode, workspace & ws);
 	VertexID addRoot();
 	GatingHierarchy();
 	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *>& trans_tbl);
 
-	GatingHierarchy(wsSampleNode curSampleNode,workspace & ws,bool isGating,trans_global_vec * _gTrans,biexpTrans * _globalBiExpTrans,linTrans * _globalLinTrans);
-
-
 	flowData getData(VertexID nodeID);//from memory
-//	flowData getData(string string,VertexID nodeID);//from cdf
-//	void loadData(string);
+
 	void loadData(const flowData &);
 
 	void unloadData();

@@ -8,8 +8,6 @@
 
 #include "include/GatingSet.hpp"
 #include <string>
-#include <libxml/tree.h>
-#include <libxml/parser.h>
 #include <iostream>
 
 #include "include/delimitedMessage.hpp"
@@ -93,7 +91,7 @@ void GatingSet::serialize_pb(string filename){
  * @param format
  * @param isPB
  */
-GatingSet::GatingSet(string filename):wsPtr(NULL)
+GatingSet::GatingSet(string filename)
 {
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
 		ifstream input(filename.c_str(), ios::in | ios::binary);
@@ -192,45 +190,15 @@ GatingSet::GatingSet(string filename):wsPtr(NULL)
 }
 
 
-template <class T>
-wsSampleNode getSample(T & ws,string sampleID){
 
-		string xpath=ws.xPathSample(sampleID);
 
-		wsNode docRoot(xmlDocGetRootElement(ws.doc));
 
-		xmlXPathObjectPtr res=docRoot.xpathInNode(xpath);
-		if(res->nodesetval->nodeNr>1)
-		{
-//			COUT<<sampleID<<" is not unique within this group!"<<endl;
-			xmlXPathFreeObject(res);
-			throw(domain_error("non-unique sampleID within the group!"));
-		}
-
-		wsSampleNode sample(res->nodesetval->nodeTab[0]);
-		xmlXPathFreeObject(res);
-		return sample;
-}
-
-/*
- * this should be called only in GatingSet destructor
- * because it is shared by every GatingHiearchy class
- * thus should not be deleted separately (otherwise it causes some segfault particulary on mac)
- */
-void GatingSet::freeWorkspace(){
-	if(wsPtr!=NULL)
-	{
-		delete wsPtr;
-		wsPtr = NULL;
-	}
-
-}
 GatingSet::~GatingSet()
 {
 	if(g_loglevel>=GATING_SET_LEVEL)
 		COUT<<endl<<"start to free GatingSet..."<<endl;
 
-	freeWorkspace();
+//	freeWorkspace();
 
 	BOOST_FOREACH(gh_map::value_type & it,ghs){
 		GatingHierarchy * ghPtr=it.second;
@@ -360,12 +328,6 @@ GatingSet* GatingSet::clone(vector<string> samples){
  */
 void GatingSet::add(GatingSet & gs,vector<string> sampleNames){
 
-	/*
-	 * wsPtr is not needed here since all the info comes from gh_template instead of wsPtr
-	 * but we need to initialize it to NULL to avoid the illegal deletion of the Nil pointer in the gatingset destructor
-	 */
-//	wsPtr=NULL;
-
 
 	/*
 	 * copy trans from gh_template into gtrans
@@ -408,11 +370,6 @@ void GatingSet::add(GatingSet & gs,vector<string> sampleNames){
  */
 GatingSet::GatingSet(GatingHierarchy * gh_template,vector<string> sampleNames){
 
-	/*
-	 * wsPtr is not needed here since all the info comes from gh_template instead of ws
-	 * but we need to initialize it to NULL to avoid the illegal deletion of the Nil pointer in the gatingset destructor
-	 */
-	wsPtr=NULL;
 
 
 	/*
@@ -450,11 +407,6 @@ GatingSet::GatingSet(GatingHierarchy * gh_template,vector<string> sampleNames){
 }
 
 GatingSet::GatingSet(vector<string> sampleNames){
-
-
-	wsPtr=NULL;
-
-
 	vector<string>::iterator it;
 	for(it=sampleNames.begin();it!=sampleNames.end();it++)
 	{
@@ -472,45 +424,7 @@ GatingSet::GatingSet(vector<string> sampleNames){
 	}
 }
 
-/*
- * doesn't seem to be used anymore
- * @param groupID
- * @param isParseGate
- */
-void GatingSet::parseWorkspace(unsigned short groupID,bool isParseGate, StringVec sampleNames)
-{
-	//first get all the sample IDs for given groupID
-	vector<string> sampleID=wsPtr->getSampleID(groupID);
-	parseWorkspace(sampleID,isParseGate, sampleNames);
 
-}
-void GatingSet::parseWorkspace(vector<string> sampleIDs,bool isParseGate, StringVec sampleNames)
-{
-	unsigned nSample = sampleNames.size();
-	if(nSample!=sampleIDs.size())
-		throw(domain_error("Sizes of sampleIDs and sampleNames are not equal!"));
-	//contruct gating hiearchy for each sampleID
-	for(unsigned i = 0; i < nSample; i++)
-	{
-		string sampleID = sampleIDs.at(i);
-		string sampleName = sampleNames.at(i);
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"... start parsing sample: "<< sampleID <<"... "<<endl;
-		wsSampleNode curSampleNode=getSample(*wsPtr, sampleID);
-
-		GatingHierarchy *curGh=new GatingHierarchy(curSampleNode,*wsPtr,isParseGate,&gTrans,&globalBiExpTrans,&globalLinTrans);
-
-//		string sampleName=wsPtr->getSampleName(curSampleNode);
-
-		ghs[sampleName]=curGh;//add to the map
-
-
-//		sampleList.push_back(sampleName);
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<"Gating hierarchy created: "<<sampleName<<endl;
-	}
-
-}
 
 /**
  * Retrieve the GatingHierarchy object from GatingSet by sample name.
@@ -571,12 +485,6 @@ void GatingSet::setSample(string oldName, string newName)
 }
 
 
-void GatingSet::gating(){
-
-}
-//void GatingSet::cloneGatingHierarchy(){
-//
-//}
 
 /*
  * It is used by R API to add global transformation object during the auto gating.

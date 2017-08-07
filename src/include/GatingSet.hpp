@@ -10,7 +10,6 @@
 #ifndef GATINGSET_HPP_
 #define GATINGSET_HPP_
 #include "GatingHierarchy.hpp"
-#include "workspace.hpp"
 #include <string>
 #include <map>
 
@@ -50,14 +49,14 @@ class GatingSet{
 	linTrans globalLinTrans;
 	trans_global_vec gTrans;//parsed from xml workspace
 	gh_map ghs;  /**< the map stores pairs of sample name and GatingHierarchy pointer */
-	workspace * wsPtr;
+//	workspace * wsPtr;
 
 private:
 
-	void freeWorkspace();//this is private because it is not supposed to be called anywhere other than destructor
+//	void freeWorkspace();//this is private because it is not supposed to be called anywhere other than destructor
 public:
 	~GatingSet();
-	GatingSet(){wsPtr=NULL;};
+	GatingSet();
 	void setSample(string oldName, string newName);
 	GatingSet(string,bool,unsigned short,int,unsigned short wsType);
 	GatingSet(GatingHierarchy *,vector<string>);
@@ -65,9 +64,9 @@ public:
 	GatingSet(string filename);
 	GatingHierarchy * getGatingHierarchy(string );
 	GatingHierarchy * getGatingHierarchy(unsigned int);
-	void gating();
-	void parseWorkspace(unsigned short,bool, StringVec sampleNames);
-	void parseWorkspace(vector<string>,bool, StringVec sampleNames);
+//	void gating();
+//	void parseWorkspace(unsigned short,bool, StringVec sampleNames);
+//	void parseWorkspace(vector<string>,bool, StringVec sampleNames);
 	vector<string> getSamples(void);
 
 	GatingSet * clone(vector<string> samples);

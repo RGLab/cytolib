@@ -7,8 +7,8 @@ This makefile requires GNU Make.
 endif
 	
 CXX_STD = CXX11
-PKG_CPPFLAGS =-DROUT @PKG_CPPFLAGS@
-PKG_LIBS =`${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` @PKG_LIBS@ 
+PKG_CPPFLAGS =-DROUT
+PKG_LIBS =`${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` 
 
 #expose headers in installed package include folder
 USERINCLUDE = $(R_PACKAGE_DIR)/include
