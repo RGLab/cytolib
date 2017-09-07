@@ -326,7 +326,6 @@ void GatingHierarchy::unloadData()
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					COUT <<"unloading raw data.."<<endl;
 //		delete fdata.data;
-		fdata.clear();
 		isLoaded=false;
 	}
 
@@ -346,7 +345,7 @@ void GatingHierarchy::transforming(double timestep = 1)
 //	unsigned nEvents=fdata.nEvents;
 //	unsigned nChannls=fdata.nChannls;
 	vector<string> channels=fdata.getParams();
-
+	int nEvents = fdata.nEvents;
 	/*
 	 * transforming each marker
 	 */
@@ -358,9 +357,10 @@ void GatingHierarchy::transforming(double timestep = 1)
 			//special treatment for time channel
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				COUT<<"multiplying "<<curChannel<<" by :"<< timestep << endl;
-			valarray<double> x(this->fdata.subset(curChannel));
-			x = x * timestep;
-			fdata.updateSlice(curChannel, x);
+			double * x = this->fdata.subset(curChannel);
+			for(int i = 0; i < nEvents; i++)
+				x[i] = x[i] * timestep;
+
 
 		}
 		else
@@ -372,16 +372,12 @@ void GatingHierarchy::transforming(double timestep = 1)
 						if(curTrans->gateOnly())
 							continue;
 
-						valarray<double> x(this->fdata.subset(curChannel));
+						double * x = fdata.subset(curChannel);
 						if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 							COUT<<"transforming "<<curChannel<<" with func:"<<curTrans->getChannel()<<endl;
 
-						curTrans->transforming(x);
-						/*
-						 * update fdata
-						 */
-						fdata.updateSlice(curChannel,x);
-			//			fdata.data[fdata.getSlice(curChannel)]=x;
+						curTrans->transforming(x,nEvents);
+
 
 					}
 

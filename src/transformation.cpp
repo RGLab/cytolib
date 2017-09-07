@@ -270,7 +270,7 @@ flinTrans::flinTrans(const pb::transformation & trans_pb):transformation(trans_p
 
 transformation::transformation():isGateOnly(false),type(CALTBL),isComputed(true){}
 transformation::transformation(bool _isGate, unsigned short _type):isGateOnly(_isGate),type(_type),isComputed(true){}
-logTrans::logTrans():transformation(false,LOG),offset(0),decade(1),T(262144), scale(1){
+logTrans::logTrans():transformation(false,LOG),offset(0),decade(1), scale(1),T(262144){
 	calTbl.setInterpolated(true);
 }
 
@@ -278,7 +278,7 @@ logTrans::logTrans():transformation(false,LOG),offset(0),decade(1),T(262144), sc
 logTrans::logTrans(double _offset,double _decade, unsigned _scale, unsigned _T):transformation(false,LOG),offset(_offset),decade(_decade), scale(_scale),T(_T){
 	calTbl.setInterpolated(true);
 }
-fasinhTrans::fasinhTrans():transformation(false,FASINH),length(256),maxRange(262144), T(262144),A(0),M(4.5){
+fasinhTrans::fasinhTrans():transformation(false,FASINH),maxRange(262144),length(256), T(262144),A(0),M(4.5){
 	calTbl.setInterpolated(true);
 }
 
@@ -296,8 +296,8 @@ fsinhTrans::fsinhTrans():fasinhTrans(){}
 
 fsinhTrans::fsinhTrans(double _length, double _maxRange, double _T, double _A, double _M):fasinhTrans(_length,_maxRange, _T, _A, _M){}
 
-void fsinhTrans:: transforming(valarray<double> & input){
-	for(unsigned i=0;i<input.size();i++)
+void fsinhTrans:: transforming(double * input, int nSize){
+	for(int i=0;i<nSize;i++)
 		input[i] = sinh(((M + A) * log(10)) * input[i]/length - A * log(10)) * T / sinh(M * log(10));
 
 }
@@ -339,10 +339,10 @@ double logTrans::flog(double x,double T,double _min) {
 /*
  * implementation copied from flowCore
  */
-void fasinhTrans::transforming(valarray<double> & input){
+void fasinhTrans::transforming(double * input, int nSize){
 
 
-	for(unsigned i=0;i<input.size();i++){
+	for(int i=0;i<nSize;i++){
 		input[i] = length * (asinh(input[i] * sinh(M * log(10)) / T) + A * log(10)) / ((M + A) * log(10));
 	}
 //		double myB = (M + A) * log(10);
@@ -413,24 +413,24 @@ boost::shared_ptr<transformation>  transformation::getInverseTransformation(){
 boost::shared_ptr<transformation> scaleTrans::getInverseTransformation(){
 	return boost::shared_ptr<transformation>(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
 }
-void logTrans::transforming(valarray<double> & input){
+void logTrans::transforming(double * input, int nSize){
 
 
 //		double thisMax=input.max();//max val must be globally determined during xml parsing
 		double thisMin=0;//input.min();
 
-		for(unsigned i=0;i<input.size();i++){
+		for(int i=0;i<nSize;i++){
 			input[i]=flog(input[i],T,thisMin) * scale;
 		}
 
 }
-void logInverseTrans::transforming(valarray<double> & input){
+void logInverseTrans::transforming(double * input, int nSize){
 
 
 //		double thisMax=input.max();
 //		double thisMin=0;//input.min();
 
-		for(unsigned i=0;i<input.size();i++){
+		for(int i=0;i<nSize;i++){
 			input[i]= pow(10, (input[i]/scale - 1) * decade) * T;
 		}
 
@@ -444,24 +444,24 @@ double flinTrans::flin(double x){
 	double A=min;
 	return (x+A)/(T+A);
 }
-void linTrans::transforming(valarray<double> & input){
-
-                input*=64;
+void linTrans::transforming(double * input, int nSize){
+	for(int i=0;i<nSize;i++)
+                input[i]*=64;
 }
 
-void scaleTrans::transforming(valarray<double> & input){
-
-		input*=(t_scale/(double)r_scale);
+void scaleTrans::transforming(double * input, int nSize){
+	for(int i=0;i<nSize;i++)
+		input[i]*=(t_scale/(double)r_scale);
 }
 
-void flinTrans::transforming(valarray<double> & input){
+void flinTrans::transforming(double * input, int nSize){
 
-	for(unsigned i=0;i<input.size();i++){
+	for(int i=0;i<nSize;i++){
 		input[i]=flin(input[i]);
 	}
 
 }
-void transformation::transforming(valarray<double> & input){
+void transformation::transforming(double * input, int nSize){
 		if(!calTbl.isInterpolated()){
 			 /* calculate calibration table from the function
 			 */
@@ -480,7 +480,7 @@ void transformation::transforming(valarray<double> & input){
 			}
 		}
 
-		input=calTbl.transforming(input);
+		calTbl.transforming(input, nSize);
 
 }
 

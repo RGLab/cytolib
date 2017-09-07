@@ -97,15 +97,13 @@ Spline_Coefs calibrationTable::getSplineCoefs(){
 
 	return res;
 }
-valarray<double> calibrationTable::transforming(valarray<double> & input){
+void calibrationTable::transforming(double * input, int nSize){
 
 
 	int imeth=2;
-	int nu=input.size();
-	valarray<double> output(nu);
 
-	spline_eval(imeth,input,output,x, y, b, c, d);
-	return output;
+	spline_eval(imeth,input, nSize, x, y, b, c, d);
+
 }
 
 

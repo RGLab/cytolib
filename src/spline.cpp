@@ -217,7 +217,7 @@ void natural_spline(valarray<double>x, valarray<double> y, valarray<double>& b,v
 
 }
 
-void spline_eval(int method, valarray<double> u, valarray<double> & v,
+void spline_eval(int method, double* u,int nSize,
 		  const valarray<double> & x, const valarray<double> & y, const valarray<double> & b, const valarray<double> & c, const valarray<double> & d)
 {
 /* Evaluate  v[l] := spline(u[l], ...),	    l = 1,..,nu, i.e. 0:(nu-1)
@@ -226,7 +226,8 @@ void spline_eval(int method, valarray<double> u, valarray<double> & v,
 //	COUT<<"entering spline_eval"<<endl;
 
 	int n=x.size();
-	int nu=u.size();
+	int nu=nSize;
+	double v[nSize];
     const int n_1 = n - 1;
     int i, j, k, l;
     double ul, dx, tmp;
@@ -264,4 +265,5 @@ void spline_eval(int method, valarray<double> u, valarray<double> & v,
 
 	v[l] = y[i] + dx*(b[i] + dx*(c[i] + dx*tmp));
     }
+    memcpy(u, v, sizeof(double)*nSize);
 }

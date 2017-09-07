@@ -38,7 +38,7 @@ public:
 	calibrationTable(string _caltype,int _spline_method);
 	void interpolate();
 	void init(unsigned);
-	valarray<double> transforming(valarray<double> &);
+	void transforming(double * input, int nSize);
 	Spline_Coefs getSplineCoefs();
 	valarray<double> getX(){return x;};
 	valarray<double> getY(){return y;};

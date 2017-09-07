@@ -10,36 +10,23 @@
 #include <algorithm>
 
 
-flowData::flowData(){ignore_case = false;nEvents =0;}
-flowData & flowData::operator=(const flowData& source){
-	params=source.params;
-	ignore_case=source.ignore_case;
-	sampleID=source.sampleID;//it is only valid when access cdf version of flowdata, used as index for sample dimension
-	nEvents=source.nEvents;
-	data.resize(source.data.size());
-	data=source.data;
-	return *this;
+flowData::flowData():data(NULL),nEvents(0),ignore_case(false){};
 
-}
-flowData::flowData(const double* mat,vector<string> _params,unsigned _nEvents,unsigned _sampleID, bool _ignore_case){
+flowData::flowData(double* mat,vector<string> _params,unsigned _nEvents,unsigned _sampleID, bool _ignore_case){
 
 
 	params=_params;
 	unsigned nChannls=params.size();
 	nEvents=_nEvents;
-	unsigned nSize=nChannls*nEvents;
 	sampleID=_sampleID;
-	data.resize(nSize);
-	data=valarray<double>(mat,nSize);
+
+	data=mat;
 	ignore_case = _ignore_case;
 }
-valarray<double> flowData::getData(){
+double * flowData::getData(){
 	return data;
 }
-void flowData::getData(double * mat,unsigned nSize){
-	for(unsigned i=0;i<nSize;i++)
-		mat[i]=data[i];
-}
+
 void flowData::setParams(vector<string> _params){
 	if(_params.size()!=params.size())
 		throw(domain_error("the number of parameters is not consistent with cdf file!"));
@@ -75,22 +62,11 @@ unsigned find_pos(vector<string> s,string pattern, bool ignore_case){
 }
 
 
-void flowData::updateSlice(string channel,valarray<double> x){
-	data[getSlice(channel)]=x;
-}
 
-slice flowData::getSlice(string channel) const{
+double * flowData::subset(string channel) const{
+	unsigned paramInd=find_pos(params,channel, ignore_case);
 
-		unsigned paramInd=find_pos(params,channel, ignore_case);
-
-//		valarray<double> data(this->data,nEvents*nChannls);
-		return slice(paramInd*nEvents,nEvents,1);
-
-}
-
-valarray<double> flowData::subset(string channel) const{
-		return data[getSlice(channel)];
-
+			return data + paramInd*nEvents;
 }
 
 

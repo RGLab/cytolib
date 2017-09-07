@@ -16,4 +16,6 @@
 extern unsigned short g_loglevel;
 extern bool my_throw_on_error;
 
+#define PRT true
+
 #endif /* GLOBAL_HPP_ */
