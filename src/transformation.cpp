@@ -289,7 +289,7 @@ boost::shared_ptr<transformation>  fasinhTrans::getInverseTransformation(){
 	return boost::shared_ptr<transformation>(new fsinhTrans(length, maxRange, T, A , M));
 }
 boost::shared_ptr<transformation>  logTrans::getInverseTransformation(){
-	return boost::shared_ptr<transformation>(new logInverseTrans(offset, decade, T,scale));
+	return boost::shared_ptr<transformation>(new logInverseTrans(offset, decade,scale, T));
 }
 
 fsinhTrans::fsinhTrans():fasinhTrans(){}
