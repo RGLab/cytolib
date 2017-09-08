@@ -470,16 +470,9 @@ vector<bool> ellipseGate::gating(flowData & fdata){
 
 	// get data
 
-	double * xdata(fdata.subset(param.xName()));
-	double * ydata(fdata.subset(param.yName()));
+	double * xdata = fdata.subset(param.xName());
+	double * ydata = fdata.subset(param.yName());
 	int nEvents=fdata.nEvents;
-	//center the data
-	for(int i = 0; i < nEvents; i++)
-	{
-		xdata[i] = xdata[i] - mu.x;
-		ydata[i] = ydata[i] - mu.y;
-	}
-
 
 	//inverse the cov matrix
 	/*
@@ -504,8 +497,10 @@ vector<bool> ellipseGate::gating(flowData & fdata){
 
 	vector<bool> res (nEvents);
 	for(int i =0;i<nEvents;i++){
-		double x = xdata[i];
-		double y = ydata[i];
+		//center the data
+
+		double x = xdata[i] - mu.x;
+		double y = ydata[i] - mu.y;
 		res[i] = (x * x * aa + x* y * cc + x* y * bb + y * y * dd) <= pow(dist, 2);
 	}
 
