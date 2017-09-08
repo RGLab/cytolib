@@ -5,7 +5,7 @@
  *      Author: wjiang2
  */
 
-#include "include/flowData.hpp"
+#include <cytolib/flowData.hpp>
 
 #include <algorithm>
 

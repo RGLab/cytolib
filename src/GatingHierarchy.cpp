@@ -5,7 +5,7 @@
  *      Author: wjiang2
  */
 
-#include "include/GatingHierarchy.hpp"
+#include <cytolib/GatingHierarchy.hpp>
 
 
 

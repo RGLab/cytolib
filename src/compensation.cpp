@@ -5,7 +5,7 @@
  *      Author: wjiang2
  */
 
-#include "include/compensation.hpp"
+#include <cytolib/compensation.hpp>
 
 
 void compensation::updateChannels(const CHANNEL_MAP & chnl_map){

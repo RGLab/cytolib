@@ -7,9 +7,9 @@
 
 
 
-#include "include/gate.hpp"
+#include <cytolib/gate.hpp>
 #include <algorithm>
-#include <valarray>
+
 
 
 /*
