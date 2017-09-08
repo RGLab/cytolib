@@ -6,11 +6,11 @@
  */
 
 
-#include "include/GatingSet.hpp"
+#include <cytolib/GatingSet.hpp>
 #include <string>
 #include <iostream>
 
-#include "include/delimitedMessage.hpp"
+#include <cytolib/delimitedMessage.hpp>
 using namespace std;
 /*
  * separate filename from dir to avoid to deal with path parsing in c++

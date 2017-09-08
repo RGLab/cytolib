@@ -2,7 +2,7 @@
 // source: GatingSet.proto
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
-#include "GatingSet.pb.h"
+#include <cytolib/GatingSet.pb.h>
 
 #include <algorithm>
 
