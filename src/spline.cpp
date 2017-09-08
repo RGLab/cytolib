@@ -227,7 +227,7 @@ void spline_eval(int method, double* u,int nSize,
 
 	int n=x.size();
 	int nu=nSize;
-	double v[nSize];
+	double * v = u;//new double[nSize];
     const int n_1 = n - 1;
     int i, j, k, l;
     double ul, dx, tmp;
@@ -241,8 +241,8 @@ void spline_eval(int method, double* u,int nSize,
 	}
     }
     else {
-	for(l = 0; l < nu; l++)
-	    v[l] = u[l];
+//	for(l = 0; l < nu; l++)
+//	    v[l] = u[l];
     }
 
     i = 0;
@@ -265,5 +265,6 @@ void spline_eval(int method, double* u,int nSize,
 
 	v[l] = y[i] + dx*(b[i] + dx*(c[i] + dx*tmp));
     }
-    memcpy(u, v, sizeof(double)*nSize);
+//    memcpy(u, v, sizeof(double)*nSize);
+//    delete v;
 }
