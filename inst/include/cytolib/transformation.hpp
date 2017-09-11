@@ -186,8 +186,9 @@ public:
 
 class fasinhTrans:public transformation{
 public:
-	double maxRange;//unused at this moment
-	double length,T, A, M;
+	double maxRange;
+	double length;//unused at this moment
+	double T, A, M;
 public:
 	fasinhTrans();
 	fasinhTrans(double , double , double , double , double );
@@ -196,8 +197,8 @@ public:
 	void convertToPb(pb::transformation & trans_pb);
 	fasinhTrans(const pb::transformation & trans_pb);
 	boost::shared_ptr<transformation> getInverseTransformation();
-	void setTransformedScale(int scale){length = scale;};
-	int getTransformedScale(){return length;};
+	void setTransformedScale(int scale){maxRange = scale;};
+	int getTransformedScale(){return maxRange;};
 	int getRawScale(){return T;};
 };
 /*
