@@ -37,7 +37,7 @@ public:
 
 	flowData & operator=(const flowData& source);//explicitly define the copy assignment since the default one is compiler-specific
 	flowData();
-	flowData(const double* mat,vector<string>,unsigned _nEvents,unsigned _sampleID, bool _ignore_case = false);
+	flowData(double* mat,vector<string>,unsigned _nEvents,unsigned _sampleID, bool _ignore_case = false);
 	slice getSlice(string channel) const;
 	void updateSlice(string channel,valarray<double> x);
 	valarray<double> subset(string channel) const;

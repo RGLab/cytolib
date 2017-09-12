@@ -21,7 +21,7 @@ flowData & flowData::operator=(const flowData& source){
 	return *this;
 
 }
-flowData::flowData(const double* mat,vector<string> _params,unsigned _nEvents,unsigned _sampleID, bool _ignore_case){
+flowData::flowData(double* mat,vector<string> _params,unsigned _nEvents,unsigned _sampleID, bool _ignore_case){
 
 
 	params=_params;
