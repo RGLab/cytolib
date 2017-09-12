@@ -18,7 +18,7 @@ using namespace std;
 #include <boost/config.hpp>
 #include <boost/graph/adj_list_serialize.hpp>
 #include <boost/algorithm/string.hpp>
-
+#include "global.hpp"
 unsigned find_pos(vector<string> s,string pattern, bool ignore_case);
 /*
  * representing one FCS data
