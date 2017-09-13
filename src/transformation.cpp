@@ -197,7 +197,7 @@ biexpTrans::biexpTrans(const pb::transformation & trans_pb):transformation(trans
 	widthBasis = bt_pb.widthbasis();
 
 	//make sure to always recompute caltbl (regardless of compute flag) since it was not saved for the sake of space
-	computCalTbl();
+//	computCalTbl(); //now we do lazy-compute since some global trans (in the legacy ws and these trans are not actually used by any samples) may not have the valid parameters which will fail the pb unarchiving process
 }
 void logTrans::convertToPb(pb::transformation & trans_pb){
 	transformation::convertToPb(trans_pb);
