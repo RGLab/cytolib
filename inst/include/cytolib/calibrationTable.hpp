@@ -28,31 +28,27 @@ struct Spline_Coefs{
 class calibrationTable{
 	friend std::ostream & operator<<(std::ostream &os, const calibrationTable &gh);
 private:
-	valarray<double> x,y,b,c,d;
+	vector<double> x,y,b,c,d;
 	int spline_method;
 	string caltype;//TODO:move this to transformation class
 	bool flag;
 public:
 	calibrationTable();
-	calibrationTable & operator=(const calibrationTable& source);
 	calibrationTable(string _caltype,int _spline_method);
 	void interpolate();
-	void init(unsigned);
 	void transforming(double * input, int nSize);
 	Spline_Coefs getSplineCoefs();
-	valarray<double> getX(){return x;};
-	valarray<double> getY(){return y;};
-	void setY(valarray<double> _y){
-			y.resize(_y.size());
+	vector<double> getX(){return x;};
+	vector<double> getY(){return y;};
+	void setY(vector<double> _y){
 			y=_y;
 			};
-	void setX(valarray<double> _x){
-				x.resize(_x.size());
+	void setX(vector<double> _x){
 				x=_x;
 				};
-	valarray<double> getB(){return b;};
-	valarray<double> getC(){return c;};
-	valarray<double> getD(){return d;};
+	vector<double> getB(){return b;};
+	vector<double> getC(){return c;};
+	vector<double> getD(){return d;};
 	void setCaltype(string _caltype){caltype=_caltype;};
 	string getCaltype(){return caltype;};
 	void setMethod(int _spline_method){spline_method=_spline_method;};

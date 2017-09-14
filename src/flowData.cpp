@@ -16,7 +16,7 @@ flowData::flowData(double* mat,vector<string> _params,unsigned _nEvents,unsigned
 
 
 	params=_params;
-	unsigned nChannls=params.size();
+
 	nEvents=_nEvents;
 	sampleID=_sampleID;
 

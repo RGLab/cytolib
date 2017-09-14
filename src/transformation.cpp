@@ -552,7 +552,7 @@ biexpTrans::biexpTrans():transformation(false, BIEXP),channelRange(4096), pos(4.
  /*
   * directly translated from java routine from tree star
   * potential segfault risk: the inappropriate biexp parameters can cause
-  * the indexing of valarray out of the boundary.
+  * the indexing of vector out of the boundary.
   */
 
 void biexpTrans::computCalTbl(){
@@ -585,7 +585,7 @@ void biexpTrans::computCalTbl(){
 	double maxChannlVal = channelRange + 1;
 	int nPoints = maxChannlVal;//4097;//fix the number of points so that it won't lost the precision when scale is set to 256 (i.e. channelRange = 256)
 
-	valarray<double> positive(nPoints), negative(nPoints), vals(nPoints);
+	vector<double> positive(nPoints), negative(nPoints), vals(nPoints);
 	double step = (maxChannlVal-1)/(double)(nPoints -1);
 	for (int j = 0; j < nPoints; j++)
 	{
@@ -597,7 +597,8 @@ void biexpTrans::computCalTbl(){
 
 
 	double s = exp((positiveRange + negativeRange) * (width + extra / decades));
-	negative *= s;
+	for(int j = 0; j < nPoints; j++)
+		negative[j] *= s;
 
 	//ensure it is not out-of-bound
 	if(zeroChan<0||zeroChan>=nPoints)
@@ -619,8 +620,6 @@ void biexpTrans::computCalTbl(){
 	 */
 	calTbl.setCaltype("flowJo");
 	calTbl.setMethod(2);
-	calTbl.init(nPoints);
-
 	calTbl.setX(positive);
 	calTbl.setY(vals);
 

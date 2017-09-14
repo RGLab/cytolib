@@ -238,6 +238,12 @@ vector<bool> nodeProperties::getIndices(){
 			throw(domain_error("trying to get Indices for unGated node!"));
 		return indices->getIndices();
 		}
+vector<unsigned> nodeProperties::getIndices_u(){
+		if(!this->isGated())
+			throw(domain_error("trying to get Indices for unGated node!"));
+		return indices->getIndices_u();
+		}
+
 void nodeProperties::setIndices(unsigned _nEvent){
 		indices.reset(new ROOTINDICES(_nEvent));
 }
@@ -255,6 +261,18 @@ void nodeProperties::setIndices(vector<bool> _ind){
 		indices.reset(new INTINDICES(_ind));
 	else
 		indices.reset(new BOOLINDICES(_ind));
+
+}
+
+void nodeProperties::setIndices(INDICE_TYPE _ind, unsigned nTotal){
+	unsigned nEvents=_ind.size();;
+	unsigned nSizeInt=sizeof(unsigned)*nEvents;
+	unsigned nSizeBool=nTotal/8;
+
+	if(nSizeInt<nSizeBool)
+		indices.reset(new INTINDICES(_ind, nTotal));
+	else
+		indices.reset(new BOOLINDICES(_ind, nTotal));
 
 }
 /*

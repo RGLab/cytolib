@@ -144,10 +144,10 @@ void spline_eval_C(int *method, int *nu, double *u, double *v,
 }
 
 /*
- * valarray version
+ * vector version
  */
 
-void natural_spline(valarray<double>x, valarray<double> y, valarray<double>& b,valarray<double>& c,valarray<double>& d)
+void natural_spline(vector<double>x, vector<double> y, vector<double>& b,vector<double>& c,vector<double>& d)
 {
     int nm1, i;
     double t;
@@ -218,7 +218,7 @@ void natural_spline(valarray<double>x, valarray<double> y, valarray<double>& b,v
 }
 
 void spline_eval(int method, double* u,int nSize,
-		  const valarray<double> & x, const valarray<double> & y, const valarray<double> & b, const valarray<double> & c, const valarray<double> & d)
+		  const vector<double> & x, const vector<double> & y, const vector<double> & b, const vector<double> & c, const vector<double> & d)
 {
 /* Evaluate  v[l] := spline(u[l], ...),	    l = 1,..,nu, i.e. 0:(nu-1)
  * Nodes x[i], coef (y[i]; b[i],c[i],d[i]); i = 1,..,n , i.e. 0:(*n-1)
