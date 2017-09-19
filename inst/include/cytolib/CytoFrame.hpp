@@ -29,14 +29,14 @@ struct param{
  * The class representing a single FCS file
  */
 class CytoFrame{
-friend:
+protected:
 	int nEvents;
 	KEY_WORDS keys;
 	vector<param> params;
 	unordered_map<string, int> channel_vs_idx;
 	unordered_map<string, int> marker_vs_idx;
 public:
-	virtual ~CytoFrame()=0;
+	virtual ~CytoFrame(){};
 	virtual void compensate(const compensation &)=0;
 //	virtual void transform(const transformation &)=0;
 	virtual void save(const string & filename, FrameType type)=0;

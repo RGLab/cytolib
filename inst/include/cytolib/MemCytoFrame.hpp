@@ -10,34 +10,27 @@
 #include "CytoFrame.hpp"
 #include <fstream>
 #include <cstring>
+#include <boost/regex.hpp>
+#include <boost/lexical_cast.hpp>
 
 struct FCS_Header{
 	float FCSversion;
 	int textstart, textend, datastart, dataend, anastart, anaend, additional;
 };
 
-class MemCytoFrame{
+class MemCytoFrame: public CytoFrame{
 	EVENT_DATA_TYPE * data;
 
 public:
 	~MemCytoFrame();
-	MemCytoFrame():data(NULL){};
+	MemCytoFrame(){data = NULL;};
 	MemCytoFrame(const string &filename, bool emptyValue, int nDataset, bool scale, double decades, double min_limit, bool truncate_max_range, bool onlyTxt);
 	void compensate(const compensation &);
 //	void transform(const transformation &);
-	void save(const string & filename);
+	void save(const string & filename, FrameType type);
 	EVENT_DATA_TYPE * getData();
 	EVENT_DATA_TYPE * getData(const string &, ColType);
-	KEY_WORDS getKeywords();
-	string getKeyword(const string &);
-	void setKeyword(const string &, const string &);
-	int nCol();
-	int nRow();
-	vector<string> getChannels();
-	vector<string> getMarkers();
-	int getColId(const string &, ColType);
-	void setChannel(const string &, const string &);
-	void setMarker(const string &, const string &);
+
 
 };
 

@@ -50,8 +50,19 @@ vector<string> CytoFrame::getMarkers(){
 			res[i] = params[i].colname.second;
 	return res;
 }
-
-int CytoFrame::getColId(const string & colname, ColType type){
+void CytoFrame::setChannel(const string & oldname, const string & newname){
+	int id = getColId(oldname, ColType::channel);
+	params[id].colname.first=newname;
+	channel_vs_idx.erase(oldname);
+	channel_vs_idx[newname] = id;
+}
+void CytoFrame::setMarker(const string & oldname, const string & newname){
+	int id = getColId(oldname, ColType::marker);
+	params[id].colname.second=newname;
+	marker_vs_idx.erase(oldname);
+	marker_vs_idx[newname] = id;
+}
+int CytoFrame::getColId(const string & colname, ColType type = ColType::unknown){
 	if(!isHashed())
 		buildHash();
 
