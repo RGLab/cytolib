@@ -655,7 +655,7 @@ vector<bool> polygonGate::gating(flowData & fdata){
 	  }
 	  /*if horizontal ray is in range of vertex find the x coordinate where
 		ray and vertex intersect*/
-	  if(ydata[i] >= min(p1y, p2y) && ydata[i] < max(p1y, p2y) &&xdata[i] <= max(p1x, p2x))
+	  if(ydata[i] >= min(p1y, p2y) && ydata[i] <= max(p1y, p2y) &&xdata[i] <= max(p1x, p2x))
 	  {
 		  xinters = (ydata[i]-p1y)*(p2x-p1x)/(p2y-p1y)+p1x;
 		/*if intersection x coordinate == point x coordinate it lies on the
