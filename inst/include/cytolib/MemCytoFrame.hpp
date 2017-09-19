@@ -8,13 +8,21 @@
 #ifndef INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #include "CytoFrame.hpp"
+#include <fstream>
+#include <cstring>
+
+struct FCS_Header{
+	float FCSversion;
+	int textstart, textend, datastart, dataend, anastart, anaend, additional;
+};
 
 class MemCytoFrame{
 	EVENT_DATA_TYPE * data;
 
 public:
 	~MemCytoFrame();
-	MemCytoFrame(const string &);
+	MemCytoFrame():data(NULL){};
+	MemCytoFrame(const string &filename, bool emptyValue, int nDataset, bool scale, double decades, double min_limit, bool truncate_max_range, bool onlyTxt);
 	void compensate(const compensation &);
 //	void transform(const transformation &);
 	void save(const string & filename);

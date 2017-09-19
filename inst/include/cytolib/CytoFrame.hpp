@@ -29,6 +29,7 @@ struct param{
  * The class representing a single FCS file
  */
 class CytoFrame{
+friend:
 	int nEvents;
 	KEY_WORDS keys;
 	vector<param> params;
