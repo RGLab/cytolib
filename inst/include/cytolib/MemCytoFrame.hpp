@@ -24,7 +24,7 @@ class MemCytoFrame: public CytoFrame{
 public:
 	~MemCytoFrame();
 	MemCytoFrame(){data = NULL;};
-	MemCytoFrame(const string &filename, bool emptyValue, int nDataset, bool scale, double decades, double min_limit, bool truncate_max_range, bool onlyTxt);
+	MemCytoFrame(const string &filename, bool isEmptyKeyValue, int nDataset, bool scale, double decades, double min_limit, bool truncate_max_range, bool ignoreTextOffset, bool onlyTxt);
 	void compensate(const compensation &);
 //	void transform(const transformation &);
 	void save(const string & filename, FrameType type);
