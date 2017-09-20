@@ -8,23 +8,18 @@
 #ifndef INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #include "CytoFrame.hpp"
-#include <fstream>
-#include <cstring>
-#include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
+#include "readFCSdata.hpp"
+typedef unique_ptr<EVENT_DATA_TYPE > EVENT_DATA_PTR;
 
-struct FCS_Header{
-	float FCSversion;
-	int textstart, textend, datastart, dataend, anastart, anaend, additional;
+struct FCS_READ_PARAM{
+	FCS_READ_HEADER_PARAM header;
+	FCS_READ_DATA_PARAM data;
 };
-
 class MemCytoFrame: public CytoFrame{
-	EVENT_DATA_TYPE * data;
+	EVENT_DATA_PTR data;
 
 public:
-	~MemCytoFrame();
-	MemCytoFrame(){data = NULL;};
-	MemCytoFrame(const string &filename, bool isEmptyKeyValue, int nDataset, bool scale, double decades, double min_limit, bool truncate_max_range, bool ignoreTextOffset, bool onlyTxt);
+	MemCytoFrame(const string &filename, FCS_READ_PARAM &, bool onlyTxt);
 	void compensate(const compensation &);
 //	void transform(const transformation &);
 	void save(const string & filename, FrameType type);

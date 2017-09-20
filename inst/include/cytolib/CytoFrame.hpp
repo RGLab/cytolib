@@ -9,17 +9,13 @@
 #define INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_
 
 
-#include <unordered_map>
-
-#include <algorithm>
-
+#include "readFCSHeader.hpp"
 #include "compensation.hpp"
 enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
 
-typedef unordered_map <string, string> KEY_WORDS;
-typedef double EVENT_DATA_TYPE;
+
 
 struct param{
 	pair<string, string> colname;
