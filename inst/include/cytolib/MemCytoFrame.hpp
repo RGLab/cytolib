@@ -9,7 +9,7 @@
 #define INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #include "CytoFrame.hpp"
 #include "readFCSdata.hpp"
-typedef unique_ptr<EVENT_DATA_TYPE > EVENT_DATA_PTR;
+
 
 struct FCS_READ_PARAM{
 	FCS_READ_HEADER_PARAM header;
