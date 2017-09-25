@@ -17,10 +17,6 @@ enum class FrameType {FCS, H5};
 
 
 
-struct param{
-	pair<string, string> colname;
-	pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> range;
-};
 /**
  * The class representing a single FCS file
  */
@@ -28,7 +24,7 @@ class CytoFrame{
 protected:
 	int nEvents;
 	KEY_WORDS keys;
-	vector<param> params;
+	vector<cytoParam> params;
 	unordered_map<string, int> channel_vs_idx;
 	unordered_map<string, int> marker_vs_idx;
 public:

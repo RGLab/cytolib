@@ -12,14 +12,15 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 
 
 	FCS_Header header;
-	readHeaderAndText(in, header, CytoFrame::keys, config.header);
+	readHeaderAndText(in, header, keys, params, config.header);
 
 
 
 	if(!onlyTxt)
 	{
 		//parse the data section
-		data = move(readFCSdata(in, header, CytoFrame::keys, config.data));
+		data = move(readFCSdata(in, header, keys, params, nEvents, config.data));
+
 	}
 }
 

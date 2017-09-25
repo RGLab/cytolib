@@ -33,32 +33,32 @@ void CytoFrame::buildHash(){
 	{
 		for(auto i = 0; i < nCol(); i++)
 		{
-			channel_vs_idx[params[i].colname.first] = i;
-			marker_vs_idx[params[i].colname.second] = i;
+			channel_vs_idx[params[i].channel] = i;
+			marker_vs_idx[params[i].marker] = i;
 		}
 	}
 }
 vector<string> CytoFrame::getChannels(){
 	vector<string> res(nCol());
 	for(auto i = 0; i < nCol(); i++)
-		res[i] = params[i].colname.first;
+		res[i] = params[i].channel;
 	return res;
 }
 vector<string> CytoFrame::getMarkers(){
 	vector<string> res(nCol());
 		for(auto i = 0; i < nCol(); i++)
-			res[i] = params[i].colname.second;
+			res[i] = params[i].marker;
 	return res;
 }
 void CytoFrame::setChannel(const string & oldname, const string & newname){
 	int id = getColId(oldname, ColType::channel);
-	params[id].colname.first=newname;
+	params[id].channel=newname;
 	channel_vs_idx.erase(oldname);
 	channel_vs_idx[newname] = id;
 }
 void CytoFrame::setMarker(const string & oldname, const string & newname){
 	int id = getColId(oldname, ColType::marker);
-	params[id].colname.second=newname;
+	params[id].marker=newname;
 	marker_vs_idx.erase(oldname);
 	marker_vs_idx[newname] = id;
 }
@@ -109,7 +109,7 @@ pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> CytoFrame::getRange(const string & colnam
 	case RangeType::instrument:
 	{
 		int idx = getColId(colname, ctype);
-		return params[idx].range;
+		return make_pair(params[idx].min, params[idx].max);
 	}
 	default:
 		throw(domain_error("invalid range type"));
