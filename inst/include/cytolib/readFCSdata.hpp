@@ -19,7 +19,7 @@ const int bsti = 1;  // Byte swap test integer
 
 struct FCS_READ_DATA_PARAM{
 	 bool scale, truncate_max_range;
-	 double decades, min_limit;
+	 EVENT_DATA_TYPE decades, min_limit;
 	 TransformType transform;
 	 FCS_READ_DATA_PARAM(){
 		 scale = false;

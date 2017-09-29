@@ -48,83 +48,90 @@ void readFCSHeader(ifstream &in, FCS_Header & header, int nOffset = 0){
 
 
 void fcsTextParse(string txt, KEY_WORDS & pairs, bool emptyValue){
+	/*
+	 * get the first character as delimiter
+	 */
+	char delimiter = txt[0];
 
-		/*
-		 * get the first character as delimiter
-		 */
-		std::string delimiter = txt.substr(0,1);
-
-		/*
-		 * check if string ends with delimiter
-		 */
-		bool isDelimiterEnd = txt.substr(txt.size()-1, 1) == delimiter;
-
-//		regexes require double-escaping (*sigh*)
-//		if(delimiter == "\\" || delimiter == "|")
-			delimiter = "\\" + delimiter;
+	/*
+	 * check if string ends with delimiter
+	 */
+	bool isDelimiterEnd = txt[txt.size()-1] == delimiter;
 
 
 
-		std::string doubleDelimiter,magicString;
-		doubleDelimiter = delimiter + delimiter;
-		magicString = "\\0QuickAndDirty\\0";
-//		std::cout << doubleDelimiter << ":" << magicString <<std::endl;
-		unsigned i = 0; //counter
-		string key;
-		/*
-		 *	when empty value is allowed, we have to take the assumption that there is no double delimiters in any keys or values,
-		 */
-		if(!emptyValue)//replace the double delimiter with a magic strings
-			txt = boost::regex_replace(txt, boost::regex(doubleDelimiter), magicString);//somehow boost::replace_all won't do the job for \\\\
-		std::cout << txt << std::endl;
+	std::string doubleDelimiter,magicString;
+	doubleDelimiter.push_back(delimiter);
+	doubleDelimiter.push_back(delimiter);
+	//search for the first unused odd char as replacememnt for double delimiter
+	//FCS 3.1 states only 0-126 ASCII are legal delimiter, but we can't assume the file always follows the standard
+	//also the TEXT main contain some special characters , thus we want to make sure the replacement char is not used anywhere in FCS TEXT
+	char oddChar = 127;
+	for(; oddChar < 256; oddChar++)
+	{
 
-		/*
-		 * then split by single delimiter
-		 */
-		boost::sregex_token_iterator token_begin(txt.begin() + 1, txt.end(), boost::regex(delimiter), -1), token_end;
-		while(token_begin != token_end){
-			i++;
-			std::string token = *token_begin++;
+		if(oddChar==delimiter||txt.find(oddChar)!=std::string::npos)
+			continue;
+		else
+			break;
+	}
+	if(oddChar==256)
+		throw(domain_error("Can't find the unused odd character from ASCII(127-255) in FSC TEXT section!"));
+
+	std::string soddChar;
+	soddChar.push_back(oddChar);
+	/*
+	 *	when empty value is allowed, we have to take the assumption that there is no double delimiters in any keys or values,
+	 */
+	if(!emptyValue)//replace the double delimiter with the odd char
+		boost::replace_all(txt, doubleDelimiter, soddChar);
+	std::vector<std::string> tokens;
+	boost::split(tokens, txt, [delimiter](char c){return c == delimiter;});
+
+	unsigned j = isDelimiterEnd?tokens.size()-2:tokens.size()-1;//last token, skip the last empty one when end with delimiter
+	string key;
+	for(unsigned i = 1; i <= j; i++){//counter, start with 1 to skip the first empty tokens
+		std::string token = tokens[i];
 //			std::cout << token << " ";
-			if(!emptyValue){
-				/*
-				 * restore double delimiter when needed
-				 * (this slows down things quite a bit, but still a lot faster than R version,
-				 *  and this double delimiter logic is not normally invoked anyway)
-				 */
-				token = boost::regex_replace(token, boost::regex(magicString), doubleDelimiter);
+		if(!emptyValue){
+			/*
+			 * restore double delimiter when needed
+			 * (this slows down things quite a bit, but still a lot faster than R version,
+			 *  and this double delimiter logic is not normally invoked anyway)
+			 */
+			boost::replace_all(token, soddChar, doubleDelimiter);
 //				std::cout << token;
-			}
+		}
 //			std::cout << std::endl;
 
-			if((i)%2 == 1)
-			{
-				if(token.empty())
-					// Rcpp::stop (temporarily switch from stop to range_error due to a bug in Rcpp 0.12.8)
-					throw std::range_error("Empty keyword name detected!If it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
-				boost::trim(token);
-				key = token;//set key
-			}
-			else{
-				pairs[key] = token;//set value
-			}
-
+		if((i)%2 == 1)
+		{
+			if(token.empty())
+				// Rcpp::stop (temporarily switch from stop to range_error due to a bug in Rcpp 0.12.8)
+				throw std::range_error("Empty keyword name detected!If it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
+			boost::trim(token);
+			key = token;//set key
+		}
+		else{
+			pairs[key] = token;//set value
 
 		}
 
-		/*
-		 * check if kw and value are paired
-		 */
-		 if(i%2 == 1){
-			 if(isDelimiterEnd){
-			   // Rcpp::stop
-			   std::string serror = "uneven number of tokens: ";
-			   serror.append(boost::lexical_cast<std::string>(i-1));
-			   throw std::range_error(serror.c_str());
-			 }
-			 else
-				 cout << "the text section does not end with delimiter: " << delimiter << ". The last keyword is dropped." << std::endl;;
-		 }
+
+	}
+
+	/*
+	 * check if kw and value are paired
+	 */
+	 if(j%2 == 1){
+		 std::string serror = "uneven number of tokens: ";
+	     serror.append(boost::lexical_cast<std::string>(j));
+	     COUT << serror << std::endl;
+	     COUT << "The last keyword is dropped." << std::endl;
+	 }
+
+
+
 }
 
 void readFCStext(ifstream &in, const FCS_Header & header, KEY_WORDS & pairs, bool emptyValue){

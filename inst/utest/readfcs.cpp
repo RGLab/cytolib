@@ -14,10 +14,17 @@ int main(void)
 //	for(auto p : cytofrm.getKeywords())
 //		cout << p.first << ": " << p.second << endl;
 	for(auto p :cytofrm.getChannels())
-		cout << p << ":" << cytofrm.getRange(p, ColType::channel, RangeType::instrument).first << ",";
+	{
+		auto r = cytofrm.getRange(p, ColType::channel, RangeType::instrument);
+		cout << p << ":(" << r.first << "," << r.second << ")"<< endl;;
+	}
+
 	cout << endl;
 	for(auto p :cytofrm.getMarkers())
-			cout << p << ":" << cytofrm.getRange(p, ColType::marker, RangeType::data).first << ",";
+	{
+			auto r = cytofrm.getRange(p, ColType::marker, RangeType::data);
+			cout << p << ":(" << r.first << "," << r.second << ")"<< endl;;
+	}
 		cout << endl;
 
 	cout << cytofrm.nCol() << " " << cytofrm.nRow()<<endl;

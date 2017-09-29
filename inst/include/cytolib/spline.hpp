@@ -9,15 +9,8 @@
 #ifndef SPLINE_HPP_
 
 #define SPLINE_HPP_
-#ifdef ROUT
-#define COUT cout //TODO: originally it was Rout, to get around Rcpp, we will have to use Rprintf/printf to rewrite all the console print
-#endif
 
-
-#ifndef ROUT
-#define COUT cout
-#endif
-
+#include "config.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <iostream>

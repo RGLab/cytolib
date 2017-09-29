@@ -74,7 +74,7 @@ int CytoFrame::getColId(const string & colname, ColType type = ColType::unknown)
 		}
 	case ColType::marker:
 		{
-			return channel_vs_idx[colname];
+			return marker_vs_idx[colname];
 		}
 	case ColType::unknown:
 	{

@@ -10,16 +10,16 @@
 
 #include <fstream>
 #include <cstring>
-#include <boost/regex.hpp>
+#include "config.hpp"
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
-#include <boost/algorithm/string/split.hpp> // Include for boost::split
-
+#include <boost/algorithm/string.hpp>
+#include <vector>
+#include <numeric>
 #include <unordered_map>
 #include <iostream>
 #include <algorithm>
 using namespace std;
+
 
 enum class TransformType {none, linearize, scale,linearize_with_PnG_scaling};
 enum class endianType {big, small, mixed};

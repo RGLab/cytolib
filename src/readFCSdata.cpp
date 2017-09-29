@@ -424,26 +424,26 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	//				 # to
 	//				 # dat[,i] <- 10^((dat[,i]/range[i])*ampli[i,1])
 				 output[idx] = pow(10,((output[idx]/params[c].max)*params[c].PnE.first));
-				 params[c].max = pow(10,params[c].PnE.first);
+//				 params[c].max = pow(10,params[c].PnE.first);
 			  }
 			  else if (fcsPnGtransform && params[c].PnG != 1) {
 				  output[idx] = output[idx] / params[c].PnG;
-				  params[c].max = (params[c].max-1) / params[c].PnG;
+//				  params[c].max = (params[c].max-1) / params[c].PnG;
 			  }
-			  else
-				  params[c].max--;
+//			  else
+//				  params[c].max--;
 			}
 			if(scale)
 			{
 				if(params[c].PnE.first > 0)
 				{
 					output[idx] = decade*((output[idx]-1)/(params[c].max-1));
-					params[c].max = decade*(params[c].max/params[c].max-1);
+//					params[c].max = decade*(params[c].max/params[c].max-1);
 				}
 				else
 				{
 					output[idx] = decade*((output[idx])/(params[c].max));
-					params[c].max = decade;
+//					params[c].max = decade;
 				}
 			}
 	    }
