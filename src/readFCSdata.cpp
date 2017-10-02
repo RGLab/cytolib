@@ -389,7 +389,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 				if(config.truncate_max_range&&output[idx] > params[c].max)
 					output[idx] = params[c].max;
 
-				if(config.min_limit > numeric_limits<int>::min()&&output[idx] < config.min_limit)
+				if(config.truncate_min_val&&output[idx] < config.min_limit)
 					output[idx] = config.min_limit;
 			}
 
