@@ -131,7 +131,7 @@ VertexID GatingHierarchy::addGate(gate* g,VertexID parentID,string popName)
 		curChild.setName(popName.c_str());
 		curChild.setGate(g);
 		if(g_loglevel>=POPULATION_LEVEL)
-			COUT<<"node created:"<<curChild.getName()<<endl;
+			PRINT("node created:"+curChild.getName()+"\n");
 		//attach the populationNode to the boost node as property
 
 		//add relation between current node and parent node
@@ -208,7 +208,7 @@ void GatingHierarchy::updateChannels(const CHANNEL_MAP & chnl_map){
 			if(g==NULL)
 				throw(domain_error("no gate available for this node"));
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT << "update channels for " <<node.getName()<<endl;
+				PRINT( "update channels for " +node.getName()+"\n");
 			if(g->getType()!=BOOLGATE&&g->getType()!=LOGICALGATE)
 				g->updateChannels(chnl_map);
 		}
@@ -224,7 +224,7 @@ void GatingHierarchy::updateChannels(const CHANNEL_MAP & chnl_map){
 
 }
 void GatingHierarchy::printLocalTrans(){
-	COUT<<endl<<"get trans from gating hierarchy"<<endl;
+	PRINT("\nget trans from gating hierarchy\n");
 	trans_map trans=this->trans.getTransMap();
 
 	for (trans_map::iterator it=trans.begin();it!=trans.end();it++)
@@ -236,7 +236,7 @@ void GatingHierarchy::printLocalTrans(){
 				throw(domain_error("non-interpolated calibration table:"+curTrans->getName()+curTrans->getChannel()+" from channel"+it->first));
 
 
-		COUT<<it->first<<curTrans->getName()<<" "<<curTrans->getChannel()<<endl;;
+		PRINT(it->first+curTrans->getName()+" "+curTrans->getChannel()+"\n");;
 
 	}
 }
@@ -251,7 +251,7 @@ void GatingHierarchy::printLocalTrans(){
  */
 //flowData GatingHierarchy::getData(string sampleName,VertexID nodeID)
 //{
-////	COUT<<"reading data from ncdf"<<endl;
+////	PRINT("reading data from ncdf\n");
 //
 //	flowData res=nc->readflowData(sampleName);
 //	//subset the results by indices for non-root node
@@ -267,7 +267,7 @@ void GatingHierarchy::printLocalTrans(){
  */
 flowData GatingHierarchy::getData(VertexID nodeID)
 {
-//	COUT<<"reading data from ncdf"<<endl;
+//	PRINT("reading data from ncdf\n");
 
 	flowData res=fdata;
 	//subset the results by indices for non-root node
@@ -292,7 +292,7 @@ flowData GatingHierarchy::getData(VertexID nodeID)
 //	if(!isLoaded)
 //	{
 //		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-//					COUT <<"loading data from cdf.."<<endl;
+//					PRINT("loading data from cdf..\n");
 //		fdata=getData(sampleName,0);
 //		isLoaded=true;
 //	}
@@ -309,7 +309,7 @@ void GatingHierarchy::loadData(const flowData & _fdata)
 	if(!isLoaded)
 	{
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-					COUT <<"loading data from memory.."<<endl;
+					PRINT("loading data from memory..\n");
 		fdata=_fdata;
 		isLoaded=true;
 	}
@@ -324,7 +324,7 @@ void GatingHierarchy::unloadData()
 	if(isLoaded)
 	{
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-					COUT <<"unloading raw data.."<<endl;
+					PRINT("unloading raw data..\n");
 //		delete fdata.data;
 		isLoaded=false;
 	}
@@ -338,7 +338,7 @@ void GatingHierarchy::unloadData()
 void GatingHierarchy::transforming(double timestep = 1)
 {
 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-		COUT <<"start transforming data :"<<fdata.getSampleID()<<endl;
+		PRINT("start transforming data :"+to_string(fdata.getSampleID())+"\n");
 	if(!isLoaded)
 		throw(domain_error("data is not loaded yet!"));
 
@@ -356,7 +356,7 @@ void GatingHierarchy::transforming(double timestep = 1)
 		if(curChannel=="Time"||curChannel=="time"){
 			//special treatment for time channel
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				COUT<<"multiplying "<<curChannel<<" by :"<< timestep << endl;
+				PRINT("multiplying "+curChannel+" by :"+ to_string(timestep) + "\n");
 			double * x = this->fdata.subset(curChannel);
 			for(int i = 0; i < nEvents; i++)
 				x[i] = x[i] * timestep;
@@ -374,7 +374,7 @@ void GatingHierarchy::transforming(double timestep = 1)
 
 						double * x = fdata.subset(curChannel);
 						if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-							COUT<<"transforming "<<curChannel<<" with func:"<<curTrans->getChannel()<<endl;
+							PRINT("transforming "+curChannel+" with func:"+curTrans->getChannel()+"\n");
 
 						curTrans->transforming(x,nEvents);
 
@@ -392,7 +392,7 @@ void GatingHierarchy::transforming(double timestep = 1)
 //	if(updateCDF)
 //	{
 //		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-//			COUT<<"saving transformed data to CDF..."<<endl;
+//			PRINT("saving transformed data to CDF...\n");
 //		nc->writeflowData(fdata);
 //	}
 }
@@ -401,7 +401,7 @@ void GatingHierarchy::transforming(double timestep = 1)
  */
 void GatingHierarchy::extendGate(float extend_val){
 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT <<endl<<"start extending Gates for:"<<fdata.getSampleID()<<endl;
+			PRINT("\nstart extending Gates for:"+to_string(fdata.getSampleID())+"\n");
 
 		if(!isLoaded)
 				throw(domain_error("data is not loaded yet!"));
@@ -418,7 +418,7 @@ void GatingHierarchy::extendGate(float extend_val){
 				if(g==NULL)
 					throw(domain_error("no gate available for this node"));
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT <<node.getName()<<endl;
+					PRINT(node.getName()+"\n");
 				if(g->getType()!=BOOLGATE)
 					g->extend(fdata,extend_val);
 			}
@@ -430,7 +430,7 @@ void GatingHierarchy::extendGate(float extend_val){
  */
 void GatingHierarchy::extendGate(float extend_val, float extend_to){
 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT <<endl<<"start extending Gates for:"<<fdata.getSampleID()<<endl;
+			PRINT("\nstart extending Gates for:"+to_string(fdata.getSampleID())+"\n");
 
 
 		VertexID_vec vertices=getVertices(0);
@@ -445,7 +445,7 @@ void GatingHierarchy::extendGate(float extend_val, float extend_to){
 				if(g==NULL)
 					throw(domain_error("no gate available for this node"));
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT <<node.getName()<<endl;
+					PRINT(node.getName()+"\n");
 				if(g->getType()!=BOOLGATE)
 					g->extend(extend_val,extend_to);
 			}
@@ -456,7 +456,7 @@ void GatingHierarchy::extendGate(float extend_val, float extend_to){
  */
 void GatingHierarchy::adjustGate(map<string,float> &gains){
 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT <<endl<<"start rescale Gates by gains for:"<<fdata.getSampleID()<<endl;
+			PRINT("\nstart rescale Gates by gains for:"+to_string(fdata.getSampleID())+"\n");
 
 
 		VertexID_vec vertices=getVertices(0);
@@ -471,7 +471,7 @@ void GatingHierarchy::adjustGate(map<string,float> &gains){
 				if(g==NULL)
 					throw(domain_error("no gate available for this node"));
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT <<node.getName()<<endl;
+					PRINT(node.getName()+"\n");
 				if(g->getType()!=BOOLGATE)
 					g->gain(gains);
 			}
@@ -483,7 +483,7 @@ void GatingHierarchy::adjustGate(map<string,float> &gains){
  */
 void GatingHierarchy::transformGate(){
 	if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT <<endl<<"start transform Gates for:"<<fdata.getSampleID()<<endl;
+			PRINT("\nstart transform Gates for:"+to_string(fdata.getSampleID())+"\n");
 
 
 		VertexID_vec vertices=getVertices(0);
@@ -498,7 +498,7 @@ void GatingHierarchy::transformGate(){
 				if(g==NULL)
 					throw(domain_error("no gate available for this node"));
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT <<node.getName()<<endl;
+					PRINT(node.getName()+"\n");
 				unsigned short gateType= g->getType();
 				if(gateType == CURLYQUADGATE)
 				{
@@ -584,14 +584,14 @@ void GatingHierarchy::calgate(VertexID u, bool computeTerminalBool, INTINDICES &
 //	if(!parentNode.isGated())
 //	{
 //		if(g_loglevel>=POPULATION_LEVEL)
-//			COUT <<"go to the ungated parent node:"<<parentNode.getName()<<endl;
+//			PRINT("go to the ungated parent node:"+parentNode.getName()+"\n");
 //		calgate(pid, computeTerminalBool);
 //	}
 //
 
 
 	if(g_loglevel>=POPULATION_LEVEL)
-		COUT <<"gating on:"<<node.getName()<<endl;
+		PRINT("gating on:"+node.getName()+"\n");
 
 	gate *g=node.getGate();
 
@@ -687,7 +687,7 @@ vector<bool> GatingHierarchy::boolGating(VertexID u, bool computeTerminalBool){
 		if(!curPop.isGated())
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT <<"go to the ungated reference node:"<<curPop.getName()<<endl;
+				PRINT("go to the ungated reference node:"+curPop.getName()+"\n");
 			gating(nodeID, true, computeTerminalBool);
 		}
 
@@ -760,7 +760,7 @@ vector<bool> GatingHierarchy::boolGating(vector<BOOL_GATE_OP> boolOpSpec, bool c
 		if(!curPop.isGated())
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT <<"go to the ungated reference node:"<<curPop.getName()<<endl;
+				PRINT("go to the ungated reference node:"+curPop.getName()+"\n");
 			gating(nodeID, true, computeTerminalBool);
 		}
 
@@ -1213,7 +1213,7 @@ VertexID_vec GatingHierarchy::getDescendants(VertexID u,string name){
 //	if(it==nodesTomatch.end())
 //	{
 //		if(g_loglevel>=POPULATION_LEVEL)
-//			COUT<<name<<" not found under the node: "<<boost::lexical_cast<string>(u)<<". returning the root instead."<<endl;;
+//			PRINT(name+" not found under the node: "+boost::lexical_cast<string>(u)+". returning the root instead.\n");;
 //		u=0;
 //	}
 	return res;
@@ -1405,7 +1405,7 @@ VertexID_vec GatingHierarchy::getChildren(VertexID source){
 	}
 	else
 	{
-		COUT<<"invalid vertexID:"<<source<<endl;
+		PRINT("invalid vertexID:"+to_string(source)+"\n");
 //		res.push_back(0);
 	}
 	return(res);

@@ -28,7 +28,7 @@
 //      auto pos_old = ind * elementSize + i;
 //      auto pos_new = ind * elementSize + j;
 ////       if(ind<=10)
-////         Rcpp::Rcout << pos_old <<":" << pos_new << std::endl;
+////         Rcpp::RPRINT( pos_old +":" + pos_new + std::endl;
 //      output.at(pos_new) = bytes.at(pos_old);;
 //    }
 //
@@ -151,7 +151,8 @@ void convertRaw_impl(ifstream & in, void * dest, unsigned short thisSize, bool i
 	  std::reverse(p, p + thisSize);
 
 }
-EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params, int &nEvents,  FCS_READ_DATA_PARAM & config){
+EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params, int &nEvents,  FCS_READ_DATA_PARAM & config)
+{
 	//## transform or scale data?
 	  bool fcsPnGtransform = false, isTransformation, scale;
 	  if(config.transform == TransformType::linearize)
@@ -242,9 +243,10 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 		  string sys = keys["$SYS"];
 		  transform(sys.begin(), sys.end(), sys.begin(),::tolower);
 		if(sys !=  "cxp")
-		  cout << "Invalid bitwidth specification.\nThis is a known bug in Beckman Coulter's CPX software.\nThe data might be corrupted if produced by another software." << endl;
+		  PRINT("Invalid bitwidth specification.\nThis is a known bug in Beckman Coulter's CPX software.\nThe data might be corrupted if produced by another software.\n");
 		else
-			cout << "Beckma Coulter CPX data.\nCorrected for invalid bitwidth 10." << endl;
+			PRINT("Beckma Coulter CPX data.\nCorrected for invalid bitwidth 10.\n");
+
 		for(auto &p : params)
 			p.PnB = 16;
 	  }

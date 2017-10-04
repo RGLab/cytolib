@@ -27,7 +27,7 @@
 //	}
 //		cout << endl;
 //
-//	cout << cytofrm.nCol() << " " << cytofrm.nRow()<<endl;
+//	cout << cytofrm.nCol() << " " << cytofrm.nRow()+"\n");
 //}
 
 

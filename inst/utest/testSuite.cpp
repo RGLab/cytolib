@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(double_precision)
 	FCS_READ_PARAM config;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	double runtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
-	cout<< runtime << endl;
+	cout << runtime << endl;
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 35);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 250170);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());

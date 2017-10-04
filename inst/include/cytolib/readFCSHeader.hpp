@@ -10,7 +10,7 @@
 
 #include <fstream>
 #include <cstring>
-#include "config.hpp"
+#include "global.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <vector>

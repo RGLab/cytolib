@@ -196,7 +196,7 @@ GatingSet::GatingSet(string filename)
 GatingSet::~GatingSet()
 {
 	if(g_loglevel>=GATING_SET_LEVEL)
-		COUT<<endl<<"start to free GatingSet..."<<endl;
+		PRINT("\nstart to free GatingSet...\n");
 
 //	freeWorkspace();
 
@@ -204,7 +204,7 @@ GatingSet::~GatingSet()
 		GatingHierarchy * ghPtr=it.second;
 		string sampleName=it.first;
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"start to free GatingHierarchy:"<<sampleName<<endl;
+			PRINT("\nstart to free GatingHierarchy:"+sampleName+"\n");
 
 		delete ghPtr;
 
@@ -214,14 +214,14 @@ GatingSet::~GatingSet()
 	{
 		trans_map curTrans=it->getTransMap();
 		if(g_loglevel>=GATING_SET_LEVEL)
-			COUT<<endl<<"start to free transformatioin group:"<<it->getGroupName()<<endl;
+			PRINT("\nstart to free transformatioin group:"+it->getGroupName()+"\n");
 		for(trans_map::iterator it1=curTrans.begin();it1!=curTrans.end();it1++)
 		{
 			transformation * curTran=it1->second;
 			if(curTran!=NULL)
 			{
 				if(g_loglevel>=GATING_SET_LEVEL)
-						COUT<<"free transformatioin:"<<curTran->getChannel()<<endl;
+						PRINT("free transformatioin:"+curTran->getChannel()+"\n");
 
 				delete curTran;
 				curTran = NULL;
@@ -243,7 +243,7 @@ void GatingSet::updateChannels(const CHANNEL_MAP & chnl_map){
 	{
 
 		if(g_loglevel>=GATING_SET_LEVEL)
-			COUT<<endl<< "update channels for transformation group:"<<it->getGroupName()<<endl;
+			PRINT("\nupdate channels for transformation group:" + it->getGroupName()+ "\n");
 		it->updateChannels(chnl_map);
 
 	}
@@ -253,7 +253,7 @@ void GatingSet::updateChannels(const CHANNEL_MAP & chnl_map){
 			GatingHierarchy * ghPtr=it.second;
 			string sampleName=it.first;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				COUT<<endl<<"update channels for GatingHierarchy:"<<sampleName<<endl;
+				PRINT("\nupdate channels for GatingHierarchy:"+sampleName+"\n");
 			ghPtr->updateChannels(chnl_map);
 			//comp
 		}
@@ -298,7 +298,7 @@ GatingSet* GatingSet::clone(vector<string> samples){
 	{
 		string curSampleName = it;
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"... copying GatingHierarchy: "<<curSampleName<<"... "<<endl;
+			PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
 		//except trans, the entire gh object is copiable
 		GatingHierarchy * curGh = new GatingHierarchy();
 		*curGh = *getGatingHierarchy(curSampleName);
@@ -334,7 +334,7 @@ void GatingSet::add(GatingSet & gs,vector<string> sampleNames){
 	 * involve deep copying of transformation pointers
 	 */
 //	if(g_loglevel>=GATING_SET_LEVEL)
-//		COUT<<"copying transformation from gh_template..."<<endl;
+//		PRINT("copying transformation from gh_template...\n");
 //	trans_global newTransGroup;
 
 //	trans_map newTmap=gh_template->getLocalTrans().cloneTransMap();
@@ -349,7 +349,7 @@ void GatingSet::add(GatingSet & gs,vector<string> sampleNames){
 	{
 		string curSampleName=*it;
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"... copying GatingHierarchy: "<<curSampleName<<"... "<<endl;
+			PRINT("\n... copying GatingHierarchy: "+curSampleName+"...\n ");
 
 
 		GatingHierarchy *toCopy=gs.getGatingHierarchy(curSampleName);
@@ -377,7 +377,7 @@ GatingSet::GatingSet(GatingHierarchy * gh_template,vector<string> sampleNames){
 	 * involve deep copying of transformation pointers
 	 */
 	if(g_loglevel>=GATING_SET_LEVEL)
-		COUT<<"copying transformation from gh_template..."<<endl;
+		PRINT("copying transformation from gh_template...\n");
 	trans_global newTransGroup;
 //	gh_template->printLocalTrans();
 	trans_map newTmap=gh_template->getLocalTrans().cloneTransMap();
@@ -392,7 +392,7 @@ GatingSet::GatingSet(GatingHierarchy * gh_template,vector<string> sampleNames){
 	{
 		string curSampleName=*it;
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"... start cloning GatingHierarchy for: "<<curSampleName<<"... "<<endl;
+			PRINT("\n... start cloning GatingHierarchy for: "+curSampleName+"... \n");
 
 
 		GatingHierarchy *curGh=gh_template->clone(newTmap,&gTrans);
@@ -402,7 +402,7 @@ GatingSet::GatingSet(GatingHierarchy * gh_template,vector<string> sampleNames){
 		ghs[curSampleName]=curGh;//add to the map
 
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<"Gating hierarchy cloned: "<<curSampleName<<endl;
+			PRINT("Gating hierarchy cloned: "+curSampleName+"\n");
 	}
 }
 
@@ -412,7 +412,7 @@ GatingSet::GatingSet(vector<string> sampleNames){
 	{
 		string curSampleName=*it;
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			COUT<<endl<<"... start adding GatingHierarchy for: "<<curSampleName<<"... "<<endl;
+			PRINT("\n... start adding GatingHierarchy for: "+curSampleName+"... \n");
 
 
 		GatingHierarchy *curGh=new GatingHierarchy();

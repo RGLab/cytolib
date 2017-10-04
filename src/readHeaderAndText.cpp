@@ -92,7 +92,7 @@ void fcsTextParse(string txt, KEY_WORDS & pairs, bool emptyValue){
 	string key;
 	for(unsigned i = 1; i <= j; i++){//counter, start with 1 to skip the first empty tokens
 		std::string token = tokens[i];
-//			std::cout << token << " ";
+//			std::PRINT( token + " ");
 		if(!emptyValue){
 			/*
 			 * restore double delimiter when needed
@@ -100,9 +100,9 @@ void fcsTextParse(string txt, KEY_WORDS & pairs, bool emptyValue){
 			 *  and this double delimiter logic is not normally invoked anyway)
 			 */
 			boost::replace_all(token, soddChar, doubleDelimiter);
-//				std::cout << token;
+//				std::PRINT( token;
 		}
-//			std::cout << std::endl;
+//			std::PRINT( std::endl;
 
 		if((i)%2 == 1)
 		{
@@ -124,10 +124,10 @@ void fcsTextParse(string txt, KEY_WORDS & pairs, bool emptyValue){
 	 * check if kw and value are paired
 	 */
 	 if(j%2 == 1){
-		 std::string serror = "uneven number of tokens: ";
+		 std::string serror = "uneven number of tokens: \n";
 	     serror.append(boost::lexical_cast<std::string>(j));
-	     COUT << serror << std::endl;
-	     COUT << "The last keyword is dropped." << std::endl;
+	     PRINT(serror);
+	     PRINT("The last keyword is dropped.\n");
 	 }
 
 
@@ -184,7 +184,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 
 	  if(config.nDataset <=0 && nNextdata >0)
 	  {
-			cout << "The file contains additional data segment%s.\n The default is to read the first segment only.\nPlease consider setting the 'dataset' argument." << endl;
+		  PRINT("The file contains additional data segment%s.\n The default is to read the first segment only.\nPlease consider setting the 'dataset' argument.");
 
 	  }
 
@@ -206,7 +206,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 	     if (datastart_h != 0)
 	     {
 	       datastart = datastart_h;
-	       cout << "warning:Missing the required $BEGINDATA keyword! Reading data based on information in the FCS HEADER only." << endl;
+	       PRINT("warning:Missing the required $BEGINDATA keyword! Reading data based on information in the FCS HEADER only.\n");
 	     } else
 	       throw(domain_error("Don't know where the data segment begins, there was no $BEGINDATA keyword and the FCS HEADER does not say it either."));
 	   }
@@ -217,7 +217,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 	   {
 		 if (dataend_h != 0) {
 			 dataend = dataend_h;
-		   cout << "warning:Missing the required $ENDDATA keyword! Reading data based on information in the FCS HEADER only." << endl;
+			 PRINT("warning:Missing the required $ENDDATA keyword! Reading data based on information in the FCS HEADER only.\n");
 		 } else
 		   throw(domain_error("Don't know where the data segment ends, there was no $ENDDATA keyword and the FCS HEADER does not say it either."));
 	   }
@@ -234,7 +234,10 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 			  string msg = "The HEADER and the TEXT segment define different starting point (";
 			  msg.append(boost::lexical_cast<string>(header.datastart) + ":" + boost::lexical_cast<string>(datastart) + ") to read the data.");
 			 if(config.ignoreTextOffset)
-			   cout <<msg << " The values in TEXT are ignored!";
+			 {
+				 msg.append(" The values in TEXT are ignored!\n");
+				 PRINT(msg);
+			 }
 			 else
 			   throw(domain_error(msg));
 		  }
@@ -249,7 +252,10 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 				string msg = "The HEADER and the TEXT segment define different ending point (";
 				msg.append(boost::lexical_cast<string>(header.dataend) + ":" + boost::lexical_cast<string>(dataend) + ") to read the data.");
 				if(config.ignoreTextOffset)
-				   cout <<msg << " The values in TEXT are ignored!";
+				 {
+					 msg.append(" The values in TEXT are ignored!\n");
+					 PRINT(msg);
+				 }
 				else
 				   throw(domain_error(msg));
 			}

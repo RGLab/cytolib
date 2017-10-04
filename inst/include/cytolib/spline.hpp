@@ -10,7 +10,7 @@
 
 #define SPLINE_HPP_
 
-#include "config.hpp"
+#include "global.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
