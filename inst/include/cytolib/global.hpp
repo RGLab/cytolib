@@ -17,7 +17,7 @@ extern unsigned short g_loglevel;
 extern bool my_throw_on_error;
 
 #ifdef ROUT
-#include <R.h>
+#include <R_ext/Print.h>
 #endif
 
 #include <iostream>
