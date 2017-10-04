@@ -27,18 +27,44 @@ void readFCSHeader(ifstream &in, FCS_Header & header, int nOffset = 0){
 
 		//parse offset
 		char tmp1[9];
+		string tmp2(" ",8);
 		in.get(tmp1, 9);
-	    header.textstart = stoi(tmp1) + nOffset;
+		//skip whitespaces
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+	    header.textstart = boost::lexical_cast<int>(tmp2) + nOffset;
+
 	    in.get(tmp1, 9);
-		header.textend = stof(tmp1) + nOffset;
+	    tmp2.resize(8);
+	    copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		header.textend = boost::lexical_cast<int>(tmp2) + nOffset;
+
 		in.get(tmp1, 9);
-		header.datastart = stof(tmp1) + nOffset;
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		header.datastart = boost::lexical_cast<int>(tmp2) + nOffset;
+
 		in.get(tmp1, 9);
-		header.dataend = stof(tmp1) + nOffset;
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		header.dataend = boost::lexical_cast<int>(tmp2) + nOffset;
+
 		in.get(tmp1, 9);
-		header.anastart = stof(tmp1) + nOffset;
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		if(tmp2.size()>0)
+			header.anastart = boost::lexical_cast<int>(tmp2) + nOffset;
+
 		in.get(tmp1, 9);
-		header.anaend = stof(tmp1) + nOffset;
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		if(tmp2.size()>0)
+			header.anaend = boost::lexical_cast<int>(tmp2) + nOffset;
 
 		header.additional = nOffset;
 
@@ -169,8 +195,14 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 		readFCSHeader(in,header, nOffset);//read the header
 		readFCStext(in, header, keys, config.isEmptyKeyValue);//read the txt section
 
-		if(keys.find("$NEXTDATA")!=keys.end())
-			nNextdata = boost::lexical_cast<int>(keys["$NEXTDATA"]);
+		if(keys.find("$NEXTDATA")!=keys.end()){
+			string nd = keys["$NEXTDATA"];
+			boost::trim(nd);
+			if(nd.size()==0)
+				throw(domain_error("empty value in $NEXTDATA"));
+			else
+			 nNextdata = boost::lexical_cast<int>(nd);
+		}
 		else
 		{
 			if(i<n)
@@ -211,7 +243,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 	       throw(domain_error("Don't know where the data segment begins, there was no $BEGINDATA keyword and the FCS HEADER does not say it either."));
 	   }
 	   else
-		   datastart = boost::lexical_cast<int>(keys["$BEGINDATA"]);
+		   datastart = stoi(keys["$BEGINDATA"]);
 
 	   if(keys.find("$ENDDATA")==keys.end())
 	   {
@@ -222,7 +254,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 		   throw(domain_error("Don't know where the data segment ends, there was no $ENDDATA keyword and the FCS HEADER does not say it either."));
 	   }
 	   else
-		   dataend = boost::lexical_cast<int>(keys["$ENDDATA"]);
+		   dataend = stoi(keys["$ENDDATA"]);
 
 	//   # when both are present and they don't agree with each other
 	   if(datastart_h != datastart)
@@ -264,7 +296,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 	}
 
 	 //parse important params from keys
-	 int nrpar = boost::lexical_cast<int>(keys["$PAR"]);
+	 int nrpar = stoi(keys["$PAR"]);
 	params.resize(nrpar);
 	KEY_WORDS::iterator it;
 	for(int i = 1; i <= nrpar; i++)
@@ -279,7 +311,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 		params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(range_str);
 
 
-		params[i-1].PnB = boost::lexical_cast<int>(keys["$P" + pid + "B"]);
+		params[i-1].PnB = stoi(keys["$P" + pid + "B"]);
 
 		it = keys.find("$P" + pid + "E");
 		if(it==keys.end())
@@ -288,7 +320,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 		{
 			vector<string> tokens;
 			boost::split(tokens, it->second, boost::is_any_of(","));
-			params[i-1].PnE = make_pair<int,int>(boost::lexical_cast<int>(tokens[0]),boost::lexical_cast<int>(tokens[1]));
+			params[i-1].PnE = make_pair<int,int>(stoi(tokens[0]),stoi(tokens[1]));
 		}
 
 		it = keys.find("$P" + pid + "G");
