@@ -10,7 +10,8 @@
 MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  bool onlyTxt = false){
 	ifstream in(filename, ios::in|ios::binary);
 
-
+	if(!in.is_open())
+		throw(domain_error("can't open the file: " + filename + "\nPlease check if the path is normalized to be recognized by c++!"));
 	FCS_Header header;
 	readHeaderAndText(in, header, keys, params, config.header);
 
