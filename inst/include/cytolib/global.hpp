@@ -17,7 +17,7 @@ extern unsigned short g_loglevel;
 extern bool my_throw_on_error;
 
 #ifdef ROUT
-#include <R.h>
+#include <R_ext/Print.h>
 #endif
 
 #include <iostream>
@@ -26,6 +26,5 @@ using namespace std;
 void PRINT(string a);
 void PRINT(const char * a);
 
-#define PRT true
 
 #endif /* GLOBAL_HPP_ */
