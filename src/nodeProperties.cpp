@@ -158,12 +158,12 @@ nodeProperties & nodeProperties::operator=(nodeProperties np){
  */
 nodeProperties::~nodeProperties(){
 
-//	COUT<<"entring the destructor of nodeProperties"<<endl;
+//	PRINT("entring the destructor of nodeProperties\n");
 
 	if(thisGate!=NULL)
 	{
 		if(g_loglevel>=GATE_LEVEL)
-			COUT<<"free gate:"<<this->thisName<<endl;
+			PRINT("free gate:"+this->thisName+"\n");
 		delete thisGate;
 	}
 }

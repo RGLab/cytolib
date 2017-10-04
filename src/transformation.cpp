@@ -41,7 +41,7 @@ trans_map trans_local::cloneTransMap(){
 		if(curTran!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"cloning transformatioin:"<<curTran->getChannel()<<endl;
+				PRINT("cloning transformatioin:"+curTran->getChannel()+"\n");
 			res[it->first]=curTran->clone();
 		}
 	}
@@ -100,7 +100,7 @@ void trans_local::updateChannels(const CHANNEL_MAP & chnl_map){
 		{
 			string newN = itChnl->second;
 			if(g_loglevel>=GATING_SET_LEVEL)
-				COUT<<"update transformation: "<< oldN << "-->" << newN <<endl;
+				PRINT("update transformation: "+ oldN + "-->" + newN +"\n");
 
 			transformation * curTran = itTp->second;
 			curTran->setChannel(newN);
@@ -379,14 +379,14 @@ boost::shared_ptr<transformation>  transformation::getInverseTransformation(){
 		if(!computed())
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"computing calibration table..."<<endl;
+				PRINT("computing calibration table...\n");
 			computCalTbl();
 		}
 
 		if(!isInterpolated())
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"spline interpolating..."<<endl;
+				PRINT("spline interpolating...\n");
 			interpolate();
 		}
 	}
@@ -405,7 +405,7 @@ boost::shared_ptr<transformation>  transformation::getInverseTransformation(){
 	//re-interpolate the inverse calibration tbl
 	inverse->calTbl.setInterpolated(false);
 	if(g_loglevel>=POPULATION_LEVEL)
-			COUT<<"spline interpolating..."<<endl;
+			PRINT("spline interpolating...\n");
 	inverse->interpolate();
 	return inverse;
 }
@@ -468,14 +468,14 @@ void transformation::transforming(valarray<double> & input){
 			if(!computed())
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT<<"computing calibration table..."<<endl;
+					PRINT("computing calibration table...\n");
 				computCalTbl();
 			}
 
 			if(!isInterpolated())
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT<<"spline interpolating..."<<endl;
+					PRINT("spline interpolating...\n");
 				interpolate();
 			}
 		}
