@@ -11,6 +11,7 @@ void readFCSHeader(ifstream &in, FCS_Header & header, int nOffset = 0){
 		 * parse the header
 		 */
 
+		in.seekg(nOffset);
 		//parse version
 		char version[7];
 		in.get(version, 7);

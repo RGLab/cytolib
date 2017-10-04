@@ -117,13 +117,15 @@ BOOST_AUTO_TEST_CASE(multidata)
 
 	string filename="../flowCore/misc/multi-datasegment.fcs";
 	FCS_READ_PARAM config;
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
-	double runtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
-	cout << runtime << endl;
-	BOOST_CHECK_EQUAL(cytofrm.nCol(), 10);
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1244);
-//	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
+//	MemCytoFrame cytofrm(filename.c_str(), config,false);
+//	double runtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
+//	cout << runtime << endl;
+//	BOOST_CHECK_EQUAL(cytofrm.nCol(), 10);
+//	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1244);
 
+	config.header.nDataset = 10;
+	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 955);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
