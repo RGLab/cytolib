@@ -18,6 +18,7 @@
 #define COUT cout
 #endif
 
+#include "global.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <iostream>

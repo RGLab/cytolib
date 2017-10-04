@@ -22,7 +22,7 @@ calibrationTable::calibrationTable(string _caltype,int _spline_method){
 
 void calibrationTable::interpolate(){
 
-//	COUT<<"entering interpolate"<<endl;
+//	PRINT("entering interpolate\n");
 
 
 	if(!flag)
