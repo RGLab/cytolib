@@ -87,11 +87,13 @@ struct parseFCSFixture{
 BOOST_FIXTURE_TEST_SUITE(parseFCS,parseFCSFixture)
 BOOST_AUTO_TEST_CASE(sample_1071)
 {
+	double start = clock();
 
 	string filename="../flowCore/misc/sample_1071.001";
 	FCS_READ_PARAM config;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
-
+	double runtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
+		cout << runtime << endl;
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 8);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 23981);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());

@@ -142,15 +142,15 @@ unique_ptr<EVENT_DATA_TYPE> readFCSdataRaw(ifstream & in, string dattype
 		}
 	return output;
 }
-void convertRaw_impl(ifstream & in, void * dest, unsigned short thisSize, bool isbyteswap)
-{
-
-  char * p = reinterpret_cast<char *>(dest);
-  in.read(p, thisSize);
-  if(isbyteswap)
-	  std::reverse(p, p + thisSize);
-
-}
+//void convertRaw_impl(char * src, void * dest, unsigned short thisSize, bool isbyteswap)
+//{
+//
+//  char * p = reinterpret_cast<char *>(dest);
+//  memcpy(dest, src, thisSize);
+//  if(isbyteswap)
+//	  std::reverse(p, p + thisSize);
+//
+//}
 EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params, int &nEvents,  FCS_READ_DATA_PARAM & config)
 {
 	//## transform or scale data?
@@ -292,7 +292,10 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	auto nElement = nrow * nCol;
 	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
 
-
+	//load entire data section with one disk IO
+	unique_ptr<char []> buf(new char[nBytes]);//we need to rearrange dat from row-major to col-major thus need a separate buf anyway (even for float)
+	in.read(buf.get(), nBytes); //load the bytes from file
+	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 	float decade = pow(10, config.decades);
 	/**
 	 * cp raw bytes(row-major) to a 2d mat (col-major) represented as 1d array(with different byte width for each elements)
@@ -307,39 +310,34 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			  auto thisSize = size_vec[c];
 			  size_t idx = nrow * c + r;
 
+			  if(isbyteswap)
+				  std::reverse(p, p + thisSize);
+
 			  if(dattype == "I")
 			  {
 				  switch(thisSize)
 				  {
 				  case sizeof(BYTE)://1 byte
 					{
-					  BYTE tmp;
-					  convertRaw_impl(in, &tmp, thisSize, isbyteswap);
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(tmp);
+					  output[idx] = static_cast<EVENT_DATA_TYPE>(*p);
 					}
 
 					  break;
 				  case sizeof(unsigned short): //2 bytes
 					{
-					  unsigned short tmp;
-					  convertRaw_impl(in, &tmp, thisSize, isbyteswap);
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(tmp);
+					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned short *>(p));
 					}
 
 					break;
 				  case sizeof(unsigned)://4 bytes
 					{
-					  unsigned tmp;
-					  convertRaw_impl(in, &tmp, thisSize, isbyteswap);
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(tmp);
+					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned *>(p));
 					}
 
 					break;
 				  case sizeof(uint64_t)://8 bytes
 					{
-					  uint64_t tmp;
-					  convertRaw_impl(in, &tmp, thisSize, isbyteswap);
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(tmp);
+					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));
 					}
 				  break;
 				  default:
@@ -365,16 +363,13 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			  {
 			  case sizeof(float):
 				{
-				  //float can be directly loaded into output without allocation of tmp and casting it
-				  convertRaw_impl(in, output.get() + idx, thisSize, isbyteswap);
+				  output[idx] = *reinterpret_cast<float *>(p);
 				}
 
 				break;
 			  case sizeof(double):
 				{
-				  BYTE tmp;
-				  convertRaw_impl(in, &tmp, thisSize, isbyteswap);
-				  output[idx] = static_cast<EVENT_DATA_TYPE>(tmp);
+				  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<double *>(p));
 				}
 
 				break;
@@ -448,6 +443,8 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 //					params[c].max = decade;
 				}
 			}
+
+			p+=thisSize;//increment pointer in the byte stream
 	    }
 	 }
 
