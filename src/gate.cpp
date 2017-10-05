@@ -809,13 +809,15 @@ void ellipsoidGate::transforming(trans_local & trans){
 		 */
 		boost::scoped_ptr<transformation> trans_gate_x,trans_gate_y;
 		if(trans_x == NULL)
-			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
-		else
+			throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_x));
+//			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
+//		else
 			trans_gate_x.reset(trans_x->clone()); //copy existing trans_x for non-linear
-
+//
 		if(trans_y == NULL)
-			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
-		else
+			throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_y));
+//			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
+//		else
 			trans_gate_y.reset(trans_y->clone()); //copy existing trans_y for non-linear
 
 		//set to scale 256

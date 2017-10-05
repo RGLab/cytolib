@@ -305,8 +305,8 @@ linTrans::linTrans():transformation(true,LIN){
         calTbl.setInterpolated(true);
 }
 
-scaleTrans::scaleTrans():linTrans(),t_scale(256), r_scale(262144){}
-scaleTrans::scaleTrans(int _t_scale, int _r_scale):linTrans(),t_scale(_t_scale), r_scale(_r_scale){}
+scaleTrans::scaleTrans():linTrans(),t_scale(256), r_scale(262144){isGateOnly = true;}
+scaleTrans::scaleTrans(int _t_scale, int _r_scale):linTrans(),t_scale(_t_scale), r_scale(_r_scale){isGateOnly = true;}
 
 flinTrans::flinTrans():transformation(false,FLIN),min(0),max(0){
 	calTbl.setInterpolated(true);
