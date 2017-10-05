@@ -657,7 +657,7 @@ INDICE_TYPE polygonGate::gating(flowData & fdata, INDICE_TYPE & parentInd){
 	  }
 	  /*if horizontal ray is in range of vertex find the x coordinate where
 		ray and vertex intersect*/
-	  if(ydata[i] >= min(p1y, p2y) && ydata[i] < max(p1y, p2y) &&xdata[i] <= max(p1x, p2x))
+	  if(ydata[i] >= min(p1y, p2y) && ydata[i] <= max(p1y, p2y) &&xdata[i] <= max(p1x, p2x))
 	  {
 		  xinters = (ydata[i]-p1y)*(p2x-p1x)/(p2y-p1y)+p1x;
 		/*if intersection x coordinate == point x coordinate it lies on the
@@ -809,13 +809,15 @@ void ellipsoidGate::transforming(trans_local & trans){
 		 */
 		boost::scoped_ptr<transformation> trans_gate_x,trans_gate_y;
 		if(trans_x == NULL)
-			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
-		else
+			throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_x));
+//			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
+//		else
 			trans_gate_x.reset(trans_x->clone()); //copy existing trans_x for non-linear
-
+//
 		if(trans_y == NULL)
-			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
-		else
+			throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_y));
+//			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
+//		else
 			trans_gate_y.reset(trans_y->clone()); //copy existing trans_y for non-linear
 
 		//set to scale 256
