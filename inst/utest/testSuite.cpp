@@ -91,6 +91,7 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 
 	string filename="../flowCore/misc/sample_1071.001";
 	FCS_READ_PARAM config;
+	config.data.num_threads = 10;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	double runtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
 		cout << runtime << endl;

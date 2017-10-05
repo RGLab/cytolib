@@ -6,7 +6,7 @@
  */
 
 #include "cytolib/readFCSdata.hpp"
-
+#include <omp.h>
 
 
 
@@ -295,21 +295,27 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	//load entire data section with one disk IO
 	unique_ptr<char []> buf(new char[nBytes]);//we need to rearrange dat from row-major to col-major thus need a separate buf anyway (even for float)
 	in.read(buf.get(), nBytes); //load the bytes from file
-	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
+//	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 	float decade = pow(10, config.decades);
 	/**
 	 * cp raw bytes(row-major) to a 2d mat (col-major) represented as 1d array(with different byte width for each elements)
 	 */
+//	double start = omp_get_wtime();//clock();
 
-	 for(auto r = 0; r < nrow; r++)
+	omp_set_num_threads(config.num_threads);
+
+
+    #pragma omp parallel for
+	for(auto c = 0; c < nCol; c++)
 	 {
-	    for(auto c = 0; c < nCol; c++)
+		for(auto r = 0; r < nrow; r++)
 	    {
 	      //convert each element
 
 			  auto thisSize = size_vec[c];
 			  size_t idx = nrow * c + r;
-
+			  size_t idx_byte = r * nRowSize + accumulate(size_vec.begin(), size_vec.begin() + c, 0);
+			  char *p = buf.get() + idx_byte;
 			  if(isbyteswap)
 				  std::reverse(p, p + thisSize);
 
@@ -447,7 +453,8 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			p+=thisSize;//increment pointer in the byte stream
 	    }
 	 }
-
+//	 cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
+//	 cout << (omp_get_wtime() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
 
 	//update params
 	for(auto &p : params)

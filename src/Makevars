@@ -7,8 +7,9 @@ This makefile requires GNU Make.
 endif
 	
 CXX_STD = CXX11
-PKG_CPPFLAGS =-DROUT -I../inst/include/
-PKG_LIBS =`${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` 
+PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
+PKG_CPPFLAGS =-DROUT -I../inst/include/ -fopenmp
+PKG_LIBS =`${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(SHLIB_OPENMP_CFLAGS) 
 
 USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
 PKGLIB = ${USERDIR}/libcytolib.a

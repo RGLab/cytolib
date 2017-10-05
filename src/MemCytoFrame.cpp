@@ -19,9 +19,11 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 
 	if(!onlyTxt)
 	{
+//		double start = clock();
 		//parse the data section
 		data = move(readFCSdata(in, header, keys, params, nEvents, config.data));
 
+//		cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
 		//update min and max
 		for(int i = 0; i < params.size(); i++)
 		{
