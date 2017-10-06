@@ -482,24 +482,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 
 	}
-
-//## make sure the ranges are transformed along with the data
-//if(transformation & !scale){
-//
-//    ampliPar <- txt[paste(id,"E",sep="")]
-//    noPnE <- is.na(ampliPar)
-//    if(any(noPnE))
-//        ampliPar[noPnE] <- "0,0"
-//    ampli <- do.call(rbind,lapply(ampliPar, function(x)
-//                                    as.integer(unlist(strsplit(x,",")))))
-//    for (i in 1:npar)
-//        if(ampli[i,1] > 0)
-//            range[,i] <- 10^((range[,i]/(origRange[i]-1))*ampli[i,1])
-//}
-//else if(scale)
-//    range[2,] <- rep(10^decades, npar)
-//
-
+	config.isTransformed = isTransformation;
 	return(output);
 
 }

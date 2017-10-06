@@ -334,7 +334,9 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 		}
 
 		params[i-1].channel = keys["$P" + pid + "N"];
-		params[i-1].marker = keys["$P" + pid + "S"];
+		it = keys.find("$P" + pid + "S");
+		if(it!=keys.end())
+			params[i-1].marker = keys["$P" + pid + "S"];
 		boost::trim(params[i-1].marker);
 	}
 

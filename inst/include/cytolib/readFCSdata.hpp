@@ -22,6 +22,7 @@ struct FCS_READ_DATA_PARAM{
 	 EVENT_DATA_TYPE decades, min_limit;
 	 TransformType transform;
 	 int num_threads;
+	 bool isTransformed;//record the outcome after parsing
 	 FCS_READ_DATA_PARAM(){
 		 scale = false;
 		 truncate_max_range = true;
@@ -30,6 +31,7 @@ struct FCS_READ_DATA_PARAM{
 		 min_limit=-111;
 		 transform =  TransformType::linearize;
 		 num_threads = 1;
+		 isTransformed = false;
 	 }
 
 

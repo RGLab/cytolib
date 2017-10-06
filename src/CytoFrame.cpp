@@ -13,7 +13,11 @@ KEY_WORDS CytoFrame::getKeywords(){
 	return keys;
 }
 string CytoFrame::getKeyword(const string & key){
-	return keys[key];
+	string res="";
+	KEY_WORDS::iterator it = keys.find(key);
+	if(it!=keys.end())
+		res = it->second;
+	return res;
 }
 void CytoFrame::setKeyword(const string & key, const string & value){
 	keys[key] = value;

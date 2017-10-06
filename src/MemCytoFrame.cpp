@@ -28,7 +28,7 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 		for(int i = 0; i < params.size(); i++)
 		{
 
-			string pid = to_string(i);
+			string pid = to_string(i+1);
 
 
 			if(keys.find("transformation")!=keys.end() &&  keys["transformation"] == "custom")
@@ -44,11 +44,41 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 			}
 
 
+
+			//insert our own PnR fields
+			if(config.data.isTransformed)
+			{
+				keys["$P" + pid + "E"] = "0,0";
+				params[i].PnE = make_pair<int,int>(0,0);
+				keys["flowCore_$P" + pid + "Rmin"] = params[i].min;
+				keys["flowCore_$P" + pid + "Rmax"] = params[i].max;
+			}
+
 			params[i].max--;
 		}
 
+		/*
+		 * ## set transformed flag and fix the PnE and the Datatype keywords
+		 */
+		keys["FILENAME"] = filename;
+		if(config.data.isTransformed)
+		{
+			keys["transformation"] ="applied";
+			keys["$DATATYPE"] = "F";
+		}
 
-
+		//GUID
+		string oldguid;
+		if(keys.find("GUID")!=keys.end()){
+			oldguid = keys["GUID"];
+			keys["ORIGINALGUID"] = oldguid;
+		}
+		else
+			oldguid = filename;
+		//strip dir
+		vector<string> paths;
+		boost::split(paths, oldguid, boost::is_any_of("/\\"));
+		keys["GUID"] = paths.back();
 
 	}
 }
