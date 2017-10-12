@@ -142,13 +142,21 @@ unique_ptr<EVENT_DATA_TYPE> readFCSdataRaw(ifstream & in, string dattype
 		}
 	return output;
 }
-//void convertRaw_impl(char * src, void * dest, unsigned short thisSize, bool isbyteswap)
-//{
+
+//void funcA1(char * p, unique_ptr<char []> tmp, size_t & elementSize){
+//	elementSize/=8;
+//}
+//void funcA2(char * p, unique_ptr<char []> tmp, size_t & elementSize){
 //
-//  char * p = reinterpret_cast<char *>(dest);
-//  memcpy(dest, src, thisSize);
-//  if(isbyteswap)
-//	  std::reverse(p, p + thisSize);
+//	  //cp the source bits
+//	  int nSizeBytes = (float)elementSize/8 + 1;
+//	  tmp.resize(new char[nSizeBytes]);
+//	  memcpy(tmp.get(), p, nSizeBytes);
+//	  //unset the extra bits for the trailing byte
+//	  int extraBits = nSizeBytes * 8 - elementSize;
+//	  tmp[nSizeBytes-1] &= (255<<extraBits);
+//	  p = tmp.get();
+//	  elementSize = nSizeBytes;
 //
 //}
 EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params, int &nEvents,  FCS_READ_DATA_PARAM & config)
@@ -308,119 +316,138 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 #ifdef _OPENMP
 	omp_set_num_threads(config.num_threads);
 #endif
-
-    #pragma omp parallel for
+	#pragma omp parallel for
 	for(auto c = 0; c < nCol; c++)
 	 {
+		void (*funcA)(char * p, char * tmp, const size_t & nBits, const size_t &nBytes) = [](char * p, char * tmp, const size_t & nBits, const size_t &nBytes){};
+		EVENT_DATA_TYPE (*funcB)(char *p);
+		void (*funcC) (EVENT_DATA_TYPE & x, int usedBits) =[](EVENT_DATA_TYPE &x, int usedBits){};
+
 		size_t element_offset = nrow * c;
 		size_t bits_offset = accumulate(params.begin(), params.begin() + c, 0, [](size_t i, cytoParam p){return i + p.PnB;});
+		int nBits = params[c].PnB;
+		int nBytes;
+		int usedBits = nBits;
+		if(nBits%8)
+		{
+			 if(nBits>sizeof(uint64_t)*8)
+			{
+			std::string serror = "odd bitwidths exceeds the data type limit:";
+			serror.append(std::to_string(nBits));
+			throw std::range_error(serror.c_str());
+			}
+			 else
+			 {
+				 nBytes = (float)nBits/8 + 1;
+
+				 funcA = [](char * p, char * tmp, const size_t & nBits, const size_t &nBytes){
+
+								  //cp the source bits
+								   tmp = new char[nBytes];
+								  memcpy(tmp, p, nBytes);
+								  //unset the extra bits for the trailing byte
+								  int extraBits = nBytes * 8 - nBits;
+								  tmp[nBytes-1] &= (255<<extraBits);
+								  p = tmp;
+
+							};
+
+			 }
+		}
+		else
+		{
+
+			nBytes = nBits / 8;
+		}
+
+
+		  if(dattype == "I")
+		  {
+			  switch(nBytes)
+			  {
+			  case sizeof(BYTE)://1 byte
+				{
+				  funcB = [](char * p){return static_cast<EVENT_DATA_TYPE>(*p);};
+				}
+
+				  break;
+			  case sizeof(unsigned short): //2 bytes
+				{
+				  funcB = [](char * p){return static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned short *>(p));};
+				}
+
+				break;
+			  case sizeof(unsigned)://4 bytes
+				{
+				  funcB = [](char * p){return static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned *>(p));};
+				}
+
+				break;
+			  case sizeof(uint64_t)://8 bytes
+				{
+				  funcB = [](char * p){return static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));};
+				}
+
+			  break;
+			  default:
+				  {
+					  std::string serror = "unsupported byte width :";
+					  serror.append(std::to_string(nBytes));
+					  throw std::range_error(serror.c_str());
+				  }
+			  }
+			  // apply bitmask for integer data
+
+			 if(params[c].max > 0)
+			 {
+			   usedBits = ceil(log2(params[c].max));
+			   if(usedBits < params[c].PnB)
+				   funcC = [](EVENT_DATA_TYPE & x, int usedBits){x = static_cast<int>(x) % (1<<usedBits);};
+			}
+
+
+		}
+		else
+		{
+		  switch(nBytes)
+		  {
+		  case sizeof(float):
+			{
+			  funcB = [](char * p){return *reinterpret_cast<float *>(p);};
+
+			}
+
+			break;
+		  case sizeof(double):
+			{
+			  funcB = [](char * p){return static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<double *>(p));};
+			}
+
+			break;
+		  default:
+			std::string serror ="Unsupported bitwidths for numerical data type:";
+			serror.append(std::to_string(nBytes));
+			throw std::range_error(serror.c_str());
+		  }
+		}
+
 		for(auto r = 0; r < nrow; r++)
 	    {
 	      //convert each element
 
-			  auto thisSize = params[c].PnB;
+
 			  size_t idx = element_offset + r;
 			  size_t idx_bits = r * nRowSize + bits_offset;
-			  char *p = buf.get() + idx_bits/8;
 			  unique_ptr<char []> tmp;
-			  if(thisSize%8)//deal with odd bitwidth
-			  {
-				  if(thisSize>sizeof(uint64_t)*8)
-				  {
-					  std::string serror = "odd bitwidths exceeds the data type limit:";
-						serror.append(std::to_string(thisSize));
-						throw std::range_error(serror.c_str());
-				  }
-				  else
-				  {
+			  char *p = buf.get() + idx_bits/8;
+			  funcA(p, tmp.get(), nBits, nBytes);
 
-					  //cp the source bits
-					  int nSizeBytes = (float)thisSize/8 + 1;
-					  tmp.reset(new char[nSizeBytes]);
-					  memcpy(tmp.get(), p, nSizeBytes);
-					  //unset the extra bits for the trailing byte
-					  int extraBits = nSizeBytes * 8 - thisSize;
-					  tmp[nSizeBytes-1] &= (255<<extraBits);
-					  p = tmp.get();
-					  thisSize = nSizeBytes;
-
-				  }
-
-			  }
-			  else
-				  thisSize/=8;
 			  if(isbyteswap)
-				  std::reverse(p, p + thisSize);
-
-			  if(dattype == "I")
-			  {
-				  switch(thisSize)
-				  {
-				  case sizeof(BYTE)://1 byte
-					{
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*p);
-					}
-
-					  break;
-				  case sizeof(unsigned short): //2 bytes
-					{
-
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned short *>(p));
-					}
-
-					break;
-				  case sizeof(unsigned)://4 bytes
-					{
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned *>(p));
-					}
-
-					break;
-				  case sizeof(uint64_t)://8 bytes
-					{
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));
-					}
-
-				  break;
-				  default:
-					  {
-						  std::string serror = "unsupported byte width :";
-						  serror.append(std::to_string(thisSize));
-						  throw std::range_error(serror.c_str());
-					  }
-				  }
-				  // apply bitmask for integer data
-
-				 if(params[c].max > 0)
-				 {
-				   int usedBits = ceil(log2(params[c].max));
-				   if(usedBits < params[c].PnB)
-					   output[idx] = static_cast<int>(output[idx]) % (1<<usedBits);
-				}
+				  std::reverse(p, p + nBytes);
 
 
-			}
-			else
-			{
-			  switch(thisSize)
-			  {
-			  case sizeof(float):
-				{
-				  output[idx] = *reinterpret_cast<float *>(p);
-				}
-
-				break;
-			  case sizeof(double):
-				{
-				  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<double *>(p));
-				}
-
-				break;
-			  default:
-				std::string serror ="Unsupported bitwidths for numerical data type:";
-				serror.append(std::to_string(thisSize));
-				throw std::range_error(serror.c_str());
-			  }
-			}
+			 output[idx] = funcB(p);
+			 funcC(output[idx], usedBits);
 
 		  // truncate data at range
 			if(keys.find("transformation") == keys.end())
@@ -486,7 +513,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 				}
 			}
 
-			p+=thisSize;//increment pointer in the byte stream
+//			p+=nBytes;//increment pointer in the byte stream
 	    }
 	 }
 //	 cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
