@@ -173,7 +173,8 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 	  if (fcsPnGtransform)
 		  keys["flowCore_fcsPnGtransform"] = "linearize-with-PnG-scaling";
-	 if(keys.find("transformation")!=keys.end())
+	  bool transDefinedinKeys = keys.find("transformation")!=keys.end();
+	 if(transDefinedinKeys)
 		 if(keys["transformation"] == "applied"||keys["transformation"] ==  "custom")
 			 isTransformation =  false;
 
@@ -298,7 +299,8 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 	//load entire data section with one disk IO
 	unique_ptr<char []> buf(new char[nBytes]);//we need to rearrange dat from row-major to col-major thus need a separate buf anyway (even for float)
-	in.read(buf.get(), nBytes); //load the bytes from file
+	char * bufPtr = buf.get();
+	in.read(bufPtr, nBytes); //load the bytes from file
 //	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 	float decade = pow(10, config.decades);
 	/**
@@ -317,11 +319,13 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 		for(auto r = 0; r < nrow; r++)
 	    {
 	      //convert each element
+			  cytoParam & param = params[c];
 
-			  auto thisSize = params[c].PnB;
+			  auto thisSize = param.PnB;
 			  size_t idx = element_offset + r;
+			  EVENT_DATA_TYPE & outElement = output[idx];
 			  size_t idx_bits = r * nRowSize + bits_offset;
-			  char *p = buf.get() + idx_bits/8;
+			  char *p = bufPtr + idx_bits/8;
 			  unique_ptr<char []> tmp;
 			  if(thisSize%8)//deal with odd bitwidth
 			  {
@@ -358,26 +362,26 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 				  {
 				  case sizeof(BYTE)://1 byte
 					{
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*p);
+					  outElement = static_cast<EVENT_DATA_TYPE>(*p);
 					}
 
 					  break;
 				  case sizeof(unsigned short): //2 bytes
 					{
 
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned short *>(p));
+					  outElement = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned short *>(p));
 					}
 
 					break;
 				  case sizeof(unsigned)://4 bytes
 					{
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned *>(p));
+					  outElement = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned *>(p));
 					}
 
 					break;
 				  case sizeof(uint64_t)://8 bytes
 					{
-					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));
+					  outElement = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));
 					}
 
 				  break;
@@ -390,11 +394,11 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 				  }
 				  // apply bitmask for integer data
 
-				 if(params[c].max > 0)
+				 if(param.max > 0)
 				 {
-				   int usedBits = ceil(log2(params[c].max));
-				   if(usedBits < params[c].PnB)
-					   output[idx] = static_cast<int>(output[idx]) % (1<<usedBits);
+				   int usedBits = ceil(log2(param.max));
+				   if(usedBits < param.PnB)
+					   outElement = static_cast<int>(outElement) % (1<<usedBits);
 				}
 
 
@@ -405,13 +409,13 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			  {
 			  case sizeof(float):
 				{
-				  output[idx] = *reinterpret_cast<float *>(p);
+				  outElement = *reinterpret_cast<float *>(p);
 				}
 
 				break;
 			  case sizeof(double):
 				{
-				  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<double *>(p));
+				  outElement = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<double *>(p));
 				}
 
 				break;
@@ -423,13 +427,13 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			}
 
 		  // truncate data at range
-			if(keys.find("transformation") == keys.end())
+			if(!transDefinedinKeys)
 			{
-				if(config.truncate_max_range&&output[idx] > params[c].max)
-					output[idx] = params[c].max;
+				if(config.truncate_max_range&&outElement > param.max)
+					outElement = param.max;
 
-				if(config.truncate_min_val&&output[idx] < config.min_limit)
-					output[idx] = config.min_limit;
+				if(config.truncate_min_val&&outElement < config.min_limit)
+					outElement = config.min_limit;
 			}
 
 
@@ -449,7 +453,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			{
 
 
-			  if(params[c].PnE.first > 0)
+			  if(param.PnE.first > 0)
 			  {
 	//				 # J.Spidlen, Nov 5, 2013: This was a very minor bug. The linearization transformation
 	//				 # for $PnE != "0,0" is defined as:
@@ -462,31 +466,30 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	//				 # dat[,i] <- 10^((dat[,i]/(range[i]-1))*ampli[i,1])
 	//				 # to
 	//				 # dat[,i] <- 10^((dat[,i]/range[i])*ampli[i,1])
-				 output[idx] = pow(10,((output[idx]/params[c].max)*params[c].PnE.first));
-//				 params[c].max = pow(10,params[c].PnE.first);
+				 outElement = pow(10,((outElement/param.max)*param.PnE.first));
+//				 param.max = pow(10,param.PnE.first);
 			  }
-			  else if (fcsPnGtransform && params[c].PnG != 1) {
-				  output[idx] = output[idx] / params[c].PnG;
-//				  params[c].max = (params[c].max-1) / params[c].PnG;
+			  else if (fcsPnGtransform && param.PnG != 1) {
+				  outElement = outElement / param.PnG;
+//				  param.max = (param.max-1) / param.PnG;
 			  }
 //			  else
-//				  params[c].max--;
+//				  param.max--;
 			}
 			if(scale)
 			{
-				if(params[c].PnE.first > 0)
+				if(param.PnE.first > 0)
 				{
-					output[idx] = decade*((output[idx]-1)/(params[c].max-1));
-//					params[c].max = decade*(params[c].max/params[c].max-1);
+					outElement = decade*((outElement-1)/(param.max-1));
+//					param.max = decade*(param.max/param.max-1);
 				}
 				else
 				{
-					output[idx] = decade*((output[idx])/(params[c].max));
-//					params[c].max = decade;
+					outElement = decade*((outElement)/(param.max));
+//					param.max = decade;
 				}
 			}
 
-			p+=thisSize;//increment pointer in the byte stream
 	    }
 	 }
 //	 cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
