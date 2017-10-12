@@ -6,7 +6,7 @@
  */
 
 #include "cytolib/readFCSdata.hpp"
-#include <omp.h>
+
 
 
 
@@ -253,8 +253,6 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	}
 
 	bool isSigned;
-	vector<unsigned short> size_vec(nCol);
-	transform(params.begin(), params.end(), size_vec.begin(), [](cytoParam i){return i.PnB/8;});
 	if(multiSize){
 
 	  isSigned = false; // #dummy. not used in mutliSize logic.
@@ -264,7 +262,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	  //# since signed = FALSE is not supported by readBin when size > 2
 	  //# we set it to TRUE automatically then to avoid warning flooded by readBin
 	  //# It shouldn't cause data clipping since we haven't found any use case where datatype is unsigned integer with size > 16bits
-	 isSigned = !(size_vec[0] == 1 ||size_vec[0] == 2);
+	 isSigned = !(params[0].PnB == 8 ||params[0].PnB == 16);
 	}
 
 
@@ -282,11 +280,17 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 //
 //	if(dattype != "i")
 //	  throw(domain_error("we don't support different bitwdiths for numeric data type!"));
-	//total bytes for each row
-	unsigned short nRowSize = accumulate(size_vec.begin(), size_vec.end(), 0);
+	//total bits for each row
+  	size_t nRowSize = accumulate(params.begin(), params.end(), 0, [](size_t i, cytoParam p){return i + p.PnB;});
 
 	//how many rows
-	unsigned nrow = nBytes/nRowSize;
+//  	KEY_WORDS::iterator it = keys.find("$TOT");
+//  	if(it==keys.end())
+//  		throw(domain_error("can't find $TOT keyword to process the parsing!"));
+//  	string sTot = it->second;
+//
+//	unsigned nrow = boost::lexical_cast<unsigned>(sTot);
+  	unsigned nrow = nBytes * 8/nRowSize;
 	nEvents = nrow;
 	//how many element to return
 	auto nElement = nrow * nCol;
@@ -301,21 +305,50 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	 * cp raw bytes(row-major) to a 2d mat (col-major) represented as 1d array(with different byte width for each elements)
 	 */
 //	double start = omp_get_wtime();//clock();
-
+#ifdef _OPENMP
 	omp_set_num_threads(config.num_threads);
-
+#endif
 
     #pragma omp parallel for
 	for(auto c = 0; c < nCol; c++)
 	 {
+		size_t element_offset = nrow * c;
+		size_t bits_offset = accumulate(params.begin(), params.begin() + c, 0, [](size_t i, cytoParam p){return i + p.PnB;});
 		for(auto r = 0; r < nrow; r++)
 	    {
 	      //convert each element
 
-			  auto thisSize = size_vec[c];
-			  size_t idx = nrow * c + r;
-			  size_t idx_byte = r * nRowSize + accumulate(size_vec.begin(), size_vec.begin() + c, 0);
-			  char *p = buf.get() + idx_byte;
+			  auto thisSize = params[c].PnB;
+			  size_t idx = element_offset + r;
+			  size_t idx_bits = r * nRowSize + bits_offset;
+			  char *p = buf.get() + idx_bits/8;
+			  unique_ptr<char []> tmp;
+			  if(thisSize%8)//deal with odd bitwidth
+			  {
+				  if(thisSize>sizeof(uint64_t)*8)
+				  {
+					  std::string serror = "odd bitwidths exceeds the data type limit:";
+						serror.append(std::to_string(thisSize));
+						throw std::range_error(serror.c_str());
+				  }
+				  else
+				  {
+
+					  //cp the source bits
+					  int nSizeBytes = (float)thisSize/8 + 1;
+					  tmp.reset(new char[nSizeBytes]);
+					  memcpy(tmp.get(), p, nSizeBytes);
+					  //unset the extra bits for the trailing byte
+					  int extraBits = nSizeBytes * 8 - thisSize;
+					  tmp[nSizeBytes-1] &= (255<<extraBits);
+					  p = tmp.get();
+					  thisSize = nSizeBytes;
+
+				  }
+
+			  }
+			  else
+				  thisSize/=8;
 			  if(isbyteswap)
 				  std::reverse(p, p + thisSize);
 
@@ -331,6 +364,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 					  break;
 				  case sizeof(unsigned short): //2 bytes
 					{
+
 					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned short *>(p));
 					}
 
@@ -345,13 +379,15 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 					{
 					  output[idx] = static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));
 					}
+
 				  break;
 				  default:
-					std::string serror = "Unsupported bitwidths when performing channel-wise reading:";
-					serror.append(std::to_string(thisSize));
-					throw std::range_error(serror.c_str());
+					  {
+						  std::string serror = "unsupported byte width :";
+						  serror.append(std::to_string(thisSize));
+						  throw std::range_error(serror.c_str());
+					  }
 				  }
-
 				  // apply bitmask for integer data
 
 				 if(params[c].max > 0)
@@ -380,7 +416,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 				break;
 			  default:
-				std::string serror ="Unsupported bitwidths when performing channel-wise reading:";
+				std::string serror ="Unsupported bitwidths for numerical data type:";
 				serror.append(std::to_string(thisSize));
 				throw std::range_error(serror.c_str());
 			  }

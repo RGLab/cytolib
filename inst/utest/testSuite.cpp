@@ -87,13 +87,13 @@ struct parseFCSFixture{
 BOOST_FIXTURE_TEST_SUITE(parseFCS,parseFCSFixture)
 BOOST_AUTO_TEST_CASE(sample_1071)
 {
-	double start = clock();
+	double start = gettime();//clock();
 
 	string filename="../flowCore/misc/sample_1071.001";
 	FCS_READ_PARAM config;
 	config.data.num_threads = 10;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
-	double runtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
+	double runtime = (gettime() - start);// / (double)(CLOCKS_PER_SEC / 1000);
 		cout << runtime << endl;
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 8);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 23981);
@@ -102,12 +102,12 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 }
 BOOST_AUTO_TEST_CASE(double_precision)
 {
-	double start = clock();
+	double start = gettime();
 
 	string filename="../flowCore/misc/double_precision/wishbone_thymus_panel1_rep1.fcs";
 	FCS_READ_PARAM config;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
-	double runtime = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
+	double runtime = (gettime() - start);
 	cout << runtime << endl;
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 35);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 250170);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(double_precision)
 }
 BOOST_AUTO_TEST_CASE(multidata)
 {
-	double start = clock();
+	double start = gettime();
 
 	string filename="../flowCore/misc/multi-datasegment.fcs";
 	FCS_READ_PARAM config;
@@ -129,6 +129,34 @@ BOOST_AUTO_TEST_CASE(multidata)
 	config.header.nDataset = 10;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 955);
+}
+BOOST_AUTO_TEST_CASE(specialDelimiter)
+{
+
+
+	string filename="../flowCore/misc/specialDelimiter.fcs";
+	FCS_READ_PARAM config;
+
+	config.header.nDataset = 16;
+	double start = gettime();//;
+	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	cout << gettime() - start << endl;
+
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 50146);
+}
+BOOST_AUTO_TEST_CASE(oddbitwidth)
+{
+
+
+	string filename="../flowCore/misc/Sample 2.fcs";
+	FCS_READ_PARAM config;
+
+	config.header.nDataset = 3;
+	double start = gettime();//clock();
+	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	cout << gettime() - start << endl;
+
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10000);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

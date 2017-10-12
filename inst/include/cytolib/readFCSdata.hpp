@@ -10,7 +10,9 @@
 #include "readFCSHeader.hpp"
 #include <memory>
 #include <ctype.h>
-
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 typedef unsigned char BYTE;
 const int bsti = 1;  // Byte swap test integer
 

@@ -305,11 +305,14 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 		string pid = to_string(i);
 		string range_str;
 		if( keys.find("transformation")!=keys.end() &&  keys["transformation"] == "custom")
-				range_str = keys["flowCore_$P" + pid + "Rmax"];
+			range_str = "flowCore_$P" + pid + "Rmax";
 		else
-				range_str = keys["$P" + pid + "R"];
-
-		params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(range_str);
+			range_str = "$P" + pid + "R";
+		it = keys.find(range_str);
+		if(it==keys.end())
+			throw(domain_error(range_str + " not contained in Text section!"));
+		else
+			params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
 
 
 		params[i-1].PnB = stoi(keys["$P" + pid + "B"]);
