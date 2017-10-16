@@ -48,109 +48,7 @@
  * @param byte_order
  * @return
  */
-unique_ptr<EVENT_DATA_TYPE> readFCSdataRaw(ifstream & in, string dattype
-		, int nBytes, int size, bool isSigned, endianType endian, bool splitInt
-		, string byte_order, bool isbyteswap){
-	int count = nBytes/size;
-	unique_ptr<EVENT_DATA_TYPE> output(new EVENT_DATA_TYPE[count]);
-	EVENT_DATA_TYPE * data_ptr = output.get();
-	vector<int>a = {1, 2, 4, 8};
 
-	if(find(a.begin(),a.end(), size)!=a.end())
-	{
-
-		if(splitInt&&dattype == "I")
-		{
-		  if(size == 4)
-		  {
-			  throw(domain_error("split int not supported yet!"));
-			//#reorder bytes for mixed endian
-			if(endian == endianType::mixed)
-			{
-
-				throw(domain_error("mixed endian not supported yet!"));
-//			  byte_order = as.integer(strsplit(byte_order, ",")[[1]]) - 1
-//			  if(length(byte_order) != size)
-//				stop("Byte order is not consistent with bidwidths!")
-//
-//			  bytes <- readBin(con=con, what="raw",n = nBytes,size=1)
-//			  newBytes <- sortBytes(bytes, byte_order)#sort the bytes
-//
-//			  con <- newBytes
-//			  endian <- "little"
-
-			}
-
-			//#read uint32 as two uint16
-//			splitted <- readBin(con=con, what=dattype
-//								,n = as.integer(count * 2) #coerce count again to ensure it is within the int limit
-//								, size = size / 2, signed=FALSE, endian=endian)
-//
-//
-//
-//			uint2double(splitted, endian == "big")
-
-
-		  }
-		  else
-			  throw(domain_error("'splitInt = TRUE' is only valid for uint32!"));
-		}else
-		{
-			if(isbyteswap)
-			{
-				while(count-->0)
-				{
-					vector<BYTE> bytes(size);
-					in.read(reinterpret_cast<char *>(&bytes[0]), size);
-//					bytes2number(data_ptr, &bytes[0], size, isbyteswap);
-					data_ptr++;
-				}
-
-			}
-			else//directly load into dest
-				in.read(reinterpret_cast<char *>(data_ptr), nBytes);
-
-
-
-		}
-
-	}
-  else
-	{
-	  throw(domain_error("odd bitwidths not supported yet!"));
-//			#read raw byte stream first
-//			oldBytes <- readBin(con=con, what="raw",n = nBytes,size=1)
-//			#convert to bit vector
-//			oldBits<-rawToBits(oldBytes)
-//			#convert the data element to the non-odd  bitwidth
-//			oldBitWidth<-size*8
-//			newBitWidth<-2^ceiling(log(oldBitWidth,2))
-//			newBits<-unlist(lapply(1:count,function(i){
-//	#							browser()
-//												start<-(i-1)*oldBitWidth+1
-//	                                            #padding zeros
-//												c(oldBits[start:(start+oldBitWidth-1)],raw(newBitWidth-oldBitWidth)
-//	                                                )
-//												}
-//									)
-//							)
-//			#convert raw byte to corresponding type by readBin
-//	        #packBits is least-significant bit first, so we need to make sure endian is set to "little" instead of the endian used in original FCS
-//			readBin(packBits(newBits,"raw"),what=dattype,n=count,size=newBitWidth/8, signed=signed, endian = "little")
-//
-//
-		}
-	return output;
-}
-//void convertRaw_impl(char * src, void * dest, unsigned short thisSize, bool isbyteswap)
-//{
-//
-//  char * p = reinterpret_cast<char *>(dest);
-//  memcpy(dest, src, thisSize);
-//  if(isbyteswap)
-//	  std::reverse(p, p + thisSize);
-//
-//}
 EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params, int &nEvents,  FCS_READ_DATA_PARAM & config)
 {
 	//## transform or scale data?
@@ -188,9 +86,6 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	else
 		endian = endianType::mixed;
 
-	bool isbyteswap = false;
-	if((is_host_big_endian()&&endian==endianType::small)||(!is_host_big_endian()&&endian==endianType::big))
-		isbyteswap = true;
 
 
 	 string dattype = keys["$DATATYPE"];
@@ -199,7 +94,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 
     if (keys["$MODE"] != "L")
-    	throw(domain_error("Don't know how to deal with $MODE" + keys["$MODE"]));
+    	throw(domain_error("Don't know how to deal with $MODE " + keys["$MODE"]));
 
 
 	fcsPnGtransform = keys.find("flowCore_fcsPnGtransform")!= keys.end() && keys["flowCore_fcsPnGtransform"] == "linearize-with-PnG-scaling";
@@ -272,9 +167,6 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
   int nBytes = header.dataend - header.datastart + 1;
 
-//  if(multiSize){
-//	if(endian == endianType::mixed)
-//		throw(domain_error("Cant't handle diverse bitwidths while endian is mixed: " + byte_order));
 
 //	vector<BYTE>bytes(nBytes);
 //	in.read((char *)&bytes[0], nBytes);
@@ -284,13 +176,6 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	//total bits for each row
   	size_t nRowSize = accumulate(params.begin(), params.end(), 0, [](size_t i, cytoParam p){return i + p.PnB;});
 
-	//how many rows
-//  	KEY_WORDS::iterator it = keys.find("$TOT");
-//  	if(it==keys.end())
-//  		throw(domain_error("can't find $TOT keyword to process the parsing!"));
-//  	string sTot = it->second;
-//
-//	unsigned nrow = boost::lexical_cast<unsigned>(sTot);
   	unsigned nrow = nBytes * 8/nRowSize;
 	nEvents = nrow;
 	//how many element to return
@@ -303,6 +188,57 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	in.read(bufPtr, nBytes); //load the bytes from file
 //	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 	float decade = pow(10, config.decades);
+	/*
+	 * mixed endian parsing could be more efficiently
+	 * integrated into the subsequent main loop of data parsing
+	 * but since it is a rare case (legacy data), we do the separate simple
+	 * preprocessing here to avoid adding extra overhead into the main loop
+	 */
+	if(endian == endianType::mixed)
+	{
+		  if(multiSize)
+			throw(domain_error("Cant't handle diverse bitwidths while endian is mixed: " + byte_order));
+
+		  vector<string> byteOrd;
+		  boost::split(byteOrd, byte_order, boost::is_any_of(","));
+		  int elementSize = byteOrd.size();
+
+		  if(params[0].PnB/8 != elementSize)
+			throw(domain_error("Byte order is not consistent with bidwidths!"));
+
+		  vector<int> iByteOrd(elementSize);
+		  for(auto i = 0; i < elementSize; i++)
+		  {
+			  iByteOrd[i] = boost::lexical_cast<int>(byteOrd[i])-1;
+		  }
+		  char * tmp = new char[elementSize];
+		  for(auto ind = 0; ind < nElement; ind++){
+
+			  memcpy(tmp, bufPtr + ind * elementSize, elementSize);
+
+		     for(auto i = 0; i < elementSize; i++){
+		       auto j = iByteOrd.at(i);
+
+		       auto pos_old = ind * elementSize + i;
+		       auto pos_new = ind * elementSize + j;
+		 //       if(ind<=10)
+		 //         Rcpp::Rcout << pos_old <<":" << pos_new << std::endl;
+
+
+		       bufPtr[pos_new] = tmp[i];
+
+		     }
+
+		   }
+		  	delete [] tmp;
+
+		    endian = endianType::small;
+	}
+
+	bool isbyteswap = false;
+	if((is_host_big_endian()&&endian==endianType::small)||(!is_host_big_endian()&&endian==endianType::big))
+		isbyteswap = true;
+
 	/**
 	 * cp raw bytes(row-major) to a 2d mat (col-major) represented as 1d array(with different byte width for each elements)
 	 */

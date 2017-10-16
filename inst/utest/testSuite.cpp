@@ -158,5 +158,19 @@ BOOST_AUTO_TEST_CASE(oddbitwidth)
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10000);
 }
+BOOST_AUTO_TEST_CASE(mixedEndian)
+{
+
+
+	string filename="../flowCore/misc/mixedEndian.fcs";
+	FCS_READ_PARAM config;
+	double start = gettime();//clock();
+	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	cout << gettime() - start << endl;
+
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 30041);
+	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 7447226);
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
