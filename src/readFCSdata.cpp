@@ -314,13 +314,14 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
     #pragma omp parallel for
 	for(auto c = 0; c < nCol; c++)
 	 {
+		string pid = to_string(c+1);
+		EVENT_DATA_TYPE realMin = numeric_limits<EVENT_DATA_TYPE>::max();
 		size_t element_offset = nrow * c;
 		size_t bits_offset = accumulate(params.begin(), params.begin() + c, 0, [](size_t i, cytoParam p){return i + p.PnB;});
+		cytoParam & param = params[c];
 		for(auto r = 0; r < nrow; r++)
 	    {
 	      //convert each element
-			  cytoParam & param = params[c];
-
 			  auto thisSize = param.PnB;
 			  size_t idx = element_offset + r;
 			  EVENT_DATA_TYPE & outElement = output[idx];
@@ -489,8 +490,20 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 //					param.max = decade;
 				}
 			}
+			realMin = realMin > outElement?outElement:realMin;
 
 	    }
+
+		if(keys.find("transformation")!=keys.end() &&  keys["transformation"] == "custom")
+			param.min = boost::lexical_cast<EVENT_DATA_TYPE>(keys["flowCore_$P" + pid + "Rmin"]);
+		else
+		{
+
+			auto zeroVals = param.PnE.second;
+			param.min = min(static_cast<EVENT_DATA_TYPE>(zeroVals), max(config.min_limit, realMin));
+
+		}
+
 	 }
 //	 cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
 //	 cout << (omp_get_wtime() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
@@ -504,7 +517,10 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 
 		  if(p.PnE.first > 0)
+		  {
+			 p.min = pow(10,p.min/(p.max-1) * p.PnE.first);
 			 p.max = pow(10,p.PnE.first);
+		  }
 		  else if (fcsPnGtransform && p.PnG != 1)
 			  p.max = (p.max-1) / p.PnG;
 		  else

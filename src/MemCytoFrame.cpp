@@ -30,21 +30,6 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 
 			string pid = to_string(i+1);
 
-
-			if(keys.find("transformation")!=keys.end() &&  keys["transformation"] == "custom")
-				params[i].min = boost::lexical_cast<EVENT_DATA_TYPE>(keys["flowCore_$P" + pid + "Rmin"]);
-			else
-			{
-
-				EVENT_DATA_TYPE * vec = getData(params[i].channel, ColType::channel);
-				auto absMin  = *min_element(vec, vec + nRow());
-				auto zeroVals = params[i].PnE.second;
-				params[i].min = min(static_cast<EVENT_DATA_TYPE>(zeroVals), max(config.data.min_limit, absMin));
-
-			}
-
-
-
 			//insert our own PnR fields
 			if(config.data.isTransformed)
 			{
@@ -53,8 +38,8 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 				keys["flowCore_$P" + pid + "Rmin"] = params[i].min;
 				keys["flowCore_$P" + pid + "Rmax"] = params[i].max;
 			}
-
-			params[i].max--;
+			else
+				params[i].max--;
 		}
 
 		/*
@@ -81,6 +66,9 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 		keys["GUID"] = paths.back();
 
 	}
+
+
+
 }
 
 
