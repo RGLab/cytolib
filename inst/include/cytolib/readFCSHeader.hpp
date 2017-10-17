@@ -48,7 +48,7 @@ struct FCS_READ_HEADER_PARAM{
 struct cytoParam{
 	string channel, marker;
 	EVENT_DATA_TYPE min, max, PnG;
-	pair<int, int> PnE;
+	pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> PnE;
 	int PnB;
 
 };

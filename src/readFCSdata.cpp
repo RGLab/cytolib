@@ -466,7 +466,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 		{
 
 			auto zeroVals = param.PnE.second;
-			param.min = min(static_cast<EVENT_DATA_TYPE>(zeroVals), max(config.min_limit, realMin));
+			param.min = min(zeroVals, max(config.min_limit, realMin));
 
 		}
 
