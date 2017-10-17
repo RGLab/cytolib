@@ -146,20 +146,7 @@ BOOST_AUTO_TEST_CASE(multidata2)
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 53691);
 }
-BOOST_AUTO_TEST_CASE(specialDelimiter)
-{
 
-
-	string filename="../flowCore/misc/specialDelimiter.fcs";
-	FCS_READ_PARAM config;
-
-	config.header.nDataset = 16;
-	double start = gettime();//;
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
-	cout << gettime() - start << endl;
-
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 50146);
-}
 BOOST_AUTO_TEST_CASE(oddbitwidth)
 {
 
@@ -188,6 +175,22 @@ BOOST_AUTO_TEST_CASE(mixedEndian)
 	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 7447226);
 
 }
+
+BOOST_AUTO_TEST_CASE(specialDelimiter)
+{
+
+
+	string filename="../flowCore/misc/specialDelimiter.fcs";
+	FCS_READ_PARAM config;
+	double start = gettime();//clock();
+	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	cout << gettime() - start << endl;
+
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 50146);
+	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 9999998);
+
+}
+
 BOOST_AUTO_TEST_CASE(gigantic_file)
 {
 

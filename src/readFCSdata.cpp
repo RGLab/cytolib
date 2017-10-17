@@ -285,6 +285,8 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 		size_t element_offset = nrow * c;
 		size_t bits_offset = accumulate(params.begin(), params.begin() + c, 0, [](size_t i, cytoParam p){return i + p.PnB;});
 		cytoParam & param = params[c];
+		int usedBits = ceil(log2(param.max));
+	    uint64_t base = static_cast<uint64_t>(1)<<usedBits;
 		for(auto r = 0; r < nrow; r++)
 	    {
 	      //convert each element
@@ -363,9 +365,9 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 				 if(param.max > 0)
 				 {
-				   int usedBits = ceil(log2(param.max));
+
 				   if(usedBits < param.PnB)
-					   outElement = static_cast<int>(outElement) % (1<<usedBits);
+					   outElement = static_cast<uint64_t>(outElement) % base;
 				}
 
 
