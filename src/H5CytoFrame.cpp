@@ -5,7 +5,6 @@
  *      Author: wjiang2
  */
 
-
 #include <cytolib/H5CytoFrame.hpp>
 void H5CytoFrame::compensate(const compensation &){
 

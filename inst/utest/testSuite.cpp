@@ -172,5 +172,23 @@ BOOST_AUTO_TEST_CASE(mixedEndian)
 	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 7447226);
 
 }
+BOOST_AUTO_TEST_CASE(gigantic_file)
+{
+
+
+	string filename="../flowCore/misc/gigantic_file.fcs";
+	FCS_READ_PARAM config;
+	vector<int> which_lines(1e3);
+	for(auto i = 0; i < 1e3; i++)
+		which_lines[i] = i;
+	config.data.which_lines = which_lines;
+	double start = gettime();//clock();
+	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	cout << gettime() - start << endl;
+
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1e3);
+	BOOST_CHECK_CLOSE(cytofrm.getData()[1], 63418.3242, 1e-6);
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()

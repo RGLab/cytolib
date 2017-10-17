@@ -177,15 +177,45 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
   	size_t nRowSize = accumulate(params.begin(), params.end(), 0, [](size_t i, cytoParam p){return i + p.PnB;});
 
   	unsigned nrow = nBytes * 8/nRowSize;
+
+  	vector<int>which_lines = config.which_lines;
+  	int nSelected = which_lines.size();
+  	if(nSelected>0){
+  		if(nSelected >= nrow)
+  			throw(domain_error("total number of which.lines exceeds the total number of events: " + to_string(nrow)));
+
+  		sort(which_lines.begin(), which_lines.end());
+  		nrow = nSelected;
+  		nBytes = nrow * nRowSize/8;
+  	}
+  	unique_ptr<char []> buf(new char[nBytes]);//we need to rearrange dat from row-major to col-major thus need a separate buf anyway (even for float)
+  	char * bufPtr = buf.get();
+  	if(nSelected>0)
+  	{
+  		char * thisBufPtr = bufPtr;
+  		auto nRowSizeBytes = nRowSize/8;
+  		for(auto i : which_lines)
+  		{
+  			auto pos =  header.datastart + i * nRowSizeBytes;
+  			if(pos > header.dataend || pos < header.datastart)
+  				throw(domain_error("the index of which.lines exceeds the data boundary: " + to_string(i)));
+  			in.seekg(pos);
+  			in.read(thisBufPtr, nRowSizeBytes);
+  			thisBufPtr += nRowSizeBytes;
+  		}
+  	}
+  	else
+  	{
+  		//load entire data section with one disk IO
+
+		in.read(bufPtr, nBytes); //load the bytes from file
+  	}
 	nEvents = nrow;
 	//how many element to return
 	auto nElement = nrow * nCol;
 	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
 
-	//load entire data section with one disk IO
-	unique_ptr<char []> buf(new char[nBytes]);//we need to rearrange dat from row-major to col-major thus need a separate buf anyway (even for float)
-	char * bufPtr = buf.get();
-	in.read(bufPtr, nBytes); //load the bytes from file
+
 //	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 	float decade = pow(10, config.decades);
 	/*

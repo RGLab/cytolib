@@ -233,7 +233,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 	//
 	//   # Let's not be too strick here as unfortunatelly, some files exported from FlowJo
 	//   # are missing the $BEGINDATA and $ENDDATA keywords and we still need to read those
-	   int datastart, dataend;
+	   unsigned long datastart, dataend;
 	   if(keys.find("$BEGINDATA")==keys.end())
 	   {
 	     if (datastart_h != 0)
@@ -255,7 +255,7 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 		   throw(domain_error("Don't know where the data segment ends, there was no $ENDDATA keyword and the FCS HEADER does not say it either."));
 	   }
 	   else
-		   dataend = stoi(keys["$ENDDATA"]);
+		   dataend = stoul(keys["$ENDDATA"]);
 
 	//   # when both are present and they don't agree with each other
 	   if(datastart_h != datastart)
