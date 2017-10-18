@@ -160,6 +160,8 @@ BOOST_AUTO_TEST_CASE(oddbitwidth)
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10000);
+	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 194);
+
 }
 BOOST_AUTO_TEST_CASE(mixedEndian)
 {
