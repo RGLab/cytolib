@@ -104,11 +104,15 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 	bool multiSize = false;
 	for(int i = 1; i < nCol; i++)
+	{
+		if(params[i].PnB%8)
+			throw(domain_error("Sorry, C parser doesn't support odd bitwidth!"));
 		if(params[i].PnB!=params[0].PnB)
 		{
 			multiSize = true;
 			break;
 		}
+	}
 	if(dattype!="I"&&multiSize)
 		throw(domain_error("Sorry, Numeric data type expects the same bitwidth for all parameters!"));
 
@@ -266,28 +270,9 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	}
 
 	bool isbyteswap = false;
-	bool oddbitwidth = false;
-	for(auto p : params)
-		if(p.PnB%8)
-		{
-			oddbitwidth = true;
-			break;
-		}
-	//force it to small for odd bithwidth due to the legacy code in R treat it this way (not sure if legimite)
-	if(oddbitwidth)
-	{
-		if(multiSize)
-			throw(domain_error("odd bitwidth can't have !"));
-//		config.num_threads = 1;//to simplify, odd bitwidth currently is done sequentially
-		endian=endianType::small;
-	}
-
 
 	if((is_host_big_endian()&&endian==endianType::small)||(!is_host_big_endian()&&endian==endianType::big))
 		isbyteswap = true;
-	//variables used for odd bitwidth logic
-	int nSizeBytes = (float)params[0].PnB/8 + 1;
-	int extraBits = nSizeBytes * 8 - params[0].PnB;
 
 	/**
 	 * cp raw bytes(row-major) to a 2d mat (col-major) represented as 1d array(with different byte width for each elements)
@@ -316,53 +301,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			  EVENT_DATA_TYPE & outElement = output[idx];
 			  size_t idx_bits = r * nRowSize + bits_offset;
 			  char *p = bufPtr + idx_bits/8;
-			  unique_ptr<char []> tmp;
-			  if(thisSize%8)//deal with odd bitwidth
-			  {
-				  if(idx_bits>0)
-					  p--;//step back 1 byte to get back the previous masked bits
-				  if(thisSize>sizeof(uint64_t)*8)
-				  {
-					  std::string serror = "odd bitwidths exceeds the data type limit:";
-						serror.append(std::to_string(thisSize));
-						throw std::range_error(serror.c_str());
-				  }
-				  else
-				  {
-
-					  //cp the source bits
-
-					  tmp.reset(new char[nSizeBytes]);
-					  memcpy(tmp.get(), p, nSizeBytes);
-
-//					  if(endian == endianType::small)
-//					  {
-						  //mask bits of most significant byte
-
-						  tmp[nSizeBytes-1] &= (255 >> extraBits);
-						  //mask bits of least significant byte
-						  if(idx_bits>0)
-							  tmp[0] &=
-//					  }
-//					  else if(endian == endianType::big)
-//					  {
-////						  //right shift all the bytes since the first byte is the most significant and needs to mask its high bits as well
-////						  for(auto j = nSizeBytes -1; j >0 ; j--)
-////							  tmp[j] >> extraBits;
-//						  tmp[nSizeBytes-1] >> extraBits;//this is probably wrong
-////						  PRINT("We are currently treating big endian as small endian for the odd bitwidth\n");
-//					  }
-//					  else
-//						  throw(domain_error("We currently don't support the odd bitwidth with mixed endian!"));
-
-					  p = tmp.get();
-					  thisSize = nSizeBytes;
-
-				  }
-
-			  }
-			  else
-				  thisSize/=8;
+			  thisSize/=8;
 			  if(isbyteswap)
 				  std::reverse(p, p + thisSize);
 
