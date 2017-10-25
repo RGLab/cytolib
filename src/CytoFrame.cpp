@@ -127,8 +127,34 @@ void CytoFrame::writeFCS(const string & filename)
 void CytoFrame::writeH5(const string & filename)
 {
 	H5File file( filename, H5F_ACC_TRUNC );
+	//define variable-length string data type
+	StrType str_type(0, H5T_VARIABLE);
+
+	/*
+	 * write params as array of compound type
+	 */
+
+
+	hsize_t dim_pne[] = {2};
+	ArrayType pne(PredType::NATIVE_FLOAT, 1, dim_pne);
+
+	CompType param_type(sizeof(cytoParam));
+	param_type.insertMember("channel", HOFFSET(cytoParam, channel), str_type);
+	param_type.insertMember("marker", HOFFSET(cytoParam, marker), str_type);
+	param_type.insertMember("min", HOFFSET(cytoParam, min), PredType::NATIVE_FLOAT);
+	param_type.insertMember("max", HOFFSET(cytoParam, max), PredType::NATIVE_FLOAT);
+	param_type.insertMember("PnG", HOFFSET(cytoParam, PnG), PredType::NATIVE_FLOAT);
+	param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
+	param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
+
+	hsize_t dim_param[] = {nCol()};
+	DataSpace dsp_param(1, dim_param);
+
+	DataSet ds_param = file.createDataSet( "params", param_type, dsp_param);
+	ds_param.write(&params[0], param_type );
+
 	 /*
-	* Define the size of the array and create the data space for fixed
+	* store events data as fixed
 	* size dataset.
 	*/
 	hsize_t dimsf[2] = {nCol(), nEvents};              // dataset dimensions
@@ -137,16 +163,8 @@ void CytoFrame::writeH5(const string & filename)
 	plist.setChunk(2, chunk_dims);
 //	plist.setFilter()
 	DataSpace dataspace( 2, dimsf);
-	/*
-	* Define datatype for the data in the file.
-	* We will store little endian float numbers.
-	*/
 	FloatType datatype( PredType::NATIVE_FLOAT );
 	datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
-	/*
-	* Create a new dataset within the file using defined dataspace and
-	* datatype and default dataset creation properties.
-	*/
 	DataSet dataset = file.createDataSet( DATASET_NAME, datatype, dataspace, plist);
 	/*
 	* Write the data to the dataset using default memory space, file
