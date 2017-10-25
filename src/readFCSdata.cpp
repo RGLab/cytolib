@@ -402,7 +402,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			{
 
 
-			  if(param.PnE.first > 0)
+			  if(param.PnE[0] > 0)
 			  {
 	//				 # J.Spidlen, Nov 5, 2013: This was a very minor bug. The linearization transformation
 	//				 # for $PnE != "0,0" is defined as:
@@ -415,7 +415,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 	//				 # dat[,i] <- 10^((dat[,i]/(range[i]-1))*ampli[i,1])
 	//				 # to
 	//				 # dat[,i] <- 10^((dat[,i]/range[i])*ampli[i,1])
-				 outElement = pow(10,((outElement/param.max)*param.PnE.first));
+				 outElement = pow(10,((outElement/param.max)*param.PnE[0]));
 //				 param.max = pow(10,param.PnE.first);
 			  }
 			  else if (fcsPnGtransform && param.PnG != 1) {
@@ -427,7 +427,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 			}
 			if(scale)
 			{
-				if(param.PnE.first > 0)
+				if(param.PnE[0] > 0)
 				{
 					outElement = decade*((outElement-1)/(param.max-1));
 //					param.max = decade*(param.max/param.max-1);
@@ -447,7 +447,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 		else
 		{
 
-			auto zeroVals = param.PnE.second;
+			auto zeroVals = param.PnE[1];
 			param.min = min(zeroVals, max(config.min_limit, realMin));
 
 		}
@@ -464,10 +464,10 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 		{
 
 
-		  if(p.PnE.first > 0)
+		  if(p.PnE[0] > 0)
 		  {
-			 p.min = pow(10,p.min/(p.max-1) * p.PnE.first);
-			 p.max = pow(10,p.PnE.first);
+			 p.min = pow(10,p.min/(p.max-1) * p.PnE[0]);
+			 p.max = pow(10,p.PnE[0]);
 		  }
 		  else if (fcsPnGtransform && p.PnG != 1)
 			  p.max = (p.max-1) / p.PnG;
@@ -476,7 +476,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 		}
 		if(scale)
 		{
-			if(p.PnE.first > 0)
+			if(p.PnE[0] > 0)
 				p.max = decade*(p.max/p.max-1);
 			else
 				p.max = decade;

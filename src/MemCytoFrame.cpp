@@ -34,7 +34,7 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 			if(config.data.isTransformed)
 			{
 				keys["$P" + pid + "E"] = "0,0";
-				params[i].PnE = make_pair<EVENT_DATA_TYPE,EVENT_DATA_TYPE>(0,0);
+				params[i].PnE = vector<EVENT_DATA_TYPE>(3,0);
 				keys["flowCore_$P" + pid + "Rmin"] = params[i].min;
 				keys["flowCore_$P" + pid + "Rmax"] = params[i].max;
 			}
