@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 8);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 23981);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
-
+	cytofrm.writeH5("/loc/no-backup/mike/shared/test.h5");
 }
 BOOST_AUTO_TEST_CASE(double_precision)
 {

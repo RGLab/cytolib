@@ -14,9 +14,7 @@
 #include <omp.h>
 #endif
 typedef unsigned char BYTE;
-const int bsti = 1;  // Byte swap test integer
 
-#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
 
 
 struct FCS_READ_DATA_PARAM{

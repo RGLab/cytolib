@@ -119,3 +119,38 @@ pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> CytoFrame::getRange(const string & colnam
 		throw(domain_error("invalid range type"));
 	}
 }
+void CytoFrame::writeFCS(const string & filename)
+{
+
+}
+
+void CytoFrame::writeH5(const string & filename)
+{
+	H5File file( filename, H5F_ACC_TRUNC );
+	 /*
+	* Define the size of the array and create the data space for fixed
+	* size dataset.
+	*/
+	hsize_t dimsf[2] = {nCol(), nEvents};              // dataset dimensions
+	DSetCreatPropList plist;
+	hsize_t	chunk_dims[2] = {1, nEvents};
+	plist.setChunk(2, chunk_dims);
+//	plist.setFilter()
+	DataSpace dataspace( 2, dimsf);
+	/*
+	* Define datatype for the data in the file.
+	* We will store little endian float numbers.
+	*/
+	FloatType datatype( PredType::NATIVE_FLOAT );
+	datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
+	/*
+	* Create a new dataset within the file using defined dataspace and
+	* datatype and default dataset creation properties.
+	*/
+	DataSet dataset = file.createDataSet( DATASET_NAME, datatype, dataspace, plist);
+	/*
+	* Write the data to the dataset using default memory space, file
+	* space, and transfer properties.
+	*/
+	dataset.write( getData(), PredType::NATIVE_FLOAT );
+}

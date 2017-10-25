@@ -27,5 +27,7 @@ void PRINT(string a);
 void PRINT(const char * a);
 
 #define PRT true
+const int bsti = 1;  // Byte swap test integer
+#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
 
 #endif /* GLOBAL_HPP_ */

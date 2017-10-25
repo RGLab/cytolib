@@ -22,7 +22,7 @@ public:
 	MemCytoFrame(const string &filename, FCS_READ_PARAM &, bool onlyTxt);
 	void compensate(const compensation &);
 //	void transform(const transformation &);
-	void save(const string & filename, FrameType type);
+
 	EVENT_DATA_TYPE * getData();
 	EVENT_DATA_TYPE * getData(const string &, ColType);
 

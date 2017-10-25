@@ -11,11 +11,14 @@
 
 #include "readFCSHeader.hpp"
 #include "compensation.hpp"
+#include <c++/H5Cpp.h>
 enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
 
+using namespace H5;
 
+const H5std_string  DATASET_NAME( "data");
 
 /**
  * The class representing a single FCS file
@@ -31,7 +34,8 @@ public:
 	virtual ~CytoFrame(){};
 	virtual void compensate(const compensation &)=0;
 //	virtual void transform(const transformation &)=0;
-	virtual void save(const string & filename, FrameType type)=0;
+	virtual void writeFCS(const string & filename);
+	virtual void writeH5(const string & filename);
 	virtual EVENT_DATA_TYPE * getData()=0;
 	virtual EVENT_DATA_TYPE * getData(const string &, ColType)=0;
 	virtual KEY_WORDS getKeywords();

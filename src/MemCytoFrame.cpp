@@ -86,6 +86,4 @@ void MemCytoFrame:: compensate(const compensation &){
 
 }
 
-void MemCytoFrame:: save(const string & filename, FrameType type){
 
-}
