@@ -319,13 +319,16 @@ void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vecto
 
 		it = keys.find("$P" + pid + "E");
 		if(it==keys.end())
-			params[i-1].PnE = vector<EVENT_DATA_TYPE>(2, 0);
+		{
+			params[i-1].PnE[0] = 0;
+			params[i-1].PnE[1] = 0;
+		}
 		else
 		{
 			vector<string> tokens;
 			boost::split(tokens, it->second, boost::is_any_of(","));
-			params[i-1].PnE.push_back(stof(tokens[0]));
-			params[i-1].PnE.push_back(stof(tokens[1]));
+			params[i-1].PnE[0] = stof(tokens[0]);
+			params[i-1].PnE[1] = stof(tokens[1]);
 		}
 
 		it = keys.find("$P" + pid + "G");

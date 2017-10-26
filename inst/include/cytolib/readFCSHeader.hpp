@@ -49,7 +49,7 @@ struct cytoParam{
 	string channel, marker;
 	EVENT_DATA_TYPE min, max, PnG;
 //	pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> PnE;//replace pair with simple array since it is not clear how to create compound type for pair
-	vector<EVENT_DATA_TYPE> PnE;
+	EVENT_DATA_TYPE PnE[2];
 	int PnB;
 
 };

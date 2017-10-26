@@ -127,8 +127,10 @@ void CytoFrame::writeFCS(const string & filename)
 void CytoFrame::writeH5(const string & filename)
 {
 	H5File file( filename, H5F_ACC_TRUNC );
-	//define variable-length string data type
-	StrType str_type(0, H5T_VARIABLE);
+	StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
+
+	FloatType datatype( PredType::NATIVE_FLOAT );
+	datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
 
 	/*
 	 * write params as array of compound type
@@ -136,14 +138,14 @@ void CytoFrame::writeH5(const string & filename)
 
 
 	hsize_t dim_pne[] = {2};
-	ArrayType pne(PredType::NATIVE_FLOAT, 1, dim_pne);
+	ArrayType pne(datatype, 1, dim_pne);
 
 	CompType param_type(sizeof(cytoParam));
 	param_type.insertMember("channel", HOFFSET(cytoParam, channel), str_type);
 	param_type.insertMember("marker", HOFFSET(cytoParam, marker), str_type);
-	param_type.insertMember("min", HOFFSET(cytoParam, min), PredType::NATIVE_FLOAT);
-	param_type.insertMember("max", HOFFSET(cytoParam, max), PredType::NATIVE_FLOAT);
-	param_type.insertMember("PnG", HOFFSET(cytoParam, PnG), PredType::NATIVE_FLOAT);
+	param_type.insertMember("min", HOFFSET(cytoParam, min), datatype);
+	param_type.insertMember("max", HOFFSET(cytoParam, max), datatype);
+	param_type.insertMember("PnG", HOFFSET(cytoParam, PnG), datatype);
 	param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
 	param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
 
@@ -163,8 +165,6 @@ void CytoFrame::writeH5(const string & filename)
 	plist.setChunk(2, chunk_dims);
 //	plist.setFilter()
 	DataSpace dataspace( 2, dimsf);
-	FloatType datatype( PredType::NATIVE_FLOAT );
-	datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
 	DataSet dataset = file.createDataSet( DATASET_NAME, datatype, dataspace, plist);
 	/*
 	* Write the data to the dataset using default memory space, file
