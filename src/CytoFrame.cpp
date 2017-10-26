@@ -155,6 +155,32 @@ void CytoFrame::writeH5(const string & filename)
 	DataSet ds_param = file.createDataSet( "params", param_type, dsp_param);
 	ds_param.write(&params[0], param_type );
 
+	/*
+	 * write keywords
+	 */
+	//convert to vector
+
+	struct key_t{
+		string key, value;
+		key_t(const string & k, const string & v):key(k),value(v){};
+	};
+	vector<key_t> keyVec;
+	for(std::pair<std::string, string> e : keys)
+	{
+		keyVec.push_back(key_t(e.first, e.second));
+	}
+
+
+	CompType key_type(sizeof(key_t));
+	key_type.insertMember("key", HOFFSET(key_t, key), str_type);
+	key_type.insertMember("value", HOFFSET(key_t, value), str_type);
+
+	hsize_t dim_key[] = {keyVec.size()};
+	DataSpace dsp_key(1, dim_key);
+
+	DataSet ds_key = file.createDataSet( "keywords", key_type, dsp_key);
+	ds_key.write(&keyVec[0], key_type );
+
 	 /*
 	* store events data as fixed
 	* size dataset.
