@@ -9,8 +9,8 @@
 
 
 
-KEY_WORDS CytoFrame::getKeywords(){
-	return keys;
+vector<pair <string, string>> CytoFrame::getKeywords(){
+	return keys.getPairs();
 }
 string CytoFrame::getKeyword(const string & key){
 	string res="";

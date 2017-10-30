@@ -38,7 +38,7 @@ public:
 	virtual void writeH5(const string & filename);
 	virtual EVENT_DATA_TYPE * getData()=0;
 	virtual EVENT_DATA_TYPE * getData(const string &, ColType)=0;
-	virtual KEY_WORDS getKeywords();
+	virtual vector<pair <string, string>> getKeywords();
 	virtual string getKeyword(const string &);
 	virtual void setKeyword(const string &, const string &);
 	virtual int nCol();

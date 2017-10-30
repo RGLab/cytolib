@@ -25,6 +25,15 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 
 //		cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
 		//update min and max
+		/*
+		 * ## set transformed flag and fix the PnE and the Datatype keywords
+		 */
+		keys["FILENAME"] = filename;
+		if(config.data.isTransformed)
+		{
+			keys["transformation"] ="applied";
+			keys["$DATATYPE"] = "F";
+		}
 		for(int i = 0; i < params.size(); i++)
 		{
 
@@ -36,22 +45,14 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 				keys["$P" + pid + "E"] = "0,0";
 				params[i].PnE[0] = 0;
 				params[i].PnE[1] = 0;
-				keys["flowCore_$P" + pid + "Rmin"] = params[i].min;
-				keys["flowCore_$P" + pid + "Rmax"] = params[i].max;
+				keys["flowCore_$P" + pid + "Rmax"] = to_string(static_cast<int>(params[i].max + 1));
+				keys["flowCore_$P" + pid + "Rmin"] = to_string(static_cast<int>(params[i].min));
 			}
 			else
 				params[i].max--;
 		}
 
-		/*
-		 * ## set transformed flag and fix the PnE and the Datatype keywords
-		 */
-		keys["FILENAME"] = filename;
-		if(config.data.isTransformed)
-		{
-			keys["transformation"] ="applied";
-			keys["$DATATYPE"] = "F";
-		}
+
 
 		//GUID
 		string oldguid;
