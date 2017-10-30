@@ -18,17 +18,11 @@ public:
 	~H5CytoFrame(){};
 	void compensate(const compensation &);
 //	void transform(const transformation &);
-	H5CytoFrame(const string & filename, FrameType type);
+	H5CytoFrame(const string & _filename);
 //	void save(const string & filename, FrameType type);
-//	EVENT_DATA_TYPE * getData();
-//	EVENT_DATA_TYPE * getData(const string &, ColType);
-//	KEY_WORDS getKeywords();
-//	string getKeyword(const string &);
+	EVENT_DATA_TYPE * getData();
+	EVENT_DATA_TYPE * getData(const string &, ColType);
 //	void setKeyword(const string &, const string &);
-//	int nCol();
-//	int nRow();
-//	vector<string> getChannels();
-//	vector<string> getMarkers();
 //	void setChannel(const string &, const string &);
 //	void setMarker(const string &, const string &);
 

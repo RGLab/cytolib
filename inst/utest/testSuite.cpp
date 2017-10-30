@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <cytolib/MemCytoFrame.hpp>
+#include <cytolib/H5CytoFrame.hpp>
 //#include "test_header.hpp"
 //float gTol = 0.05;
 
@@ -98,7 +99,14 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 8);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 23981);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
-	cytofrm.writeH5("/loc/no-backup/mike/shared/test.h5");
+
+	string h5file = "/loc/no-backup/mike/shared/test.h5";
+	cytofrm.writeH5(h5file);
+	H5CytoFrame h5fr(h5file);
+	BOOST_CHECK_EQUAL(h5fr.nCol(), 8);
+	BOOST_CHECK_EQUAL(h5fr.nRow(), 23981);
+
+
 }
 BOOST_AUTO_TEST_CASE(double_precision)
 {
