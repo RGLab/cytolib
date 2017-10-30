@@ -28,7 +28,40 @@ struct FCS_Header{
 	int textstart, textend, datastart, dataend, anastart, anaend, additional;
 };
 
-typedef unordered_map <string, string> KEY_WORDS;
+//typedef unordered_map <string, string> KEY_WORDS;
+/**
+ * this class mimic the map behavior so that the same code
+ * can be used for both map and vector based container
+ */
+class vec_kw_constainer{
+ typedef vector<pair <string, string>> KW_PAIR;
+ KW_PAIR kw;
+public:
+ typedef KW_PAIR::iterator iterator;
+ typedef KW_PAIR::const_iterator const_iterator;
+ size_t size(){return kw.size();}
+ KW_PAIR getPairs(){return kw;}
+ iterator end(){return kw.end();}
+ iterator begin(){return kw.begin();}
+ iterator find(const string &key){
+         return std::find_if(kw.begin(), kw.end(), [key](const pair<string, string> & p){return p.first == key;});
+ }
+
+ string & operator [](const string & key){
+         iterator it = find(key);
+         if(it==end())
+         {
+                 kw.push_back(pair<string, string>(key, ""));
+                 return kw.back().second;
+         }
+         else
+                 return it->second;
+   }
+};
+
+
+typedef vec_kw_constainer KEY_WORDS;
+
 typedef float EVENT_DATA_TYPE;
 typedef unique_ptr<EVENT_DATA_TYPE[] > EVENT_DATA_PTR;
 struct FCS_READ_HEADER_PARAM{

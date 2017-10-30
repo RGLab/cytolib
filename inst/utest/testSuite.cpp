@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 
 	string filename="../flowCore/misc/sample_1071.001";
 	FCS_READ_PARAM config;
-	config.data.num_threads = 10;
+	config.data.num_threads = 4;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	double runtime = (gettime() - start);// / (double)(CLOCKS_PER_SEC / 1000);
 		cout << runtime << endl;
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(multidata1)
 //	BOOST_CHECK_EQUAL(cytofrm.nCol(), 10);
 //	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1244);
 
-	config.header.nDataset = 10;
+	config.header.nDataset = 4;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 955);
 }
