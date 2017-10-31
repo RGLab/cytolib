@@ -151,9 +151,17 @@ void CytoFrame::writeH5(const string & filename)
 
 	hsize_t dim_param[] = {nCol()};
 	DataSpace dsp_param(1, dim_param);
-
+//	vector<const char *> cvec;
+//	for(auto & c : params)
+//	{
+//		cvec.push_back(c.channel.c_str());
+////		cout << c.channel << ":" <<cvec.back() << endl;
+//	}
+//
+//	for(auto c : cvec)
+//		cout << c << endl;
 	DataSet ds_param = file.createDataSet( "params", param_type, dsp_param);
-	ds_param.write(&params[0], param_type );
+	ds_param.write(params.data(), param_type );
 
 	/*
 	 * write keywords

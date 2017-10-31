@@ -39,6 +39,7 @@ class vec_kw_constainer{
 public:
  typedef KW_PAIR::iterator iterator;
  typedef KW_PAIR::const_iterator const_iterator;
+ void resize(size_t n){kw.resize(n);}
  size_t size(){return kw.size();}
  KW_PAIR getPairs(){return kw;}
  iterator end(){return kw.end();}
@@ -57,6 +58,9 @@ public:
          else
                  return it->second;
    }
+ pair <string, string> & operator [](const int & n){
+	 return kw[n];
+ }
 };
 
 

@@ -15,57 +15,96 @@ H5CytoFrame::H5CytoFrame(const string & _filename):filename(_filename)
 	H5File file( filename, H5F_ACC_RDONLY);
 
 	DataSet ds_param = file.openDataSet("params");
-	DataType param_type = ds_param.getDataType();
+//	DataType param_type = ds_param.getDataType();
 
 	hsize_t dim_param[1];
 	DataSpace dsp_param = ds_param.getSpace();
 	dsp_param.getSimpleExtentDims(dim_param);
-	CytoFrame::params.resize(dim_param[0]);
-//	StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
-//
-//	FloatType datatype( PredType::NATIVE_FLOAT );
-//	datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
+	int nParam = dim_param[0];
+
+	StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
+
+	FloatType datatype( PredType::NATIVE_FLOAT );
+	datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
 
 	/*
 	 * read params as array of compound type
 	 */
 
-//
-//	hsize_t dim_pne[] = {2};
-//	ArrayType pne(datatype, 1, dim_pne);
-//
-//	CompType param_type(sizeof(cytoParam));
-//	param_type.insertMember("channel", HOFFSET(cytoParam, channel), str_type);
-//	param_type.insertMember("marker", HOFFSET(cytoParam, marker), str_type);
-//	param_type.insertMember("min", HOFFSET(cytoParam, min), datatype);
-//	param_type.insertMember("max", HOFFSET(cytoParam, max), datatype);
-//	param_type.insertMember("PnG", HOFFSET(cytoParam, PnG), datatype);
-//	param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
-//	param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
 
-	ds_param.read(&CytoFrame::params[0],param_type);
+	hsize_t dim_pne[] = {2};
+	ArrayType pne(datatype, 1, dim_pne);
+
+	/*
+	 * have to redefine cytoParam to use char * since H5 can't directly read into string member of the compound type
+	 */
+	struct cytoParam1{
+		char * channel;
+		char * marker;
+		EVENT_DATA_TYPE min, max, PnG;
+		EVENT_DATA_TYPE PnE[2];
+		int PnB;
+
+	};
+	vector<cytoParam1> pvec(nParam);
+
+	CompType param_type(sizeof(cytoParam1));
+	param_type.insertMember("channel", HOFFSET(cytoParam1, channel), str_type);
+	param_type.insertMember("marker", HOFFSET(cytoParam1, marker), str_type);
+	param_type.insertMember("min", HOFFSET(cytoParam1, min), datatype);
+	param_type.insertMember("max", HOFFSET(cytoParam1, max), datatype);
+	param_type.insertMember("PnG", HOFFSET(cytoParam1, PnG), datatype);
+	param_type.insertMember("PnE", HOFFSET(cytoParam1, PnE), pne);
+	param_type.insertMember("PnB", HOFFSET(cytoParam1, PnB), PredType::NATIVE_INT8);
+
+	ds_param.read(pvec.data(),param_type);
+	//cp back to param
+	params.resize(nParam);
+	for(auto i = 0; i < nParam; i++)
+	{
+		params[i].channel = pvec[i].channel;
+		delete [] pvec[i].channel;//reclaim vlen char
+		params[i].marker = pvec[i].marker;
+		delete [] pvec[i].marker;
+		params[i].min = pvec[i].min;
+		params[i].max = pvec[i].max;
+		params[i].PnG = pvec[i].PnG;
+		params[i].PnE[0] = pvec[i].PnE[0];
+		params[i].PnE[1] = pvec[i].PnE[1];
+		params[i].PnB = pvec[i].PnB;
+	}
+
+
 	/*
 	 * read keywords
 	 */
-	//convert to vector
+	struct key_t{
+			char * key;
+			char * value;
+//			key_t(const char * k, const char * v):key(k),value(v){};
+		};
+	CompType key_type(sizeof(key_t));
+	key_type.insertMember("key", HOFFSET(key_t, key), str_type);
+	key_type.insertMember("value", HOFFSET(key_t, value), str_type);
 
-//	struct key_t{
-//		string key, value;
-//		key_t(const string & k, const string & v):key(k),value(v){};
-//	};
-//	vector<key_t> keyVec;
-//
-//	CompType key_type(sizeof(key_t));
-//	key_type.insertMember("key", HOFFSET(key_t, key), str_type);
-//	key_type.insertMember("value", HOFFSET(key_t, value), str_type);
-//
-//
-//	DataSet ds_key = file.createDataSet( "keywords", key_type, dsp_key);
-//	ds_key.write(&keyVec[0], key_type );
-//	for(std::pair<std::string, string> e : keys)
-//	{
-//			keyVec.push_back(key_t(e.first, e.second));
-//		}
+
+	DataSet ds_key = file.openDataSet( "keywords");
+	DataSpace dsp_key = ds_key.getSpace();
+	hsize_t dim_key[1];
+	dsp_key.getSimpleExtentDims(dim_key);
+	int nKey = dim_key[0];
+
+	vector<key_t> keyVec(nKey);
+	ds_key.read(keyVec.data(), key_type);
+	keys.resize(nKey);
+	for(auto i = 0; i < nKey; i++)
+	{
+		keys[i].first = keyVec[i].key;
+		delete [] keyVec[i].key;
+		keys[i].second = keyVec[i].value;
+		delete [] keyVec[i].value;
+	}
+	//read nEvents
 	hsize_t dimsf[2];              // dataset dimensions
 	DataSet dataset = file.openDataSet(DATASET_NAME);
 	DataSpace dataspace = dataset.getSpace();

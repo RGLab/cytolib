@@ -105,7 +105,10 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 	H5CytoFrame h5fr(h5file);
 	BOOST_CHECK_EQUAL(h5fr.nCol(), 8);
 	BOOST_CHECK_EQUAL(h5fr.nRow(), 23981);
-
+//	for(auto c: h5fr.getChannels())
+//		cout << c << endl;
+//	for(auto c: h5fr.getKeywords())
+//			cout << c.first << ";" << c.second << endl;
 
 }
 BOOST_AUTO_TEST_CASE(double_precision)
