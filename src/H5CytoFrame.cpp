@@ -113,7 +113,11 @@ H5CytoFrame::H5CytoFrame(const string & _filename):filename(_filename)
 }
 
 EVENT_DATA_TYPE * H5CytoFrame::getData(){
+	H5File file( filename, H5F_ACC_RDONLY);
+	DataSet dataset = file.openDataSet(DATASET_NAME);
 	EVENT_DATA_TYPE * data = new EVENT_DATA_TYPE[nCol() * nRow()];
+	dataset.read(data, PredType::NATIVE_FLOAT);
+
 	return data;
 }
 EVENT_DATA_TYPE * H5CytoFrame::getData(const string & colname, ColType type){
