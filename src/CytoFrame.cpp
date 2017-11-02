@@ -25,9 +25,6 @@ void CytoFrame::setKeyword(const string & key, const string & value){
 int CytoFrame::nCol(){
 	return params.size();
 }
-int CytoFrame::nRow(){
-	return nEvents;
-}
 
 bool CytoFrame::isHashed(){
 	return channel_vs_idx.size()==nCol();
@@ -106,8 +103,9 @@ pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> CytoFrame::getRange(const string & colnam
 	case RangeType::data:
 		{
 
-			EVENT_DATA_TYPE * vec = getData(colname, ctype);
-			auto res = minmax_element(vec, vec + nRow());
+			EVENT_DATA_VEC vec = getData(colname, ctype);
+			EVENT_DATA_TYPE * data = &vec[0];
+			auto res = minmax_element(data, data + nRow());
 			return make_pair(*res.first, *res.second);
 		}
 	case RangeType::instrument:
@@ -193,6 +191,7 @@ void CytoFrame::writeH5(const string & filename)
 	* store events data as fixed
 	* size dataset.
 	*/
+	int nEvents = nRow();
 	hsize_t dimsf[2] = {nCol(), nEvents};              // dataset dimensions
 	DSetCreatPropList plist;
 	hsize_t	chunk_dims[2] = {1, nEvents};
@@ -204,5 +203,5 @@ void CytoFrame::writeH5(const string & filename)
 	* Write the data to the dataset using default memory space, file
 	* space, and transfer properties.
 	*/
-	dataset.write( getData(), PredType::NATIVE_FLOAT );
+	dataset.write(&getData()[0], PredType::NATIVE_FLOAT );
 }

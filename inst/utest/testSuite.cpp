@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(multidata1)
 //	BOOST_CHECK_EQUAL(cytofrm.nCol(), 10);
 //	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1244);
 
-	config.header.nDataset = 4;
+	config.header.nDataset = 10;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 955);
 }

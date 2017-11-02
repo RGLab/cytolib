@@ -25,7 +25,7 @@ const H5std_string  DATASET_NAME( "data");
  */
 class CytoFrame{
 protected:
-	int nEvents;
+//	int nEvents;
 	KEY_WORDS keys;
 	vector<cytoParam> params;
 	unordered_map<string, int> channel_vs_idx;
@@ -36,13 +36,13 @@ public:
 //	virtual void transform(const transformation &)=0;
 	virtual void writeFCS(const string & filename);
 	virtual void writeH5(const string & filename);
-	virtual EVENT_DATA_TYPE * getData()=0;
-	virtual EVENT_DATA_TYPE * getData(const string &, ColType)=0;
+	virtual EVENT_DATA_VEC getData()=0;
+	virtual EVENT_DATA_VEC getData(const string &, ColType)=0;
 	virtual vector<pair <string, string>> getKeywords();
 	virtual string getKeyword(const string &);
 	virtual void setKeyword(const string &, const string &);
 	virtual int nCol();
-	virtual int nRow();
+	virtual int nRow()=0;
 	virtual bool isHashed();
 	virtual void buildHash();
 	virtual vector<string> getChannels();

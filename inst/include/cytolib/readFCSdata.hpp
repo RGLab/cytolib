@@ -37,7 +37,7 @@ struct FCS_READ_DATA_PARAM{
 
 
 };
-EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params,int & nEvents, FCS_READ_DATA_PARAM &);
+void readFCSdata(ifstream &in, EVENT_DATA_VEC & output, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params,  FCS_READ_DATA_PARAM & config);
 
 
 

@@ -21,7 +21,7 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 	{
 //		double start = clock();
 		//parse the data section
-		data = move(readFCSdata(in, header, keys, params, nEvents, config.data));
+		readFCSdata(in, data,header, keys, params, config.data);
 
 //		cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
 		//update min and max
@@ -72,14 +72,21 @@ MemCytoFrame::MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  boo
 
 
 }
+int MemCytoFrame::nRow(){
 
-
-EVENT_DATA_TYPE * MemCytoFrame::getData(){
-	return data.get();
+	return data.size()/nCol();
 }
-EVENT_DATA_TYPE * MemCytoFrame::getData(const string & colname, ColType type){
+
+
+EVENT_DATA_VEC MemCytoFrame::getData(){
+	return data;
+}
+EVENT_DATA_VEC MemCytoFrame::getData(const string & colname, ColType type){
 	int idx = getColId(colname, type);
-	return data.get() + idx * nRow();
+	int nEvents = nRow();
+	EVENT_DATA_VEC res(nEvents);
+	memcpy(&res[0], &data[0] + idx * nEvents, nEvents*sizeof(EVENT_DATA_TYPE));
+	return res ;
 }
 
 

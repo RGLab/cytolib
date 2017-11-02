@@ -12,7 +12,7 @@ void H5CytoFrame::compensate(const compensation &){
 
 H5CytoFrame::H5CytoFrame(const string & _filename):filename(_filename)
 {
-	H5File file( filename, H5F_ACC_RDONLY);
+	file.openFile(filename, H5F_ACC_RDONLY);
 
 	DataSet ds_param = file.openDataSet("params");
 //	DataType param_type = ds_param.getDataType();
@@ -104,25 +104,30 @@ H5CytoFrame::H5CytoFrame(const string & _filename):filename(_filename)
 		keys[i].second = keyVec[i].value;
 		delete [] keyVec[i].value;
 	}
+
+	//open dataset for event data
+
+	dataset = file.openDataSet(DATASET_NAME);
+	dataspace = dataset.getSpace();
+	dataspace.getSimpleExtentDims(dims);
+
+}
+
+int H5CytoFrame::nRow(){
 	//read nEvents
-	hsize_t dimsf[2];              // dataset dimensions
-	DataSet dataset = file.openDataSet(DATASET_NAME);
-	DataSpace dataspace = dataset.getSpace();
-	dataspace.getSimpleExtentDims(dimsf);
-	nEvents = dimsf[1];
+	return dims[1];
 }
 
-EVENT_DATA_TYPE * H5CytoFrame::getData(){
-	H5File file( filename, H5F_ACC_RDONLY);
-	DataSet dataset = file.openDataSet(DATASET_NAME);
-	EVENT_DATA_TYPE * data = new EVENT_DATA_TYPE[nCol() * nRow()];
-	dataset.read(data, PredType::NATIVE_FLOAT);
+EVENT_DATA_VEC H5CytoFrame::getData(){
+	EVENT_DATA_VEC data(nCol() * nRow());
+	dataset.read(data.data(), PredType::NATIVE_FLOAT);
 
 	return data;
 }
-EVENT_DATA_TYPE * H5CytoFrame::getData(const string & colname, ColType type){
+EVENT_DATA_VEC H5CytoFrame::getData(const string & colname, ColType type){
 	int idx = getColId(colname, type);
-	EVENT_DATA_TYPE * data = new EVENT_DATA_TYPE[nRow()];
+	EVENT_DATA_VEC data(nRow());
+//	hsize_t dim[1];
 	return data;
-//	return data.get() + idx * nRow();
+
 }

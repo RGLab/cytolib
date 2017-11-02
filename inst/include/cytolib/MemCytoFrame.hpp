@@ -16,15 +16,15 @@ struct FCS_READ_PARAM{
 	FCS_READ_DATA_PARAM data;
 };
 class MemCytoFrame: public CytoFrame{
-	EVENT_DATA_PTR data;
+	EVENT_DATA_VEC data;
 
 public:
 	MemCytoFrame(const string &filename, FCS_READ_PARAM &, bool onlyTxt);
 	void compensate(const compensation &);
-//	void transform(const transformation &);
+	int nRow();
 
-	EVENT_DATA_TYPE * getData();
-	EVENT_DATA_TYPE * getData(const string &, ColType);
+	EVENT_DATA_VEC getData();
+	EVENT_DATA_VEC getData(const string &, ColType);
 
 
 };

@@ -67,6 +67,7 @@ public:
 typedef vec_kw_constainer KEY_WORDS;
 
 typedef float EVENT_DATA_TYPE;
+typedef vector<EVENT_DATA_TYPE> EVENT_DATA_VEC;
 typedef unique_ptr<EVENT_DATA_TYPE[] > EVENT_DATA_PTR;
 struct FCS_READ_HEADER_PARAM{
 	bool isEmptyKeyValue, ignoreTextOffset;

@@ -49,7 +49,7 @@
  * @return
  */
 
-EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params, int &nEvents,  FCS_READ_DATA_PARAM & config)
+void readFCSdata(ifstream &in, EVENT_DATA_VEC & output, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params,  FCS_READ_DATA_PARAM & config)
 {
 	//## transform or scale data?
 	  bool fcsPnGtransform = false, isTransformation, scale;
@@ -214,11 +214,11 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 		in.read(bufPtr, nBytes); //load the bytes from file
   	}
-	nEvents = nrow;
+//	nEvents = nrow;
 	//how many element to return
 	auto nElement = nrow * nCol;
-	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
-
+//	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
+	output.resize(nElement);
 
 //	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 	float decade = pow(10, config.decades);
@@ -486,7 +486,7 @@ EVENT_DATA_PTR readFCSdata(ifstream &in, const FCS_Header & header,KEY_WORDS & k
 
 	}
 	config.isTransformed = isTransformation;
-	return(output);
+
 
 }
 
