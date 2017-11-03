@@ -3,58 +3,73 @@ ellipse_parsed parseEllipse(vector<float> x, vector<float> y){
 
 
 // get center
-  if(x.size()!=y.size())
-    throw(logic_error("invalid antipodal coordinates!"));
+	if(x.size()!=y.size())
+	throw(logic_error("invalid antipodal coordinates!"));
 
-  int n = x.size();
-  float mu_x = 0, mu_y = 0;
-  for(auto & i : x)
-    mu_x+=i;
-  mu_x/=n;
-  for(auto & i : y)
-    mu_y+=i;
-  mu_y/=n;
+	int n = x.size();
+	float mu_x = 0, mu_y = 0;
+	for(auto & i : x)
+	mu_x+=i;
+	mu_x/=n;
+	for(auto & i : y)
+	mu_y+=i;
+	mu_y/=n;
 
 
- //center the antipods
-  for(auto & i :x)
-    i-=mu_x;
-  for(auto & i :y)
-    i-=mu_y;
+  //center the antipods
+	for(auto & i :x)
+	i-=mu_x;
+	for(auto & i :y)
+	i-=mu_y;
 
-  //compute  a, b
-  //far left point
-  int l = min_element(x.begin(), x.end()) - x.begin();
+	//compute  a, b
 
-  //far right point
-  int r = max_element(x.begin(), x.end()) - x.begin();
-  //get length of a
-  int  a = sqrt(pow(x[l]-x[r],2) + pow(y[l]-y[r],2))/2;
+	/*
+	 * yet to be proved that L and R are always a pair of opposite antipod points (either b or a)
+	 * since top vs bottom has already been proved to be
+	 * not necessarily the opposite points. see the example in https://github.com/RGLab/flowWorkspace/issues/142#issuecomment-280752179
+	 */
+	//far left point
+	int L = min_element(x.begin(), x.end()) - x.begin();
+	//far right point
+	int R = max_element(x.begin(), x.end()) - x.begin();
 
-  // use rest of two points for b
-  vector<int> ind;
-  for(int i = 0; i < n; ++i)
-    if(i !=l &&i!=r)
-      ind.push_back(i);
-  int  b = sqrt(pow(x[ind[0]]-x[ind[1]],2) + pow(y[ind[0]]-y[ind[1]],2))/2;
+	 // use rest of two points
+	vector<int> ind;
+	for(int i = 0; i < n; ++i)
+		if(i !=L &&i!=R)
+			ind.push_back(i);
 
-  //compute angle
-  float alpha = atan2(y[r]-y[l],x[r]-x[l]);
-  // Q <- rbind(L,antipods.rest[1, ])
-  //     rownames(Q) <- NULL
-  ellipse_parsed res;
-  //record two antipods
-  res.x.push_back(x[l]);
-  res.y.push_back(y[l]);
-  res.x.push_back(x[ind[0]]);
-  res.y.push_back(y[ind[0]]);
-  //record mu and a, b, alpha
-  res.mu_x = mu_x;
-  res.mu_y = mu_y;
-  res.a = a;
-  res.b = b;
-  res.alpha = alpha;
-  return res;
+
+
+
+	//the lengths of two axis
+	int a = sqrt(pow(x[L]-x[R],2) + pow(y[L]-y[R],2))/2;
+	int b = sqrt(pow(x[ind[0]]-x[ind[1]],2) + pow(y[ind[0]]-y[ind[1]],2))/2;
+
+	//correct a b if needed
+	if(a < b)
+	{
+		swap(a,b);
+		L = ind[0];
+		R = ind[1];
+	}
+
+	//computing alpha (rotated angle)
+	float alpha = atan2(y[R]-y[L],x[R]-x[L]);
+	ellipse_parsed res;
+	//record two antipods
+//	res.x.push_back(x[L]);
+//	res.y.push_back(y[L]);
+//	res.x.push_back(x[B]);
+//	res.y.push_back(y[B]);
+	//record mu and a, b, alpha
+	res.mu_x = mu_x;
+	res.mu_y = mu_y;
+	res.a = a;
+	res.b = b;
+	res.alpha = alpha;
+	return res;
 }
 /**
  * translated from flowClust:::.ellipsePoints R code

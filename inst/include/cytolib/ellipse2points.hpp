@@ -12,7 +12,7 @@
 struct ellipse_parsed{
 
   float mu_x, mu_y, a, b, alpha;
-  vector<float>x,y;
+//  vector<float>x,y;
 
 };
 struct matrix{
