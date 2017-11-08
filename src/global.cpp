@@ -7,7 +7,7 @@
 
 #include <cytolib/global.hpp>
 
-unsigned short g_loglevel = 0;
+unsigned short g_loglevel = 0;// debug print is turned off by default
 bool my_throw_on_error = true;//can be toggle off to get a partially parsed gating tree for debugging purpose
 
 void PRINT(string a){

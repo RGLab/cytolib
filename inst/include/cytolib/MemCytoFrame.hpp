@@ -10,16 +10,29 @@
 #include "CytoFrame.hpp"
 #include "readFCSdata.hpp"
 
-
+/**
+ * the container that stores the different FCS parse arguments
+ */
 struct FCS_READ_PARAM{
 	FCS_READ_HEADER_PARAM header;
 	FCS_READ_DATA_PARAM data;
 };
+
+/**
+ * The class represents the in-memory version of CytoFrame, which stores and owns the events data
+ */
 class MemCytoFrame: public CytoFrame{
 	EVENT_DATA_VEC data;
 
 public:
-	MemCytoFrame(const string &filename, FCS_READ_PARAM &, bool onlyTxt);
+	/**
+	 * Constructor from the FCS file
+	 *
+	 * @param filename FCS file path
+	 * @param config the parse arguments.
+	 * @param onlyTxt flag indicates whether to only parse text segment (which contains the keywords)
+	 */
+	MemCytoFrame(const string &filename, FCS_READ_PARAM & config, bool onlyTxt);
 	void compensate(const compensation &);
 	int nRow();
 

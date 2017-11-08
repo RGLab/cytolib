@@ -96,9 +96,9 @@ int CytoFrame::getColId(const string & colname, ColType type = ColType::unknown)
 
 }
 
-pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> CytoFrame::getRange(const string & colname, ColType ctype, RangeType type){
+pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> CytoFrame::getRange(const string & colname, ColType ctype, RangeType rtype){
 
-	switch(type)
+	switch(rtype)
 	{
 	case RangeType::data:
 		{

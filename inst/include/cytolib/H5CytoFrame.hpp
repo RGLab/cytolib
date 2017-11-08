@@ -10,7 +10,11 @@
 #include <cytolib/CytoFrame.hpp>
 
 
-
+/**
+ * The class represents the H5 version of cytoFrame
+ * It doesn't store and own the event data in memory.
+ * Instead, data is read from H5 file on demand, which is more memory efficient.
+ */
 class H5CytoFrame:public CytoFrame{
 protected:
 	string filename;
@@ -26,6 +30,10 @@ public:
 	~H5CytoFrame(){};
 	void compensate(const compensation &);
 	int nRow();
+	/**
+	 * constructor from the H5 format of FCS
+	 * @param _filename H5 file path
+	 */
 	H5CytoFrame(const string & _filename);
 //	void save(const string & filename, FrameType type);
 	EVENT_DATA_VEC getData();

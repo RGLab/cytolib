@@ -69,9 +69,14 @@ typedef vec_kw_constainer KEY_WORDS;
 typedef float EVENT_DATA_TYPE;
 typedef vector<EVENT_DATA_TYPE> EVENT_DATA_VEC;
 typedef unique_ptr<EVENT_DATA_TYPE[] > EVENT_DATA_PTR;
+
+/**
+ * the struct that stores the FCS  header parse arguments
+ */
 struct FCS_READ_HEADER_PARAM{
-	bool isEmptyKeyValue, ignoreTextOffset;
-	int nDataset;
+	bool isEmptyKeyValue; //whether allow the keyword value to be empty. When true, then double delimiter will be considered as empty keyword value.
+	bool ignoreTextOffset; //whether to ignore the offset recorded in the text segment of FCS
+	int nDataset; // which data set to be parsed when multi-data segments are detected
 	FCS_READ_HEADER_PARAM(){
 		isEmptyKeyValue = false;
 		ignoreTextOffset = false;
@@ -91,6 +96,15 @@ struct cytoParam{
 	int PnB;
 
 };
+/**
+ * parse the FCS header and Text segment
+ *
+ * @param in (input) the file stream object opened from FCS file
+ * @param header (output) the FCS_Header object to store the result of FCS header
+ * @param keys (output) the KEY_WORDS object to store parsed keywords
+ * @param params (output) cytoParam container to store the parsed parameters
+ * @param config (input) FCS_READ_HEADER_PARAM object gives the parsing arguments for header
+ */
 void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vector<cytoParam> & params, const FCS_READ_HEADER_PARAM & config);
 
 
