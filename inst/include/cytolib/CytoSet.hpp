@@ -11,19 +11,11 @@
 
 #include "CytoFrame.hpp"
 
-
-
-class pData{
-	vector<vector<string>> tbl;
-};
-
-
 /**
  * A container of the collection of CytoFrames
  */
 class CytoSet{
 	unordered_map<string, CytoFrame> frames;
-	pData pd;
 public:
 	virtual ~CytoSet()=0;
 	virtual CytoFrame getFrame(const string & sampleName)=0;

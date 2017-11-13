@@ -16,6 +16,7 @@ enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
 
+typedef unordered_map<string, string> PDATA;
 using namespace H5;
 
 const H5std_string  DATASET_NAME( "data");
@@ -25,7 +26,7 @@ const H5std_string  DATASET_NAME( "data");
  */
 class CytoFrame{
 protected:
-//	int nEvents;
+	PDATA pd;
 	KEY_WORDS keys;//keyword pairs parsed from FCS Text section
 	vector<cytoParam> params;// parameters coerced from keywords and computed from data for quick query
 	unordered_map<string, int> channel_vs_idx;//hash map for query by channel
@@ -112,8 +113,8 @@ public:
 	 * @return
 	 */
 	virtual int getColId(const string & colname, ColType type);
-	virtual void setChannel(const string &, const string &);
-	virtual void setMarker(const string &, const string &);
+	virtual void setChannel(const string & oldname, const string &newname);
+	virtual void setMarker(const string & oldname, const string & newname);
 	/**
 	 * the range of a specific column
 	 * @param colname
