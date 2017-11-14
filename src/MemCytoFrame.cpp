@@ -83,6 +83,8 @@ EVENT_DATA_VEC MemCytoFrame::getData(){
 }
 EVENT_DATA_VEC MemCytoFrame::getData(const string & colname, ColType type){
 	int idx = getColId(colname, type);
+	if(idx<0)
+		throw(domain_error("colname not found: " + colname));
 	int nEvents = nRow();
 	EVENT_DATA_VEC res(nEvents);
 	memcpy(&res[0], &data[0] + idx * nEvents, nEvents*sizeof(EVENT_DATA_TYPE));

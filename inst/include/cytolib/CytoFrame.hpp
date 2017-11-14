@@ -123,6 +123,7 @@ public:
 	 * @return
 	 */
 	virtual pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> getRange(const string & colname, ColType ctype, RangeType rtype);
+	PDATA getPData(){return pd;}
 };
 
 

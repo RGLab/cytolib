@@ -53,12 +53,16 @@ vector<string> CytoFrame::getMarkers(){
 }
 void CytoFrame::setChannel(const string & oldname, const string & newname){
 	int id = getColId(oldname, ColType::channel);
+	if(id<0)
+		throw(domain_error("colname not found: " + oldname));
 	params[id].channel=newname;
 	channel_vs_idx.erase(oldname);
 	channel_vs_idx[newname] = id;
 }
 void CytoFrame::setMarker(const string & oldname, const string & newname){
 	int id = getColId(oldname, ColType::marker);
+	if(id<0)
+		throw(domain_error("colname not found: " + oldname));
 	params[id].marker=newname;
 	marker_vs_idx.erase(oldname);
 	marker_vs_idx[newname] = id;
@@ -82,7 +86,7 @@ int CytoFrame::getColId(const string & colname, ColType type = ColType::unknown)
 		unordered_map<string, int>::iterator it1 = channel_vs_idx.find(colname);
 		unordered_map<string, int>::iterator it2 = marker_vs_idx.find(colname);
 		if(it1==channel_vs_idx.end()&&it2==marker_vs_idx.end())
-			throw(domain_error("colname not found: " + colname));
+			return -1;
 		else if(it1!=channel_vs_idx.end()&&it2!=marker_vs_idx.end())
 			throw(domain_error("ambiguous colname without colType: " + colname ));
 		else if(it1!=channel_vs_idx.end())
@@ -111,6 +115,8 @@ pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> CytoFrame::getRange(const string & colnam
 	case RangeType::instrument:
 	{
 		int idx = getColId(colname, ctype);
+		if(idx<0)
+			throw(domain_error("colname not found: " + colname));
 		return make_pair(params[idx].min, params[idx].max);
 	}
 	default:

@@ -126,6 +126,8 @@ EVENT_DATA_VEC H5CytoFrame::getData(){
 }
 EVENT_DATA_VEC H5CytoFrame::getData(const string & colname, ColType type){
 	int idx = getColId(colname, type);
+	if(idx<0)
+		throw(domain_error("colname not found: " + colname));
 	EVENT_DATA_VEC data(nRow());
 //	hsize_t dim[1];
 	return data;
