@@ -200,13 +200,13 @@ void polygonGate::extend(flowData & fdata,float extend_val){
 		if(v.at(i).x<=extend_val)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT <<"extending "<<x<<"from "<<v.at(i).x<<" to :"<<xMin<<endl;
+				PRINT("extending " + x + "from " + to_string(v.at(i).x)+" to :"+to_string(xMin)+"\n");
 			v.at(i).x=min(xMin, v.at(i).x);
 		}
 		if(v.at(i).y<=extend_val)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT <<"extending "<<y<<"from "<<v.at(i).y<<" to :"<<yMin<<endl;
+				PRINT("extending " + y + "from " + to_string(v.at(i).y)+" to :"+to_string(yMin)+"\n");
 			v.at(i).y=min(yMin, v.at(i).y);
 
 		}
@@ -229,13 +229,13 @@ void polygonGate::extend(float extend_val, float extend_to){
 		if(v.at(i).x<=extend_val)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT <<"extending "<<x<<"from "<<v.at(i).x<<" to :"<<xMin<<endl;
+				PRINT("extending " + x + "from " + to_string(v.at(i).x)+" to :"+to_string(xMin)+"\n");
 			v.at(i).x=min(xMin,v.at(i).x);
 		}
 		if(v.at(i).y<=extend_val)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT <<"extending "<<y<<"from "<<v.at(i).y<<" to :"<<yMin<<endl;
+				PRINT("extending " + y + "from " + to_string(v.at(i).y)+" to :"+to_string(yMin)+"\n");
 			v.at(i).y=min(yMin, v.at(i).y);
 
 		}
@@ -260,7 +260,7 @@ void polygonGate::gain(map<string,float> & gains){
 			{
 				float this_gain = it->second;
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT<<"adjusting: "<<channel_x<<endl;;
+					PRINT("adjusting: "+channel_x+"\n");
 
 				for(unsigned i=0;i<vertices.size();i++)
 					vertices.at(i).x=vertices.at(i).x/this_gain;
@@ -271,7 +271,7 @@ void polygonGate::gain(map<string,float> & gains){
 			{
 				float this_gain = it->second;
 				if(g_loglevel>=POPULATION_LEVEL)
-					COUT<<"adjusting: "<<channel_y<<endl;;
+					PRINT("adjusting: "+channel_y+"\n");
 
 				for(unsigned i=0;i<vertices.size();i++)
 					vertices.at(i).y=vertices.at(i).y/this_gain;
@@ -279,7 +279,7 @@ void polygonGate::gain(map<string,float> & gains){
 
 
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<endl;
+				PRINT("\n");
 			param.setVertices(vertices);
 			isGained=true;
 		}
@@ -354,7 +354,7 @@ void ellipseGate::gain(map<string,float> & gains){
 		{
 			float this_gain = it->second;
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"adjusting: "<<channel_x<<endl;;
+				PRINT("adjusting: "+channel_x+"\n");;
 			for(unsigned i=0;i<antipodal_vertices.size();i++)
 				antipodal_vertices.at(i).x=antipodal_vertices.at(i).x/this_gain;
 		}
@@ -363,12 +363,12 @@ void ellipseGate::gain(map<string,float> & gains){
 		{
 			float this_gain = it->second;
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"adjusting: "<<channel_y<<endl;;
+				PRINT("adjusting: "+channel_y+"\n");;
 			for(unsigned i=0;i<antipodal_vertices.size();i++)
 				antipodal_vertices.at(i).y=antipodal_vertices.at(i).y/this_gain;
 		}
 		if(g_loglevel>=POPULATION_LEVEL)
-			COUT<<endl;
+			PRINT("\n");
 
 		isGained=true;
 	}
@@ -519,7 +519,7 @@ void rangeGate::extend(flowData & fdata,float extend_val){
 	if(param.getMin()<=extend_val)
 	{
 		if(g_loglevel>=POPULATION_LEVEL)
-			COUT <<"extending "<<pName<<"from "<<param.getMin()<<" to :"<<xMin<<endl;
+			PRINT("extending "+pName+"from "+to_string(param.getMin())+" to :"+to_string(xMin)+"\n");
 		param.setMin(min(xMin, param.getMin()));
 	}
 
@@ -533,7 +533,7 @@ void rangeGate::extend(float extend_val, float extend_to){
 	if(param.getMin()<=extend_val)
 	{
 		if(g_loglevel>=POPULATION_LEVEL)
-			COUT <<"extending "<<pName<<"from "<<param.getMin()<<" to :"<<xMin<<endl;
+			PRINT("extending "+pName+"from "+to_string(param.getMin())+" to :"+to_string(xMin)+"\n");
 		param.setMin(min(xMin, param.getMin()));
 	}
 
@@ -550,7 +550,7 @@ void rangeGate::gain(map<string,float> & gains){
 			float this_gain = it->second;
 
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"adjusting "<<param.getName()<<endl;
+				PRINT("adjusting "+param.getName()+"\n");
 
 			param.setMin(param.getMin()/this_gain);
 			param.setMax(param.getMax()/this_gain);
@@ -742,7 +742,7 @@ void ellipseGate::transforming(trans_local & trans){
 		if(trans_x!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"transforming: "<<channel_x<<endl;;
+				PRINT("transforming: "+channel_x+"\n");;
 
 			trans_x->transforming(vert.x);
 			for(unsigned i=0;i<antipodal_vertices.size();i++)
@@ -751,14 +751,14 @@ void ellipseGate::transforming(trans_local & trans){
 		if(trans_y!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"transforming: "<<channel_y<<endl;;
+				PRINT("transforming: "+channel_y+"\n");;
 
 			trans_y->transforming(vert.y);
 			for(unsigned i=0;i<antipodal_vertices.size();i++)
 				antipodal_vertices.at(i).y=vert.y[i];
 		}
 		if(g_loglevel>=POPULATION_LEVEL)
-			COUT<<endl;
+			PRINT("\n");
 		isTransformed=true;
 
 		//compute the covariance matrix after transformed
@@ -892,7 +892,7 @@ void polygonGate::transforming(transformation * trans_x, transformation * trans_
 		if(trans_x!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"transforming: "<<channel_x<<endl;;
+			PRINT("transforming: "+channel_x+"\n");
 			trans_x->transforming(vert.x);
 			for(unsigned i=0;i<vertices.size();i++)
 				vertices.at(i).x=vert.x[i];
@@ -900,13 +900,13 @@ void polygonGate::transforming(transformation * trans_x, transformation * trans_
 		if(trans_y!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"transforming: "<<channel_y<<endl;;
+			PRINT("transforming: "+channel_y+"\n");;
 			trans_y->transforming(vert.y);
 			for(unsigned i=0;i<vertices.size();i++)
 				vertices.at(i).y=vert.y[i];
 		}
 		if(g_loglevel>=POPULATION_LEVEL)
-			COUT<<endl;
+			PRINT("\n");
 		param.setVertices(vertices);
 		isTransformed=true;
 	}
@@ -921,8 +921,8 @@ void rangeGate::transforming(trans_local & trans){
 		if(curTrans!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
-				COUT<<"transforming "<<param.getName()<<endl;
-	//		valarray<double> output(curTrans->transforming(vert.x));
+				PRINT("transforming "+param.getName()+"\n");
+			//		valarray<double> output(curTrans->transforming(vert.x));
 	//		param.min=output[0];
 	//		param.max=output[1];
 			curTrans->transforming(vert.x);

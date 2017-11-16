@@ -16,4 +16,15 @@
 extern unsigned short g_loglevel;
 extern bool my_throw_on_error;
 
+#ifdef ROUT
+#include <R_ext/Print.h>
+#endif
+
+#include <iostream>
+#include <string>
+using namespace std;
+void PRINT(string a);
+void PRINT(const char * a);
+
+
 #endif /* GLOBAL_HPP_ */

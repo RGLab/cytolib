@@ -55,7 +55,7 @@ void calibrationTable::init(unsigned nSize){
 
 void calibrationTable::interpolate(){
 
-//	COUT<<"entering interpolate"<<endl;
+//	PRINT("entering interpolate\n");
 
 
 	if(!flag)

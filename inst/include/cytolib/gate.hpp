@@ -101,12 +101,12 @@ public:
 		return res;
 	}
 	void print(){
-		COUT<<"x:";
+		PRINT("x:");
 		for(unsigned i=0;i<x.size();i++)
-				COUT<<x[i]<<",";
-//		COUT<<"x:";
+				PRINT(to_string(x[i])+",");
+//		PRINT("x:");
 //		for(unsigned i=0;i<x.size();i++)
-//				COUT<<x[i]<<",";
+//				PRINT(x[i]+",");
 
 	}
 };
