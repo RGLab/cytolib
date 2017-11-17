@@ -33,6 +33,7 @@ public:
 	 *
 	 */
 	virtual vector<bool> getIndices()=0;
+	virtual vector<unsigned> getIndices_u()=0;
 	/**
 	 * compute the event count from the event indices
 	 */
@@ -57,7 +58,9 @@ private:
 public:
 	BOOLINDICES():POPINDICES(){};
 	BOOLINDICES(vector <bool> _ind);
+	BOOLINDICES(vector <unsigned> _ind, unsigned _nEvent);
 	vector<bool> getIndices();
+	vector<unsigned> getIndices_u();
 	unsigned getCount();
 
 	POPINDICES * clone();
@@ -75,8 +78,10 @@ private:
 public:
 	INTINDICES():POPINDICES(){};
 	INTINDICES(vector <bool> _ind);
+	INTINDICES(vector <unsigned> _ind, unsigned _nEvent):POPINDICES(_nEvent),x(_ind){};
 	INTINDICES(const pb::POPINDICES & ind_pb);
 	vector<bool> getIndices();
+	vector<unsigned> getIndices_u(){return x;};
 	unsigned getCount();
 	POPINDICES * clone();
 	void convertToPb(pb::POPINDICES & ind_pb);
@@ -92,6 +97,7 @@ public:
 	ROOTINDICES(unsigned _nEvents):POPINDICES(_nEvents){};
 	ROOTINDICES(const pb::POPINDICES & ind_pb);
 	vector<bool> getIndices();
+	vector<unsigned> getIndices_u();
 	unsigned getCount();
 	POPINDICES * clone();
 	void convertToPb(pb::POPINDICES & ind_pb);

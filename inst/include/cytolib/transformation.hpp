@@ -59,7 +59,7 @@ public:
 	transformation();
 	transformation(bool _isGate,unsigned short _type);
 	virtual ~transformation(){};
-	virtual void transforming(valarray<double> & input);
+	virtual void transforming(double * input, int nSize);
 	virtual void computCalTbl(){};//dummy routine that does nothing
 	virtual Spline_Coefs getSplineCoefs(){return calTbl.getSplineCoefs();};
 	virtual void setCalTbl(calibrationTable _tbl);
@@ -192,7 +192,7 @@ public:
 public:
 	fasinhTrans();
 	fasinhTrans(double , double , double , double , double );
-	virtual void transforming(valarray<double> & input);
+	virtual void transforming(double * input, int nSize);
 	fasinhTrans * clone(){return new fasinhTrans(*this);};
 	void convertToPb(pb::transformation & trans_pb);
 	fasinhTrans(const pb::transformation & trans_pb);
@@ -209,7 +209,7 @@ class fsinhTrans:public fasinhTrans{
 public:
 	fsinhTrans();
 	fsinhTrans(double , double , double , double , double );
-	void transforming(valarray<double> & input);
+	void transforming(double * input, int nSize);
 	boost::shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
 //	fsinhTrans * clone(){return new fasinhTrans(*this);};
 //	void convertToPb(pb::transformation & trans_pb);
@@ -232,7 +232,7 @@ public:
 	logTrans();//deprecated
 	logTrans(double _offset,double _decade, unsigned _scale, unsigned T);
 	double flog(double x,double _max,double _min);
-	void transforming(valarray<double> & input);
+	void transforming(double * input, int nSize);
 	logTrans * clone(){return new logTrans(*this);};
 	void convertToPb(pb::transformation & trans_pb);
 	logTrans(const pb::transformation & trans_pb);
@@ -246,7 +246,7 @@ public:
 class logInverseTrans:public logTrans{
 public:
 	logInverseTrans(double _offset,double _decade, unsigned _scale, unsigned _T):logTrans(_offset, _decade, _scale, _T){};
-	void transforming(valarray<double> & input);
+	void transforming(double * input, int nSize);
 
 };
 
@@ -254,7 +254,7 @@ public:
 class linTrans:public transformation{
 public:
         linTrans();
-        void transforming(valarray<double> & input);
+        void transforming(double * input, int nSize);
         linTrans * clone(){return new linTrans(*this);};
         void convertToPb(pb::transformation & trans_pb);
         linTrans(const pb::transformation & trans_pb);
@@ -273,7 +273,7 @@ class scaleTrans:public linTrans{
 public:
 	scaleTrans();
 	scaleTrans(int,int);
-	void transforming(valarray<double> & input);
+	void transforming(double * input, int nSize);
 	scaleTrans * clone(){return new scaleTrans(*this);};
 	boost::shared_ptr<transformation> getInverseTransformation();
 	void setTransformedScale(int _scale){t_scale = _scale;};
@@ -289,7 +289,7 @@ public:
 	flinTrans();
 	flinTrans(double _minRange, double _maxRange);
 	double flin(double x);
-	void transforming(valarray<double> & input);
+	void transforming(double * input, int nSize);
 	flinTrans * clone(){return new flinTrans(*this);};
 	void convertToPb(pb::transformation & trans_pb);
 	flinTrans(const pb::transformation & trans_pb);

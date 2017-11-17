@@ -16,6 +16,8 @@
 //#include <R_ext/Constants.h>
 #include "compensation.hpp"
 #include "ellipse2points.hpp"
+
+
 using namespace std;
 
 
@@ -65,22 +67,20 @@ const double pi = 3.1415926535897;
 #define ANDNOT 3
 #define ORNOT 4
 
-struct vertices_vector{
+typedef vector<unsigned> INDICE_TYPE;
+
+
+class vertices_vector{
+public:
 	vector<double> x;
 	vector<double> y;
-};
-
-class vertices_valarray{
-public:
-	valarray<double> x;
-	valarray<double> y;
 public:
 	void resize(unsigned nSize){
 		x.resize(nSize);
 		y.resize(nSize);
 	}
-	vertices_valarray(){};
-	vertices_valarray(vector<coordinate> vertices){
+	vertices_vector(){};
+	vertices_vector(vector<coordinate> vertices){
 
 			unsigned nSize=vertices.size();
 			resize(nSize);
@@ -90,16 +90,9 @@ public:
 				y[i]=vertices.at(i).y;
 			}
 
-	}
-	vertices_vector toVector(){
-		vertices_vector res;
-		for(unsigned i=0;i<x.size();i++)
-			res.x.push_back(x[i]);
-		for(unsigned i=0;i<y.size();i++)
-			res.y.push_back(y[i]);
-
-		return res;
-	}
+	};
+	//dummy api for backward compatibility
+	vertices_vector toVector(){return *this;};
 	void print(){
 		COUT<<"x:";
 		for(unsigned i=0;i<x.size();i++)
@@ -122,7 +115,7 @@ private:
 public:
 	paramRange(double _min,double _max,string _name){min=_min;max=_max;name=_name;};
 	paramRange(){};
-	vertices_valarray toValarray();
+	vertices_vector toVector();
 	void setName(string _n){name=_n;};
 	void updateChannels(const CHANNEL_MAP & chnl_map){
 
@@ -166,7 +159,7 @@ public:
 					*it = itChnl->second;
 			}
 		};
-	vertices_valarray toValarray();
+	vertices_vector toVector();
 	string xName(){return params.at(0);};
 	string yName(){return params.at(1);};
 	paramPoly(){};
@@ -226,12 +219,12 @@ public:
 	virtual ~gate(){};
 	virtual unsigned short getType()=0;
 	virtual vector<BOOL_GATE_OP> getBoolSpec(){throw(domain_error("undefined getBoolSpec function!"));};
-	virtual vector<bool> gating(flowData &){throw(domain_error("undefined gating function!"));};
+	virtual INDICE_TYPE gating(flowData &, INDICE_TYPE &){throw(domain_error("undefined gating function!"));};
 	virtual void extend(flowData &,float){throw(domain_error("undefined extend function!"));};
 	virtual void extend(float,float){throw(domain_error("undefined extend function!"));};
 	virtual void gain(map<string,float> &){throw(domain_error("undefined gain function!"));};
 	virtual vector<string> getParamNames(){throw(domain_error("undefined getParam function!"));};
-	virtual vertices_valarray getVertices(){throw(domain_error("undefined getVertices function!"));};
+	virtual vertices_vector getVertices(){throw(domain_error("undefined getVertices function!"));};
 	virtual void transforming(trans_local &){throw(domain_error("undefined transforming function!"));};
 	virtual void updateChannels(const CHANNEL_MAP & chnl_map){throw(domain_error("undefined updateChannels function!"));};
 	virtual gate * clone()=0;
@@ -249,7 +242,7 @@ private:
 public:
 	rangeGate();
 	unsigned short getType(){return RANGEGATE;}
-	vector<bool> gating(flowData &);
+	INDICE_TYPE gating(flowData &, INDICE_TYPE &);
 	void extend(flowData &,float);
 	void extend(float,float);
 	void gain(map<string,float> &);
@@ -258,7 +251,7 @@ public:
 	vector<string> getParamNames(){return param.getNameArray();};
 	void setParam(paramRange _param){param=_param;};
 	void updateChannels(const CHANNEL_MAP & chnl_map){param.updateChannels(chnl_map);};
-	vertices_valarray getVertices(){return param.toValarray();};
+	vertices_vector getVertices(){return param.toVector();};
 	rangeGate * clone(){return new rangeGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
 	rangeGate(const pb::gate & gate_pb);
@@ -283,10 +276,10 @@ public:
 	virtual void extend(flowData &,float);
 	void extend(float,float);
 	virtual void gain(map<string,float> &);
-	virtual vector<bool> gating(flowData &);
+	virtual INDICE_TYPE gating(flowData &, INDICE_TYPE &);
 	virtual void transforming(trans_local &);
 	virtual void transforming(transformation * trans_x, transformation * trans_y);
-	virtual vertices_valarray getVertices(){return param.toValarray();};
+	virtual vertices_vector getVertices(){return param.toVector();};
 	void setParam(paramPoly _param){param=_param;};
 	void updateChannels(const CHANNEL_MAP & chnl_map){param.updateChannels(chnl_map);};
 	virtual paramPoly getParam(){return param;};
@@ -308,7 +301,7 @@ public:
  */
 class rectGate:public polygonGate {
 public:
-	vector<bool> gating(flowData &);
+	INDICE_TYPE gating(flowData &, INDICE_TYPE &);
 	unsigned short getType(){return RECTGATE;}
 	rectGate * clone(){return new rectGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
@@ -333,7 +326,7 @@ public:
 	ellipseGate(){dist = 1;};
 	ellipseGate(coordinate _mu, vector<coordinate> _cov, double _dist);
 	ellipseGate(vector<coordinate> _antipodal, vector<string> _params);
-	vector<bool> gating(flowData &);
+	INDICE_TYPE gating(flowData &, INDICE_TYPE &);
 	vector<coordinate> getCovarianceMat(){
 		if(!Transformed())
 			throw(domain_error("EllipseGate has not been transformed so covariance matrix is unavailable!"));
@@ -376,7 +369,7 @@ public:
 	ellipsoidGate * clone(){return new ellipsoidGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
 	ellipsoidGate(const pb::gate & gate_pb);
-	vector<bool> gating(flowData &);
+	INDICE_TYPE gating(flowData &, INDICE_TYPE &);
 	unsigned short getType(){return POLYGONGATE;}//expose it to R as polygonGate since the original antipodal points can't be used directly anyway
 };
 
@@ -447,7 +440,7 @@ public:
 			throw(logic_error("CurlyGuadGate can't not be transformed before interpolation!"));
 	};
 	void interpolate(trans_local & trans);
-	vector<bool> gating(flowData &);
+	INDICE_TYPE gating(flowData &, INDICE_TYPE &);
 	virtual unsigned short getType(){return CURLYQUADGATE;}
 	CurlyGuadGate * clone(){return new CurlyGuadGate(*this);};
 

@@ -10,7 +10,6 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include <valarray>
 #include <stdexcept>
 
 using namespace std;
@@ -22,25 +21,23 @@ using namespace std;
 unsigned find_pos(vector<string> s,string pattern, bool ignore_case);
 /*
  * representing one FCS data
- * currently used as a transient copy of flow data (passed from R)
- * resource is released once the gating is done
+ *
+ * does not own the actual data, instead it holds the pointer to the external data array
+ * so that there is zero overhead when passing data from R
  */
 class flowData{
 
 public:
 	vector<string> params;
 	unsigned sampleID;//it is only valid when access cdf version of flowdata, used as index for sample dimension
-	valarray<double> data;
+	double * data;
 	unsigned nEvents;
 	bool ignore_case; //whether channel-searching is case sensitive
 
 
-	flowData & operator=(const flowData& source);//explicitly define the copy assignment since the default one is compiler-specific
 	flowData();
 	flowData(double* mat,vector<string>,unsigned _nEvents,unsigned _sampleID, bool _ignore_case = false);
-	slice getSlice(string channel) const;
-	void updateSlice(string channel,valarray<double> x);
-	valarray<double> subset(string channel) const;
+	double * subset(string channel) const;
 	/*
 	 * accessors
 	 */
@@ -51,10 +48,7 @@ public:
 	void setSampleID(unsigned _sampleID){sampleID=_sampleID;};
 	unsigned getSampleID(){return sampleID;};
 
-	void clear(){data.resize(0);};
-	unsigned dataSize(){return data.size();};
-	void getData(double * mat,unsigned nSize);
-	valarray<double> getData();
+	double * getData();
 };
 
 

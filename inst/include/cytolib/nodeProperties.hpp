@@ -63,8 +63,12 @@ public:
 	bool getHiddenFlag();
 
 	vector<bool> getIndices();
+	vector<unsigned> getIndices_u();
 	void setIndices(vector<bool> _ind);
+	void setIndices(INDICE_TYPE _ind, unsigned nTotal);
+
 	void setIndices(unsigned _nEvent);
+	int getTotal(){return indices->getTotal();};
 	void setGate(gate *gate);
 	void computeStats();
 	void convertToPb(pb::nodeProperties & np_pb, bool isRoot);

@@ -186,15 +186,15 @@ void inPolygon_c(double *data, int nrd,
 void polygonGate::extend(flowData & fdata,float extend_val){
 	string x=param.xName();
 	string y=param.yName();
-	valarray<double> xdata(fdata.subset(x));
-	valarray<double> ydata(fdata.subset(y));
-
+	double* xdata(fdata.subset(x));
+	double* ydata(fdata.subset(y));
+	int nSize = fdata.nEvents;
 	vector<coordinate> v=param.getVertices();
 	/*
 	 * get R_min
 	 */
-	double xMin=xdata.min();
-	double yMin=ydata.min();
+	double xMin=*min_element(xdata, xdata + nSize);
+	double yMin=*min_element(ydata, ydata + nSize);
 	for(unsigned i=0;i<v.size();i++)
 	{
 		if(v.at(i).x<=extend_val)
@@ -465,17 +465,14 @@ void ellipseGate::computeCov(){
 /*
  * translated from flowCore::%in% method for ellipsoidGate
  */
-vector<bool> ellipseGate::gating(flowData & fdata){
+INDICE_TYPE ellipseGate::gating(flowData & fdata, INDICE_TYPE & parentInd){
 
 
 	// get data
 
-	valarray<double> xdata(fdata.subset(param.xName()));
-	valarray<double> ydata(fdata.subset(param.yName()));
+	double * xdata = fdata.subset(param.xName());
+	double * ydata = fdata.subset(param.yName());
 
-	//center the data
-	xdata = xdata - mu.x;
-	ydata = ydata - mu.y;
 
 	//inverse the cov matrix
 	/*
@@ -497,12 +494,17 @@ vector<bool> ellipseGate::gating(flowData & fdata){
 	dd = a/det;
 
 	// if inside of the ellipse
-	unsigned nEvents=xdata.size();
-	vector<bool> res (nEvents);
-	for(unsigned i =0;i<nEvents;i++){
-		double x = xdata[i];
-		double y = ydata[i];
-		res[i] = (x * x * aa + x* y * cc + x* y * bb + y * y * dd) <= pow(dist, 2);
+	int nEvents=parentInd.size();
+	INDICE_TYPE res;
+	res.reserve(nEvents);
+	for(auto i : parentInd){
+		//center the data
+
+		double x = xdata[i] - mu.x;
+		double y = ydata[i] - mu.y;
+		bool isIn = (x * x * aa + x* y * cc + x* y * bb + y * y * dd) <= pow(dist, 2);
+		if(isIn != neg)
+		res.push_back(i);
 	}
 
 	return res;
@@ -510,12 +512,13 @@ vector<bool> ellipseGate::gating(flowData & fdata){
 
 void rangeGate::extend(flowData & fdata,float extend_val){
 	string pName=param.getName();
-	valarray<double> data_1d(fdata.subset(pName));
-
+	double * data_1d = fdata.subset(pName);
+	int nSize = fdata.nEvents;
 	/*
 	 * get R_min
 	 */
-	double xMin=data_1d.min();
+
+	double xMin= *min_element(data_1d, data_1d + nSize);
 	if(param.getMin()<=extend_val)
 	{
 		if(g_loglevel>=POPULATION_LEVEL)
@@ -542,7 +545,7 @@ void rangeGate::extend(float extend_val, float extend_to){
 void rangeGate::gain(map<string,float> & gains){
 	if(!isGained)
 	{
-		vertices_valarray vert(getVertices());
+		vertices_vector vert(getVertices());
 
 		map<string,float>::iterator it=gains.find(param.getName().c_str());
 		if(it!=gains.end())
@@ -613,7 +616,7 @@ void rangeGate::gain(map<string,float> & gains){
  *  indices are allocated within gating function, so it is up to caller to free it
  *  and now it is freed in destructor of its owner "nodeProperties" object
  */
-vector<bool> polygonGate::gating(flowData & fdata){
+INDICE_TYPE polygonGate::gating(flowData & fdata, INDICE_TYPE & parentInd){
 
 
 
@@ -623,19 +626,18 @@ vector<bool> polygonGate::gating(flowData & fdata){
 
 	string x=param.xName();
 	string y=param.yName();
-	valarray<double> xdata(fdata.subset(x));
-	valarray<double> ydata(fdata.subset(y));
-
-	unsigned nEvents=xdata.size();
-	//init the indices
-	vector<bool> ind(nEvents);
+	double * xdata = fdata.subset(x);
+	double * ydata = fdata.subset(y);
 
 
 	unsigned counter;
 	double xinters;
 	double p1x, p2x, p1y, p2y;
 
-	for(unsigned i=0; i<nEvents; i++)
+	int nEvents=parentInd.size();
+	INDICE_TYPE res;
+	res.reserve(nEvents);
+	for(auto i : parentInd)
 	{//iterate over points
 	p1x=vertices.at(0).x;
 	p1y=vertices.at(0).y;
@@ -673,12 +675,12 @@ vector<bool> polygonGate::gating(flowData & fdata){
 	}
 	/*uneven number of vertices passed means "in"*/
 
-	ind[i]=((counter % 2) != 0);
-
+	 bool isIn =((counter % 2) != 0);
+	 if(isIn != neg)
+		res.push_back(i);
 	}
-	if(isNegate())
-		ind.flip();
-	return ind;
+
+	return res;
 }
 
 /*
@@ -730,8 +732,8 @@ void ellipseGate::transforming(trans_local & trans){
 		string channel_y=param.yName();
 
 		//get vertices in valarray format
-		vertices_valarray vert(antipodal_vertices);
-
+		vertices_vector vert(antipodal_vertices);
+		int nSize = antipodal_vertices.size();
 		/*
 		 * do the actual transformations
 		 */
@@ -744,8 +746,8 @@ void ellipseGate::transforming(trans_local & trans){
 			if(g_loglevel>=POPULATION_LEVEL)
 				COUT<<"transforming: "<<channel_x<<endl;;
 
-			trans_x->transforming(vert.x);
-			for(unsigned i=0;i<antipodal_vertices.size();i++)
+			trans_x->transforming(&vert.x[0],nSize);
+			for(int i=0;i<nSize;i++)
 				antipodal_vertices.at(i).x=vert.x[i];
 		}
 		if(trans_y!=NULL)
@@ -753,8 +755,8 @@ void ellipseGate::transforming(trans_local & trans){
 			if(g_loglevel>=POPULATION_LEVEL)
 				COUT<<"transforming: "<<channel_y<<endl;;
 
-			trans_y->transforming(vert.y);
-			for(unsigned i=0;i<antipodal_vertices.size();i++)
+			trans_y->transforming(&vert.y[0],nSize);
+			for(int i=0;i<nSize;i++)
 				antipodal_vertices.at(i).y=vert.y[i];
 		}
 		if(g_loglevel>=POPULATION_LEVEL)
@@ -796,8 +798,6 @@ void ellipsoidGate::transforming(trans_local & trans){
 		string channel_x=param.xName();
 		string channel_y=param.yName();
 
-		//get vertices in valarray format
-		vertices_valarray vert(antipodal_vertices);
 
 
 		transformation * trans_x=trans.getTran(channel_x);
@@ -849,8 +849,8 @@ void ellipsoidGate::transforming(trans_local & trans){
 /*
  * ellipsoidGate can't use ellipseGate gating function due to its special treatment of the scale
  */
-vector<bool> ellipsoidGate::gating(flowData & fdata){
-	return polygonGate::gating(fdata);
+INDICE_TYPE ellipsoidGate::gating(flowData & fdata, INDICE_TYPE & parentInd){
+	return polygonGate::gating(fdata, parentInd);
 }
 /*
  * a wrapper that calls transforming(transformation * , transformation * )
@@ -879,30 +879,31 @@ void polygonGate::transforming(transformation * trans_x, transformation * trans_
 	if(!Transformed())
 	{
 		vector<coordinate> vertices=param.getVertices();
+		int nSize = vertices.size();
 		/*
 		 * get channel names to select respective transformation functions
 		 */
 		string channel_x=param.xName();
 		string channel_y=param.yName();
 
-		//get vertices in valarray format
-		vertices_valarray vert(vertices);
+		//get vertices in array format
+		vertices_vector vert(vertices);
 
 
 		if(trans_x!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
 				COUT<<"transforming: "<<channel_x<<endl;;
-			trans_x->transforming(vert.x);
-			for(unsigned i=0;i<vertices.size();i++)
+			trans_x->transforming(&vert.x[0], nSize);
+			for(int i=0;i<nSize;i++)
 				vertices.at(i).x=vert.x[i];
 		}
 		if(trans_y!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
 				COUT<<"transforming: "<<channel_y<<endl;;
-			trans_y->transforming(vert.y);
-			for(unsigned i=0;i<vertices.size();i++)
+			trans_y->transforming(&vert.y[0], nSize);
+			for(int i=0;i<nSize;i++)
 				vertices.at(i).y=vert.y[i];
 		}
 		if(g_loglevel>=POPULATION_LEVEL)
@@ -915,50 +916,40 @@ void polygonGate::transforming(transformation * trans_x, transformation * trans_
 void rangeGate::transforming(trans_local & trans){
 	if(!Transformed())
 	{
-		vertices_valarray vert(getVertices());
+		double vert[2] = {param.getMin(),param.getMax()};
 
 		transformation * curTrans=trans.getTran(param.getName());
 		if(curTrans!=NULL)
 		{
 			if(g_loglevel>=POPULATION_LEVEL)
 				COUT<<"transforming "<<param.getName()<<endl;
-	//		valarray<double> output(curTrans->transforming(vert.x));
-	//		param.min=output[0];
-	//		param.max=output[1];
-			curTrans->transforming(vert.x);
-			param.setMin(vert.x[0]);
-			param.setMax(vert.x[1]);
+
+			curTrans->transforming(vert, 2);
+			param.setMin(vert[0]);
+			param.setMax(vert[1]);
 		}
 		isTransformed=true;
 	}
 
 }
 
-vector<bool> rangeGate::gating(flowData & fdata){
+INDICE_TYPE rangeGate::gating(flowData & fdata, INDICE_TYPE & parentInd){
 
-	valarray<double> data_1d(fdata.subset(param.getName()));
+	double * data_1d = fdata.subset(param.getName());
 
-	unsigned nEvents=data_1d.size();
-	//init the indices
-	vector<bool> ind(nEvents);
-
-	/*
-	 * actual gating
-	 */
-	for(unsigned i=0;i<nEvents;i++)
-	{
-		ind[i]=data_1d[i]<=param.getMax()&&data_1d[i]>=param.getMin();
+	int nEvents=parentInd.size();
+	INDICE_TYPE res;
+	res.reserve(nEvents);
+	for(auto i : parentInd){
+		bool isIn = data_1d[i]<=param.getMax()&&data_1d[i]>=param.getMin();
+		if(isIn != neg)
+		res.push_back(i);
 	}
 
-
-	if(isNegate())
-		ind.flip();
-
-	return ind;
-
+	return res;
 }
 
-vector<bool> rectGate::gating(flowData & fdata){
+INDICE_TYPE rectGate::gating(flowData & fdata, INDICE_TYPE & parentInd){
 
 	vector<coordinate> vertices=param.getVertices();
 	unsigned nVertex=vertices.size();
@@ -966,17 +957,17 @@ vector<bool> rectGate::gating(flowData & fdata){
 		throw(domain_error("invalid number of vertices for rectgate!"));
 	string x=param.xName();
 	string y=param.yName();
-	valarray<double> xdata(fdata.subset(x));
-	valarray<double> ydata(fdata.subset(y));
+	double * xdata = fdata.subset(x);
+	double * ydata =fdata.subset(y);
 
-	unsigned nEvents=xdata.size();
-	//init the indices
-	vector<bool> ind(nEvents);
+	int nEvents=parentInd.size();
+	INDICE_TYPE res;
+	res.reserve(nEvents);
 
 	/*
 	 * actual gating
 	 */
-	for(unsigned i=0;i<nEvents;i++)
+	for(auto i : parentInd)
 	{
 		bool inX,inY;
 		double xMin=vertices.at(0).x;
@@ -990,19 +981,17 @@ vector<bool> rectGate::gating(flowData & fdata){
 
 		inX=xdata[i]<=xMax&&xdata[i]>=xMin;
 		inY=ydata[i]<=yMax&&ydata[i]>=yMin;
-		ind[i]=inX&&inY;
+		bool isIn = inX&&inY;
+		if(isIn != neg)
+		res.push_back(i);
 	}
 
-
-	if(isNegate())
-		ind.flip();
-
-	return ind;
+	return res;
 
 }
-vertices_valarray paramPoly::toValarray(){
+vertices_vector paramPoly::toVector(){
 
-	vertices_valarray res;
+	vertices_vector res;
 	unsigned nSize=vertices.size();
 	res.resize(nSize);
 	for(unsigned i=0;i<nSize;i++)
@@ -1014,9 +1003,9 @@ vertices_valarray paramPoly::toValarray(){
 }
 
 
-vertices_valarray paramRange::toValarray(){
+vertices_vector paramRange::toVector(){
 
-	vertices_valarray res;
+	vertices_vector res;
 	res.resize(2);
 	res.x[0]=min;
 	res.x[1]=max;
@@ -1025,10 +1014,10 @@ vertices_valarray paramRange::toValarray(){
 }
 
 
-vector<bool> CurlyGuadGate::gating(flowData & fdata){
+INDICE_TYPE CurlyGuadGate::gating(flowData & fdata, INDICE_TYPE & parentInd){
 	if(interpolated)
 	{
-		return polygonGate::gating(fdata);
+		return polygonGate::gating(fdata, parentInd);
 	}
 	else
 	{

@@ -39,7 +39,15 @@ void unpackFromBytes(vector <bool> & x, const vector<unsigned char>& x_bytes){
 vector<bool> BOOLINDICES::getIndices(){
 	return x;
 }
+vector<unsigned> BOOLINDICES::getIndices_u(){
+	vector<unsigned> res;
 
+	for(auto i = 0; i < x.size(); i++){
+		if(x[i])
+			res.push_back(i);
+	}
+	return res;
+}
 /*
  * convert int to bool indices
  */
@@ -60,6 +68,14 @@ vector<bool> ROOTINDICES::getIndices(){
 
 	return res;
 }
+vector<unsigned> ROOTINDICES::getIndices_u(){
+
+	vector<unsigned> res(nEvents);
+	for(auto i = 0; i < nEvents; i++)
+		res[i]=i;
+	return res;
+}
+
 
 
 unsigned BOOLINDICES::getCount(){
@@ -74,6 +90,13 @@ unsigned INTINDICES::getCount(){
 unsigned ROOTINDICES::getCount(){
 
 	return nEvents;
+}
+
+BOOLINDICES::BOOLINDICES(vector <unsigned> _ind, unsigned _nEvent){
+	nEvents = _nEvent;
+	x.resize(nEvents);
+	for(auto i : _ind)
+		x[i] = true;
 }
 BOOLINDICES::BOOLINDICES(vector <bool> _ind){
 	x=_ind;

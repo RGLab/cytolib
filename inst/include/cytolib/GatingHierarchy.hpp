@@ -126,7 +126,9 @@ public:
 	void printLocalTrans();//for the debugging purpose
 	void transforming(double timestep);
 	void gating(VertexID,bool recompute=false, bool computeTerminalBool=true);
-	void calgate(VertexID, bool computeTerminalBool=true);
+	void gating(VertexID,bool recompute, bool computeTerminalBool, INTINDICES &parentIndice);
+
+	void calgate(VertexID, bool computeTerminalBool, INTINDICES &parentIndice);
 	vector<bool> boolGating(VertexID, bool computeTerminalBool);
 	vector<bool> boolGating(vector<BOOL_GATE_OP> boolOpSpec, bool computeTerminalBool);
 	void extendGate(float);
