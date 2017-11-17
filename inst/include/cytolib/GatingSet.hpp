@@ -82,17 +82,19 @@ public:
 	 * @param _new
 	 */
 	void setSample(const string & _old, const string & _new){
-		auto it = find(_new);
-		if(it!=end())
-			throw(range_error(_new + " already exists!"));
-		it = find(_old);
-		if(it==end())
-			throw(range_error(_old + " not found!"));
+		if(_old.compare(_new) != 0)
+		{
+			auto it = find(_new);
+			if(it!=end())
+				throw(range_error(_new + " already exists!"));
+			it = find(_old);
+			if(it==end())
+				throw(range_error(_old + " not found!"));
 
-		auto gh = it->second;
-		erase(_old);
-		ghs[_new] = gh;
-
+			auto gh = it->second;
+			erase(_old);
+			ghs[_new] = gh;
+		}
 	};
 
 	~GatingSet()
