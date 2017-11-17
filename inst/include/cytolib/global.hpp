@@ -26,6 +26,4 @@ using namespace std;
 void PRINT(string a);
 void PRINT(const char * a);
 
-#define PRT true
-
 #endif /* GLOBAL_HPP_ */
