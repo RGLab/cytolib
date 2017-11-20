@@ -943,6 +943,8 @@ public:
 						| cc, dd |
 		 */
 		EVENT_DATA_TYPE a , b, c, d;
+		if(cov.size()!=2)
+			throw(domain_error("invalid cov matrix!"));
 		a = cov.at(0).x;
 		b = cov.at(0).y;
 		c = cov.at(1).x;

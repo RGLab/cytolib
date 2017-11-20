@@ -57,6 +57,9 @@ public:
 	 */
 	nodeProperties(const pb::nodeProperties & np_pb):thisGate(NULL),hidden(false){
 		thisName = np_pb.thisname();
+		if(g_loglevel>=POPULATION_LEVEL)
+				PRINT("loading node: "+thisName+"\n");;
+
 		hidden = np_pb.hidden();
 		for(int i = 0; i < np_pb.fcstats_size(); i++){
 		   const pb::POPSTATS &	stat_pb = np_pb.fcstats(i);
