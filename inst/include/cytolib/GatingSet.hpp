@@ -21,10 +21,6 @@ using namespace std;
 #define PB true
 #define BS false
 
-#define WS_WIN 1
-#define WS_MAC 2
-#define WS_VX 3
-#define WS_MAC_3 4
 
 
 /**
