@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 #include "gate.hpp"
-#include <boost/scoped_ptr.hpp>
 inline void packToBytes(const vector <bool> & x, vector<unsigned char> & bytes){
 	/*
 	 * pack bits into bytes

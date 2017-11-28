@@ -1156,7 +1156,7 @@ public:
 			/*
 			 * re-construct the trans object that was used by flowJo to transform ellipsoid gate to 256 scale
 			 */
-			boost::scoped_ptr<transformation> trans_gate_x,trans_gate_y;
+			unique_ptr<transformation> trans_gate_x,trans_gate_y;
 			if(trans_x == NULL)
 				throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_x));
 	//			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
@@ -1329,7 +1329,7 @@ public:
 		/*
 		 * and rescale raw to 256 space
 		 */
-		boost::scoped_ptr<transformation> trans_gate_x,trans_gate_y;
+		unique_ptr<transformation> trans_gate_x,trans_gate_y;
 		if(trans_x == NULL)
 			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
 		else
