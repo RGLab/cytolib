@@ -22,9 +22,39 @@ extern bool my_throw_on_error;
 
 #include <iostream>
 #include <string>
+#include <memory>
+#include <ctype.h>
+#include <vector>
 using namespace std;
-void PRINT(string a);
-void PRINT(const char * a);
+
+extern unsigned short g_loglevel;// debug print is turned off by default
+extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
+
+inline void PRINT(string a){
+#ifdef ROUT
+ Rprintf(a.c_str());
+#else
+ cout << a;
+#endif
+
+}
+inline void PRINT(const char * a){
+#ifdef ROUT
+ Rprintf(a);
+#else
+ cout << a;
+#endif
+
+}
+
+
+
+const int bsti = 1;  // Byte swap test integer
+#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
+
+typedef double EVENT_DATA_TYPE;
+typedef vector<EVENT_DATA_TYPE> EVENT_DATA_VEC;
+typedef unique_ptr<EVENT_DATA_TYPE[] > EVENT_DATA_PTR;
 
 #define PRT true
 const int bsti = 1;  // Byte swap test integer
