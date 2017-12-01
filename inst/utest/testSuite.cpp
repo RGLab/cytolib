@@ -4,6 +4,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/H5CytoFrame.hpp>
+unsigned short g_loglevel = 0;
 //#include "test_header.hpp"
 //float gTol = 0.05;
 

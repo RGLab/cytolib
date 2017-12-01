@@ -57,7 +57,5 @@ typedef vector<EVENT_DATA_TYPE> EVENT_DATA_VEC;
 typedef unique_ptr<EVENT_DATA_TYPE[] > EVENT_DATA_PTR;
 
 #define PRT true
-const int bsti = 1;  // Byte swap test integer
-#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
 
 #endif /* GLOBAL_HPP_ */

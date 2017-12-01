@@ -42,7 +42,7 @@ public:
 	{
 		return params;
 	}
-	virtual void writeFCS(const string & filename);
+//	virtual void writeFCS(const string & filename);
 	/**
 	 * save the CytoFrame as HDF5 format
 	 *
