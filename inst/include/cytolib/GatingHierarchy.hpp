@@ -95,28 +95,68 @@ private:
 						we can try uBlas for this simple task, but when cid=="-1",we still need to
 						do this in R since comp is extracted from FCS keyword (unless it can be optionally extracted from workspace keyword)
 	 	 	 	 	  */
-	unique_ptr<flowData> fdata; /* in-memory version copy frm, loaded on demand */
+	unique_ptr<MemCytoFrame> fdata; /* in-memory version copy frm, loaded on demand */
+	unique_ptr<CytoFrame> frmPtr;
 	populationTree tree; /**< the gating tree */
 
 	PARAM_VEC transFlag; /*< for internal use of parse flowJo workspace */
 	trans_local trans; /*< the transformation used for this particular GatingHierarchy object */
 
 public:
+	 /**
+		  * forwarding APIs
+		  */
+		vector<string> getChannels(){return frmPtr->getChannels();};
 
+
+		//* forward to the first element's getChannels
+		vector<string> getMarkers(){return frmPtr->getMarkers();};
+
+		void setMarker(const string & _old, const string & _new){
+			frmPtr->setMarker(_old, _new);
+		};
+
+		int nCol(){return frmPtr->nCol();}
+
+		/**
+		 * Get the reference of cytoFrame
+		 * @return
+		 */
+		CytoFrame & getData()
+		{
+			return *frmPtr;
+		}
+		/**
+		 * extract in-memory data from a node
+		 * @param nodeID node id
+		 * @return MemCytoFrame , which is a subset of the original data
+		 */
+	//	MemCytoFrame getData(VertexID nodeID)
+	//	{
+	//		loadData();
+	//
+	//		//subset the results by indices for non-root node
+	//		if(nodeID>0)
+	//		{
+	//
+	//		}
+	//		else
+	//			return *fdata;
+	//	}
 
 
 	/**
 	 * load the in-memory copy of frm
 	 */
-	void loadData(const flowData & _fdata)
-	{
-		if(!fdata)
-		{
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("loading data into memory..\n");
-			fdata.reset(new flowData(_fdata));
-		}
-	}
+		void loadData()
+			{
+				if(!fdata)
+				{
+					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+						PRINT("loading data into memory..\n");
+					fdata.reset(new MemCytoFrame(*frmPtr));
+				}
+			}
 
 	void unloadData()
 	{
@@ -140,6 +180,8 @@ public:
 	 */
 	void updateChannels(const CHANNEL_MAP & chnl_map)
 	{
+		//update flow data
+		frmPtr->updateChannels(chnl_map);
 
 		//update comp
 		comp.updateChannels(chnl_map);
@@ -673,7 +715,7 @@ public:
 		nodeProperties & node=getNodeProperty(u);
 		if(u==0)
 		{
-			node.setIndices(fdata->nRow());
+			node.setIndices(frmPtr->nRow());
 			node.computeStats();
 		}else
 		{
