@@ -122,15 +122,35 @@ public:
 
 		vector<key_t> keyVec(nKey);
 		ds_key.read(keyVec.data(), key_type);
-		keys.resize(nKey);
+//		keys.resize(nKey);
 		for(auto i = 0; i < nKey; i++)
 		{
-			keys[i].first = keyVec[i].key;
+			keys[keyVec[i].key] = keyVec[i].value;
 			delete [] keyVec[i].key;
-			keys[i].second = keyVec[i].value;
+			delete [] keyVec[i].value;
+
+//			keys[i].first = keyVec[i].key;
+//			delete [] keyVec[i].key;
+//			keys[i].second = keyVec[i].value;
+//			delete [] keyVec[i].value;
+		}
+		/*
+		 * read pdata
+		 */
+		DataSet ds_pd = file.openDataSet( "pdata");
+		DataSpace dsp_pd = ds_pd.getSpace();
+		hsize_t dim_pd[1];
+		dsp_pd.getSimpleExtentDims(dim_pd);
+		int nPd = dim_pd[0];
+
+		keyVec.resize(nPd);
+		ds_pd.read(keyVec.data(), key_type);
+		for(auto i = 0; i < nPd; i++)
+		{
+			pd[keyVec[i].key] = keyVec[i].value;
+			delete [] keyVec[i].key;
 			delete [] keyVec[i].value;
 		}
-
 		//open dataset for event data
 
 		dataset = file.openDataSet(DATASET_NAME);

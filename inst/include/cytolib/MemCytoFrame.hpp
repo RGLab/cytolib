@@ -32,7 +32,7 @@ public:
 	 */
 	MemCytoFrame(const CytoFrame & frm)
 	{
-		pd = frm.getPData();
+
 		keys.setPairs(frm.getKeywords());
 		params = frm.getParams();
 		buildHash();

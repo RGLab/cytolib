@@ -113,6 +113,22 @@ public:
 		DataSet ds_key = file.createDataSet( "keywords", key_type, dsp_key);
 		ds_key.write(&keyVec[0], key_type );
 
+		/*
+		 * write pdata
+		 */
+		keyVec.clear();//reuse keyVec and key_type for pd
+		for(std::pair<std::string, string> e : pd)
+		{
+			keyVec.push_back(key_t(e.first, e.second));
+		}
+
+
+		hsize_t dim_pd[] = {keyVec.size()};
+		DataSpace dsp_pd(1, dim_pd);
+
+		DataSet ds_pd = file.createDataSet( "pdata", key_type, dsp_pd);
+		ds_pd.write(&keyVec[0], key_type );
+
 		 /*
 		* store events data as fixed
 		* size dataset.

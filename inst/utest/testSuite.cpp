@@ -141,6 +141,16 @@ BOOST_AUTO_TEST_CASE(multidata1)
 	config.header.nDataset = 10;
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 955);
+
+	//pd
+	cytofrm.setPData("colA", "a1");
+	BOOST_CHECK_EQUAL(cytofrm.getPData("colB"), "");
+	BOOST_CHECK_EQUAL(cytofrm.getPData("colA"), "a1");
+
+	string h5file = "/loc/no-backup/mike/shared/test.h5";
+	cytofrm.writeH5(h5file);
+	H5CytoFrame fr1(h5file);
+	BOOST_CHECK_EQUAL(fr1.getPData("colA"), "a1");
 }
 BOOST_AUTO_TEST_CASE(multidata2)
 {
