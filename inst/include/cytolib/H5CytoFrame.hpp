@@ -143,7 +143,11 @@ public:
 		//read nEvents
 		return dims[1];
 	}
-
+	/**
+	 * Read data from disk.
+	 * The caller will directly receive the data vector without the copy overhead thanks to the move semantics supported for vector container in c++11
+	 * @return
+	 */
 	EVENT_DATA_VEC getData() const{
 		EVENT_DATA_VEC data(nCol() * nRow());
 		dataset.read(data.data(), PredType::NATIVE_FLOAT);

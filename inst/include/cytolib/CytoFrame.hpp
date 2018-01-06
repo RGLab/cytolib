@@ -350,6 +350,18 @@ public:
 	}
 
 	const PDATA & getPData() const {return pd;}
+	string getPData(const string & name) const {
+		auto it = pd.find(name);
+		if(it==pd.end())
+			return "";
+		else
+			return it->second;
+
+	}
+	void setPData(const string & name, const string & value){
+		pd[name] = value;
+	}
+	void delPData(const string & name){pd.erase(name);}
 };
 
 

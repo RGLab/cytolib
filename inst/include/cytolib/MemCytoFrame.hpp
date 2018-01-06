@@ -924,7 +924,10 @@ public:
 		return data.size()/nCol();
 	}
 
-
+/**
+ * Caller will receive a copy of data
+ * @return
+ */
 	EVENT_DATA_VEC getData() const{
 		return data;
 	}
