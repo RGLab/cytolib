@@ -271,6 +271,8 @@ public:
 			{
 				if(computeTerminalBool||getChildren(u).size()>0)
 				{
+
+
 					vector<bool> curIndices;
 					curIndices=boolGating(u, computeTerminalBool);
 					//combine with parent indices
@@ -281,7 +283,11 @@ public:
 					node.setIndices(curIndices);
 				}
 				else
+				{
+//					cout << computeTerminalBool << " : " << getChildren(u).size() <<  " : " << g->getType() << endl;
 					return;
+				}
+
 
 				break;
 			}
@@ -684,17 +690,22 @@ public:
 			 */
 			if(recompute||!node.isGated())
 				calgate(u, computeTerminalBool, parentIndice);
+
 		}
 
 		//recursively gate all the descendants of u
-
-		INTINDICES pind(node.getIndices_u(), node.getTotal());
-		VertexID_vec children=getChildren(u);
-		for(VertexID_vec::iterator it=children.begin();it!=children.end();it++)
+		if(node.isGated())
 		{
-			//add boost node
-			VertexID curChildID = *it;
-			gating(curChildID,recompute, computeTerminalBool, pind);
+			INTINDICES pind(node.getIndices_u(), node.getTotal());
+			VertexID_vec children=getChildren(u);
+			for(VertexID_vec::iterator it=children.begin();it!=children.end();it++)
+			{
+				//add boost node
+				VertexID curChildID = *it;
+
+				gating(curChildID,recompute, computeTerminalBool, pind);
+			}
+
 		}
 
 	}
