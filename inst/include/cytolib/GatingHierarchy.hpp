@@ -10,6 +10,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <queue>
+#include <unordered_set>
 #include "populationTree.hpp"
 #include <fstream>
 #include <algorithm>
@@ -252,7 +254,7 @@ public:
 
 
 		if(g_loglevel>=POPULATION_LEVEL)
-			PRINT("gating on:"+node.getName()+"\n");
+			PRINT("gating on:"+getNodePath(u)+"\n");
 
 		gate *g=node.getGate();
 
@@ -269,6 +271,8 @@ public:
 			{
 				if(computeTerminalBool||getChildren(u).size()>0)
 				{
+
+
 					vector<bool> curIndices;
 					curIndices=boolGating(u, computeTerminalBool);
 					//combine with parent indices
@@ -279,7 +283,11 @@ public:
 					node.setIndices(curIndices);
 				}
 				else
+				{
+//					cout << computeTerminalBool << " : " << getChildren(u).size() <<  " : " << g->getType() << endl;
 					return;
+				}
+
 
 				break;
 			}
@@ -682,17 +690,22 @@ public:
 			 */
 			if(recompute||!node.isGated())
 				calgate(u, computeTerminalBool, parentIndice);
+
 		}
 
 		//recursively gate all the descendants of u
-
-		INTINDICES pind(node.getIndices_u(), node.getTotal());
-		VertexID_vec children=getChildren(u);
-		for(VertexID_vec::iterator it=children.begin();it!=children.end();it++)
+		if(node.isGated())
 		{
-			//add boost node
-			VertexID curChildID = *it;
-			gating(curChildID,recompute, computeTerminalBool, pind);
+			INTINDICES pind(node.getIndices_u(), node.getTotal());
+			VertexID_vec children=getChildren(u);
+			for(VertexID_vec::iterator it=children.begin();it!=children.end();it++)
+			{
+				//add boost node
+				VertexID curChildID = *it;
+
+				gating(curChildID,recompute, computeTerminalBool, pind);
+			}
+
 		}
 
 	}
@@ -1061,14 +1074,6 @@ public:
 
 	}
 
-	/*
-	  * Searching for reference node for bool gating given the refnode name and current bool node id
-	  *
-	  *
-	  * @param u the current bool node
-	 * @param refPath the reference node name
-	 * @return reference node id
-	 */
 	VertexID getRefNodeID(VertexID u,vector<string> refPath){
 
 		/*
@@ -1097,59 +1102,85 @@ public:
 				errMsg.append(refPath.at(refPath.size()-1));
 				if(nMatches == 0)
 					throw(domain_error(errMsg + " not found!" ));
-				else{
+				else
+				{
 					/*
 					 * select the nearest one to u when multiple nodes matches
-					 * The deeper the common ancestor is, the closer the refNode is to the target bool node
+					 * using bfs search starting from u
 					 */
+					unordered_set<VertexID> candidates(nodeIDs.begin(), nodeIDs.end());
+//					for(auto i : candidates)
+//						cout << "candidate ref: " << getNodePath(i) << endl;
+					queue<VertexID> toVisit;
+					unordered_set<VertexID> visited;
+					bool found = false;
+					toVisit.push(u);
+					VertexID_vec nearest;
+					while(!toVisit.empty())
+					{
+						int nSize = toVisit.size();
+//						cout << "# of nodes of the current level: " << nSize << endl;
+						//visit the current level
+						while(nSize-- > 0)
+						{
+							//pop from front and mark it
+							VertexID v = toVisit.front();
+							toVisit.pop();
+							visited.insert(v);
+//							cout << "pop " << getNodePath(v) << endl;
+							if(candidates.find(v)!=candidates.end())
+							{
+								found = true;
+								nearest.push_back(v);
+//								cout << "found " << getNodePath(v) << endl;
+							}
 
-					vector<unsigned> similarity;
-					for(VertexID_vec::iterator it = nodeIDs.begin(); it!= nodeIDs.end(); it++){
-						unsigned nAncestorDepths;
-						VertexID_vec thisNodeVec(2);
-						thisNodeVec.at(0) = u;
-						thisNodeVec.at(1) = *it;
-						VertexID ancestor = getCommonAncestor(thisNodeVec, nAncestorDepths);
-						/*
-						 * set to minimum when the reference node is the descendant of bool node itself
-						 * then this reference node should be excluded since it will cause infinite-loop of self-referral
-						 */
-						if(ancestor == u)
-							nAncestorDepths = 0;
-						similarity.push_back(nAncestorDepths);
-					}
 
+							//add all its adjacent nodes to the list
+							if(v>0)//add parent
+							{
+								VertexID p = getParent(v);
+								if(visited.find(p)==visited.end())
+								{
+//									cout << "push parent " << getNodePath(p) << endl;
+									toVisit.push(p);
+								}
 
-					vector<unsigned>::iterator maxIt = max_element(similarity.begin(), similarity.end());
-					vector<unsigned> matchedInd;
-					for(unsigned i = 0; i < similarity.size(); i++){
-						if(similarity.at(i) == *maxIt)
-							matchedInd.push_back(i);
-					}
-					/*
-					 * try to break the tie when multiple nodes have the same minimum depths
-					 * by picking the one with the node depth closest to u
-					 */
-					unsigned nTie = matchedInd.size();
-					vector<unsigned> relativeDepthVec(nTie);
-					unsigned boolNodeDepth = getNodeDepths(u);
-					unsigned nPos;
-					if(nTie > 1){
-						for(unsigned i = 0; i < nTie; i ++){
-							VertexID thisNode = nodeIDs.at(matchedInd.at(i));
-							relativeDepthVec.at(i) = std::abs((int)(getNodeDepths(thisNode) - boolNodeDepth));
+							}
+							//add children
+							VertexID_vec children = getChildren(v);
+							for(auto i : children)
+							{
+								if(visited.find(i)==visited.end())
+								{
+//									cout << "push child " << getNodePath(i) << endl;
+									toVisit.push(i);
+								}
+
+							}
 						}
-						vector<unsigned>::iterator minIt = min_element(relativeDepthVec.begin(), relativeDepthVec.end());
-						if(count(relativeDepthVec.begin(), relativeDepthVec.end(), *minIt) > 1)
-							throw(domain_error(errMsg + " can't be determined due to the multiple matches with the same distance to boolean node!" ));
-						else{
-							nPos = matchedInd.at(distance(relativeDepthVec.begin(), minIt));
-						}
-					}else{
-
-						nPos = matchedInd.at(0);
+						//if already match to refPath in the current level, then stop searching
+						if(found)
+							break;
 					}
-					return nodeIDs.at(nPos);
+
+
+					if(nearest.size() > 1){
+						errMsg += " can't be determined due to the multiple matches with the same distance to boolean node!\n";
+						for(auto & v : nearest)
+						{
+							errMsg += getNodePath(v) + "\n";
+						}
+						throw(domain_error(errMsg));
+
+					}
+					else{
+						if(g_loglevel>=POPULATION_LEVEL)
+							PRINT("RefNode is matched to the nearest neighbor: " + getNodePath(nearest[0])+"\n");
+
+						return nearest[0];
+					}
+
 				}
 
 			}
@@ -1381,6 +1412,22 @@ public:
 		}
 
 		return i ;
+	}
+	/**
+	 * Convert node Id to abs path
+	 * @param u
+	 * @return
+	 */
+	string getNodePath(VertexID u)
+	{
+		string res;
+
+		while(u > 0){
+			res = "/" + getNodeProperty(u).getName() + res;
+			u = getParent(u);
+		}
+		return res;
+
 	}
 	/**
 	 * Get ancestor node for the given node
