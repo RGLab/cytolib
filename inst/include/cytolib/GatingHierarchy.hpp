@@ -1147,16 +1147,20 @@ public:
 								}
 
 							}
-							//add children
-							VertexID_vec children = getChildren(v);
-							for(auto i : children)
+							if(v != u)//skip the descendants of the boolgate itself
 							{
-								if(visited.find(i)==visited.end())
-								{
-//									cout << "push child " << getNodePath(i) << endl;
-									toVisit.push(i);
-								}
 
+								//add children
+								VertexID_vec children = getChildren(v);
+								for(auto i : children)
+								{
+									if(visited.find(i)==visited.end())
+									{
+	//									cout << "push child " << getNodePath(i) << endl;
+										toVisit.push(i);
+									}
+
+								}
 							}
 						}
 						//if already match to refPath in the current level, then stop searching
