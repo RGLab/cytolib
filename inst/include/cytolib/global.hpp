@@ -8,13 +8,13 @@
 #ifndef GLOBAL_HPP_
 #define GLOBAL_HPP_
 
-#define GATING_SET_LEVEL 1
-#define GATING_HIERARCHY_LEVEL 2
-#define POPULATION_LEVEL 3
-#define GATE_LEVEL 4
-
-extern unsigned short g_loglevel;
-extern bool my_throw_on_error;
+enum loglevel_t{
+	NO_LOG = 0,
+	GATING_SET_LEVEL = 1,
+	GATING_HIERARCHY_LEVEL = 2,
+	POPULATION_LEVEL = 3,
+	GATE_LEVEL = 4
+	};
 
 #ifdef ROUT
 #include <R_ext/Print.h>
@@ -27,8 +27,6 @@ extern bool my_throw_on_error;
 #include <vector>
 using namespace std;
 
-extern unsigned short g_loglevel;// debug print is turned off by default
-extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
 
 inline void PRINT(string a){
 #ifdef ROUT

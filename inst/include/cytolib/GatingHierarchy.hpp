@@ -89,6 +89,8 @@ struct OurVertexPropertyWriterR {
 
 class GatingHierarchy{
 private:
+	unsigned short g_loglevel;// debug print is turned off by default
+
 	compensation comp; /*< compensation object */
 
 	/* compensation is currently done in R due to the linear Algebra
@@ -104,7 +106,7 @@ private:
 
 public:
 
-
+	void set_loglevel(unsigned short _g_loglevel){g_loglevel = _g_loglevel;};
 
 	/**
 	 * load the in-memory copy of frm
@@ -338,7 +340,7 @@ public:
 		 * , customized copy and assignment constructor is required
 		 *
 		 */
-	GatingHierarchy(const GatingHierarchy & _gh)
+	GatingHierarchy(const GatingHierarchy & _gh):g_loglevel(NO_LOG)
 	{
 		comp = _gh.comp;
 
@@ -365,8 +367,8 @@ public:
 	 * 	GatingHierarchy *curGh=new GatingHierarchy();
 	 * \endcode
 	 */
-	GatingHierarchy(){}
-	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
+	GatingHierarchy():g_loglevel(NO_LOG){}
+	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):g_loglevel(NO_LOG),comp(_comp), transFlag(_transFlag),trans(_trans) {};
 	void convertToPb(pb::GatingHierarchy & gh_pb){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
@@ -402,7 +404,7 @@ public:
 
 	}
 
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *> & trans_tbl){
+	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *> & trans_tbl):g_loglevel(NO_LOG){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 

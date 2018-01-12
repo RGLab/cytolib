@@ -31,6 +31,7 @@ using namespace std;
  *
  */
 class GatingSet{
+	unsigned short g_loglevel;// debug print is turned off by default
 
 	biexpTrans globalBiExpTrans; //default bi-exponential transformation functions
 	linTrans globalLinTrans;
@@ -52,6 +53,13 @@ public:
 			 return ghs.find(sampleName);
 	 }
 	 size_t erase ( const string& k ){return ghs.erase(k);}
+
+	 void set_loglevel(unsigned short _g_loglevel){
+		 g_loglevel = _g_loglevel;
+		 for(auto & it :ghs)
+			 it.second.set_loglevel(_g_loglevel);
+	 };
+	 unsigned short get_loglevel(){return g_loglevel;};
 	 /**
 	  * insert
 	  * @param sampleName
@@ -122,7 +130,7 @@ public:
 
 	}
 
-	GatingSet(){};
+	GatingSet():g_loglevel(NO_LOG){};
 
 	/**
 	 * separate filename from dir to avoid to deal with path parsing in c++
@@ -204,7 +212,7 @@ public:
 	 * @param format
 	 * @param isPB
 	 */
-	GatingSet(string filename)
+	GatingSet(string filename):g_loglevel(NO_LOG)
 	{
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
 		ifstream input(filename.c_str(), ios::in | ios::binary);
@@ -423,7 +431,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,vector<string> sampleNames){
+	GatingSet(const GatingHierarchy & gh_template,vector<string> sampleNames):g_loglevel(NO_LOG){
 
 
 
@@ -458,7 +466,7 @@ public:
 		}
 	}
 
-	GatingSet(vector<string> sampleNames){
+	GatingSet(vector<string> sampleNames):g_loglevel(NO_LOG){
 		vector<string>::iterator it;
 		for(it=sampleNames.begin();it!=sampleNames.end();it++)
 		{
