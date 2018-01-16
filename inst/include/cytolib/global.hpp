@@ -13,8 +13,6 @@
 #define POPULATION_LEVEL 3
 #define GATE_LEVEL 4
 
-extern unsigned short g_loglevel;
-extern bool my_throw_on_error;
 
 #ifdef ROUT
 #include <R_ext/Print.h>
@@ -29,6 +27,9 @@ using namespace std;
 
 extern unsigned short g_loglevel;// debug print is turned off by default
 extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
+#define CYTOLIB_INIT() \
+		bool my_throw_on_error = true;\
+		unsigned short g_loglevel = 0;\
 
 inline void PRINT(string a){
 #ifdef ROUT
