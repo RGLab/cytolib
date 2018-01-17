@@ -15,7 +15,7 @@
 //#include <R_ext/Constants.h>
 #include "compensation.hpp"
 #include "ellipse2points.hpp"
-#include "flowData.hpp"
+#include "MemCytoFrame.hpp"
 
 using namespace std;
 
@@ -244,8 +244,8 @@ public:
 	virtual ~gate(){};
 	virtual unsigned short getType()=0;
 	virtual vector<BOOL_GATE_OP> getBoolSpec(){throw(domain_error("undefined getBoolSpec function!"));};
-	virtual INDICE_TYPE gating(flowData &, INDICE_TYPE &){throw(domain_error("undefined gating function!"));};
-	virtual void extend(flowData &,float){throw(domain_error("undefined extend function!"));};
+	virtual INDICE_TYPE gating(MemCytoFrame &, INDICE_TYPE &){throw(domain_error("undefined gating function!"));};
+	virtual void extend(MemCytoFrame &,float){throw(domain_error("undefined extend function!"));};
 	virtual void extend(float,float){throw(domain_error("undefined extend function!"));};
 	virtual void gain(map<string,float> &){throw(domain_error("undefined gain function!"));};
 	virtual vector<string> getParamNames(){throw(domain_error("undefined getParam function!"));};
@@ -297,7 +297,7 @@ public:
 
 	}
 
-	INDICE_TYPE gating(flowData & fdata, INDICE_TYPE & parentInd){
+	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 
 		EVENT_DATA_TYPE * data_1d = fdata.subset(param.getName());
 
@@ -313,10 +313,10 @@ public:
 		return res;
 	}
 
-	void extend(flowData & fdata,float extend_val){
+	void extend(MemCytoFrame & fdata,float extend_val){
 		string pName=param.getName();
 		EVENT_DATA_TYPE * data_1d = fdata.subset(pName);
-		int nSize = fdata.nEvents;
+		int nSize = fdata.nRow();
 		/*
 		 * get R_min
 		 */
@@ -396,12 +396,12 @@ public:
 	 * the data points that are below this theshold range
 	 * to cut data range)
 	 */
-	virtual void extend(flowData & fdata,float extend_val){
+	virtual void extend(MemCytoFrame & fdata,float extend_val){
 		string x=param.xName();
 		string y=param.yName();
 		EVENT_DATA_TYPE* xdata(fdata.subset(x));
 		EVENT_DATA_TYPE* ydata(fdata.subset(y));
-		int nSize = fdata.nEvents;
+		int nSize = fdata.nRow();
 		vector<coordinate> v=param.getVertices();
 		/*
 		 * get R_min
@@ -506,7 +506,7 @@ public:
 	 *  indices are allocated within gating function, so it is up to caller to free it
 	 *  and now it is freed in destructor of its owner "nodeProperties" object
 	 */
-	virtual INDICE_TYPE gating(flowData & fdata, INDICE_TYPE & parentInd){
+	virtual INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 
 
 
@@ -670,7 +670,7 @@ public:
 
 
 
-	INDICE_TYPE gating(flowData & fdata, INDICE_TYPE & parentInd){
+	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 
 		vector<coordinate> vertices=param.getVertices();
 		unsigned nVertex=vertices.size();
@@ -769,7 +769,7 @@ public:
 
 	}
 
-	void extend(flowData & fdata,float extend_val){
+	void extend(MemCytoFrame & fdata,float extend_val){
 
 		/*
 		 * get R_min
@@ -927,7 +927,7 @@ public:
 	/*
 	 * translated from flowCore::%in% method for ellipsoidGate
 	 */
-	INDICE_TYPE gating(flowData & fdata, INDICE_TYPE & parentInd){
+	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 
 
 		// get data
@@ -1198,7 +1198,7 @@ public:
 	/*
 	 * ellipsoidGate can't use ellipseGate gating function due to its special treatment of the scale
 	 */
-	INDICE_TYPE gating(flowData & fdata, INDICE_TYPE & parentInd){
+	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 		return polygonGate::gating(fdata, parentInd);
 	}
 	unsigned short getType(){return POLYGONGATE;}//expose it to R as polygonGate since the original antipodal points can't be used directly anyway
@@ -1300,7 +1300,7 @@ public:
 
 
 
-	INDICE_TYPE gating(flowData & fdata, INDICE_TYPE & parentInd){
+	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 		if(interpolated)
 		{
 			return polygonGate::gating(fdata, parentInd);

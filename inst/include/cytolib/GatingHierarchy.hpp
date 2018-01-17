@@ -19,7 +19,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/breadth_first_search.hpp>
-#include "CytoFrame.hpp"
+#include "MemCytoFrame.hpp"
 #define REGULAR 0
 #define TSORT 1
 #define BFS 2
@@ -87,7 +87,7 @@ struct OurVertexPropertyWriterR {
 	Each FCS file is associated with one GatingHierarchy object.
 	It can also serves as a gating template when data is empty.
  */
-
+template<class FrameType>
 class GatingHierarchy{
 private:
 	compensation comp; /*< compensation object */
@@ -97,8 +97,8 @@ private:
 						we can try uBlas for this simple task, but when cid=="-1",we still need to
 						do this in R since comp is extracted from FCS keyword (unless it can be optionally extracted from workspace keyword)
 	 	 	 	 	  */
-	unique_ptr<MemCytoFrame> fdata; /* in-memory version copy frm, loaded on demand */
-	unique_ptr<CytoFrame> frmPtr;
+	MemCytoFrame fdata; /* in-memory version copy frm, loaded on demand */
+	FrameType frm;
 	populationTree tree; /**< the gating tree */
 
 	PARAM_VEC transFlag; /*< for internal use of parse flowJo workspace */
@@ -108,25 +108,25 @@ public:
 	 /**
 		  * forwarding APIs
 		  */
-		vector<string> getChannels(){return frmPtr->getChannels();};
+		vector<string> getChannels(){return frm.getChannels();};
 
 
 		//* forward to the first element's getChannels
-		vector<string> getMarkers(){return frmPtr->getMarkers();};
+		vector<string> getMarkers(){return frm.getMarkers();};
 
 		void setMarker(const string & _old, const string & _new){
-			frmPtr->setMarker(_old, _new);
+			frm.setMarker(_old, _new);
 		};
 
-		int nCol(){return frmPtr->nCol();}
-
+		int nCol(){frm.nCol();}
+		int nRow(){frm.nRow();}
 		/**
 		 * Get the reference of cytoFrame
 		 * @return
 		 */
 		CytoFrame & getData()
 		{
-			return *frmPtr;
+			return frm;
 		}
 		/**
 		 * extract in-memory data from a node
@@ -146,17 +146,25 @@ public:
 	//			return *fdata;
 	//	}
 
+	/**
+	 * copy setter
+	 * @param _frm
+	 */
+	void setframe(FrameType & _frm)
+	{
+		frm = _frm;
+	}
 
 	/**
 	 * load the in-memory copy of frm
 	 */
 		void loadData()
 			{
-				if(!fdata)
+				if(fdata.nRow()==0)
 				{
 					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 						PRINT("loading data into memory..\n");
-					fdata.reset(new MemCytoFrame(*frmPtr));
+					fdata = MemCytoFrame(frm);
 				}
 			}
 
@@ -164,11 +172,11 @@ public:
 	{
 		{
 
-			if(fdata)
+			if(fdata.nRow()>0)
 			{
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("unloading raw data..\n");
-				fdata.release();
+				fdata = MemCytoFrame();
 			}
 
 
@@ -183,7 +191,7 @@ public:
 	void updateChannels(const CHANNEL_MAP & chnl_map)
 	{
 		//update flow data
-		frmPtr->updateChannels(chnl_map);
+		frm.updateChannels(chnl_map);
 
 		//update comp
 		comp.updateChannels(chnl_map);
@@ -227,13 +235,13 @@ public:
 	{
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("start transforming data \n");
-		if(!fdata)
+		if(fdata.nRow()==0)
 			throw(domain_error("data is not loaded yet!"));
 
 	//	unsigned nEvents=fdata.nEvents;
 	//	unsigned nChannls=fdata.nChannls;
-		vector<string> channels=fdata->getChannels();
-		int nEvents = fdata->nRow();
+		vector<string> channels=fdata.getChannels();
+		int nEvents = fdata.nRow();
 		/*
 		 * transforming each marker
 		 */
@@ -245,7 +253,7 @@ public:
 				//special treatment for time channel
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("multiplying "+curChannel+" by :"+ to_string(timestep) + "\n");
-				EVENT_DATA_TYPE * x = this->fdata->subset(curChannel);
+				EVENT_DATA_TYPE * x = this->fdata.subset(curChannel);
 				for(int i = 0; i < nEvents; i++)
 					x[i] = x[i] * timestep;
 
@@ -260,7 +268,7 @@ public:
 							if(curTrans->gateOnly())
 								continue;
 
-							EVENT_DATA_TYPE * x = fdata->subset(curChannel);
+							EVENT_DATA_TYPE * x = fdata.subset(curChannel);
 							if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 								PRINT("transforming "+curChannel+" with func:"+curTrans->getChannel()+"\n");
 
@@ -340,7 +348,7 @@ public:
 		default:
 			{
 				vector<unsigned> pind = parentIndice.getIndices_u();
-				vector<unsigned> curIndices=g->gating(*fdata, pind);
+				vector<unsigned> curIndices=g->gating(fdata, pind);
 				node.setIndices(curIndices, parentIndice.getTotal());
 			}
 
@@ -355,7 +363,7 @@ public:
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\nstart extending Gates \n");
 
-			if(!fdata)
+			if(fdata.nRow()==0)
 					throw(domain_error("data is not loaded yet!"));
 
 			VertexID_vec vertices=getVertices(0);
@@ -372,7 +380,7 @@ public:
 					if(g_loglevel>=POPULATION_LEVEL)
 						PRINT(node.getName()+"\n");
 					if(g->getType()!=BOOLGATE)
-						g->extend(*fdata,extend_val);
+						g->extend(fdata,extend_val);
 				}
 			}
 	}
@@ -408,8 +416,8 @@ public:
 	 * 	GatingHierarchy *curGh=new GatingHierarchy();
 	 * \endcode
 	 */
-	GatingHierarchy(){}
-	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
+	GatingHierarchy<FrameType>(){}
+	GatingHierarchy<FrameType>(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
 	void convertToPb(pb::GatingHierarchy & gh_pb){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
@@ -445,7 +453,7 @@ public:
 
 	}
 
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *> & trans_tbl){
+	GatingHierarchy<FrameType>(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *> & trans_tbl){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 
@@ -723,7 +731,7 @@ public:
 		nodeProperties & node=getNodeProperty(u);
 		if(u==0)
 		{
-			node.setIndices(frmPtr->nRow());
+			node.setIndices(frm.nRow());
 			node.computeStats();
 		}else
 		{

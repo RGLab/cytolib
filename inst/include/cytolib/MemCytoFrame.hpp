@@ -25,7 +25,7 @@ class MemCytoFrame: public CytoFrame{
 	EVENT_DATA_VEC data;
 
 public:
-
+	MemCytoFrame(){};
 	/**
 	 * Constructor from a generic CytoFrame object
 	 * @param frm a reference to CytoFrame
@@ -625,9 +625,6 @@ public:
 
 	}
 
-
-
-
 	void fcsTextParse(string txt, KEY_WORDS & pairs, bool emptyValue){
 		/*
 		 * get the first character as delimiter
@@ -920,8 +917,10 @@ public:
 
 
 	int nRow() const{
-
-		return data.size()/nCol();
+		if(nCol()==0)
+			return 0;
+		else
+			return data.size()/nCol();
 	}
 
 /**

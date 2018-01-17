@@ -30,17 +30,18 @@ using namespace std;
  *  It also stores the global transformations.
  *
  */
+template<class FrameType>
 class GatingSet{
 
 	biexpTrans globalBiExpTrans; //default bi-exponential transformation functions
 	linTrans globalLinTrans;
 	trans_global_vec gTrans;//parsed from xml workspace
 
-	typedef unordered_map<string,GatingHierarchy> gh_map;
+	typedef unordered_map<string,GatingHierarchy<FrameType>> gh_map;
 	gh_map ghs;
 public:
-	typedef gh_map::iterator iterator;
-	typedef gh_map::const_iterator const_iterator;
+	typedef typename gh_map::iterator iterator;
+	typedef typename gh_map::const_iterator const_iterator;
 
 	/*
 	 * forwarding APIs
@@ -57,7 +58,7 @@ public:
 	  * @param sampleName
 	  * @return
 	  */
-	 GatingHierarchy & operator [](const string & sampleName){
+	 GatingHierarchy<FrameType> & operator [](const string & sampleName){
 			 return ghs[sampleName];
 	   }
 
@@ -164,7 +165,7 @@ public:
 		}
 
 		//add sample name
-		BOOST_FOREACH(gh_map::value_type & it,ghs){
+		for(auto & it : ghs){
 				string sn = it.first;
 				gs_pb.add_samplename(sn);
 		}
@@ -181,9 +182,9 @@ public:
 			 * write pb message for each sample
 			 */
 
-			BOOST_FOREACH(gh_map::value_type & it,ghs){
+			for(auto & it :ghs){
 					string sn = it.first;
-					GatingHierarchy & gh =  it.second;
+					GatingHierarchy<FrameType> & gh =  it.second;
 
 					pb::GatingHierarchy pb_gh;
 					gh.convertToPb(pb_gh);
@@ -296,7 +297,7 @@ public:
 				}
 
 
-				ghs[sn] = GatingHierarchy(gh_pb, trans_tbl);
+				ghs[sn] = GatingHierarchy<FrameType>(gh_pb, trans_tbl);
 			}
 		}
 
@@ -308,7 +309,7 @@ public:
 	 * @param sampleName a string providing the sample name as the key
 	 * @return a pointer to the GatingHierarchy object
 	 */
-	GatingHierarchy & getGatingHierarchy(string sampleName)
+	GatingHierarchy<FrameType> & getGatingHierarchy(string sampleName)
 	{
 
 		iterator it=ghs.find(sampleName);
@@ -360,7 +361,7 @@ public:
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
 			//except trans, the entire gh object is copiable
-			GatingHierarchy curGh = getGatingHierarchy(curSampleName);
+			GatingHierarchy<FrameType> curGh = getGatingHierarchy(curSampleName);
 
 			//update trans_local with new trans pointers
 			trans_map newTmap = curGh.getLocalTrans().getTransMap();
@@ -411,7 +412,7 @@ public:
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"...\n ");
 
 
-			GatingHierarchy &toCopy=gs.getGatingHierarchy(curSampleName);
+			GatingHierarchy<FrameType> &toCopy=gs.getGatingHierarchy(curSampleName);
 
 			ghs[curSampleName]=toCopy.clone();
 
@@ -423,7 +424,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,vector<string> sampleNames){
+	GatingSet(const GatingHierarchy<FrameType> & gh_template,vector<string> sampleNames){
 
 
 
@@ -467,7 +468,7 @@ public:
 				PRINT("\n... start adding GatingHierarchy for: "+curSampleName+"... \n");
 
 
-			GatingHierarchy & curGh=addGatingHierarchy(curSampleName);
+			GatingHierarchy<FrameType> & curGh=addGatingHierarchy(curSampleName);
 			curGh.addRoot();//add default root
 
 		}
@@ -500,12 +501,12 @@ public:
 	 * insert an empty GatingHierarchy
 	 * @param sn
 	 */
-	GatingHierarchy & addGatingHierarchy(string sn){
+	GatingHierarchy<FrameType> & addGatingHierarchy(string sn){
 		if(ghs.find(sn)!=ghs.end())
 			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sn));
 		return ghs[sn];
 	}
-	void addGatingHierarchy(const GatingHierarchy & gh, string sn){
+	void addGatingHierarchy(const GatingHierarchy<FrameType> & gh, string sn){
 			if(ghs.find(sn)!=ghs.end())
 				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sn));
 			ghs[sn] = gh;
