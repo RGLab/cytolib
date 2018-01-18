@@ -22,7 +22,7 @@ struct FCS_READ_PARAM{
  * The class represents the in-memory version of CytoFrame, which stores and owns the events data
  */
 class MemCytoFrame: public CytoFrame{
-	EVENT_DATA_VEC data;
+	EVENT_DATA_VEC data;//col-major
 
 public:
 	MemCytoFrame(){};
@@ -46,11 +46,15 @@ public:
 	 * @param onlyTxt flag indicates whether to only parse text segment (which contains the keywords)
 	 */
 	MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  bool onlyTxt = false){
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("Reading "  + filename + "\n");
 		ifstream in(filename, ios::in|ios::binary);
 
 		if(!in.is_open())
 			throw(domain_error("can't open the file: " + filename + "\nPlease check if the path is normalized to be recognized by c++!"));
 		FCS_Header header;
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("Parsing FCS header \n");
 		readHeaderAndText(in, header, keys, params, config.header);
 
 		buildHash();
@@ -59,6 +63,8 @@ public:
 		{
 	//		double start = clock();
 			//parse the data section
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("Parsing FCS data section \n");
 			readFCSdata(in, data,header, keys, params, config.data);
 
 	//		cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
@@ -939,15 +945,22 @@ public:
 		memcpy(&res[0], &data[0] + idx * nEvents, nEvents*sizeof(EVENT_DATA_TYPE));
 		return res ;
 	}
-
-
-
-	void  compensate(const compensation &){
-
+	/**
+	 * copy setter
+	 * @param _data
+	 */
+	void setData(const EVENT_DATA_VEC & _data)
+	{
+		data = _data;
 	}
-
-
-
+	/**
+	 * move setter
+	 * @param _data
+	 */
+	void setData(EVENT_DATA_VEC && _data)
+	{
+		data = _data;
+	}
 	/**
 	 * return the pointer of a particular data column
 	 *

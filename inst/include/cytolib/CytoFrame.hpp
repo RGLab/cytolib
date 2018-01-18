@@ -8,16 +8,19 @@
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_
 
-
+#include <armadillo>
 #include "readFCSHeader.hpp"
 #include "compensation.hpp"
+
 #include <c++/H5Cpp.h>
 enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
 
 typedef unordered_map<string, string> PDATA;
+
 using namespace H5;
+using namespace arma;
 
 const H5std_string  DATASET_NAME( "data");
 
@@ -33,7 +36,63 @@ protected:
 	unordered_map<string, int> marker_vs_idx;//hash map for query by marker
 public:
 	virtual ~CytoFrame(){};
-	virtual void compensate(const compensation &)=0;
+	virtual compensation get_spillover(const string & key = "SPILL")
+	{
+		compensation comp;
+
+		if(keys.find(key)!=keys.end())
+		{
+			string val = keys[key];
+			vector<string> valVec;
+			boost::split(valVec, val, boost::is_any_of(","));
+			int n = boost::lexical_cast<int>(valVec[0]);
+			if(n > 0)
+			{
+				comp.spillOver.resize(n*n);
+				comp.marker.resize(n);
+				for(int i = 0; i < n; i++)//param name
+				{
+					comp.marker[i] = valVec[i+1];
+				}
+				for(unsigned i = n + 1; i < valVec.size(); i++)//param name
+				{
+					comp.spillOver[i-n-1] = boost::lexical_cast<double>(valVec[i]);
+				}
+
+			}
+
+		}
+		return comp;
+	}
+
+
+	virtual void compensate(const compensation & comp)
+	{
+
+		int nMarker = comp.marker.size();
+		EVENT_DATA_VEC dat = getData();
+		arma::mat A(dat.data(), nRow(), nCol(), false, true);//point to the original data
+//		A.rows(1,3).print("\ndata");
+		arma::mat B(comp.spillOver.data(), nMarker, nMarker);
+//		B.print("comp");
+		B = B.t();
+//		B.print("comp transpose");
+		B = inv(B);
+//		B.print("comp inverse");
+		uvec indices(nMarker);
+		for(int i = 0; i < nMarker; i++)
+		{
+			int id = getColId(comp.marker[i], ColType::channel);
+			if(id < 0)
+				throw(domain_error(params[i].channel + " not found in compensation parameters!"));
+
+			indices[i] = id;
+		}
+//		uvec rind={1,2};
+//		A.submat(rind,indices).print("data ");
+		A.cols(indices) = A.cols(indices) * B;
+//		A.submat(rind,indices).print("data comp");
+	}
 	/**
 	 * getter from cytoParam vector
 	 * @return
@@ -162,6 +221,8 @@ public:
 	 * @return
 	 */
 	virtual EVENT_DATA_VEC getData(const string & colname, ColType type) const=0;
+	virtual void setData(const EVENT_DATA_VEC &)=0;
+	virtual void setData(EVENT_DATA_VEC &&)=0;
 	/**
 	 * extract all the keyword pairs
 	 *
@@ -318,6 +379,8 @@ public:
 		int id = getColId(oldname, ColType::channel);
 		if(id<0)
 			throw(domain_error("colname not found: " + oldname));
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT(oldname + "-->"  + newname + "\n");
 		params[id].channel=newname;
 		channel_vs_idx.erase(oldname);
 		channel_vs_idx[newname] = id;

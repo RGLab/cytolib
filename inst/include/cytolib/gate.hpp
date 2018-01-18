@@ -7,15 +7,11 @@
 
 #ifndef GATE_HPP_
 #define GATE_HPP_
-#include <iostream>
-#include <string>
-#include <limits>
-#include <vector>
+#include "MemCytoFrame.hpp"
 #include "transformation.hpp"
-//#include <R_ext/Constants.h>
 #include "compensation.hpp"
 #include "ellipse2points.hpp"
-#include "MemCytoFrame.hpp"
+
 
 using namespace std;
 

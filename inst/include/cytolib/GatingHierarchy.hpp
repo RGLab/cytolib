@@ -168,7 +168,7 @@ public:
 				}
 			}
 
-	void unloadData()
+	void unloadData(bool flush)
 	{
 		{
 
@@ -176,6 +176,8 @@ public:
 			{
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("unloading raw data..\n");
+				if(flush)
+					frm.setData(fdata.getData());
 				fdata = MemCytoFrame();
 			}
 
@@ -225,6 +227,46 @@ public:
 			it->updateChannels(chnl_map);
 
 	}
+
+	/**
+	 * add prefix (e.g. Comp_ or <>) to channel name of the data
+	 */
+	void compensate()
+	{
+		vector<string> markers;
+		if(comp.cid == "-2" || comp.cid == "")
+			PRINT("No compensation");
+		else if(comp.cid == "-1")
+		{
+			PRINT("Compensating with Acquisition defined compensation matrix");
+			/**
+			 * compensate with spillover defined in keyword
+			 */
+			compensation comp1 = frm.get_spillover();
+
+			frm.compensate(comp1);
+			markers = comp1.marker;
+		}
+		else
+		{
+			frm.compensate(comp);
+			markers = comp.marker;
+		}
+
+
+
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("start prefixing data columns\n");
+
+		for(const string & old : markers)
+		{
+			frm.setChannel(old, comp.prefix + old + comp.suffix);
+		}
+
+
+
+	}
+
 	trans_local getLocalTrans() const{return trans;}
 
 	/**

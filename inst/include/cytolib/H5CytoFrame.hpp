@@ -28,17 +28,13 @@ protected:
 	hsize_t dims[2];              // dataset dimensions
 public:
 	~H5CytoFrame(){};
-
-	void compensate(const compensation &){
-
-	}
 	/**
 	 * constructor from the H5 format of FCS
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & _filename):filename(_filename)
+	H5CytoFrame(const string & _filename, unsigned int flags = H5F_ACC_RDONLY):filename(_filename)
 	{
-		file.openFile(filename, H5F_ACC_RDONLY);
+		file.openFile(filename, flags);
 
 		DataSet ds_param = file.openDataSet("params");
 	//	DataType param_type = ds_param.getDataType();
@@ -183,7 +179,22 @@ public:
 		return data;
 
 	}
+	/**
+	 * copy setter
+	 * @param _data
+	 */
+	void setData(const EVENT_DATA_VEC & _data)
+	{
 
+		dataset.write(_data.data(), PredType::NATIVE_FLOAT );
+
+	}
+
+	void setData(EVENT_DATA_VEC && _data)
+	{
+		EVENT_DATA_VEC data = _data;
+		setData(data);
+	}
 };
 
 

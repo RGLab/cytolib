@@ -9,9 +9,6 @@
 #ifndef POPINDICES_HPP_
 #define POPINDICES_HPP_
 
-#include <map>
-#include <string>
-#include <vector>
 #include "gate.hpp"
 inline void packToBytes(const vector <bool> & x, vector<unsigned char> & bytes){
 	/*
