@@ -242,7 +242,7 @@ public:
 			/**
 			 * compensate with spillover defined in keyword
 			 */
-			compensation comp1 = frm.get_spillover();
+			compensation comp1 = frm.get_compensation();
 
 			frm.compensate(comp1);
 			markers = comp1.marker;

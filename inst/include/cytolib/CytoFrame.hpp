@@ -8,7 +8,6 @@
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_
 
-#include <armadillo>
 #include "readFCSHeader.hpp"
 #include "compensation.hpp"
 
@@ -20,7 +19,6 @@ enum class FrameType {FCS, H5};
 typedef unordered_map<string, string> PDATA;
 
 using namespace H5;
-using namespace arma;
 
 const H5std_string  DATASET_NAME( "data");
 
@@ -36,7 +34,8 @@ protected:
 	unordered_map<string, int> marker_vs_idx;//hash map for query by marker
 public:
 	virtual ~CytoFrame(){};
-	virtual compensation get_spillover(const string & key = "SPILL")
+
+	compensation get_compensation(const string & key = "SPILL")
 	{
 		compensation comp;
 
@@ -73,10 +72,8 @@ public:
 		EVENT_DATA_VEC dat = getData();
 		arma::mat A(dat.data(), nRow(), nCol(), false, true);//point to the original data
 //		A.rows(1,3).print("\ndata");
-		arma::mat B(comp.spillOver.data(), nMarker, nMarker);
+		mat B = comp.get_spillover_mat();
 //		B.print("comp");
-		B = B.t();
-//		B.print("comp transpose");
 		B = inv(B);
 //		B.print("comp inverse");
 		uvec indices(nMarker);

@@ -7,7 +7,11 @@
 
 #ifndef INCLUDE_COMPENSATION_HPP_
 #define INCLUDE_COMPENSATION_HPP_
+#include <armadillo>
 #include "transformation.hpp"
+
+using namespace arma;
+
 class compensation{
 public:
 	string cid;
@@ -18,7 +22,20 @@ public:
 	vector<string> marker;
 	vector<double> spillOver;
 	compensation(){};
+	/**
+	 * convert spillover matrix from row-majored std::vector
+	 * to col-majored arma::ma
+	 * @return
+	 */
+	mat get_spillover_mat ()const
+	{
 
+		unsigned nMarker = marker.size();
+		if(spillOver.size()!=nMarker * nMarker)
+			throw(domain_error("invalid spillover matrix!"));
+		mat B(spillOver.data(), nMarker, nMarker);
+		return B.t();
+	}
 	void updateChannels(const CHANNEL_MAP & chnl_map){
 
 		for(vector<string>::iterator it = marker.begin(); it != marker.end(); it++)
