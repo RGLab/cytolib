@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(double_precision)
 }
 BOOST_AUTO_TEST_CASE(multidata1)
 {
-	double start = gettime();
+//	double start = gettime();
 
 	string filename="../flowCore/misc/multi-datasegment.fcs";
 	FCS_READ_PARAM config;
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(multidata1)
 }
 BOOST_AUTO_TEST_CASE(multidata2)
 {
-	double start = gettime();
+//	double start = gettime();
 
 	string filename="../flowCore/misc/multi_data_segment.LMD";
 	FCS_READ_PARAM config;

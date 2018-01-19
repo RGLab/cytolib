@@ -78,7 +78,7 @@ public:
 				keys["transformation"] ="applied";
 				keys["$DATATYPE"] = "F";
 			}
-			for(int i = 0; i < params.size(); i++)
+			for(unsigned i = 0; i < params.size(); i++)
 			{
 
 				string pid = to_string(i+1);
@@ -193,25 +193,21 @@ public:
 		if(dattype!="I"&&multiSize)
 			throw(domain_error("Sorry, Numeric data type expects the same bitwidth for all parameters!"));
 
-		bool splitInt;
-		if(dattype=="I"){
-
-	//	  vector<unsigned> range(nCol);
-	//
-	//	  for(int i = 1; i <= nCol; i++)
-	//		  range[i-1] = boost::lexical_cast<unsigned>(range_str[i-1]);
-		  if(multiSize)
-			splitInt = false;
-		  else
-			  splitInt = params[0].PnB == 32;
-
-
-		}
-		else
-		{
-		  splitInt = false;
-
-		}
+//		bool splitInt;
+//		if(dattype=="I"){
+//
+//		  if(multiSize)
+//			splitInt = false;
+//		  else
+//			  splitInt = params[0].PnB == 32;
+//
+//
+//		}
+//		else
+//		{
+//		  splitInt = false;
+//
+//		}
 
 
 
@@ -229,19 +225,19 @@ public:
 		  }
 		}
 
-		bool isSigned;
-		if(multiSize){
-
-		  isSigned = false; // #dummy. not used in mutliSize logic.
-		}else{
-
-
-		  //# since signed = FALSE is not supported by readBin when size > 2
-		  //# we set it to TRUE automatically then to avoid warning flooded by readBin
-		  //# It shouldn't cause data clipping since we haven't found any use case where datatype is unsigned integer with size > 16bits
-		 isSigned = !(params[0].PnB == 8 ||params[0].PnB == 16);
-		}
-
+//		bool isSigned;
+//		if(multiSize){
+//
+//		  isSigned = false; // #dummy. not used in mutliSize logic.
+//		}else{
+//
+//
+//		  //# since signed = FALSE is not supported by readBin when size > 2
+//		  //# we set it to TRUE automatically then to avoid warning flooded by readBin
+//		  //# It shouldn't cause data clipping since we haven't found any use case where datatype is unsigned integer with size > 16bits
+//		 isSigned = !(params[0].PnB == 8 ||params[0].PnB == 16);
+//		}
+//
 
 
 	  in.seekg(header.datastart);
@@ -260,7 +256,7 @@ public:
 	  	unsigned nrow = nBytes * 8/nRowSize;
 
 	  	vector<int>which_lines = config.which_lines;
-	  	int nSelected = which_lines.size();
+	  	unsigned nSelected = which_lines.size();
 	  	if(nSelected>0){
 	  		if(nSelected >= nrow)
 	  			throw(domain_error("total number of which.lines exceeds the total number of events: " + to_string(nrow)));
@@ -277,7 +273,7 @@ public:
 	  		auto nRowSizeBytes = nRowSize/8;
 	  		for(auto i : which_lines)
 	  		{
-	  			auto pos =  header.datastart + i * nRowSizeBytes;
+	  			int pos =  header.datastart + i * nRowSizeBytes;
 	  			if(pos > header.dataend || pos < header.datastart)
 	  				throw(domain_error("the index of which.lines exceeds the data boundary: " + to_string(i)));
 	  			in.seekg(pos);
@@ -293,7 +289,7 @@ public:
 	  	}
 	//	nEvents = nrow;
 		//how many element to return
-		auto nElement = nrow * nCol;
+	  	size_t nElement = nrow * nCol;
 	//	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
 		output.resize(nElement);
 
@@ -323,14 +319,14 @@ public:
 				  iByteOrd[i] = boost::lexical_cast<int>(byteOrd[i])-1;
 			  }
 			  char * tmp = new char[elementSize];
-			  for(auto ind = 0; ind < nElement; ind++){
+			  for(size_t ind = 0; ind < nElement; ind++){
 
 				  memcpy(tmp, bufPtr + ind * elementSize, elementSize);
 
 			     for(auto i = 0; i < elementSize; i++){
 			       auto j = iByteOrd.at(i);
 
-			       auto pos_old = ind * elementSize + i;
+//			       auto pos_old = ind * elementSize + i;
 			       auto pos_new = ind * elementSize + j;
 			 //       if(ind<=10)
 			 //         Rcpp::Rcout << pos_old <<":" << pos_new << std::endl;
@@ -369,8 +365,8 @@ public:
 			cytoParam & param = params[c];
 			int usedBits = ceil(log2(param.max));
 		    uint64_t base = static_cast<uint64_t>(1)<<usedBits;
-		    auto thisSize = params[c-1].PnB;
-			for(auto r = 0; r < nrow; r++)
+//		    auto thisSize = params[c-1].PnB;
+			for(size_t r = 0; r < nrow; r++)
 		    {
 		      //convert each element
 				  auto thisSize = param.PnB;
@@ -792,8 +788,8 @@ public:
 		//##for DATA segment exceeding 99,999,999 byte.
 		 if(header.FCSversion >= 3)
 		 {
-		   int datastart_h = header.datastart - header.additional;
-		   int dataend_h = header.dataend - header.additional;
+			 unsigned long datastart_h = header.datastart - header.additional;
+			 unsigned long dataend_h = header.dataend - header.additional;
 
 		//
 		//   # Let's not be too strick here as unfortunatelly, some files exported from FlowJo
@@ -922,7 +918,7 @@ public:
 	}
 
 
-	int nRow() const{
+	unsigned nRow() const{
 		if(nCol()==0)
 			return 0;
 		else

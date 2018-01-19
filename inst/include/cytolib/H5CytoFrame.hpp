@@ -155,7 +155,7 @@ public:
 
 	}
 
-	int nRow() const{
+	unsigned nRow() const{
 		//read nEvents
 		return dims[1];
 	}

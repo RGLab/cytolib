@@ -192,7 +192,7 @@ public:
 		* store events data as fixed
 		* size dataset.
 		*/
-		int nEvents = nRow();
+		unsigned nEvents = nRow();
 		hsize_t dimsf[2] = {nCol(), nEvents};              // dataset dimensions
 		DSetCreatPropList plist;
 		hsize_t	chunk_dims[2] = {1, nEvents};
@@ -261,7 +261,7 @@ public:
 	 *
 	 * @return
 	 */
-	virtual int nCol() const
+	virtual unsigned nCol() const
 	{
 		return params.size();
 	}
@@ -270,7 +270,7 @@ public:
 	 * get the number of rows(or events)
 	 * @return
 	 */
-	virtual int nRow() const=0;
+	virtual unsigned nRow() const=0;
 	/**
 	 * check if the hash map for channel and marker has been built
 	 * @return
@@ -286,7 +286,7 @@ public:
 	 */
 	virtual void buildHash()
 	{
-		for(auto i = 0; i < nCol(); i++)
+		for(unsigned i = 0; i < nCol(); i++)
 		{
 			channel_vs_idx[params[i].channel] = i;
 			marker_vs_idx[params[i].marker] = i;
@@ -300,7 +300,7 @@ public:
 	virtual vector<string> getChannels() const
 	{
 		vector<string> res(nCol());
-		for(auto i = 0; i < nCol(); i++)
+		for(unsigned i = 0; i < nCol(); i++)
 			res[i] = params[i].channel;
 		return res;
 	}
@@ -320,7 +320,7 @@ public:
 	virtual vector<string> getMarkers() const
 	{
 		vector<string> res(nCol());
-			for(auto i = 0; i < nCol(); i++)
+			for(unsigned i = 0; i < nCol(); i++)
 				res[i] = params[i].marker;
 		return res;
 	}
