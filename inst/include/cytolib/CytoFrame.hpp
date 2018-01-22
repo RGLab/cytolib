@@ -89,6 +89,7 @@ public:
 //		A.submat(rind,indices).print("data ");
 		A.cols(indices) = A.cols(indices) * B;
 //		A.submat(rind,indices).print("data comp");
+		setData(dat);
 	}
 	/**
 	 * getter from cytoParam vector

@@ -242,14 +242,14 @@ public:
 			/**
 			 * compensate with spillover defined in keyword
 			 */
-			compensation comp1 = frm.get_compensation();
+			compensation comp1 = fdata.get_compensation();
 
-			frm.compensate(comp1);
+			fdata.compensate(comp1);
 			markers = comp1.marker;
 		}
 		else
 		{
-			frm.compensate(comp);
+			fdata.compensate(comp);
 			markers = comp.marker;
 		}
 
@@ -260,7 +260,7 @@ public:
 
 		for(const string & old : markers)
 		{
-			frm.setChannel(old, comp.prefix + old + comp.suffix);
+			fdata.setChannel(old, comp.prefix + old + comp.suffix);
 		}
 
 

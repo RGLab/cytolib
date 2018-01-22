@@ -23,6 +23,23 @@ public:
 	vector<double> spillOver;
 	compensation(){};
 	/**
+	 * constructor from the existing spillover matrix
+	 * @spillover arma:mat representing a col-major matrix
+	 * @_markers string vector
+	 */
+	compensation(mat spillMat, vector<string> _markers){
+		if(spillMat.n_cols!=spillMat.n_rows)
+			throw(domain_error("non-squared shaped spillover matrix!"));
+		if(spillMat.n_cols!=_markers.size())
+			throw(domain_error("The number of columns of the spillover matrix is not the same as the markers!"));
+
+		marker = _markers;
+		mat B = spillMat.t();
+
+		spillOver.resize(spillMat.n_elem);
+		memcpy(spillOver.data(), B.mem, sizeof(double)*spillMat.n_elem);
+	}
+	/**
 	 * convert spillover matrix from row-majored std::vector
 	 * to col-majored arma::ma
 	 * @return
