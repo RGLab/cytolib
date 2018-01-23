@@ -158,7 +158,7 @@ public:
 	/**
 	 * load the in-memory copy of frm
 	 */
-		void loadData()
+		void load_fdata_cache()
 			{
 				if(fdata.nRow()==0)
 				{
@@ -168,7 +168,7 @@ public:
 				}
 			}
 
-	void unloadData(bool flush)
+	void release_fdata_cache(bool flush)
 	{
 		{
 
