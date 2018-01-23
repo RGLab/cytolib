@@ -667,12 +667,13 @@ public:
 			boost::replace_all(txt, doubleDelimiter, soddChar);
 		std::vector<std::string> tokens;
 		boost::split(tokens, txt, [delimiter](char c){return c == delimiter;});
+//		PRINT( txt + "\n");
 
 		unsigned j = isDelimiterEnd?tokens.size()-2:tokens.size()-1;//last token, skip the last empty one when end with delimiter
 		string key;
 		for(unsigned i = 1; i <= j; i++){//counter, start with 1 to skip the first empty tokens
 			std::string token = tokens[i];
-	//			std::PRINT( token + " ");
+//				PRINT( token + " ");
 			if(!emptyValue){
 				/*
 				 * restore double delimiter when needed
@@ -682,7 +683,7 @@ public:
 				boost::replace_all(token, soddChar, doubleDelimiter);
 	//				std::PRINT( token;
 			}
-	//			std::PRINT( std::endl;
+//				PRINT("\n");
 
 			if((i)%2 == 1)
 			{
@@ -704,10 +705,10 @@ public:
 		 * check if kw and value are paired
 		 */
 		 if(j%2 == 1){
-			 std::string serror = "uneven number of tokens: \n";
+			 std::string serror = "uneven number of tokens: ";
 		     serror.append(boost::lexical_cast<std::string>(j));
-		     PRINT(serror);
-		     PRINT("The last keyword is dropped.\n");
+		     PRINT(serror + "\n");
+		     PRINT("The last keyword is dropped.!\nIf it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
 		 }
 
 
@@ -725,7 +726,8 @@ public:
 	//	    txt <- iconv(rawToChar(txt), "", "latin1", sub="byte")
 		 int nTxt = header.textend - header.textstart + 1;
 		 char * tmp = new char[nTxt + 1];
-		 in.get(tmp, nTxt + 1);
+		 in.read(tmp, nTxt);//can't use in.get since it will stop at newline '\n' which could be present in FCS TXT
+		 tmp[nTxt]='\0';//make it as c_string
 		 string txt(tmp);
 		 delete [] tmp;
 	     fcsTextParse(txt, pairs, emptyValue);
@@ -805,7 +807,12 @@ public:
 		       throw(domain_error("Don't know where the data segment begins, there was no $BEGINDATA keyword and the FCS HEADER does not say it either."));
 		   }
 		   else
-			   datastart = stoi(keys["$BEGINDATA"]);
+		   {
+			   string bd = keys["$BEGINDATA"];
+			   boost::trim(bd);
+			   datastart = stoi(bd);
+		   }
+
 
 		   if(keys.find("$ENDDATA")==keys.end())
 		   {
@@ -816,7 +823,12 @@ public:
 			   throw(domain_error("Don't know where the data segment ends, there was no $ENDDATA keyword and the FCS HEADER does not say it either."));
 		   }
 		   else
-			   dataend = stoul(keys["$ENDDATA"]);
+		   {
+			   string ed = keys["$ENDDATA"];
+			   boost::trim(ed);
+			   dataend = stoul(ed);
+		   }
+
 
 		//   # when both are present and they don't agree with each other
 		   if(datastart_h != datastart)
@@ -858,7 +870,8 @@ public:
 		}
 
 		 //parse important params from keys
-		 int nrpar = stoi(keys["$PAR"]);
+		 string par = keys["$PAR"];
+		 int nrpar = stoi(par);
 		params.resize(nrpar);
 		KEY_WORDS::iterator it;
 		for(int i = 1; i <= nrpar; i++)

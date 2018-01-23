@@ -234,4 +234,17 @@ BOOST_AUTO_TEST_CASE(gigantic_file)
 
 }
 
+BOOST_AUTO_TEST_CASE(newline_in_txt)
+{
+
+
+	string filename="../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs";
+	FCS_READ_PARAM config;
+
+	MemCytoFrame cytofrm(filename.c_str(), config,false);
+
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10045);
+	BOOST_CHECK_CLOSE(cytofrm.getData()[1], 9220, 1e-6);
+
+}
 BOOST_AUTO_TEST_SUITE_END()
