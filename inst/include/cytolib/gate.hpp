@@ -295,7 +295,7 @@ public:
 
 	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 
-		EVENT_DATA_TYPE * data_1d = fdata.subset(param.getName());
+		EVENT_DATA_TYPE * data_1d = fdata.subset(param.getName(), ColType::channel);
 
 		int nEvents=parentInd.size();
 		INDICE_TYPE res;
@@ -311,7 +311,7 @@ public:
 
 	void extend(MemCytoFrame & fdata,float extend_val){
 		string pName=param.getName();
-		EVENT_DATA_TYPE * data_1d = fdata.subset(pName);
+		EVENT_DATA_TYPE * data_1d = fdata.subset(pName, ColType::channel);
 		int nSize = fdata.nRow();
 		/*
 		 * get R_min
@@ -395,8 +395,8 @@ public:
 	virtual void extend(MemCytoFrame & fdata,float extend_val){
 		string x=param.xName();
 		string y=param.yName();
-		EVENT_DATA_TYPE* xdata(fdata.subset(x));
-		EVENT_DATA_TYPE* ydata(fdata.subset(y));
+		EVENT_DATA_TYPE* xdata(fdata.subset(x, ColType::channel));
+		EVENT_DATA_TYPE* ydata(fdata.subset(y, ColType::channel));
 		int nSize = fdata.nRow();
 		vector<coordinate> v=param.getVertices();
 		/*
@@ -512,8 +512,8 @@ public:
 
 		string x=param.xName();
 		string y=param.yName();
-		EVENT_DATA_TYPE * xdata = fdata.subset(x);
-		EVENT_DATA_TYPE * ydata = fdata.subset(y);
+		EVENT_DATA_TYPE * xdata = fdata.subset(x, ColType::channel);
+		EVENT_DATA_TYPE * ydata = fdata.subset(y, ColType::channel);
 
 
 		unsigned counter;
@@ -674,8 +674,8 @@ public:
 			throw(domain_error("invalid number of vertices for rectgate!"));
 		string x=param.xName();
 		string y=param.yName();
-		EVENT_DATA_TYPE * xdata = fdata.subset(x);
-		EVENT_DATA_TYPE * ydata =fdata.subset(y);
+		EVENT_DATA_TYPE * xdata = fdata.subset(x, ColType::channel);
+		EVENT_DATA_TYPE * ydata =fdata.subset(y, ColType::channel);
 
 		int nEvents=parentInd.size();
 		INDICE_TYPE res;
@@ -928,8 +928,8 @@ public:
 
 		// get data
 
-		EVENT_DATA_TYPE * xdata = fdata.subset(param.xName());
-		EVENT_DATA_TYPE * ydata = fdata.subset(param.yName());
+		EVENT_DATA_TYPE * xdata = fdata.subset(param.xName(), ColType::channel);
+		EVENT_DATA_TYPE * ydata = fdata.subset(param.yName(), ColType::channel);
 
 
 		//inverse the cov matrix

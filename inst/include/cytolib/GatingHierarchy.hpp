@@ -249,6 +249,7 @@ public:
 		}
 		else
 		{
+			PRINT("Compensating with workspace defined compensation matrix");
 			fdata.compensate(comp);
 			markers = comp.marker;
 		}
@@ -295,7 +296,7 @@ public:
 				//special treatment for time channel
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("multiplying "+curChannel+" by :"+ to_string(timestep) + "\n");
-				EVENT_DATA_TYPE * x = this->fdata.subset(curChannel);
+				EVENT_DATA_TYPE * x = this->fdata.subset(curChannel, ColType::channel);
 				for(int i = 0; i < nEvents; i++)
 					x[i] = x[i] * timestep;
 
@@ -310,7 +311,7 @@ public:
 							if(curTrans->gateOnly())
 								continue;
 
-							EVENT_DATA_TYPE * x = fdata.subset(curChannel);
+							EVENT_DATA_TYPE * x = fdata.subset(curChannel, ColType::channel);
 							if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 								PRINT("transforming "+curChannel+" with func:"+curTrans->getChannel()+"\n");
 
