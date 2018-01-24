@@ -15,9 +15,11 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
-#define NATURAL 2
-
 using namespace std;
+
+namespace cytolib
+{
+#define NATURAL 2
 /*TODO:change it to c++ version
  * n :number of input points
  * x,y:coordinates of input points
@@ -276,4 +278,5 @@ inline void spline_eval(int method, double* u,int nSize,
 //    memcpy(u, v, sizeof(double)*nSize);
 //    delete v;
 }
+};
 #endif /* SPLINE_HPP_ */

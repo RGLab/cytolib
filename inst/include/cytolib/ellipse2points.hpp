@@ -9,6 +9,8 @@
 #define INCLUDE_ELLIPSE2POINTS_HPP_
 
 
+namespace cytolib
+{
 struct ellipse_parsed{
 
   float mu_x, mu_y, a, b, alpha;
@@ -139,6 +141,7 @@ inline matrix toPoly(ellipse_parsed res, int n){
 
 }
 
+};
 
 
 #endif /* INCLUDE_ELLIPSE2POINTS_HPP_ */

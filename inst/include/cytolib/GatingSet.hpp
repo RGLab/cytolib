@@ -15,6 +15,8 @@
 
 using namespace std;
 
+namespace cytolib
+{
 #define ARCHIVE_TYPE_BINARY 0
 #define ARCHIVE_TYPE_TEXT 1
 #define ARCHIVE_TYPE_XML 2
@@ -53,6 +55,67 @@ public:
 			 return ghs.find(sampleName);
 	 }
 	 size_t erase ( const string& k ){return ghs.erase(k);}
+
+	 /**
+	  * forward to the first element's getChannels
+	  */
+	vector<string> getChannels(){return begin().second.getChannels();};
+	/**
+	 * modify the channels for each individual frame
+	 * @param _old
+	 * @param _new
+	 */
+	void setChannels(const string & _old, const string & _new){
+		for(auto & p : ghs)
+			p.second.setChannels(_old, _new);
+	};
+
+	//* forward to the first element's getChannels
+	vector<string> getMarkers(){return begin()->second.getMarkers();};
+
+	void setMarkers(const string & _old, const string & _new){
+		for(auto & p : ghs)
+			p.second.setMarkers(_old, _new);
+	};
+
+	int nCol(){return begin()->second.nCol();}
+
+	/**
+	 * validity checks on the frame to see if its data structure is consistent with cytoset
+	 *
+	 * @param frm
+	 * @return
+	 */
+	int isNotValidFrame(const CytoFrame & frm){
+		//validity check the channels against the existing frms
+		if(nCol() != frm.nCol())
+			return -1;
+
+		//check channel in linear time(taking advantage of the hash map)
+		auto frm1 = begin()->second;
+		for(const auto & c : frm.getChannels())
+		{
+			if(frm1.getColId(c, ColType::channel) <0 )
+				return -2;
+		}
+
+		//check the pdata
+		const auto & pd1 = frm1.getPData();
+		const auto & pd2 = frm.getPData();
+		if(pd1.size()!=pd2.size())
+			return -3;
+
+		for(const auto & p : pd2)
+		{
+			if(pd1.find(p.first)==pd1.end())
+				return -4;
+		}
+		return 0;
+	}
+//todo:
+//	CytoSet subset(const vector<string> & sampleNames);
+//	vector<PDATA> getPData();
+//	void setPData(const pData & pd);
 	 /**
 	  * insert
 	  * @param sampleName
@@ -545,6 +608,7 @@ public:
 
 };
 
+};
 
 
 #endif /* GATINGSET_HPP_ */

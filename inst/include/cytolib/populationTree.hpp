@@ -12,6 +12,8 @@
 #include <boost/graph/adjacency_list.hpp>
 
 
+namespace cytolib
+{
 #define ROOTNODE 0
 
 struct Edge{
@@ -42,5 +44,6 @@ typedef populationTree::vertex_descriptor VertexID;//!ID for the node in the gat
 typedef populationTree::vertex_iterator VertexIt;
 typedef populationTree::edge_descriptor   EdgeID;
 typedef populationTree::edge_iterator   EdgeIt;
+};
 
 #endif /* TREE_HPP_ */

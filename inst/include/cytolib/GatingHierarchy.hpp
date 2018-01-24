@@ -20,6 +20,10 @@
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include "MemCytoFrame.hpp"
+using namespace std;
+
+namespace cytolib
+{
 #define REGULAR 0
 #define TSORT 1
 #define BFS 2
@@ -29,7 +33,7 @@
  */
 typedef unsigned int NODEID;
 
-using namespace std;
+
 typedef map<string,VertexID> VertexID_map;
 typedef vector<VertexID> VertexID_vec;
 typedef vector<string> StringVec;
@@ -1706,6 +1710,7 @@ public:
 		trans.setTransMap(tm);
 
 	}
+};
 };
 
 #endif /* GATINGHIERARCHY_HPP_ */

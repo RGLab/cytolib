@@ -24,9 +24,11 @@
 #include <ctype.h>
 #include <vector>
 using namespace std;
-
 extern unsigned short g_loglevel;// debug print is turned off by default
 extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
+
+namespace cytolib
+{
 #define CYTOLIB_INIT() \
 		bool my_throw_on_error = true;\
 		unsigned short g_loglevel = 0;\
@@ -58,5 +60,6 @@ typedef vector<EVENT_DATA_TYPE> EVENT_DATA_VEC;
 typedef unique_ptr<EVENT_DATA_TYPE[] > EVENT_DATA_PTR;
 
 #define PRT true
+};
 
 #endif /* GLOBAL_HPP_ */

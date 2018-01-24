@@ -10,6 +10,8 @@
 #include <cytolib/CytoFrame.hpp>
 
 
+namespace cytolib
+{
 /**
  * The class represents the H5 version of cytoFrame
  * It doesn't store and own the event data in memory.
@@ -197,6 +199,7 @@ public:
 	}
 };
 
+};
 
 
 

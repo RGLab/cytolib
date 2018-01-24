@@ -12,6 +12,8 @@
 
 using namespace arma;
 
+namespace cytolib
+{
 class compensation{
 public:
 	string cid;
@@ -85,5 +87,6 @@ public:
 	}
 };
 
+};
 
 #endif /* INCLUDE_COMPENSATION_HPP_ */

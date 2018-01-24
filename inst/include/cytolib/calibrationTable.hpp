@@ -19,6 +19,8 @@ using namespace std;
 #include <boost/foreach.hpp>
 #include <GatingSet.pb.h>
 
+namespace cytolib
+{
 struct Spline_Coefs{
 	map<string,vector<double> > coefs;
 	int method;
@@ -144,6 +146,7 @@ public:
 		flag = cal_pb.flag();
 	}
 
+};
 };
 
 

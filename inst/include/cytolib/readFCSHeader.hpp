@@ -21,6 +21,8 @@
 using namespace std;
 
 
+namespace cytolib
+{
 enum class TransformType {none, linearize, scale,linearize_with_PnG_scaling};
 enum class endianType {big, small, mixed};
 struct FCS_Header{
@@ -100,5 +102,6 @@ struct cytoParam{
 };
 
 
+};
 
 #endif /* INST_INCLUDE_CYTOLIB_READFCSHEADER_HPP_ */

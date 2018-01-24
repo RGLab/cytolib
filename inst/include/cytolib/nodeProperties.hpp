@@ -12,6 +12,8 @@
 
 using namespace std;
 
+namespace cytolib
+{
 
 /*! population stats */
 typedef map<string,float> POPSTATS;
@@ -345,6 +347,7 @@ public:
 
 	}
 
+};
 };
 
 #endif /* NODEPROPERTIES_HPP_ */

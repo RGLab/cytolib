@@ -16,6 +16,8 @@
 using namespace std;
 
 
+namespace cytolib
+{
 struct BOOL_GATE_OP{
 	vector<string> path;
 	char op;
@@ -1467,5 +1469,6 @@ public:
 	virtual unsigned short getType(){return CURLYQUADGATE;}
 	CurlyGuadGate * clone(){return new CurlyGuadGate(*this);};
 
+};
 };
 #endif /* GATE_HPP_ */

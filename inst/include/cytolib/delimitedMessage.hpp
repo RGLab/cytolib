@@ -10,7 +10,8 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
-
+namespace cytolib
+{
 /**
  *  based on the non-official code written by protobuf's author Kenton Varda
  * @param rawInput
@@ -67,5 +68,6 @@ inline bool readDelimitedFrom(
   return true;
 }
 
+};
 
 #endif /* DELIMITEDMESSAGE_HPP_ */

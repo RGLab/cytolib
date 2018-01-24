@@ -10,6 +10,9 @@
 #define POPINDICES_HPP_
 
 #include "gate.hpp"
+
+namespace cytolib
+{
 inline void packToBytes(const vector <bool> & x, vector<unsigned char> & bytes){
 	/*
 	 * pack bits into bytes
@@ -247,5 +250,6 @@ public:
 	}
 };
 
+};
 
 #endif /* POPINDICES_HPP_ */

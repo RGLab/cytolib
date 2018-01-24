@@ -13,6 +13,10 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+
+
+namespace cytolib
+{
 typedef unsigned char BYTE;
 
 
@@ -41,6 +45,7 @@ struct FCS_READ_DATA_PARAM{
 };
 
 
+};
 
 
 

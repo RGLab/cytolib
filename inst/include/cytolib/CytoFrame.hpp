@@ -12,6 +12,9 @@
 #include "compensation.hpp"
 
 #include <c++/H5Cpp.h>
+
+namespace cytolib
+{
 enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
@@ -21,6 +24,7 @@ typedef unordered_map<string, string> PDATA;
 using namespace H5;
 
 const H5std_string  DATASET_NAME( "data");
+
 
 /**
  * The class representing a single FCS file
@@ -440,7 +444,7 @@ public:
 	}
 	void delPData(const string & name){pd.erase(name);}
 };
-
+};
 
 
 #endif /* INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_ */

@@ -7,15 +7,6 @@
 
 #ifndef TRANSFORMATION_HPP_
 #define TRANSFORMATION_HPP_
-
-#define CALTBL 0
-#define LOG 1
-#define LIN 2
-#define FLIN 3
-#define FASINH 4
-//#define LOGICLE 1
-#define BIEXP 5
-
 #include <map>
 #include <string>
 #include <vector>
@@ -28,6 +19,17 @@
 #include "global.hpp"
 
 using namespace std;
+
+namespace cytolib
+{
+#define CALTBL 0
+#define LOG 1
+#define LIN 2
+#define FLIN 3
+#define FASINH 4
+//#define LOGICLE 1
+#define BIEXP 5
+
 
 struct coordinate
 {
@@ -861,6 +863,6 @@ public:
 	void setTransformedScale(int scale){throw(domain_error("setTransformedScale function not defined!"));};
 
 };
-
+};
 
 #endif /* TRANSFORMATION_HPP_ */

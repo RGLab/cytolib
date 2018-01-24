@@ -10,6 +10,8 @@
 #include "CytoFrame.hpp"
 #include "readFCSdata.hpp"
 
+namespace cytolib
+{
 /**
  * the container that stores the different FCS parse arguments
  */
@@ -994,6 +996,7 @@ public:
 #else
 #define gettime() clock()/(double)(CLOCKS_PER_SEC / 1000)
 #endif
+};
 
 
 

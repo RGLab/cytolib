@@ -4,41 +4,8 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/H5CytoFrame.hpp>
-unsigned short g_loglevel = 0;
-//#include "test_header.hpp"
-//float gTol = 0.05;
-
-//unsigned short myTestPolymorphism(){
-//	gate * g= NULL;
-//
-//	rectGate rectg =rectGate();
-//	g=&rectg;
-//
-//	rectGate * newG = dynamic_cast<rectGate*>(g);
-//	return newG->getType();
-//
-//}
-//BOOST_AUTO_TEST_SUITE(Polymorph)
-//BOOST_AUTO_TEST_CASE(gateCastDown)
-//{
-//	BOOST_CHECK(myTestPolymorphism() == RECTGATE);
-//	BOOST_CHECK(myTestPolymorphism() != POLYGONGATE);
-//
-//}
-//BOOST_AUTO_TEST_SUITE_END()
-//
-//BOOST_AUTO_TEST_SUITE(RegExp)
-//BOOST_AUTO_TEST_CASE(flowChannelMatch)
-//{
-//	string strPattern = "[FS]SC-[AWH]";
-//	boost::regex ex(strPattern);
-//
-//	BOOST_CHECK(boost::regex_match( "FSC",ex) == false);
-//	BOOST_CHECK(boost::regex_match( "FSC-A",ex) == true);
-//	BOOST_CHECK(boost::regex_match( "FSC-AD",ex) == false);
-//}
-//
-//BOOST_AUTO_TEST_SUITE_END()
+using namespace cytolib;
+CYTOLIB_INIT();
 struct globalFixture{
 	globalFixture(){
 //		cout << "Enter tolerance (e.g. 0.08):" << endl;
