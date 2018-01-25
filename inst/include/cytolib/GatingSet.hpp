@@ -50,8 +50,8 @@ public:
 	 size_t size(){return ghs.size();}
 	 iterator end(){return ghs.end();}
 	 iterator begin(){return ghs.begin();}
-	 iterator find(const string &sampleName){
-			 return ghs.find(sampleName);
+	 iterator find(const string &sample_uid){
+			 return ghs.find(sample_uid);
 	 }
 	 size_t erase ( const string& k ){return ghs.erase(k);}
 
@@ -120,15 +120,15 @@ public:
 	  * @param sampleName
 	  * @return
 	  */
-	 GatingHierarchy & operator [](const string & sampleName){
-			 return ghs[sampleName];
+	 GatingHierarchy & operator [](const string & sample_uid){
+			 return ghs[sample_uid];
 	   }
 
 	/**
 	 * iterate through hash map to extract sample names
 	 * @return
 	 */
-	vector<string> getSamples(){
+	vector<string> get_sample_uids(){
 		vector<string> res;
 		for(const auto & f : ghs)
 			res.push_back(f.first);
@@ -140,7 +140,7 @@ public:
 	 * @param _old
 	 * @param _new
 	 */
-	void setSample(const string & _old, const string & _new){
+	void set_sample_uid(const string & _old, const string & _new){
 		if(_old.compare(_new) != 0)
 		{
 			auto it = find(_new);
@@ -371,12 +371,12 @@ public:
 	 * @param sampleName a string providing the sample name as the key
 	 * @return a pointer to the GatingHierarchy object
 	 */
-	GatingHierarchy & getGatingHierarchy(string sampleName)
+	GatingHierarchy & getGatingHierarchy(string sample_uid)
 	{
 
-		iterator it=ghs.find(sampleName);
+		iterator it=ghs.find(sample_uid);
 		if(it==ghs.end())
-			throw(domain_error(sampleName+" not found in gating set!"));
+			throw(domain_error(sample_uid + " not found in gating set!"));
 		else
 			return it->second;
 	}
@@ -385,7 +385,7 @@ public:
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet* clone(vector<string> samples){
+	GatingSet* clone(vector<string> sample_uids){
 		GatingSet * gs=new GatingSet();
 
 		//deep copying trans_global_vec
@@ -417,7 +417,7 @@ public:
 
 		//copy gh
 
-		for(auto & it : samples)
+		for(auto & it : sample_uids)
 		{
 			string curSampleName = it;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -448,7 +448,7 @@ public:
 	 *
 	 * copy gating trees from self to the dest gs
 	 */
-	void add(GatingSet & gs,vector<string> sampleNames){
+	void add(GatingSet & gs,vector<string> sample_uids){
 
 
 		/*
@@ -467,7 +467,7 @@ public:
 		 * use newTmap for all other new ghs
 		 */
 		vector<string>::iterator it;
-		for(it=sampleNames.begin();it!=sampleNames.end();it++)
+		for(it=sample_uids.begin();it!=sample_uids.end();it++)
 		{
 			string curSampleName=*it;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -486,7 +486,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,vector<string> sampleNames){
+	GatingSet(const GatingHierarchy & gh_template,vector<string> sample_uids){
 
 
 
@@ -506,7 +506,7 @@ public:
 		 * use newTmap for all other new ghs
 		 */
 		vector<string>::iterator it;
-		for(it=sampleNames.begin();it!=sampleNames.end();it++)
+		for(it=sample_uids.begin();it!=sample_uids.end();it++)
 		{
 			string curSampleName=*it;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -521,16 +521,16 @@ public:
 		}
 	}
 
-	GatingSet(vector<string> sampleNames){
+	GatingSet(vector<string> sample_uids){
 		vector<string>::iterator it;
-		for(it=sampleNames.begin();it!=sampleNames.end();it++)
+		for(it=sample_uids.begin();it!=sample_uids.end();it++)
 		{
-			string curSampleName=*it;
+			string sample_uid=*it;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... start adding GatingHierarchy for: "+curSampleName+"... \n");
+				PRINT("\n... start adding GatingHierarchy for: "+sample_uid+"... \n");
 
 
-			GatingHierarchy & curGh=addGatingHierarchy(curSampleName);
+			GatingHierarchy & curGh=addGatingHierarchy(sample_uid);
 			curGh.addRoot();//add default root
 
 		}
@@ -563,15 +563,15 @@ public:
 	 * insert an empty GatingHierarchy
 	 * @param sn
 	 */
-	GatingHierarchy & addGatingHierarchy(string sn){
-		if(ghs.find(sn)!=ghs.end())
-			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sn));
-		return ghs[sn];
+	GatingHierarchy & addGatingHierarchy(string sample_uid){
+		if(ghs.find(sample_uid)!=ghs.end())
+			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
+		return ghs[sample_uid];
 	}
-	void addGatingHierarchy(const GatingHierarchy & gh, string sn){
-			if(ghs.find(sn)!=ghs.end())
-				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sn));
-			ghs[sn] = gh;
+	void addGatingHierarchy(const GatingHierarchy & gh, string sample_uid){
+			if(ghs.find(sample_uid)!=ghs.end())
+				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
+			ghs[sample_uid] = gh;
 	}
 
 	/**
