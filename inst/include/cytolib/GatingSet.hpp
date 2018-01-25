@@ -32,14 +32,13 @@ namespace cytolib
  *  It also stores the global transformations.
  *
  */
-template<class FrameType>
 class GatingSet{
 
 	biexpTrans globalBiExpTrans; //default bi-exponential transformation functions
 	linTrans globalLinTrans;
 	trans_global_vec gTrans;//parsed from xml workspace
 
-	typedef unordered_map<string,GatingHierarchy<FrameType>> gh_map;
+	typedef unordered_map<string,GatingHierarchy> gh_map;
 	gh_map ghs;
 public:
 	typedef typename gh_map::iterator iterator;
@@ -59,23 +58,23 @@ public:
 	 /**
 	  * forward to the first element's getChannels
 	  */
-	vector<string> getChannels(){return begin().second.getChannels();};
+	vector<string> getChannels(){return begin()->second.getChannels();};
 	/**
 	 * modify the channels for each individual frame
 	 * @param _old
 	 * @param _new
 	 */
-	void setChannels(const string & _old, const string & _new){
+	void setChannel(const string & _old, const string & _new){
 		for(auto & p : ghs)
-			p.second.setChannels(_old, _new);
+			p.second.setChannel(_old, _new);
 	};
 
 	//* forward to the first element's getChannels
 	vector<string> getMarkers(){return begin()->second.getMarkers();};
 
-	void setMarkers(const string & _old, const string & _new){
+	void setMarker(const string & _old, const string & _new){
 		for(auto & p : ghs)
-			p.second.setMarkers(_old, _new);
+			p.second.setMarker(_old, _new);
 	};
 
 	int nCol(){return begin()->second.nCol();}
@@ -86,32 +85,32 @@ public:
 	 * @param frm
 	 * @return
 	 */
-	int isNotValidFrame(const CytoFrame & frm){
-		//validity check the channels against the existing frms
-		if(nCol() != frm.nCol())
-			return -1;
-
-		//check channel in linear time(taking advantage of the hash map)
-		auto frm1 = begin()->second;
-		for(const auto & c : frm.getChannels())
-		{
-			if(frm1.getColId(c, ColType::channel) <0 )
-				return -2;
-		}
-
-		//check the pdata
-		const auto & pd1 = frm1.getPData();
-		const auto & pd2 = frm.getPData();
-		if(pd1.size()!=pd2.size())
-			return -3;
-
-		for(const auto & p : pd2)
-		{
-			if(pd1.find(p.first)==pd1.end())
-				return -4;
-		}
-		return 0;
-	}
+//	int isNotValidFrame(const CytoFrame & frm){
+//		//validity check the channels against the existing frms
+//		if(nCol() != frm.nCol())
+//			return -1;
+//
+//		//check channel in linear time(taking advantage of the hash map)
+//		auto frm1 = begin()->second;
+//		for(const auto & c : frm.getChannels())
+//		{
+//			if(frm1.getColId(c, ColType::channel) <0 )
+//				return -2;
+//		}
+//
+//		//check the pdata
+//		const auto & pd1 = frm1.getPData();
+//		const auto & pd2 = frm.getPData();
+//		if(pd1.size()!=pd2.size())
+//			return -3;
+//
+//		for(const auto & p : pd2)
+//		{
+//			if(pd1.find(p.first)==pd1.end())
+//				return -4;
+//		}
+//		return 0;
+//	}
 //todo:
 //	CytoSet subset(const vector<string> & sampleNames);
 //	vector<PDATA> getPData();
@@ -121,7 +120,7 @@ public:
 	  * @param sampleName
 	  * @return
 	  */
-	 GatingHierarchy<FrameType> & operator [](const string & sampleName){
+	 GatingHierarchy & operator [](const string & sampleName){
 			 return ghs[sampleName];
 	   }
 
@@ -247,7 +246,7 @@ public:
 
 			for(auto & it :ghs){
 					string sn = it.first;
-					GatingHierarchy<FrameType> & gh =  it.second;
+					GatingHierarchy & gh =  it.second;
 
 					pb::GatingHierarchy pb_gh;
 					gh.convertToPb(pb_gh);
@@ -360,7 +359,7 @@ public:
 				}
 
 
-				ghs[sn] = GatingHierarchy<FrameType>(gh_pb, trans_tbl);
+				ghs[sn] = GatingHierarchy(gh_pb, trans_tbl);
 			}
 		}
 
@@ -372,7 +371,7 @@ public:
 	 * @param sampleName a string providing the sample name as the key
 	 * @return a pointer to the GatingHierarchy object
 	 */
-	GatingHierarchy<FrameType> & getGatingHierarchy(string sampleName)
+	GatingHierarchy & getGatingHierarchy(string sampleName)
 	{
 
 		iterator it=ghs.find(sampleName);
@@ -424,7 +423,7 @@ public:
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
 			//except trans, the entire gh object is copiable
-			GatingHierarchy<FrameType> curGh = getGatingHierarchy(curSampleName);
+			GatingHierarchy curGh = getGatingHierarchy(curSampleName);
 
 			//update trans_local with new trans pointers
 			trans_map newTmap = curGh.getLocalTrans().getTransMap();
@@ -475,7 +474,7 @@ public:
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"...\n ");
 
 
-			GatingHierarchy<FrameType> &toCopy=gs.getGatingHierarchy(curSampleName);
+			GatingHierarchy &toCopy=gs.getGatingHierarchy(curSampleName);
 
 			ghs[curSampleName]=toCopy.clone();
 
@@ -487,7 +486,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy<FrameType> & gh_template,vector<string> sampleNames){
+	GatingSet(const GatingHierarchy & gh_template,vector<string> sampleNames){
 
 
 
@@ -531,7 +530,7 @@ public:
 				PRINT("\n... start adding GatingHierarchy for: "+curSampleName+"... \n");
 
 
-			GatingHierarchy<FrameType> & curGh=addGatingHierarchy(curSampleName);
+			GatingHierarchy & curGh=addGatingHierarchy(curSampleName);
 			curGh.addRoot();//add default root
 
 		}
@@ -564,12 +563,12 @@ public:
 	 * insert an empty GatingHierarchy
 	 * @param sn
 	 */
-	GatingHierarchy<FrameType> & addGatingHierarchy(string sn){
+	GatingHierarchy & addGatingHierarchy(string sn){
 		if(ghs.find(sn)!=ghs.end())
 			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sn));
 		return ghs[sn];
 	}
-	void addGatingHierarchy(const GatingHierarchy<FrameType> & gh, string sn){
+	void addGatingHierarchy(const GatingHierarchy & gh, string sn){
 			if(ghs.find(sn)!=ghs.end())
 				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sn));
 			ghs[sn] = gh;

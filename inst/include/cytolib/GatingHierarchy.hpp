@@ -91,7 +91,6 @@ struct OurVertexPropertyWriterR {
 	Each FCS file is associated with one GatingHierarchy object.
 	It can also serves as a gating template when data is empty.
  */
-template<class FrameType>
 class GatingHierarchy{
 private:
 	compensation comp; /*< compensation object */
@@ -102,7 +101,7 @@ private:
 						do this in R since comp is extracted from FCS keyword (unless it can be optionally extracted from workspace keyword)
 	 	 	 	 	  */
 	MemCytoFrame fdata; /* in-memory version copy frm, loaded on demand */
-	FrameType frm;
+	auto_ptr<CytoFrame> frmPtr;
 	populationTree tree; /**< the gating tree */
 
 	PARAM_VEC transFlag; /*< for internal use of parse flowJo workspace */
@@ -112,25 +111,29 @@ public:
 	 /**
 		  * forwarding APIs
 		  */
-		vector<string> getChannels(){return frm.getChannels();};
+		vector<string> getChannels(){return frmPtr->getChannels();};
 
 
 		//* forward to the first element's getChannels
-		vector<string> getMarkers(){return frm.getMarkers();};
+		vector<string> getMarkers(){return frmPtr->getMarkers();};
 
 		void setMarker(const string & _old, const string & _new){
-			frm.setMarker(_old, _new);
+			frmPtr->setMarker(_old, _new);
 		};
+		void setChannel(const string & _old, const string & _new){
 
-		int nCol(){frm.nCol();}
-		int nRow(){frm.nRow();}
+			updateChannels(CHANNEL_MAP({{_old, _new}}));
+
+		}
+		int nCol(){frmPtr->nCol();}
+		int nRow(){frmPtr->nRow();}
 		/**
 		 * Get the reference of cytoFrame
 		 * @return
 		 */
 		CytoFrame & getData()
 		{
-			return frm;
+			return *frmPtr;
 		}
 		/**
 		 * extract in-memory data from a node
@@ -154,9 +157,9 @@ public:
 	 * copy setter
 	 * @param _frm
 	 */
-	void setframe(FrameType & _frm)
+	void set_frame_ptr(CytoFrame * _frmPtr)
 	{
-		frm = _frm;
+		frmPtr.reset(_frmPtr);
 	}
 
 	/**
@@ -168,7 +171,7 @@ public:
 				{
 					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 						PRINT("loading data into memory..\n");
-					fdata = MemCytoFrame(frm);
+					fdata = MemCytoFrame(*frmPtr);
 				}
 			}
 
@@ -181,7 +184,7 @@ public:
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("unloading raw data..\n");
 				if(flush)
-					frm.setData(fdata.getData());
+					frmPtr->setData(fdata.getData());
 				fdata = MemCytoFrame();
 			}
 
@@ -197,7 +200,7 @@ public:
 	void updateChannels(const CHANNEL_MAP & chnl_map)
 	{
 		//update flow data
-		frm.updateChannels(chnl_map);
+		frmPtr->updateChannels(chnl_map);
 
 		//update comp
 		comp.updateChannels(chnl_map);
@@ -463,8 +466,8 @@ public:
 	 * 	GatingHierarchy *curGh=new GatingHierarchy();
 	 * \endcode
 	 */
-	GatingHierarchy<FrameType>(){}
-	GatingHierarchy<FrameType>(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
+	GatingHierarchy(){}
+	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
 	void convertToPb(pb::GatingHierarchy & gh_pb){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
@@ -500,7 +503,7 @@ public:
 
 	}
 
-	GatingHierarchy<FrameType>(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *> & trans_tbl){
+	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *> & trans_tbl){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 
@@ -778,7 +781,7 @@ public:
 		nodeProperties & node=getNodeProperty(u);
 		if(u==0)
 		{
-			node.setIndices(frm.nRow());
+			node.setIndices(frmPtr->nRow());
 			node.computeStats();
 		}else
 		{
