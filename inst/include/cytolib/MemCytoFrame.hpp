@@ -326,7 +326,7 @@ public:
 				  memcpy(tmp, bufPtr + ind * elementSize, elementSize);
 
 			     for(auto i = 0; i < elementSize; i++){
-			       auto j = iByteOrd.at(i);
+			       auto j = iByteOrd[i];
 
 //			       auto pos_old = ind * elementSize + i;
 			       auto pos_new = ind * elementSize + j;

@@ -127,7 +127,7 @@ public:
 		packToBytes(x, bytes);
 		string * byte_pb = ind_pb.mutable_bind();
 		for(unsigned i = 0; i < bytes.size(); i++){
-			unsigned char byte = bytes.at(i);
+			unsigned char byte = bytes[i];
 			byte_pb->append(string(1, byte));
 		}
 		ind_pb.set_nevents(nEvents);
@@ -171,7 +171,7 @@ public:
 
 		for(vector<unsigned>::iterator it=x.begin();it!=x.end();it++){
 			unsigned i=*it;
-			res.at(i)=true;
+			res[i]=true;
 		}
 		return res;
 	}
@@ -201,7 +201,7 @@ public:
 		unsigned nSize = ind_pb.iind_size();
 		x = vector<unsigned>(nSize);
 		for(unsigned i = 0; i < nSize; i++)
-			x.at(i) = ind_pb.iind(i);
+			x[i] = ind_pb.iind(i);
 	}
 
 

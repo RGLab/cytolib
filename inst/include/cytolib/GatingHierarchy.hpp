@@ -279,9 +279,8 @@ public:
 
 	/**
 	 * transform the data
-	 * @param timestep
 	 */
-	void transforming(double timestep = 1)
+	void transforming()
 	{
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("start transforming data \n");
@@ -1086,7 +1085,7 @@ public:
 		res.erase(remove_if(res.begin(),res.end(), isEmpty), res.end());
 
 		//prepend root if it is absolute path (starts with /) and root is not yet prepended yet
-		if(gatePath[0] == '/' && res.at(0)!= "root")
+		if(gatePath[0] == '/' && res[0]!= "root")
 			res.insert(res.begin(), "root");
 		return (getNodeID(res));
 
@@ -1102,12 +1101,12 @@ public:
 		VertexID_vec nodeIDs = queryByPath(0,gatePath);
 		unsigned nMatches = nodeIDs.size();
 		if(nMatches == 1)
-				return nodeIDs.at(0);
+				return nodeIDs[0];
 		else{
 			string errMsg;
 			for(unsigned i = 0; i < gatePath.size()-1; i ++)
-				errMsg.append(gatePath.at(i) + "/");
-			errMsg.append(gatePath.at(gatePath.size()-1));
+				errMsg.append(gatePath[i] + "/");
+			errMsg.append(gatePath[gatePath.size()-1]);
 			if(nMatches == 0)
 				throw(domain_error(errMsg + " not found!" ));
 			else
@@ -1141,9 +1140,9 @@ public:
 		for(unsigned i = 0; i < nSize; i++)
 		{
 			unsigned counter = 0;
-			for(VertexID curNode = nodeIDs.at(i); curNode != 0; curNode = getParent(curNode))
+			for(VertexID curNode = nodeIDs[i]; curNode != 0; curNode = getParent(curNode))
 			{
-				paths.at(i).push_back(curNode);
+				paths[i].push_back(curNode);
 				counter++;
 			}
 			minDepths = min(counter, minDepths);
@@ -1156,13 +1155,13 @@ public:
 		{
 			//check if all nodes are the same at this level
 			unsigned j = 0;
-			unsigned pos = paths.at(j).size()-nDepths -1;//root is at the end of vector
-			VertexID u = paths.at(j).at(pos);
+			unsigned pos = paths[j].size()-nDepths -1;//root is at the end of vector
+			VertexID u = paths[j][pos];
 			//loop through the rest nodes to see if they equal to u
 			for(j = 1; j < nSize; j++)
 			{
-				unsigned pos = paths.at(j).size()-nDepths -1;
-				if(paths.at(j).at(pos) != u)
+				unsigned pos = paths[j].size()-nDepths -1;
+				if(paths[j][pos] != u)
 					break;
 			}
 
@@ -1186,7 +1185,7 @@ public:
 		VertexID_vec nodeIDs = queryByPath(boolParentID,refPath);
 		unsigned nMatches = nodeIDs.size();
 		if(nMatches == 1)
-			return nodeIDs.at(0);
+			return nodeIDs[0];
 		else
 		{
 			/*
@@ -1196,12 +1195,12 @@ public:
 			 nodeIDs = queryByPath(0,refPath);
 			 nMatches = nodeIDs.size();
 			if(nMatches == 1)
-					return nodeIDs.at(0);
+					return nodeIDs[0];
 			else{
 				string errMsg = "Reference node: ";
 				for(unsigned i = 0; i < refPath.size()-1; i ++)
-					errMsg.append(refPath.at(i) + "/");
-				errMsg.append(refPath.at(refPath.size()-1));
+					errMsg.append(refPath[i] + "/");
+				errMsg.append(refPath[refPath.size()-1]);
 				if(nMatches == 0)
 					throw(domain_error(errMsg + " not found!" ));
 				else
@@ -1308,7 +1307,7 @@ public:
 		/*
 		 * search for the leaf node
 		 */
-		string leafName=gatePath.at(gatePath.size()-1);
+		string leafName=gatePath[gatePath.size()-1];
 		VertexID_vec leafIDs=getDescendants(ancestorID,leafName);
 
 
@@ -1438,7 +1437,7 @@ public:
 				popName.append(" not found within the gating tree!");
 				throw(domain_error(popName));
 		case 1:
-				return (res.at(0));
+				return (res[0]);
 
 		default:
 				popName.append(" is ambiguous within the gating tree!");
@@ -1580,7 +1579,7 @@ public:
 		if(res.size()>1) //we only allow one parent per node
 			throw(domain_error(err+" :multiple parent nodes found!"));
 
-		return(res.at(0));
+		return(res[0]);
 	}
 
 	/**

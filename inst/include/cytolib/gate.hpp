@@ -26,7 +26,7 @@ struct BOOL_GATE_OP{
 		BOOL_GATE_OP_pb.set_isnot(isNot);
 		BOOL_GATE_OP_pb.set_op(op);
 		for(unsigned i = 0; i < path.size(); i++){
-			 BOOL_GATE_OP_pb.add_path(path.at(i));
+			 BOOL_GATE_OP_pb.add_path(path[i]);
 		}
 	};
 	BOOL_GATE_OP(){};
@@ -83,8 +83,8 @@ public:
 			resize(nSize);
 			for(unsigned i=0;i<nSize;i++)
 			{
-				x[i]=vertices.at(i).x;
-				y[i]=vertices.at(i).y;
+				x[i]=vertices[i].x;
+				y[i]=vertices[i].y;
 			}
 
 	};
@@ -146,7 +146,7 @@ class paramPoly
 private:
 
 
-	vector<string> params;//params.at(0) is x, params.at(1) is y axis
+	vector<string> params;//params[0] is x, params[1] is y axis
 	vector<coordinate> vertices;
 public:
 	vector<coordinate> getVertices(){return vertices;};
@@ -171,14 +171,14 @@ public:
 		res.resize(nSize);
 		for(unsigned i=0;i<nSize;i++)
 		{
-			res.x[i]=vertices.at(i).x;
-			res.y[i]=vertices.at(i).y;
+			res.x[i]=vertices[i].x;
+			res.y[i]=vertices[i].y;
 		}
 		return res;
 	}
 
-	string xName(){return params.at(0);};
-	string yName(){return params.at(1);};
+	string xName(){return params[0];};
+	string yName(){return params[1];};
 	paramPoly(){};
 	void convertToPb(pb::paramPoly & paramPoly_pb){
 		BOOST_FOREACH(vector<string>::value_type & it, params){
@@ -408,17 +408,17 @@ public:
 		EVENT_DATA_TYPE yMin=*min_element(ydata, ydata + nSize);
 		for(unsigned i=0;i<v.size();i++)
 		{
-			if(v.at(i).x<=extend_val)
+			if(v[i].x<=extend_val)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
-					PRINT("extending " + x + "from " + to_string(v.at(i).x)+" to :"+to_string(xMin)+"\n");
-				v.at(i).x=min(xMin, v.at(i).x);
+					PRINT("extending " + x + "from " + to_string(v[i].x)+" to :"+to_string(xMin)+"\n");
+				v[i].x=min(xMin, v[i].x);
 			}
-			if(v.at(i).y<=extend_val)
+			if(v[i].y<=extend_val)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
-					PRINT("extending " + y + "from " + to_string(v.at(i).y)+" to :"+to_string(yMin)+"\n");
-				v.at(i).y=min(yMin, v.at(i).y);
+					PRINT("extending " + y + "from " + to_string(v[i].y)+" to :"+to_string(yMin)+"\n");
+				v[i].y=min(yMin, v[i].y);
 
 			}
 		}
@@ -437,17 +437,17 @@ public:
 		EVENT_DATA_TYPE yMin=extend_to;
 		for(unsigned i=0;i<v.size();i++)
 		{
-			if(v.at(i).x<=extend_val)
+			if(v[i].x<=extend_val)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
-					PRINT("extending " + x + "from " + to_string(v.at(i).x)+" to :"+to_string(xMin)+"\n");
-				v.at(i).x=min(xMin,v.at(i).x);
+					PRINT("extending " + x + "from " + to_string(v[i].x)+" to :"+to_string(xMin)+"\n");
+				v[i].x=min(xMin,v[i].x);
 			}
-			if(v.at(i).y<=extend_val)
+			if(v[i].y<=extend_val)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
-					PRINT("extending " + y + "from " + to_string(v.at(i).y)+" to :"+to_string(yMin)+"\n");
-				v.at(i).y=min(yMin, v.at(i).y);
+					PRINT("extending " + y + "from " + to_string(v[i].y)+" to :"+to_string(yMin)+"\n");
+				v[i].y=min(yMin, v[i].y);
 
 			}
 		}
@@ -474,7 +474,7 @@ public:
 						PRINT("adjusting: "+channel_x+"\n");
 
 					for(unsigned i=0;i<vertices.size();i++)
-						vertices.at(i).x=vertices.at(i).x/this_gain;
+						vertices[i].x=vertices[i].x/this_gain;
 				}
 
 				it=gains.find(channel_y);
@@ -485,7 +485,7 @@ public:
 						PRINT("adjusting: "+channel_y+"\n");
 
 					for(unsigned i=0;i<vertices.size();i++)
-						vertices.at(i).y=vertices.at(i).y/this_gain;
+						vertices[i].y=vertices[i].y/this_gain;
 				}
 
 
@@ -527,21 +527,21 @@ public:
 		res.reserve(nEvents);
 		for(auto i : parentInd)
 		{//iterate over points
-		p1x=vertices.at(0).x;
-		p1y=vertices.at(0).y;
+		p1x=vertices[0].x;
+		p1y=vertices[0].y;
 		counter=0;
 		for(unsigned j=1; j <= nVertex; j++)
 		{// iterate over vertices
 		  /*p1x,p1y and p2x,p2y are the endpoints of the current vertex*/
 		  if (j == nVertex)
 		  {//the last vertice must "loop around"
-			p2x = vertices.at(0).x;
-			p2y = vertices.at(0).y;
+			p2x = vertices[0].x;
+			p2y = vertices[0].y;
 		  }
 		  else
 		  {
-			p2x = vertices.at(j).x;
-			p2y = vertices.at(j).y;
+			p2x = vertices[j].x;
+			p2y = vertices[j].y;
 		  }
 		  /*if horizontal ray is in range of vertex find the x coordinate where
 			ray and vertex intersect*/
@@ -617,7 +617,7 @@ public:
 					PRINT("transforming: "+channel_x+"\n");;
 				trans_x->transforming(&vert.x[0], nSize);
 				for(int i=0;i<nSize;i++)
-					vertices.at(i).x=vert.x[i];
+					vertices[i].x=vert.x[i];
 			}
 			if(trans_y!=NULL)
 			{
@@ -625,7 +625,7 @@ public:
 					PRINT("transforming: "+channel_y+"\n");;
 				trans_y->transforming(&vert.y[0], nSize);
 				for(int i=0;i<nSize;i++)
-					vertices.at(i).y=vert.y[i];
+					vertices[i].y=vert.y[i];
 			}
 			if(g_loglevel>=POPULATION_LEVEL)
 				PRINT("\n");
@@ -689,11 +689,11 @@ public:
 		for(auto i : parentInd)
 		{
 			bool inX,inY;
-			EVENT_DATA_TYPE xMin=vertices.at(0).x;
-			EVENT_DATA_TYPE yMin=vertices.at(0).y;
+			EVENT_DATA_TYPE xMin=vertices[0].x;
+			EVENT_DATA_TYPE yMin=vertices[0].y;
 
-			EVENT_DATA_TYPE xMax=vertices.at(1).x;
-			EVENT_DATA_TYPE yMax=vertices.at(1).y;
+			EVENT_DATA_TYPE xMax=vertices[1].x;
+			EVENT_DATA_TYPE yMax=vertices[1].y;
 
 			if(xMin>xMax||yMin>yMax)
 				throw(domain_error("invalid vertices for rectgate!"));
@@ -775,7 +775,7 @@ public:
 		vector<coordinate> v=param.getVertices();
 		for(unsigned i=0;i<v.size();i++)
 		{
-			if((v.at(i).x<=extend_val)|(v.at(i).y<=extend_val))
+			if((v[i].x<=extend_val)|(v[i].y<=extend_val))
 			{
 				throw(domain_error("try to extend the coordinates for ellipse gate!"));
 			}
@@ -791,7 +791,7 @@ public:
 		vector<coordinate> v=param.getVertices();
 		for(unsigned i=0;i<v.size();i++)
 		{
-			if((v.at(i).x<=extend_val)|(v.at(i).y<=extend_val))
+			if((v[i].x<=extend_val)|(v[i].y<=extend_val))
 			{
 				throw(domain_error("try to extend the coordinates for ellipse gate!"));
 			}
@@ -816,7 +816,7 @@ public:
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("adjusting: "+channel_x+"\n");;
 				for(unsigned i=0;i<antipodal_vertices.size();i++)
-					antipodal_vertices.at(i).x=antipodal_vertices.at(i).x/this_gain;
+					antipodal_vertices[i].x=antipodal_vertices[i].x/this_gain;
 			}
 			it=gains.find(channel_y);
 			if(it!=gains.end())
@@ -825,7 +825,7 @@ public:
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("adjusting: "+channel_y+"\n");;
 				for(unsigned i=0;i<antipodal_vertices.size();i++)
-					antipodal_vertices.at(i).y=antipodal_vertices.at(i).y/this_gain;
+					antipodal_vertices[i].y=antipodal_vertices[i].y/this_gain;
 			}
 			if(g_loglevel>=POPULATION_LEVEL)
 				PRINT("\n");
@@ -888,8 +888,8 @@ public:
 			if(it != R_it && it != L_it)
 				Q.push_back(*it);
 		}
-		coordinate V1 = Q.at(0);
-		coordinate V2 = Q.at(1);
+		coordinate V1 = Q[0];
+		coordinate V2 = Q[1];
 		EVENT_DATA_TYPE b = hypot(V1.x-V2.x,V1.y-V2.y)/2;
 
 		EVENT_DATA_TYPE a2 = a * a ;
@@ -943,10 +943,10 @@ public:
 		EVENT_DATA_TYPE a , b, c, d;
 		if(cov.size()!=2)
 			throw(domain_error("invalid cov matrix!"));
-		a = cov.at(0).x;
-		b = cov.at(0).y;
-		c = cov.at(1).x;
-		d = cov.at(1).y;
+		a = cov[0].x;
+		b = cov[0].y;
+		c = cov[1].x;
+		d = cov[1].y;
 
 		EVENT_DATA_TYPE det = a* d - b* c;
 		EVENT_DATA_TYPE aa, bb, cc, dd;
@@ -985,11 +985,11 @@ public:
 			mu.convertToPb(*coor_pb);
 			for(unsigned i = 0; i < cov.size(); i++){
 				pb::coordinate * coor_pb = g_pb->add_cov();
-				cov.at(i).convertToPb(*coor_pb);
+				cov[i].convertToPb(*coor_pb);
 			}
 			for(unsigned i = 0; i < antipodal_vertices.size(); i++){
 				pb::coordinate * coor_pb = g_pb->add_antipodal_vertices();
-				antipodal_vertices.at(i).convertToPb(*coor_pb);
+				antipodal_vertices[i].convertToPb(*coor_pb);
 			}
 	}
 	ellipseGate(const pb::gate & gate_pb):polygonGate(gate_pb),mu(coordinate(gate_pb.eg().mu())),dist(gate_pb.eg().dist()){
@@ -1067,7 +1067,7 @@ public:
 
 				trans_x->transforming(&vert.x[0],nSize);
 				for(int i=0;i<nSize;i++)
-					antipodal_vertices.at(i).x=vert.x[i];
+					antipodal_vertices[i].x=vert.x[i];
 			}
 			if(trans_y!=NULL)
 			{
@@ -1076,7 +1076,7 @@ public:
 
 				trans_y->transforming(&vert.y[0],nSize);
 				for(int i=0;i<nSize;i++)
-					antipodal_vertices.at(i).y=vert.y[i];
+					antipodal_vertices[i].y=vert.y[i];
 			}
 			if(g_loglevel>=POPULATION_LEVEL)
 				PRINT("\n");
@@ -1232,7 +1232,7 @@ public:
 		//cp its unique member
 		for(unsigned i = 0; i < boolOpSpec.size(); i++){
 			pb::BOOL_GATE_OP * gop_pb = g_pb->add_boolopspec();
-			boolOpSpec.at(i).convertToPb(*gop_pb);
+			boolOpSpec[i].convertToPb(*gop_pb);
 		}
 
 	}
@@ -1358,7 +1358,7 @@ public:
 
 		setTransformed(false);//reset flag so that it won't interfere the next transforming
 
-		coordinate center = param.getVertices().at(0);
+		coordinate center = param.getVertices()[0];
 		EVENT_DATA_TYPE x_mu = center.x;
 		EVENT_DATA_TYPE y_mu = center.y;
 		//locate the a value
@@ -1377,15 +1377,15 @@ public:
 		EVENT_DATA_TYPE delta;
 		for(auto i = 0; i < nLen; i++){
 			delta = nStep * i;
-			curve1.at(i).x = x_mu + delta;
-			curve1.at(i).y = multiplier * pow(delta, 2) + y_mu;
+			curve1[i].x = x_mu + delta;
+			curve1[i].y = multiplier * pow(delta, 2) + y_mu;
 		}
 		//curve2:  (vertical)
 		nStep = (y_max - y_mu) / nLen;
 		for(auto i = 0; i < nLen; i++){
 			delta = nStep * i;
-			curve2.at(i).y = y_mu + delta;
-			curve2.at(i).x = multiplier * pow(delta, 2) + x_mu;
+			curve2[i].y = y_mu + delta;
+			curve2[i].x = multiplier * pow(delta, 2) + x_mu;
 		}
 
 		vector<coordinate> polyVert; //the interpolated vertices for polygon
