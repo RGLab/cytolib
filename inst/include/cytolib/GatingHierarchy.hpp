@@ -301,6 +301,7 @@ public:
 			string curChannel=*it1;
 			if(curChannel=="Time"||curChannel=="time"){
 				//special treatment for time channel
+				EVENT_DATA_TYPE timestep = frmPtr->get_time_step(curChannel);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("multiplying "+curChannel+" by :"+ to_string(timestep) + "\n");
 				EVENT_DATA_TYPE * x = this->fdata.subset(curChannel, ColType::channel);

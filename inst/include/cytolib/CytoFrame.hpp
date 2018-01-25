@@ -25,6 +25,11 @@ using namespace H5;
 
 const H5std_string  DATASET_NAME( "data");
 
+struct TM_ext
+{
+	tm time;
+	EVENT_DATA_TYPE fractional_secs;
+};
 
 /**
  * The class representing a single FCS file
@@ -429,7 +434,65 @@ public:
 			throw(domain_error("invalid range type"));
 		}
 	}
+	/**
+	 * Compute the time step from keyword either "$TIMESTEP" or "$BTIM", "$TIMESTEP" is preferred when it is present
+	 * This is used to convert time channel to the meaningful units later on during data transforming
+	 * @param
+	 * @return
+	 */
+	EVENT_DATA_TYPE get_time_step(const string time_channel)
+	{
 
+	  //check if $TIMESTEP is available
+		EVENT_DATA_TYPE ts;
+		auto it_time = keys.find("$TIMESTEP");
+		if(it_time != keys.end())
+				ts = boost::lexical_cast<EVENT_DATA_TYPE>(it_time->second);
+		else
+		{
+		  auto it_btime = keys.find("$BTIM");
+		  auto it_etime = keys.find("$ETIM");
+		  if(it_btime == keys.end() || it_etime == keys.end())
+			  ts = 1;
+		  else
+		  {
+			  TM_ext btime = parse_time_with_fractional_seconds(it_btime->second);
+			  TM_ext etime = parse_time_with_fractional_seconds(it_etime->second);
+
+			  ts = difftime(mktime(&btime.time),mktime(&btime.time));
+			  ts = ts + etime.fractional_secs/100 - btime.fractional_secs/100;
+
+			  const auto time_range = getRange(time_channel, ColType::channel, RangeType::data);
+			  ts /= (time_range.second - time_range.first);
+//	      as.numeric(time.total)/diff(unit.range)
+
+	    }
+	  }
+		return ts;
+	}
+
+
+	/**
+	 * Parse the time string with fractional seconds
+	 * std lib doesn't handle and boost::posix_time is not header-only
+	 * @param s_time time string "H:M:S.ss"
+	 * @return
+	 */
+	TM_ext parse_time_with_fractional_seconds(const string s_time){
+		TM_ext res;
+		vector<string> time_vec;
+		//split the H:M:S.ms by .
+		boost::split(time_vec, s_time, boost::is_any_of("."));
+		//using std lib to parse the first half
+		strptime(time_vec[0].c_str(), "%H:%M:%S", &(res.time));
+		 //parse the second half as fractional seconds
+		if(time_vec.size()==2)
+		{
+			res.fractional_secs = boost::lexical_cast<EVENT_DATA_TYPE>(time_vec[1]);
+		}
+		else
+			res.fractional_secs = 0;
+	}
 	const PDATA & getPData() const {return pd;}
 	string getPData(const string & name) const {
 		auto it = pd.find(name);
