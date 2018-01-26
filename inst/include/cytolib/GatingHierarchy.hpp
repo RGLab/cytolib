@@ -238,40 +238,44 @@ public:
 
 	}
 
+
+
 	/**
+	 * compensate the data by the spillover provided by workspace
+	 * or FCS TEXT keyword
 	 * add prefix (e.g. Comp_ or <>) to channel name of the data
 	 */
 	void compensate()
 	{
-		vector<string> markers;
 		if(comp.cid == "-2" || comp.cid == "")
-			PRINT("No compensation");
+		{
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("No compensation\n");
+			return;
+		}
 		else if(comp.cid == "-1")
 		{
-			PRINT("Compensating with Acquisition defined compensation matrix");
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("Retrieve the Acquisition defined compensation matrix from FCS\n");
 			/**
 			 * compensate with spillover defined in keyword
 			 */
-			compensation comp1 = fdata.get_compensation();
+			set_compensation(fdata.get_compensation());
 			//TODO:fix slash in compensation parameters for vX
 			//currently I have not figured out the clean way to pass is_fix_slash flag from ws
 			//this scenario may never occur so we won't bother the fix it until it bites us
-			fdata.compensate(comp1);
-			markers = comp1.marker;
-		}
-		else
-		{
-			PRINT("Compensating with workspace defined compensation matrix");
-			fdata.compensate(comp);
-			markers = comp.marker;
+
 		}
 
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("Compensating...\n");
 
+		fdata.compensate(comp);
 
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("start prefixing data columns\n");
 
-		for(const string & old : markers)
+		for(const string & old : comp.marker)
 		{
 			fdata.setChannel(old, comp.prefix + old + comp.suffix);
 		}
@@ -644,10 +648,13 @@ public:
 	 * Getter function for compensation member
 	 * @return
 	 */
-	compensation getCompensation(){
+	compensation get_compensation(){
 		return comp;
 	}
-
+	void set_compensation(const compensation & _comp)
+	{
+		comp = _comp;
+	}
 	void printLocalTrans(){
 		PRINT("\nget trans from gating hierarchy\n");
 		trans_map trans=this->trans.getTransMap();
