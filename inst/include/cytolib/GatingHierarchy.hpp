@@ -102,7 +102,7 @@ private:
 						do this in R since comp is extracted from FCS keyword (unless it can be optionally extracted from workspace keyword)
 	 	 	 	 	  */
 	MemCytoFrame fdata; /* in-memory version copy frm, loaded on demand */
-	auto_ptr<CytoFrame> frmPtr;
+	unique_ptr<CytoFrame> frmPtr;
 	populationTree tree; /**< the gating tree */
 
 	PARAM_VEC transFlag; /*< for internal use of parse flowJo workspace */
@@ -126,8 +126,8 @@ public:
 			updateChannels(CHANNEL_MAP({{_old, _new}}));
 
 		}
-		int nCol(){frmPtr->nCol();}
-		int nRow(){frmPtr->nRow();}
+		int nCol(){return frmPtr->nCol();}
+		int nRow(){return frmPtr->nRow();}
 		/**
 		 * Get the reference of cytoFrame
 		 * @return

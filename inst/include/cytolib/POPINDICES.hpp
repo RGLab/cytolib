@@ -100,7 +100,7 @@ public:
 	vector<unsigned> getIndices_u(){
 		vector<unsigned> res;
 
-		for(auto i = 0; i < x.size(); i++){
+		for(unsigned i = 0; i < x.size(); i++){
 			if(x[i])
 				res.push_back(i);
 		}
@@ -225,7 +225,7 @@ public:
 	vector<unsigned> getIndices_u(){
 
 		vector<unsigned> res(nEvents);
-		for(auto i = 0; i < nEvents; i++)
+		for(unsigned i = 0; i < nEvents; i++)
 			res[i]=i;
 		return res;
 	}
