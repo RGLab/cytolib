@@ -78,10 +78,12 @@ typedef vec_kw_constainer KEY_WORDS;
  * the struct that stores the FCS  header parse arguments
  */
 struct FCS_READ_HEADER_PARAM{
+	bool is_fix_slash_in_channel_name;
 	bool isEmptyKeyValue; //whether allow the keyword value to be empty. When true, then double delimiter will be considered as empty keyword value.
 	bool ignoreTextOffset; //whether to ignore the offset recorded in the text segment of FCS
 	int nDataset; // which data set to be parsed when multi-data segments are detected
 	FCS_READ_HEADER_PARAM(){
+		is_fix_slash_in_channel_name = false;
 		isEmptyKeyValue = false;
 		ignoreTextOffset = false;
 		nDataset = 1;

@@ -917,6 +917,9 @@ public:
 			}
 
 			params[i-1].channel = keys["$P" + pid + "N"];
+			if(config.is_fix_slash_in_channel_name)
+				boost::replace_all(params[i-1].channel, "/", ".");
+
 			it = keys.find("$P" + pid + "S");
 			if(it!=keys.end())
 				params[i-1].marker = keys["$P" + pid + "S"];

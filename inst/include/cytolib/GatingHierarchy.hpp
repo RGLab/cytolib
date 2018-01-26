@@ -253,7 +253,9 @@ public:
 			 * compensate with spillover defined in keyword
 			 */
 			compensation comp1 = fdata.get_compensation();
-
+			//TODO:fix slash in compensation parameters for vX
+			//currently I have not figured out the clean way to pass is_fix_slash flag from ws
+			//this scenario may never occur so we won't bother the fix it until it bites us
 			fdata.compensate(comp1);
 			markers = comp1.marker;
 		}
