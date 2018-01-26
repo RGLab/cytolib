@@ -36,7 +36,7 @@ public:
 	{
 
 		keys.setPairs(frm.getKeywords());
-		params = frm.getParams();
+		params = frm.get_params();
 		buildHash();
 		data = frm.getData();
 	}

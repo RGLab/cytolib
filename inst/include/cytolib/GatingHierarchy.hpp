@@ -184,7 +184,10 @@ public:
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("unloading raw data..\n");
 				if(flush)
+				{
 					frmPtr->setData(fdata.getData());
+					frmPtr->set_params(fdata.get_params());
+				}
 				fdata = MemCytoFrame();
 			}
 
@@ -280,7 +283,7 @@ public:
 	/**
 	 * transform the data
 	 */
-	void transforming()
+	void transform_data()
 	{
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("start transforming data \n");
@@ -298,6 +301,7 @@ public:
 		{
 
 			string curChannel=*it1;
+			auto param_range = fdata.get_range(curChannel, ColType::channel, RangeType::instrument);
 			if(curChannel=="Time"||curChannel=="time"){
 				//special treatment for time channel
 				EVENT_DATA_TYPE timestep = frmPtr->get_time_step(curChannel);
@@ -306,7 +310,8 @@ public:
 				EVENT_DATA_TYPE * x = this->fdata.subset(curChannel, ColType::channel);
 				for(int i = 0; i < nEvents; i++)
 					x[i] = x[i] * timestep;
-
+				param_range.first = param_range.first * timestep;
+				param_range.second = param_range.second * timestep;
 
 			}
 			else
@@ -324,11 +329,14 @@ public:
 
 							curTrans->transforming(x,nEvents);
 
+							curTrans->transforming(&param_range.first, 1);
 
+							curTrans->transforming(&param_range.second, 1);
 						}
 
 			}
 
+			fdata.set_range(curChannel, ColType::channel, param_range);
 
 		}
 
@@ -714,7 +722,7 @@ public:
 	/*
 	 * transform gates
 	 */
-	void transformGate(){
+	void transform_gate(){
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\nstart transform Gates \n");
 

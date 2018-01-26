@@ -104,9 +104,14 @@ public:
 	 * getter from cytoParam vector
 	 * @return
 	 */
-	const vector<cytoParam> & getParams () const
+	const vector<cytoParam> & get_params() const
 	{
 		return params;
+	}
+
+	void set_params(const vector<cytoParam> & _params)
+	{
+		params = _params;
 	}
 //	virtual void writeFCS(const string & filename);
 	/**
@@ -404,13 +409,26 @@ public:
 	}
 
 	/**
+	 * Update the instrument range (typically after data transformation)
+	 * @param colname
+	 * @param ctype
+	 * @param new_range
+	 */
+	virtual void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range){
+		int idx = getColId(colname, ctype);
+		if(idx<0)
+			throw(domain_error("colname not found: " + colname));
+		params[idx].min = new_range.first;
+		params[idx].max = new_range.second;
+	}
+	/**
 	 * the range of a specific column
 	 * @param colname
 	 * @param ctype the type of column
 	 * @param rtype either RangeType::data or RangeType::instrument
 	 * @return
 	 */
-	virtual pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> getRange(const string & colname, ColType ctype, RangeType rtype) const
+	virtual pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> get_range(const string & colname, ColType ctype, RangeType rtype) const
 	{
 
 		switch(rtype)
@@ -462,7 +480,7 @@ public:
 			  ts = difftime(mktime(&btime.time),mktime(&btime.time));
 			  ts = ts + etime.fractional_secs/100 - btime.fractional_secs/100;
 
-			  const auto time_range = getRange(time_channel, ColType::channel, RangeType::data);
+			  const auto time_range = get_range(time_channel, ColType::channel, RangeType::data);
 			  ts /= (time_range.second - time_range.first);
 //	      as.numeric(time.total)/diff(unit.range)
 
