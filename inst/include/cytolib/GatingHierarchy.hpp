@@ -20,6 +20,7 @@
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include "MemCytoFrame.hpp"
+#include "H5CytoFrame.hpp"
 using namespace std;
 
 namespace cytolib
@@ -131,7 +132,7 @@ public:
 		 * Get the reference of cytoFrame
 		 * @return
 		 */
-		CytoFrame & getData()
+		CytoFrame & get_frm_ref()
 		{
 			return *frmPtr;
 		}
@@ -187,6 +188,7 @@ public:
 				{
 					frmPtr->setData(fdata.getData());
 					frmPtr->set_params(fdata.get_params());
+					frmPtr->set_pheno_data(fdata.get_pheno_data());
 				}
 				fdata = MemCytoFrame();
 			}

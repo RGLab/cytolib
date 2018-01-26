@@ -19,7 +19,7 @@ namespace cytolib
  */
 class H5CytoFrame:public CytoFrame{
 protected:
-	string filename;
+	string filename_;
 	/*
 	 * these H5 handlers remain open during the life cycle of H5CytoFrame
 	 * for faster accessing the data
@@ -31,12 +31,23 @@ protected:
 public:
 	~H5CytoFrame(){};
 	/**
-	 * constructor from the H5 format of FCS
+	 * constructor from FCS
+	 * @param fcs_filename
+	 * @param h5_filename
+	 */
+	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config,  bool onlyTxt, const string & h5_filename):filename_(h5_filename)
+	{
+		MemCytoFrame fr(fcs_filename, config, onlyTxt);
+		fr.writeH5(h5_filename);
+		*this = H5CytoFrame(h5_filename);
+	}
+	/**
+	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & _filename, unsigned int flags = H5F_ACC_RDONLY):filename(_filename)
+	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):filename_(h5_filename)
 	{
-		file.openFile(filename, flags);
+		file.openFile(filename_, flags);
 
 		DataSet ds_param = file.openDataSet("params");
 	//	DataType param_type = ds_param.getDataType();

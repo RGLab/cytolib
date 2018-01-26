@@ -510,9 +510,10 @@ public:
 		}
 		else
 			res.fractional_secs = 0;
+		return res;
 	}
-	const PDATA & getPData() const {return pd;}
-	string getPData(const string & name) const {
+	const PDATA & get_pheno_data() const {return pd;}
+	string get_pheno_data(const string & name) const {
 		auto it = pd.find(name);
 		if(it==pd.end())
 			return "";
@@ -520,8 +521,12 @@ public:
 			return it->second;
 
 	}
-	void setPData(const string & name, const string & value){
+	void set_pheno_data(const string & name, const string & value){
 		pd[name] = value;
+	}
+	void set_pheno_data(const PDATA & _pd)
+	{
+		pd = _pd;
 	}
 	void delPData(const string & name){pd.erase(name);}
 };
