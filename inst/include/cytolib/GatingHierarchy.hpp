@@ -155,12 +155,12 @@ public:
 	//	}
 
 	/**
-	 * copy setter
+	 * move setter
 	 * @param _frm
 	 */
-	void set_frame_ptr(CytoFrame * _frmPtr)
+	void set_frame_ptr(unique_ptr<CytoFrame> && _frmPtr)
 	{
-		frmPtr.reset(_frmPtr);
+		frmPtr = _frmPtr;
 	}
 
 	/**
@@ -186,7 +186,7 @@ public:
 					PRINT("unloading raw data..\n");
 				if(flush)
 				{
-					frmPtr->setData(fdata.getData());
+					frmPtr->setData(fdata.get_data());
 					frmPtr->set_params(fdata.get_params());
 					frmPtr->set_pheno_data(fdata.get_pheno_data());
 				}

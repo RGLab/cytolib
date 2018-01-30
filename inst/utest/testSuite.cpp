@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(oddbitwidth)
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10000);
-	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 194);
+	BOOST_CHECK_EQUAL(cytofrm.get_data()[1], 194);
 
 }
 BOOST_AUTO_TEST_CASE(mixedEndian)
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(mixedEndian)
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 30041);
-	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 7447226);
+	BOOST_CHECK_EQUAL(cytofrm.get_data()[1], 7447226);
 
 }
 
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(specialDelimiter)
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 50146);
-	BOOST_CHECK_EQUAL(cytofrm.getData()[1], 9999998);
+	BOOST_CHECK_EQUAL(cytofrm.get_data()[1], 9999998);
 
 }
 
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(gigantic_file)
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1e3);
-	BOOST_CHECK_CLOSE(cytofrm.getData()[1], 63418.3242, 1e-6);
+	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 63418.3242, 1e-6);
 
 }
 
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(newline_in_txt)
 	MemCytoFrame cytofrm(filename.c_str(), config,false);
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10045);
-	BOOST_CHECK_CLOSE(cytofrm.getData()[1], 9220, 1e-6);
+	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 9220, 1e-6);
 
 }
 BOOST_AUTO_TEST_SUITE_END()

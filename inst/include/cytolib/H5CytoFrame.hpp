@@ -35,9 +35,9 @@ public:
 	 * @param fcs_filename
 	 * @param h5_filename
 	 */
-	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config,  bool onlyTxt, const string & h5_filename):filename_(h5_filename)
+	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config,  bool is_read_data, const string & h5_filename):filename_(h5_filename)
 	{
-		MemCytoFrame fr(fcs_filename, config, onlyTxt);
+		MemCytoFrame fr(fcs_filename, config, is_read_data);
 		fr.writeH5(h5_filename);
 		*this = H5CytoFrame(h5_filename);
 	}
@@ -177,13 +177,13 @@ public:
 	 * The caller will directly receive the data vector without the copy overhead thanks to the move semantics supported for vector container in c++11
 	 * @return
 	 */
-	EVENT_DATA_VEC getData() const{
+	EVENT_DATA_VEC get_data() const{
 		EVENT_DATA_VEC data(nCol() * nRow());
 		dataset.read(data.data(), PredType::NATIVE_FLOAT);
 
 		return data;
 	}
-	EVENT_DATA_VEC getData(const string & colname, ColType type) const{
+	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
 		int idx = getColId(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));

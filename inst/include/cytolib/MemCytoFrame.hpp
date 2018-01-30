@@ -9,7 +9,8 @@
 #define INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #include "CytoFrame.hpp"
 #include "readFCSdata.hpp"
-
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 namespace cytolib
 {
 /**
@@ -26,6 +27,10 @@ struct FCS_READ_PARAM{
 class MemCytoFrame: public CytoFrame{
 	EVENT_DATA_VEC data;//col-major
 
+	// below are cached for fcs parsing, should be of no usage once the data section is parsed
+	string filename_;
+	FCS_Header header_;
+
 public:
 	MemCytoFrame(){};
 	/**
@@ -35,10 +40,10 @@ public:
 	MemCytoFrame(const CytoFrame & frm)
 	{
 
-		keys.setPairs(frm.getKeywords());
+		keys = frm.get_keywords();
 		params = frm.get_params();
 		buildHash();
-		data = frm.getData();
+		data = frm.get_data();
 	}
 	/**
 	 * Constructor from the FCS file
@@ -47,71 +52,29 @@ public:
 	 * @param config the parse arguments.
 	 * @param onlyTxt flag indicates whether to only parse text segment (which contains the keywords)
 	 */
-	MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  bool onlyTxt = false){
+	MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  bool is_read_data = true):filename_(filename)
+	{
+
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("Reading "  + filename + "\n");
 		ifstream in(filename, ios::in|ios::binary);
 
 		if(!in.is_open())
 			throw(domain_error("can't open the file: " + filename + "\nPlease check if the path is normalized to be recognized by c++!"));
-		FCS_Header header;
+
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("Parsing FCS header \n");
-		readHeaderAndText(in, header, keys, params, config.header);
+		read_fcs_header_and_text(in, config.header);
 
 		buildHash();
 
-		if(!onlyTxt)
+		if(is_read_data)
 		{
 	//		double start = clock();
 			//parse the data section
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("Parsing FCS data section \n");
-			readFCSdata(in, data,header, keys, params, config.data);
+			read_fcs_data(in, config.data);
 
 	//		cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
-			//update min and max
-			/*
-			 * ## set transformed flag and fix the PnE and the Datatype keywords
-			 */
-			keys["FILENAME"] = filename;
-			if(config.data.isTransformed)
-			{
-				keys["transformation"] ="applied";
-				keys["$DATATYPE"] = "F";
-			}
-			for(unsigned i = 0; i < params.size(); i++)
-			{
-
-				string pid = to_string(i+1);
-
-				//insert our own PnR fields
-				if(config.data.isTransformed)
-				{
-					keys["$P" + pid + "E"] = "0,0";
-					params[i].PnE[0] = 0;
-					params[i].PnE[1] = 0;
-					keys["flowCore_$P" + pid + "Rmax"] = to_string(static_cast<int>(params[i].max + 1));
-					keys["flowCore_$P" + pid + "Rmin"] = to_string(static_cast<int>(params[i].min));
-				}
-				else
-					params[i].max--;
-			}
-
-
-
-			//GUID
-			string oldguid;
-			if(keys.find("GUID")!=keys.end()){
-				oldguid = keys["GUID"];
-				keys["ORIGINALGUID"] = oldguid;
-			}
-			else
-				oldguid = filename;
-			//strip dir
-			vector<string> paths;
-			boost::split(paths, oldguid, boost::is_any_of("/\\"));
-			keys["GUID"] = paths.back();
 
 		}
 
@@ -128,8 +91,11 @@ public:
 	 * @param params (input&output) the params parsed by readHeaderAndText
 	 * @param config (input) the parsing arguments for data
 	 */
-	void readFCSdata(ifstream &in, EVENT_DATA_VEC & output, const FCS_Header & header,KEY_WORDS & keys, vector<cytoParam> & params,  FCS_READ_DATA_PARAM & config)
+	void read_fcs_data(ifstream &in, const FCS_READ_DATA_PARAM & config)
 	{
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("Parsing FCS data section \n");
+
 		//## transform or scale data?
 		  bool fcsPnGtransform = false, isTransformation, scale;
 		  if(config.transform == TransformType::linearize)
@@ -242,9 +208,9 @@ public:
 //
 
 
-	  in.seekg(header.datastart);
+	  in.seekg(header_.datastart);
 
-	  int nBytes = header.dataend - header.datastart + 1;
+	  int nBytes = header_.dataend - header_.datastart + 1;
 
 
 	//	vector<BYTE>bytes(nBytes);
@@ -275,8 +241,8 @@ public:
 	  		auto nRowSizeBytes = nRowSize/8;
 	  		for(auto i : which_lines)
 	  		{
-	  			int pos =  header.datastart + i * nRowSizeBytes;
-	  			if(pos > header.dataend || pos < header.datastart)
+	  			int pos =  header_.datastart + i * nRowSizeBytes;
+	  			if(pos > header_.dataend || pos < header_.datastart)
 	  				throw(domain_error("the index of which.lines exceeds the data boundary: " + to_string(i)));
 	  			in.seekg(pos);
 	  			in.read(thisBufPtr, nRowSizeBytes);
@@ -293,7 +259,7 @@ public:
 		//how many element to return
 	  	size_t nElement = nrow * nCol;
 	//	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
-		output.resize(nElement);
+	  	data.resize(nElement);
 
 	//	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 		float decade = pow(10, config.decades);
@@ -373,7 +339,7 @@ public:
 		      //convert each element
 				  auto thisSize = param.PnB;
 				  size_t idx = element_offset + r;
-				  EVENT_DATA_TYPE & outElement = output[idx];
+				  EVENT_DATA_TYPE & outElement = data[idx];
 				  size_t idx_bits = r * nRowSize + bits_offset;
 				  char *p = bufPtr + idx_bits/8;
 				  thisSize/=8;
@@ -560,11 +526,54 @@ public:
 
 
 		}
-		config.isTransformed = isTransformation;
+//		config.isTransformed = isTransformation;
 
+		//update min and max
+		/*
+		 * ## set transformed flag and fix the PnE and the Datatype keywords
+		 */
+		keys["FILENAME"] = filename_;
+		if(isTransformation)
+		{
+			keys["transformation"] ="applied";
+			keys["$DATATYPE"] = "F";
+		}
+		for(unsigned i = 0; i < params.size(); i++)
+		{
+
+			string pid = to_string(i+1);
+
+			//insert our own PnR fields
+			if(isTransformation)
+			{
+				keys["$P" + pid + "E"] = "0,0";
+				params[i].PnE[0] = 0;
+				params[i].PnE[1] = 0;
+				keys["flowCore_$P" + pid + "Rmax"] = to_string(static_cast<int>(params[i].max + 1));
+				keys["flowCore_$P" + pid + "Rmin"] = to_string(static_cast<int>(params[i].min));
+			}
+			else
+				params[i].max--;
+		}
+
+
+
+		//GUID
+		string oldguid;
+		if(keys.find("GUID")!=keys.end()){
+			oldguid = keys["GUID"];
+			keys["ORIGINALGUID"] = oldguid;
+		}
+		else
+			oldguid = filename_;
+		//strip dir
+//			vector<string> paths;
+//			boost::split(paths, oldguid, boost::is_any_of("/\\"));
+//			keys["GUID"] = paths.back();
+		keys["GUID"] = fs::path(oldguid).filename();
 
 	}
-	void readFCSHeader(ifstream &in, FCS_Header & header, int nOffset = 0){
+	void read_fcs_header(ifstream &in, int nOffset = 0){
 		/*
 			 * parse the header
 			 */
@@ -577,7 +586,7 @@ public:
 		    if(strcmp(version, "FCS2.0")!=0&&strcmp(version, "FCS3.0")!=0&&strcmp(version, "FCS3.1")!=0)
 			     throw(domain_error("This does not seem to be a valid FCS2.0, FCS3.0 or FCS3.1 file"));
 
-		    header.FCSversion = boost::lexical_cast<float>(version+3);
+		    header_.FCSversion = boost::lexical_cast<float>(version+3);
 
 		    char tmp[5];
 		    in.get(tmp, 5);
@@ -591,45 +600,45 @@ public:
 			//skip whitespaces
 			copy(tmp1, tmp1+8, tmp2.begin());
 			boost::trim(tmp2);
-		    header.textstart = boost::lexical_cast<int>(tmp2) + nOffset;
+		    header_.textstart = boost::lexical_cast<int>(tmp2) + nOffset;
 
 		    in.get(tmp1, 9);
 		    tmp2.resize(8);
 		    copy(tmp1, tmp1+8, tmp2.begin());
 			boost::trim(tmp2);
-			header.textend = boost::lexical_cast<int>(tmp2) + nOffset;
+			header_.textend = boost::lexical_cast<int>(tmp2) + nOffset;
 
 			in.get(tmp1, 9);
 			tmp2.resize(8);
 			copy(tmp1, tmp1+8, tmp2.begin());
 			boost::trim(tmp2);
-			header.datastart = boost::lexical_cast<int>(tmp2) + nOffset;
+			header_.datastart = boost::lexical_cast<int>(tmp2) + nOffset;
 
 			in.get(tmp1, 9);
 			tmp2.resize(8);
 			copy(tmp1, tmp1+8, tmp2.begin());
 			boost::trim(tmp2);
-			header.dataend = boost::lexical_cast<int>(tmp2) + nOffset;
-
-			in.get(tmp1, 9);
-			tmp2.resize(8);
-			copy(tmp1, tmp1+8, tmp2.begin());
-			boost::trim(tmp2);
-			if(tmp2.size()>0)
-				header.anastart = boost::lexical_cast<int>(tmp2) + nOffset;
+			header_.dataend = boost::lexical_cast<int>(tmp2) + nOffset;
 
 			in.get(tmp1, 9);
 			tmp2.resize(8);
 			copy(tmp1, tmp1+8, tmp2.begin());
 			boost::trim(tmp2);
 			if(tmp2.size()>0)
-				header.anaend = boost::lexical_cast<int>(tmp2) + nOffset;
+				header_.anastart = boost::lexical_cast<int>(tmp2) + nOffset;
 
-			header.additional = nOffset;
+			in.get(tmp1, 9);
+			tmp2.resize(8);
+			copy(tmp1, tmp1+8, tmp2.begin());
+			boost::trim(tmp2);
+			if(tmp2.size()>0)
+				header_.anaend = boost::lexical_cast<int>(tmp2) + nOffset;
+
+			header_.additional = nOffset;
 
 	}
 
-	void fcsTextParse(string txt, KEY_WORDS & pairs, bool emptyValue){
+	void parse_fcs_text(string txt, bool emptyValue){
 		/*
 		 * get the first character as delimiter
 		 */
@@ -696,7 +705,7 @@ public:
 				key = token;//set key
 			}
 			else{
-				pairs[key] = token;//set value
+				keys[key] = token;//set value
 
 			}
 
@@ -717,8 +726,8 @@ public:
 
 	}
 
-	void readFCStext(ifstream &in, const FCS_Header & header, KEY_WORDS & pairs, bool emptyValue){
-		 in.seekg(header.textstart);
+	void read_fcs_txt(ifstream &in, bool emptyValue){
+		 in.seekg(header_.textstart);
 		    /**
 		     *  Certain software (e.g. FlowJo 8 on OS X) likes to put characters into
 		    files that readChar can't read, yet readBin, rawToChar and iconv can
@@ -726,16 +735,16 @@ public:
 		     */
 	//	    txt <- readBin(con,"raw", offsets["textend"]-offsets["textstart"]+1)
 	//	    txt <- iconv(rawToChar(txt), "", "latin1", sub="byte")
-		 int nTxt = header.textend - header.textstart + 1;
+		 int nTxt = header_.textend - header_.textstart + 1;
 		 char * tmp = new char[nTxt + 1];
 		 in.read(tmp, nTxt);//can't use in.get since it will stop at newline '\n' which could be present in FCS TXT
 		 tmp[nTxt]='\0';//make it as c_string
 		 string txt(tmp);
 		 delete [] tmp;
-	     fcsTextParse(txt, pairs, emptyValue);
+	     parse_fcs_text(txt, emptyValue);
 
-		if(pairs.find("FCSversion")==pairs.end())
-		  pairs["FCSversion"] = boost::lexical_cast<string>(header.FCSversion);
+		if(keys.find("FCSversion")==keys.end())
+			keys["FCSversion"] = boost::lexical_cast<string>(header_.FCSversion);
 
 	}
 
@@ -748,7 +757,7 @@ public:
 	 * @param params (output) cytoParam container to store the parsed parameters
 	 * @param config (input) FCS_READ_HEADER_PARAM object gives the parsing arguments for header
 	 */
-	void readHeaderAndText(ifstream &in,FCS_Header & header, KEY_WORDS & keys, vector<cytoParam> & params, const FCS_READ_HEADER_PARAM & config){
+	void read_fcs_header_and_text(ifstream &in, const FCS_READ_HEADER_PARAM & config){
 
 
 		 //search the stream for the header and txt of the nth DataSet
@@ -758,8 +767,8 @@ public:
 		for(int i = 1; i <= n; i++)
 		{
 			nOffset += nNextdata;
-			readFCSHeader(in,header, nOffset);//read the header
-			readFCStext(in, header, keys, config.isEmptyKeyValue);//read the txt section
+			read_fcs_header(in, nOffset);//read the header
+			read_fcs_txt(in, config.isEmptyKeyValue);//read the txt section
 
 			if(keys.find("$NEXTDATA")!=keys.end()){
 				string nd = keys["$NEXTDATA"];
@@ -790,10 +799,10 @@ public:
 		 * checkOffset:Fix the offset when its values recorded in header and TEXT don't agree
 		 */
 		//##for DATA segment exceeding 99,999,999 byte.
-		 if(header.FCSversion >= 3)
+		 if(header_.FCSversion >= 3)
 		 {
-			 unsigned long datastart_h = header.datastart - header.additional;
-			 unsigned long dataend_h = header.dataend - header.additional;
+			 unsigned long datastart_h = header_.datastart - header_.additional;
+			 unsigned long dataend_h = header_.dataend - header_.additional;
 
 		//
 		//   # Let's not be too strick here as unfortunatelly, some files exported from FlowJo
@@ -835,12 +844,12 @@ public:
 		//   # when both are present and they don't agree with each other
 		   if(datastart_h != datastart)
 		   {
-			  if(datastart_h== 0) //#use the TEXT when header is 0
-				  header.datastart =  datastart + header.additional;
+			  if(datastart_h== 0) //#use the TEXT when header_ is 0
+				  header_.datastart =  datastart + header_.additional;
 			  else
 			  {//#trust the header when it is non-zero
 				  string msg = "The HEADER and the TEXT segment define different starting point (";
-				  msg.append(boost::lexical_cast<string>(header.datastart) + ":" + boost::lexical_cast<string>(datastart) + ") to read the data.");
+				  msg.append(boost::lexical_cast<string>(header_.datastart) + ":" + boost::lexical_cast<string>(datastart) + ") to read the data.");
 				 if(config.ignoreTextOffset)
 				 {
 					 msg.append(" The values in TEXT are ignored!\n");
@@ -853,12 +862,12 @@ public:
 		//   #both are present and they don't agree
 		   if(dataend_h != dataend)
 		   {
-			   if(dataend_h== 0 || dataend_h== 99999999)//#use TEXT when either header is 0 or TEXT is 99999999
-				header.dataend = dataend + header.additional;
+			   if(dataend_h== 0 || dataend_h== 99999999)//#use TEXT when either header_ is 0 or TEXT is 99999999
+				header_.dataend = dataend + header_.additional;
 			   else
 				{//#otherwise trust the header
 					string msg = "The HEADER and the TEXT segment define different ending point (";
-					msg.append(boost::lexical_cast<string>(header.dataend) + ":" + boost::lexical_cast<string>(dataend) + ") to read the data.");
+					msg.append(boost::lexical_cast<string>(header_.dataend) + ":" + boost::lexical_cast<string>(dataend) + ") to read the data.");
 					if(config.ignoreTextOffset)
 					 {
 						 msg.append(" The values in TEXT are ignored!\n");
@@ -947,10 +956,10 @@ public:
  * Caller will receive a copy of data
  * @return
  */
-	EVENT_DATA_VEC getData() const{
+	EVENT_DATA_VEC get_data() const{
 		return data;
 	}
-	EVENT_DATA_VEC getData(const string & colname, ColType type) const{
+	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
 		int idx = getColId(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));

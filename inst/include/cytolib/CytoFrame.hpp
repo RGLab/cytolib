@@ -78,7 +78,7 @@ public:
 	{
 
 		int nMarker = comp.marker.size();
-		EVENT_DATA_VEC dat = getData();
+		EVENT_DATA_VEC dat = get_data();
 		arma::mat A(dat.data(), nRow(), nCol(), false, true);//point to the original data
 //		A.rows(1,3).print("\ndata");
 		mat B = comp.get_spillover_mat();
@@ -216,14 +216,14 @@ public:
 		* Write the data to the dataset using default memory space, file
 		* space, and transfer properties.
 		*/
-		dataset.write(&getData()[0], PredType::NATIVE_FLOAT );
+		dataset.write(&get_data()[0], PredType::NATIVE_FLOAT );
 	}
 
 	/**
 	 * get the data of entire event matrix
 	 * @return
 	 */
-	virtual EVENT_DATA_VEC getData() const=0;
+	virtual EVENT_DATA_VEC get_data() const=0;
 	/**
 	 * get the data for the single channel
 	 *
@@ -232,7 +232,7 @@ public:
 	 * when ColType::unknown, both types will be tried for the column match.
 	 * @return
 	 */
-	virtual EVENT_DATA_VEC getData(const string & colname, ColType type) const=0;
+	virtual EVENT_DATA_VEC get_data(const string & colname, ColType type) const=0;
 	virtual void setData(const EVENT_DATA_VEC &)=0;
 	virtual void setData(EVENT_DATA_VEC &&)=0;
 	/**
@@ -240,8 +240,8 @@ public:
 	 *
 	 * @return a vector of pairs of strings
 	 */
-	 virtual const KW_PAIR & getKeywords() const{
-		return keys.getPairs();
+	 virtual const KEY_WORDS & get_keywords() const{
+		return keys;
 	}
 	/**
 	 * extract the value of the single keyword by keyword name
@@ -249,7 +249,7 @@ public:
 	 * @param key keyword name
 	 * @return keyword value as a string
 	 */
-	virtual string getKeyword(const string & key) const
+	virtual string get_keyword(const string & key) const
 	{
 		string res="";
 		auto it = keys.find(key);
@@ -263,7 +263,7 @@ public:
 	 * @param key keyword name
 	 * @param value keyword value
 	 */
-	virtual void setKeyword(const string & key, const string & value)
+	virtual void set_keyword(const string & key, const string & value)
 	{
 		keys[key] = value;
 	}
@@ -436,7 +436,7 @@ public:
 		case RangeType::data:
 			{
 
-				EVENT_DATA_VEC vec = getData(colname, ctype);
+				EVENT_DATA_VEC vec = get_data(colname, ctype);
 				EVENT_DATA_TYPE * data = &vec[0];
 				auto res = minmax_element(data, data + nRow());
 				return make_pair(*res.first, *res.second);
