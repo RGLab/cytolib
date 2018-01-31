@@ -230,4 +230,17 @@ BOOST_AUTO_TEST_CASE(newline_in_txt)
 	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 9220, 1e-6);
 
 }
+BOOST_AUTO_TEST_CASE(samples_F1)
+{
+
+
+	string filename="../flowWorkspace/wsTestSuite/McGill/Treg/samples_F1.fcs";
+	FCS_READ_PARAM config;
+
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1000000);
+	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 60981.75, 1e-6);
+
+}
 BOOST_AUTO_TEST_SUITE_END()

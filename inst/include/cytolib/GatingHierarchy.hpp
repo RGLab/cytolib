@@ -101,8 +101,7 @@ private:
 						we can try uBlas for this simple task, but when cid=="-1",we still need to
 						do this in R since comp is extracted from FCS keyword (unless it can be optionally extracted from workspace keyword)
 	 	 	 	 	  */
-	MemCytoFrame fdata; /* in-memory version copy frm, loaded on demand */
-	unique_ptr<CytoFrame> frmPtr;
+	H5CytoFrame cytoframe_;
 	populationTree tree; /**< the gating tree */
 
 	PARAM_VEC transFlag; /*< for internal use of parse flowJo workspace */
@@ -112,29 +111,29 @@ public:
 	 /**
 		  * forwarding APIs
 		  */
-		vector<string> getChannels(){return frmPtr->getChannels();};
+		vector<string> getChannels(){return cytoframe_.getChannels();};
 
 
 		//* forward to the first element's getChannels
-		vector<string> getMarkers(){return frmPtr->getMarkers();};
+		vector<string> getMarkers(){return cytoframe_.getMarkers();};
 
 		void setMarker(const string & _old, const string & _new){
-			frmPtr->setMarker(_old, _new);
+			cytoframe_.setMarker(_old, _new);
 		};
 		void setChannel(const string & _old, const string & _new){
 
 			updateChannels(CHANNEL_MAP({{_old, _new}}));
 
 		}
-		int nCol(){return frmPtr->nCol();}
-		int nRow(){return frmPtr->nRow();}
+		int nCol(){return cytoframe_.nCol();}
+		int nRow(){return cytoframe_.nRow();}
 		/**
 		 * Get the reference of cytoFrame
 		 * @return
 		 */
-		CytoFrame & get_frm_ref()
+		CytoFrame & get_cytoframe_ref()
 		{
-			return *frmPtr;
+			return cytoframe_;
 		}
 		/**
 		 * extract in-memory data from a node
@@ -158,46 +157,49 @@ public:
 	 * move setter
 	 * @param _frm
 	 */
-	void set_frame_ptr(unique_ptr<CytoFrame> && _frmPtr)
+	void set_cytoframe(const H5CytoFrame & cytoframe)
 	{
-		frmPtr = _frmPtr;
+		cytoframe_ = cytoframe;
 	}
-
-	/**
-	 * load the in-memory copy of frm
-	 */
-		void load_fdata_cache()
-			{
-				if(fdata.nRow()==0)
-				{
-					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-						PRINT("loading data into memory..\n");
-					fdata = MemCytoFrame(*frmPtr);
-				}
-			}
-
-	void release_fdata_cache(bool flush)
+	void set_cytoframe(const string & h5_file)
 	{
-		{
-
-			if(fdata.nRow()>0)
-			{
-				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-					PRINT("unloading raw data..\n");
-				if(flush)
-				{
-					frmPtr->setData(fdata.get_data());
-					frmPtr->set_params(fdata.get_params());
-					frmPtr->set_pheno_data(fdata.get_pheno_data());
-				}
-				fdata = MemCytoFrame();
-			}
-
-
-
-		}
+		cytoframe_ = H5CytoFrame(h5_file);
 	}
-
+//	/**
+//	 * load the in-memory copy of frm
+//	 */
+//	void load_fdata_cache()
+//	{
+//		if(cytoframe_cache_.nRow()==0)
+//		{
+//			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+//				PRINT("loading data into memory..\n");
+//			cytoframe_cache_ = MemCytoFrame(cytoframe_);
+//		}
+//	}
+//
+//	void release_fdata_cache(bool flush)
+//	{
+//		{
+//
+//			if(cytoframe_cache_.nRow()>0)
+//			{
+//				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+//					PRINT("unloading raw data..\n");
+//				if(flush)
+//				{
+//					cytoframe_.setData(cytoframe_cache_.get_data());
+//					cytoframe_.set_params(cytoframe_cache_.get_params());
+//					cytoframe_.set_pheno_data(cytoframe_cache_.get_pheno_data());
+//				}
+//				cytoframe_cache_ = MemCytoFrame();
+//			}
+//
+//
+//
+//		}
+//	}
+//
 	/**
 	 * setter for channels
 	 * @param chnl_map
@@ -205,7 +207,7 @@ public:
 	void updateChannels(const CHANNEL_MAP & chnl_map)
 	{
 		//update flow data
-		frmPtr->updateChannels(chnl_map);
+		cytoframe_.updateChannels(chnl_map);
 
 		//update comp
 		comp.updateChannels(chnl_map);
@@ -247,7 +249,7 @@ public:
 	 * or FCS TEXT keyword
 	 * add prefix (e.g. Comp_ or <>) to channel name of the data
 	 */
-	void compensate()
+	void compensate(MemCytoFrame & cytoframe)
 	{
 		if(comp.cid == "-2" || comp.cid == "")
 		{
@@ -262,7 +264,7 @@ public:
 			/**
 			 * compensate with spillover defined in keyword
 			 */
-			set_compensation(fdata.get_compensation());
+			set_compensation(cytoframe.get_compensation());
 			//TODO:fix slash in compensation parameters for vX
 			//currently I have not figured out the clean way to pass is_fix_slash flag from ws
 			//this scenario may never occur so we won't bother the fix it until it bites us
@@ -272,14 +274,14 @@ public:
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("Compensating...\n");
 
-		fdata.compensate(comp);
+		cytoframe.compensate(comp);
 
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("start prefixing data columns\n");
 
 		for(const string & old : comp.marker)
 		{
-			fdata.setChannel(old, comp.prefix + old + comp.suffix);
+			cytoframe.setChannel(old, comp.prefix + old + comp.suffix);
 		}
 
 
@@ -291,17 +293,17 @@ public:
 	/**
 	 * transform the data
 	 */
-	void transform_data()
+	void transform_data(MemCytoFrame & cytoframe)
 	{
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("start transforming data \n");
-		if(fdata.nRow()==0)
+		if(cytoframe.nRow()==0)
 			throw(domain_error("data is not loaded yet!"));
 
 	//	unsigned nEvents=fdata.nEvents;
 	//	unsigned nChannls=fdata.nChannls;
-		vector<string> channels=fdata.getChannels();
-		int nEvents = fdata.nRow();
+		vector<string> channels=cytoframe.getChannels();
+		int nEvents = cytoframe.nRow();
 		/*
 		 * transforming each marker
 		 */
@@ -309,13 +311,13 @@ public:
 		{
 
 			string curChannel=*it1;
-			auto param_range = fdata.get_range(curChannel, ColType::channel, RangeType::instrument);
+			auto param_range = cytoframe.get_range(curChannel, ColType::channel, RangeType::instrument);
 			if(curChannel=="Time"||curChannel=="time"){
 				//special treatment for time channel
-				EVENT_DATA_TYPE timestep = frmPtr->get_time_step(curChannel);
+				EVENT_DATA_TYPE timestep = cytoframe.get_time_step(curChannel);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("multiplying "+curChannel+" by :"+ to_string(timestep) + "\n");
-				EVENT_DATA_TYPE * x = this->fdata.subset(curChannel, ColType::channel);
+				EVENT_DATA_TYPE * x = cytoframe.subset(curChannel, ColType::channel);
 				for(int i = 0; i < nEvents; i++)
 					x[i] = x[i] * timestep;
 				param_range.first = param_range.first * timestep;
@@ -331,7 +333,7 @@ public:
 							if(curTrans->gateOnly())
 								continue;
 
-							EVENT_DATA_TYPE * x = fdata.subset(curChannel, ColType::channel);
+							EVENT_DATA_TYPE * x = cytoframe.subset(curChannel, ColType::channel);
 							if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 								PRINT("transforming "+curChannel+" with func:"+curTrans->getChannel()+"\n");
 
@@ -344,7 +346,7 @@ public:
 
 			}
 
-			fdata.set_range(curChannel, ColType::channel, param_range);
+			cytoframe.set_range(curChannel, ColType::channel, param_range);
 
 		}
 
@@ -352,7 +354,7 @@ public:
 	}
 
 
-	void calgate(VertexID u, bool computeTerminalBool, INTINDICES &parentIndice)
+	void calgate(MemCytoFrame & cytoframe, VertexID u, bool computeTerminalBool, INTINDICES &parentIndice)
 	{
 		nodeProperties & node=getNodeProperty(u);
 
@@ -365,7 +367,7 @@ public:
 	//	{
 	//		if(g_loglevel>=POPULATION_LEVEL)
 	//			PRINT("go to the ungated parent node:"+parentNode.getName()+"\n");
-	//		calgate(pid, computeTerminalBool);
+	//		calgate(cytoframe, pid, computeTerminalBool);
 	//	}
 	//
 
@@ -391,7 +393,7 @@ public:
 
 
 					vector<bool> curIndices;
-					curIndices=boolGating(u, computeTerminalBool);
+					curIndices=boolGating(cytoframe, u, computeTerminalBool);
 					//combine with parent indices
 					VertexID pid=getParent(u);
 					nodeProperties & parentNode =getNodeProperty(pid);
@@ -414,7 +416,7 @@ public:
 		default:
 			{
 				vector<unsigned> pind = parentIndice.getIndices_u();
-				vector<unsigned> curIndices=g->gating(fdata, pind);
+				vector<unsigned> curIndices=g->gating(cytoframe, pind);
 				node.setIndices(curIndices, parentIndice.getTotal());
 			}
 
@@ -425,11 +427,11 @@ public:
 		node.computeStats();
 	}
 
-	void extendGate(float extend_val){
+	void extendGate(MemCytoFrame & cytoframe, float extend_val){
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\nstart extending Gates \n");
 
-			if(fdata.nRow()==0)
+			if(cytoframe.nRow()==0)
 					throw(domain_error("data is not loaded yet!"));
 
 			VertexID_vec vertices=getVertices(0);
@@ -446,7 +448,7 @@ public:
 					if(g_loglevel>=POPULATION_LEVEL)
 						PRINT(node.getName()+"\n");
 					if(g->getType()!=BOOLGATE)
-						g->extend(fdata,extend_val);
+						g->extend(cytoframe,extend_val);
 				}
 			}
 	}
@@ -455,25 +457,38 @@ public:
 		 * , customized copy and assignment constructor is required
 		 *
 		 */
-	GatingHierarchy(const GatingHierarchy & _gh)
-	{
-		comp = _gh.comp;
-
-		tree = _gh.tree;
-		transFlag = _gh.transFlag;
-		trans = _gh.trans;
-
-	}
-	GatingHierarchy & operator=(GatingHierarchy _gh){
-			std::swap(comp, _gh.comp);
-			std::swap(tree, _gh.tree);
-			std::swap(transFlag, _gh.transFlag);
-			std::swap(trans, _gh.trans);
-
-
-			return *this;
-
-		}
+//	GatingHierarchy(const GatingHierarchy & _gh)
+//	{
+//		comp = _gh.comp;
+//
+//		tree = _gh.tree;
+//		transFlag = _gh.transFlag;
+//		trans = _gh.trans;
+////		cytoframe_.reset(_gh.cytoframe_.clone());
+//	}
+//	GatingHierarchy & operator=(GatingHierarchy && _gh){
+//			std::swap(comp, _gh.comp);
+//			std::swap(tree, _gh.tree);
+//			std::swap(transFlag, _gh.transFlag);
+//			std::swap(trans, _gh.trans);
+//
+////			swap(cytoframe_, _gh.cytoframe_);
+//			return *this;
+//
+//		}
+//
+//	GatingHierarchy & operator=(const GatingHierarchy & _gh){
+//		comp = _gh.comp;
+//
+//		tree = _gh.tree;
+//		transFlag = _gh.transFlag;
+//		trans = _gh.trans;
+//
+//
+////			swap(cytoframe_, _gh.cytoframe_);
+//			return *this;
+//
+//		}
 	/**
 	 * default constructor that creates an empty gating tree
 	 *
@@ -768,7 +783,7 @@ public:
 	 * assuming data have already been compensated and transformed
 	 *
 	 */
-	void gating(VertexID u,bool recompute=false, bool computeTerminalBool=true)
+	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute=false, bool computeTerminalBool=true)
 	{
 		//get parent ind
 		INTINDICES parentIndice;
@@ -782,15 +797,15 @@ public:
 			 *
 			 */
 			if(!node.isGated())
-				gating(u, recompute, computeTerminalBool);
+				gating(cytoframe, u, recompute, computeTerminalBool);
 
 			parentIndice = INTINDICES(node.getIndices());
 
 		}
 
-		gating(u, recompute, computeTerminalBool, parentIndice);
+		gating(cytoframe, u, recompute, computeTerminalBool, parentIndice);
 	}
-	void gating(VertexID u,bool recompute, bool computeTerminalBool, INTINDICES &parentIndice)
+	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute, bool computeTerminalBool, INTINDICES &parentIndice)
 	{
 
 	//	if(!isLoaded)
@@ -800,7 +815,7 @@ public:
 		nodeProperties & node=getNodeProperty(u);
 		if(u==0)
 		{
-			node.setIndices(frmPtr->nRow());
+			node.setIndices(cytoframe.nRow());
 			node.computeStats();
 		}else
 		{
@@ -809,7 +824,7 @@ public:
 			 *
 			 */
 			if(recompute||!node.isGated())
-				calgate(u, computeTerminalBool, parentIndice);
+				calgate(cytoframe, u, computeTerminalBool, parentIndice);
 
 		}
 
@@ -823,7 +838,7 @@ public:
 				//add boost node
 				VertexID curChildID = *it;
 
-				gating(curChildID,recompute, computeTerminalBool, pind);
+				gating(cytoframe, curChildID,recompute, computeTerminalBool, pind);
 			}
 
 		}
@@ -837,7 +852,7 @@ public:
 	 * @return
 	 */
 
-	vector<bool> boolGating(VertexID u, bool computeTerminalBool){
+	vector<bool> boolGating(MemCytoFrame & cytoframe, VertexID u, bool computeTerminalBool){
 
 		nodeProperties & node=getNodeProperty(u);
 		gate * g=node.getGate();
@@ -879,7 +894,7 @@ public:
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("go to the ungated reference node:"+curPop.getName()+"\n");
-				gating(nodeID, true, computeTerminalBool);
+				gating(cytoframe, nodeID, true, computeTerminalBool);
 			}
 
 			vector<bool> curPopInd=curPop.getIndices();
@@ -924,7 +939,7 @@ public:
 	 * @param boolOpSpec
 	 * @return
 	 */
-	vector<bool> boolGating(vector<BOOL_GATE_OP> boolOpSpec, bool computeTerminalBool){
+	vector<bool> boolGating(MemCytoFrame & cytoframe, vector<BOOL_GATE_OP> boolOpSpec, bool computeTerminalBool){
 
 		vector<bool> ind;
 		/*
@@ -952,7 +967,7 @@ public:
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("go to the ungated reference node:"+curPop.getName()+"\n");
-				gating(nodeID, true, computeTerminalBool);
+				gating(cytoframe, nodeID, true, computeTerminalBool);
 			}
 
 			vector<bool> curPopInd=curPop.getIndices();

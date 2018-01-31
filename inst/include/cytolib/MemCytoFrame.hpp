@@ -25,13 +25,13 @@ struct FCS_READ_PARAM{
  * The class represents the in-memory version of CytoFrame, which stores and owns the events data
  */
 class MemCytoFrame: public CytoFrame{
-	EVENT_DATA_VEC data;//col-major
+	EVENT_DATA_VEC data_;//col-major
 
 	// below are cached for fcs parsing, should be of no usage once the data section is parsed
 	string filename_;
 	FCS_READ_PARAM config_;
 	FCS_Header header_;
-	ifstream in_;
+	ifstream in_;//because of this member, the class needs to explicitly define copy/assignment constructor
 
 	void parse_fcs_header(ifstream &in, int nOffset = 0)
 	{
@@ -166,7 +166,7 @@ class MemCytoFrame: public CytoFrame{
 				key = token;//set key
 			}
 			else{
-				keys[key] = token;//set value
+				keys_[key] = token;//set value
 
 			}
 
@@ -204,8 +204,8 @@ class MemCytoFrame: public CytoFrame{
 		 delete [] tmp;
 	     string_to_keywords(txt, emptyValue);
 
-		if(keys.find("FCSversion")==keys.end())
-			keys["FCSversion"] = boost::lexical_cast<string>(header_.FCSversion);
+		if(keys_.find("FCSversion")==keys_.end())
+			keys_["FCSversion"] = boost::lexical_cast<string>(header_.FCSversion);
 
 	}
 	void open_fcs_file()
@@ -222,18 +222,59 @@ class MemCytoFrame: public CytoFrame{
 		}
 	}
 public:
-	MemCytoFrame(){};
+	MemCytoFrame(){}
+	MemCytoFrame(const MemCytoFrame & frm):CytoFrame(frm)
+	{
+		filename_ = frm.filename_;
+		config_ = frm.config_;
+		header_ = frm.header_;
+		data_ = frm.data_;
+	}
+	MemCytoFrame & operator=(const MemCytoFrame & frm)
+	{
+		pheno_data_ = frm.pheno_data_;
+		keys_ = frm.keys_;
+		params = frm.params;
+		channel_vs_idx = frm.channel_vs_idx;
+		marker_vs_idx = frm.marker_vs_idx;
+		filename_ = frm.filename_;
+		config_ = frm.config_;
+		header_ = frm.header_;
+		data_ = frm.data_;
+		return *this;
+	}
+	MemCytoFrame(MemCytoFrame && frm)
+	{
+		swap(pheno_data_, frm.pheno_data_);
+		swap(keys_, frm.keys_);
+		swap(params, frm.params);
+		swap(channel_vs_idx, frm.channel_vs_idx);
+		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(filename_, frm.filename_);
+		swap(config_, frm.config_);
+		swap(header_, frm.header_);
+		swap(data_, frm.data_);
+	}
+	MemCytoFrame & operator=(MemCytoFrame && frm)
+	{
+		swap(pheno_data_, frm.pheno_data_);
+		swap(keys_, frm.keys_);
+		swap(params, frm.params);
+		swap(channel_vs_idx, frm.channel_vs_idx);
+		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(filename_, frm.filename_);
+		swap(config_, frm.config_);
+		swap(header_, frm.header_);
+		swap(data_, frm.data_);
+		return *this;
+	}
 	/**
 	 * Constructor from a generic CytoFrame object
 	 * @param frm a reference to CytoFrame
 	 */
-	MemCytoFrame(const CytoFrame & frm)
+	MemCytoFrame(const CytoFrame & frm):CytoFrame(frm)
 	{
-
-		keys = frm.get_keywords();
-		params = frm.get_params();
-		buildHash();
-		data = frm.get_data();
+		data_ = frm.get_data();
 	}
 	/**
 	 * Constructor from the FCS file
@@ -242,9 +283,7 @@ public:
 	 * @param config the parse arguments.
 	 * @param onlyTxt flag indicates whether to only parse text segment (which contains the keywords)
 	 */
-	MemCytoFrame(const string &filename, FCS_READ_PARAM & config):filename_(filename),config_(config)
-	{
-	}
+	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){}
 
 	void read_fcs()
 	{
@@ -291,14 +330,14 @@ public:
 		  }
 
 		  if (fcsPnGtransform)
-			  keys["flowCore_fcsPnGtransform"] = "linearize-with-PnG-scaling";
-		  bool transDefinedinKeys = keys.find("transformation")!=keys.end();
+			  keys_["flowCore_fcsPnGtransform"] = "linearize-with-PnG-scaling";
+		  bool transDefinedinKeys = keys_.find("transformation")!=keys_.end();
 		 if(transDefinedinKeys)
-			 if(keys["transformation"] == "applied"||keys["transformation"] ==  "custom")
+			 if(keys_["transformation"] == "applied"||keys_["transformation"] ==  "custom")
 				 isTransformation =  false;
 
 
-		string byte_order = keys["$BYTEORD"];
+		string byte_order = keys_["$BYTEORD"];
 		endianType endian;
 		if(byte_order == "4,3,2,1" || byte_order == "2,1")
 			endian = endianType::big;
@@ -309,18 +348,18 @@ public:
 
 
 
-		 string dattype = keys["$DATATYPE"];
+		 string dattype = keys_["$DATATYPE"];
 		 if(dattype!="I"&&dattype!="F"&&dattype!="D")
 			 throw(domain_error("Don't know how to deal with $DATATYPE"));
 
 
-	    if (keys["$MODE"] != "L")
-	    	throw(domain_error("Don't know how to deal with $MODE " + keys["$MODE"]));
+	    if (keys_["$MODE"] != "L")
+	    	throw(domain_error("Don't know how to deal with $MODE " + keys_["$MODE"]));
 
 
-		fcsPnGtransform = keys.find("flowCore_fcsPnGtransform")!= keys.end() && keys["flowCore_fcsPnGtransform"] == "linearize-with-PnG-scaling";
+		fcsPnGtransform = keys_.find("flowCore_fcsPnGtransform")!= keys_.end() && keys_["flowCore_fcsPnGtransform"] == "linearize-with-PnG-scaling";
 
-	//	int nrowTotal= boost::lexical_cast<int>(keys["$TOT"]);
+	//	int nrowTotal= boost::lexical_cast<int>(keys_["$TOT"]);
 		int nCol = params.size();
 
 		bool multiSize = false;
@@ -357,7 +396,7 @@ public:
 
 		if(!multiSize){
 		  if(params[0].PnB ==10){
-			  string sys = keys["$SYS"];
+			  string sys = keys_["$SYS"];
 			  transform(sys.begin(), sys.end(), sys.begin(),::tolower);
 			if(sys !=  "cxp")
 			  PRINT("Invalid bitwidth specification.\nThis is a known bug in Beckman Coulter's CPX software.\nThe data might be corrupted if produced by another software.\n");
@@ -435,7 +474,7 @@ public:
 		//how many element to return
 	  	size_t nElement = nrow * nCol;
 	//	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
-	  	data.resize(nElement);
+	  	data_.resize(nElement);
 
 	//	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 		float decade = pow(10, config.decades);
@@ -515,7 +554,7 @@ public:
 		      //convert each element
 				  auto thisSize = param.PnB;
 				  size_t idx = element_offset + r;
-				  EVENT_DATA_TYPE & outElement = data[idx];
+				  EVENT_DATA_TYPE & outElement = data_[idx];
 				  size_t idx_bits = r * nRowSize + bits_offset;
 				  char *p = bufPtr + idx_bits/8;
 				  thisSize/=8;
@@ -659,8 +698,8 @@ public:
 
 		    }
 
-			if(keys.find("transformation")!=keys.end() &&  keys["transformation"] == "custom")
-				param.min = boost::lexical_cast<EVENT_DATA_TYPE>(keys["flowCore_$P" + pid + "Rmin"]);
+			if(keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom")
+				param.min = boost::lexical_cast<EVENT_DATA_TYPE>(keys_["flowCore_$P" + pid + "Rmin"]);
 			else
 			{
 
@@ -708,11 +747,11 @@ public:
 		/*
 		 * ## set transformed flag and fix the PnE and the Datatype keywords
 		 */
-		keys["FILENAME"] = filename_;
+		keys_["FILENAME"] = filename_;
 		if(isTransformation)
 		{
-			keys["transformation"] ="applied";
-			keys["$DATATYPE"] = "F";
+			keys_["transformation"] ="applied";
+			keys_["$DATATYPE"] = "F";
 		}
 		for(unsigned i = 0; i < params.size(); i++)
 		{
@@ -722,11 +761,11 @@ public:
 			//insert our own PnR fields
 			if(isTransformation)
 			{
-				keys["$P" + pid + "E"] = "0,0";
+				keys_["$P" + pid + "E"] = "0,0";
 				params[i].PnE[0] = 0;
 				params[i].PnE[1] = 0;
-				keys["flowCore_$P" + pid + "Rmax"] = to_string(static_cast<int>(params[i].max + 1));
-				keys["flowCore_$P" + pid + "Rmin"] = to_string(static_cast<int>(params[i].min));
+				keys_["flowCore_$P" + pid + "Rmax"] = to_string(static_cast<int>(params[i].max + 1));
+				keys_["flowCore_$P" + pid + "Rmin"] = to_string(static_cast<int>(params[i].min));
 			}
 			else
 				params[i].max--;
@@ -736,17 +775,17 @@ public:
 
 		//GUID
 		string oldguid;
-		if(keys.find("GUID")!=keys.end()){
-			oldguid = keys["GUID"];
-			keys["ORIGINALGUID"] = oldguid;
+		if(keys_.find("GUID")!=keys_.end()){
+			oldguid = keys_["GUID"];
+			keys_["ORIGINALGUID"] = oldguid;
 		}
 		else
 			oldguid = filename_;
 		//strip dir
 //			vector<string> paths;
 //			boost::split(paths, oldguid, boost::is_any_of("/\\"));
-//			keys["GUID"] = paths.back();
-		keys["GUID"] = fs::path(oldguid).filename();
+//			keys_["GUID"] = paths.back();
+		keys_["GUID"] = fs::path(oldguid).filename();
 
 	}
 
@@ -776,8 +815,8 @@ public:
 			parse_fcs_header(in, nOffset);//read the header
 			parse_fcs_text_section(in, config.isEmptyKeyValue);//read the txt section
 
-			if(keys.find("$NEXTDATA")!=keys.end()){
-				string nd = keys["$NEXTDATA"];
+			if(keys_.find("$NEXTDATA")!=keys_.end()){
+				string nd = keys_["$NEXTDATA"];
 				boost::trim(nd);
 				if(nd.size()==0)
 					throw(domain_error("empty value in $NEXTDATA"));
@@ -814,7 +853,7 @@ public:
 		//   # Let's not be too strick here as unfortunatelly, some files exported from FlowJo
 		//   # are missing the $BEGINDATA and $ENDDATA keywords and we still need to read those
 		   unsigned long datastart, dataend;
-		   if(keys.find("$BEGINDATA")==keys.end())
+		   if(keys_.find("$BEGINDATA")==keys_.end())
 		   {
 		     if (datastart_h != 0)
 		     {
@@ -825,13 +864,13 @@ public:
 		   }
 		   else
 		   {
-			   string bd = keys["$BEGINDATA"];
+			   string bd = keys_["$BEGINDATA"];
 			   boost::trim(bd);
 			   datastart = stoi(bd);
 		   }
 
 
-		   if(keys.find("$ENDDATA")==keys.end())
+		   if(keys_.find("$ENDDATA")==keys_.end())
 		   {
 			 if (dataend_h != 0) {
 				 dataend = dataend_h;
@@ -841,7 +880,7 @@ public:
 		   }
 		   else
 		   {
-			   string ed = keys["$ENDDATA"];
+			   string ed = keys_["$ENDDATA"];
 			   boost::trim(ed);
 			   dataend = stoul(ed);
 		   }
@@ -886,8 +925,8 @@ public:
 
 		}
 
-		 //parse important params from keys
-		 string par = keys["$PAR"];
+		 //parse important params from keys_
+		 string par = keys_["$PAR"];
 		 int nrpar = stoi(par);
 		params.resize(nrpar);
 		KEY_WORDS::iterator it;
@@ -895,21 +934,21 @@ public:
 		{
 			string pid = to_string(i);
 			string range_str;
-			if( keys.find("transformation")!=keys.end() &&  keys["transformation"] == "custom")
+			if( keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom")
 				range_str = "flowCore_$P" + pid + "Rmax";
 			else
 				range_str = "$P" + pid + "R";
-			it = keys.find(range_str);
-			if(it==keys.end())
+			it = keys_.find(range_str);
+			if(it==keys_.end())
 				throw(domain_error(range_str + " not contained in Text section!"));
 			else
 				params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
 
 
-			params[i-1].PnB = stoi(keys["$P" + pid + "B"]);
+			params[i-1].PnB = stoi(keys_["$P" + pid + "B"]);
 
-			it = keys.find("$P" + pid + "E");
-			if(it==keys.end())
+			it = keys_.find("$P" + pid + "E");
+			if(it==keys_.end())
 			{
 				params[i-1].PnE[0] = 0;
 				params[i-1].PnE[1] = 0;
@@ -922,8 +961,8 @@ public:
 				params[i-1].PnE[1] = stof(tokens[1]);
 			}
 
-			it = keys.find("$P" + pid + "G");
-			if(it==keys.end())
+			it = keys_.find("$P" + pid + "G");
+			if(it==keys_.end())
 				params[i-1].PnG = 1;
 			else
 			{
@@ -931,13 +970,13 @@ public:
 				params[i-1].PnG = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
 			}
 
-			params[i-1].channel = keys["$P" + pid + "N"];
+			params[i-1].channel = keys_["$P" + pid + "N"];
 			if(config.is_fix_slash_in_channel_name)
 				boost::replace_all(params[i-1].channel, "/", ".");
 
-			it = keys.find("$P" + pid + "S");
-			if(it!=keys.end())
-				params[i-1].marker = keys["$P" + pid + "S"];
+			it = keys_.find("$P" + pid + "S");
+			if(it!=keys_.end())
+				params[i-1].marker = keys_["$P" + pid + "S"];
 			boost::trim(params[i-1].marker);
 		}
 
@@ -956,7 +995,7 @@ public:
 		if(nCol()==0)
 			return 0;
 		else
-			return data.size()/nCol();
+			return data_.size()/nCol();
 	}
 
 /**
@@ -964,7 +1003,7 @@ public:
  * @return
  */
 	EVENT_DATA_VEC get_data() const{
-		return data;
+		return data_;
 	}
 	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
 		int idx = getColId(colname, type);
@@ -972,7 +1011,7 @@ public:
 			throw(domain_error("colname not found: " + colname));
 		int nEvents = nRow();
 		EVENT_DATA_VEC res(nEvents);
-		memcpy(&res[0], &data[0] + idx * nEvents, nEvents*sizeof(EVENT_DATA_TYPE));
+		memcpy(&res[0], &data_[0] + idx * nEvents, nEvents*sizeof(EVENT_DATA_TYPE));
 		return res ;
 	}
 	/**
@@ -981,7 +1020,7 @@ public:
 	 */
 	void setData(const EVENT_DATA_VEC & _data)
 	{
-		data = _data;
+		data_ = _data;
 	}
 	/**
 	 * move setter
@@ -989,7 +1028,7 @@ public:
 	 */
 	void setData(EVENT_DATA_VEC && _data)
 	{
-		data = _data;
+		data_ = _data;
 	}
 	/**
 	 * return the pointer of a particular data column
@@ -1004,7 +1043,7 @@ public:
 		int idx = getColId(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
-		return data.data() + idx * nRow();
+		return data_.data() + idx * nRow();
 	}
 
 

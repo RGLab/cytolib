@@ -30,12 +30,13 @@ protected:
 	hsize_t dims[2];              // dataset dimensions
 public:
 	~H5CytoFrame(){};
+	H5CytoFrame(){};
 	/**
 	 * constructor from FCS
 	 * @param fcs_filename
 	 * @param h5_filename
 	 */
-	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config,  bool is_read_data, const string & h5_filename):filename_(h5_filename)
+	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename):filename_(h5_filename)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
@@ -135,7 +136,7 @@ public:
 //		keys.resize(nKey);
 		for(auto i = 0; i < nKey; i++)
 		{
-			keys[keyVec[i].key] = keyVec[i].value;
+			keys_[keyVec[i].key] = keyVec[i].value;
 			delete [] keyVec[i].key;
 			delete [] keyVec[i].value;
 
@@ -157,7 +158,7 @@ public:
 		ds_pd.read(keyVec.data(), key_type);
 		for(auto i = 0; i < nPd; i++)
 		{
-			pd[keyVec[i].key] = keyVec[i].value;
+			pheno_data_[keyVec[i].key] = keyVec[i].value;
 			delete [] keyVec[i].key;
 			delete [] keyVec[i].value;
 		}

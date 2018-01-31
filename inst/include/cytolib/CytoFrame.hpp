@@ -36,21 +36,31 @@ struct TM_ext
  */
 class CytoFrame{
 protected:
-	PDATA pd;
-	KEY_WORDS keys;//keyword pairs parsed from FCS Text section
+	PDATA pheno_data_;
+	KEY_WORDS keys_;//keyword pairs parsed from FCS Text section
 	vector<cytoParam> params;// parameters coerced from keywords and computed from data for quick query
 	unordered_map<string, int> channel_vs_idx;//hash map for query by channel
 	unordered_map<string, int> marker_vs_idx;//hash map for query by marker
 public:
 	virtual ~CytoFrame(){};
+	CytoFrame (){};
+	CytoFrame(const CytoFrame & frm)
+	{
+		pheno_data_ = frm.pheno_data_;
+		keys_ = frm.keys_;
+		params = frm.params;
+		channel_vs_idx = frm.channel_vs_idx;
+		marker_vs_idx = frm.marker_vs_idx;
+
+	}
 
 	compensation get_compensation(const string & key = "SPILL")
 	{
 		compensation comp;
 
-		if(keys.find(key)!=keys.end())
+		if(keys_.find(key)!=keys_.end())
 		{
-			string val = keys[key];
+			string val = keys_[key];
 			vector<string> valVec;
 			boost::split(valVec, val, boost::is_any_of(","));
 			int n = boost::lexical_cast<int>(valVec[0]);
@@ -168,7 +178,7 @@ public:
 			key_t(const string & k, const string & v):key(k),value(v){};
 		};
 		vector<key_t> keyVec;
-		for(std::pair<std::string, string> e : keys)
+		for(std::pair<std::string, string> e : keys_)
 		{
 			keyVec.push_back(key_t(e.first, e.second));
 		}
@@ -188,7 +198,7 @@ public:
 		 * write pdata
 		 */
 		keyVec.clear();//reuse keyVec and key_type for pd
-		for(std::pair<std::string, string> e : pd)
+		for(std::pair<std::string, string> e : pheno_data_)
 		{
 			keyVec.push_back(key_t(e.first, e.second));
 		}
@@ -241,7 +251,7 @@ public:
 	 * @return a vector of pairs of strings
 	 */
 	 virtual const KEY_WORDS & get_keywords() const{
-		return keys;
+		return keys_;
 	}
 	/**
 	 * extract the value of the single keyword by keyword name
@@ -252,8 +262,8 @@ public:
 	virtual string get_keyword(const string & key) const
 	{
 		string res="";
-		auto it = keys.find(key);
-		if(it!=keys.end())
+		auto it = keys_.find(key);
+		if(it!=keys_.end())
 			res = it->second;
 		return res;
 	}
@@ -265,7 +275,7 @@ public:
 	 */
 	virtual void set_keyword(const string & key, const string & value)
 	{
-		keys[key] = value;
+		keys_[key] = value;
 	}
 
 	/**
@@ -463,14 +473,14 @@ public:
 
 	  //check if $TIMESTEP is available
 		EVENT_DATA_TYPE ts;
-		auto it_time = keys.find("$TIMESTEP");
-		if(it_time != keys.end())
+		auto it_time = keys_.find("$TIMESTEP");
+		if(it_time != keys_.end())
 				ts = boost::lexical_cast<EVENT_DATA_TYPE>(it_time->second);
 		else
 		{
-		  auto it_btime = keys.find("$BTIM");
-		  auto it_etime = keys.find("$ETIM");
-		  if(it_btime == keys.end() || it_etime == keys.end())
+		  auto it_btime = keys_.find("$BTIM");
+		  auto it_etime = keys_.find("$ETIM");
+		  if(it_btime == keys_.end() || it_etime == keys_.end())
 			  ts = 1;
 		  else
 		  {
@@ -512,23 +522,23 @@ public:
 			res.fractional_secs = 0;
 		return res;
 	}
-	const PDATA & get_pheno_data() const {return pd;}
+	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const {
-		auto it = pd.find(name);
-		if(it==pd.end())
+		auto it = pheno_data_.find(name);
+		if(it==pheno_data_.end())
 			return "";
 		else
 			return it->second;
 
 	}
 	void set_pheno_data(const string & name, const string & value){
-		pd[name] = value;
+		pheno_data_[name] = value;
 	}
 	void set_pheno_data(const PDATA & _pd)
 	{
-		pd = _pd;
+		pheno_data_ = _pd;
 	}
-	void delPData(const string & name){pd.erase(name);}
+	void delPData(const string & name){pheno_data_.erase(name);}
 };
 };
 
