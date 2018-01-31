@@ -29,8 +29,198 @@ class MemCytoFrame: public CytoFrame{
 
 	// below are cached for fcs parsing, should be of no usage once the data section is parsed
 	string filename_;
+	FCS_READ_PARAM config_;
 	FCS_Header header_;
+	ifstream in_;
 
+	void parse_fcs_header(ifstream &in, int nOffset = 0)
+	{
+		/*
+		 * parse the header
+		 */
+
+		in.seekg(nOffset);
+		//parse version
+		char version[7];
+		in.get(version, 7);
+
+		if(strcmp(version, "FCS2.0")!=0&&strcmp(version, "FCS3.0")!=0&&strcmp(version, "FCS3.1")!=0)
+			 throw(domain_error("This does not seem to be a valid FCS2.0, FCS3.0 or FCS3.1 file"));
+
+		header_.FCSversion = boost::lexical_cast<float>(version+3);
+
+		char tmp[5];
+		in.get(tmp, 5);
+		if(strcmp(tmp, "    "))
+			 throw(domain_error("This does not seem to be a valid FCS header"));
+
+		//parse offset
+		char tmp1[9];
+		string tmp2(" ",8);
+		in.get(tmp1, 9);
+		//skip whitespaces
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		header_.textstart = boost::lexical_cast<int>(tmp2) + nOffset;
+
+		in.get(tmp1, 9);
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		header_.textend = boost::lexical_cast<int>(tmp2) + nOffset;
+
+		in.get(tmp1, 9);
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		header_.datastart = boost::lexical_cast<int>(tmp2) + nOffset;
+
+		in.get(tmp1, 9);
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		header_.dataend = boost::lexical_cast<int>(tmp2) + nOffset;
+
+		in.get(tmp1, 9);
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		if(tmp2.size()>0)
+			header_.anastart = boost::lexical_cast<int>(tmp2) + nOffset;
+
+		in.get(tmp1, 9);
+		tmp2.resize(8);
+		copy(tmp1, tmp1+8, tmp2.begin());
+		boost::trim(tmp2);
+		if(tmp2.size()>0)
+			header_.anaend = boost::lexical_cast<int>(tmp2) + nOffset;
+
+		header_.additional = nOffset;
+
+	}
+
+	void string_to_keywords(string txt, bool emptyValue){
+		/*
+		 * get the first character as delimiter
+		 */
+		char delimiter = txt[0];
+
+		/*
+		 * check if string ends with delimiter
+		 */
+		bool isDelimiterEnd = txt[txt.size()-1] == delimiter;
+
+
+
+		std::string doubleDelimiter,magicString;
+		doubleDelimiter.push_back(delimiter);
+		doubleDelimiter.push_back(delimiter);
+		//search for the first unused odd char as replacememnt for double delimiter
+		//FCS 3.1 states only 0-126 ASCII are legal delimiter, but we can't assume the file always follows the standard
+		//also the TEXT main contain some special characters , thus we want to make sure the replacement char is not used anywhere in FCS TEXT
+		char oddChar = 127;
+		for(; oddChar < 256; oddChar++)
+		{
+
+			if(oddChar==delimiter||txt.find(oddChar)!=std::string::npos)
+				continue;
+			else
+				break;
+		}
+		if(oddChar==256)
+			throw(domain_error("Can't find the unused odd character from ASCII(127-255) in FSC TEXT section!"));
+
+		std::string soddChar;
+		soddChar.push_back(oddChar);
+		/*
+		 *	when empty value is allowed, we have to take the assumption that there is no double delimiters in any keys or values,
+		 */
+		if(!emptyValue)//replace the double delimiter with the odd char
+			boost::replace_all(txt, doubleDelimiter, soddChar);
+		std::vector<std::string> tokens;
+		boost::split(tokens, txt, [delimiter](char c){return c == delimiter;});
+//		PRINT( txt + "\n");
+
+		unsigned j = isDelimiterEnd?tokens.size()-2:tokens.size()-1;//last token, skip the last empty one when end with delimiter
+		string key;
+		for(unsigned i = 1; i <= j; i++){//counter, start with 1 to skip the first empty tokens
+			std::string token = tokens[i];
+//				PRINT( token + " ");
+			if(!emptyValue){
+				/*
+				 * restore double delimiter when needed
+				 * (this slows down things quite a bit, but still a lot faster than R version,
+				 *  and this double delimiter logic is not normally invoked anyway)
+				 */
+				boost::replace_all(token, soddChar, doubleDelimiter);
+	//				std::PRINT( token;
+			}
+//				PRINT("\n");
+
+			if((i)%2 == 1)
+			{
+				if(token.empty())
+					// Rcpp::stop (temporarily switch from stop to range_error due to a bug in Rcpp 0.12.8)
+					throw std::range_error("Empty keyword name detected!If it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
+				boost::trim(token);
+				key = token;//set key
+			}
+			else{
+				keys[key] = token;//set value
+
+			}
+
+
+		}
+
+		/*
+		 * check if kw and value are paired
+		 */
+		 if(j%2 == 1){
+			 std::string serror = "uneven number of tokens: ";
+		     serror.append(boost::lexical_cast<std::string>(j));
+		     PRINT(serror + "\n");
+		     PRINT("The last keyword is dropped.!\nIf it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
+		 }
+
+
+
+	}
+
+	void parse_fcs_text_section(ifstream &in, bool emptyValue){
+		 in.seekg(header_.textstart);
+		    /**
+		     *  Certain software (e.g. FlowJo 8 on OS X) likes to put characters into
+		    files that readChar can't read, yet readBin, rawToChar and iconv can
+		     handle just fine.
+		     */
+	//	    txt <- readBin(con,"raw", offsets["textend"]-offsets["textstart"]+1)
+	//	    txt <- iconv(rawToChar(txt), "", "latin1", sub="byte")
+		 int nTxt = header_.textend - header_.textstart + 1;
+		 char * tmp = new char[nTxt + 1];
+		 in.read(tmp, nTxt);//can't use in.get since it will stop at newline '\n' which could be present in FCS TXT
+		 tmp[nTxt]='\0';//make it as c_string
+		 string txt(tmp);
+		 delete [] tmp;
+	     string_to_keywords(txt, emptyValue);
+
+		if(keys.find("FCSversion")==keys.end())
+			keys["FCSversion"] = boost::lexical_cast<string>(header_.FCSversion);
+
+	}
+	void open_fcs_file()
+	{
+
+		if(!in_.is_open())
+		{
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("Opening "  + filename_ + "\n");
+			in_.open(filename_, ios::in|ios::binary);
+
+			if(!in_.is_open())
+				throw(domain_error("can't open the file: " + filename_ + "\nPlease check if the path is normalized to be recognized by c++!"));
+		}
+	}
 public:
 	MemCytoFrame(){};
 	/**
@@ -52,43 +242,29 @@ public:
 	 * @param config the parse arguments.
 	 * @param onlyTxt flag indicates whether to only parse text segment (which contains the keywords)
 	 */
-	MemCytoFrame(const string &filename, FCS_READ_PARAM & config,  bool is_read_data = true):filename_(filename)
+	MemCytoFrame(const string &filename, FCS_READ_PARAM & config):filename_(filename),config_(config)
 	{
-
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			PRINT("Reading "  + filename + "\n");
-		ifstream in(filename, ios::in|ios::binary);
-
-		if(!in.is_open())
-			throw(domain_error("can't open the file: " + filename + "\nPlease check if the path is normalized to be recognized by c++!"));
-
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			PRINT("Parsing FCS header \n");
-		read_fcs_header_and_text(in, config.header);
-
-		buildHash();
-
-		if(is_read_data)
-		{
-	//		double start = clock();
-			//parse the data section
-			read_fcs_data(in, config.data);
-
-	//		cout << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << endl;
-
-		}
-
-
-
 	}
+
+	void read_fcs()
+	{
+		open_fcs_file();
+		read_fcs_header(in_, config_.header);
+		read_fcs_data(in_, config_.data);
+		in_.close();
+	}
+
+	void read_fcs_data()
+	{
+		open_fcs_file();
+		read_fcs_data(in_, config_.data);
+		in_.close();
+	}
+
 	/**
 	 * parse the data segment of FCS
 	 *
 	 * @param in (input) file stream object opened from FCS file
-	 * @param output (output) the container to store the parsed data
-	 * @param header (input) the header parsed by readHeaderAndText
-	 * @param keys (input&output) the keywords parsed by readHeaderAndText
-	 * @param params (input&output) the params parsed by readHeaderAndText
 	 * @param config (input) the parsing arguments for data
 	 */
 	void read_fcs_data(ifstream &in, const FCS_READ_DATA_PARAM & config)
@@ -573,192 +749,22 @@ public:
 		keys["GUID"] = fs::path(oldguid).filename();
 
 	}
-	void read_fcs_header(ifstream &in, int nOffset = 0){
-		/*
-			 * parse the header
-			 */
 
-			in.seekg(nOffset);
-			//parse version
-			char version[7];
-			in.get(version, 7);
-
-		    if(strcmp(version, "FCS2.0")!=0&&strcmp(version, "FCS3.0")!=0&&strcmp(version, "FCS3.1")!=0)
-			     throw(domain_error("This does not seem to be a valid FCS2.0, FCS3.0 or FCS3.1 file"));
-
-		    header_.FCSversion = boost::lexical_cast<float>(version+3);
-
-		    char tmp[5];
-		    in.get(tmp, 5);
-			if(strcmp(tmp, "    "))
-				 throw(domain_error("This does not seem to be a valid FCS header"));
-
-			//parse offset
-			char tmp1[9];
-			string tmp2(" ",8);
-			in.get(tmp1, 9);
-			//skip whitespaces
-			copy(tmp1, tmp1+8, tmp2.begin());
-			boost::trim(tmp2);
-		    header_.textstart = boost::lexical_cast<int>(tmp2) + nOffset;
-
-		    in.get(tmp1, 9);
-		    tmp2.resize(8);
-		    copy(tmp1, tmp1+8, tmp2.begin());
-			boost::trim(tmp2);
-			header_.textend = boost::lexical_cast<int>(tmp2) + nOffset;
-
-			in.get(tmp1, 9);
-			tmp2.resize(8);
-			copy(tmp1, tmp1+8, tmp2.begin());
-			boost::trim(tmp2);
-			header_.datastart = boost::lexical_cast<int>(tmp2) + nOffset;
-
-			in.get(tmp1, 9);
-			tmp2.resize(8);
-			copy(tmp1, tmp1+8, tmp2.begin());
-			boost::trim(tmp2);
-			header_.dataend = boost::lexical_cast<int>(tmp2) + nOffset;
-
-			in.get(tmp1, 9);
-			tmp2.resize(8);
-			copy(tmp1, tmp1+8, tmp2.begin());
-			boost::trim(tmp2);
-			if(tmp2.size()>0)
-				header_.anastart = boost::lexical_cast<int>(tmp2) + nOffset;
-
-			in.get(tmp1, 9);
-			tmp2.resize(8);
-			copy(tmp1, tmp1+8, tmp2.begin());
-			boost::trim(tmp2);
-			if(tmp2.size()>0)
-				header_.anaend = boost::lexical_cast<int>(tmp2) + nOffset;
-
-			header_.additional = nOffset;
-
+	void read_fcs_header()
+	{
+		open_fcs_file();
+		read_fcs_header(in_, config_.header);
+	    in_.close();
 	}
-
-	void parse_fcs_text(string txt, bool emptyValue){
-		/*
-		 * get the first character as delimiter
-		 */
-		char delimiter = txt[0];
-
-		/*
-		 * check if string ends with delimiter
-		 */
-		bool isDelimiterEnd = txt[txt.size()-1] == delimiter;
-
-
-
-		std::string doubleDelimiter,magicString;
-		doubleDelimiter.push_back(delimiter);
-		doubleDelimiter.push_back(delimiter);
-		//search for the first unused odd char as replacememnt for double delimiter
-		//FCS 3.1 states only 0-126 ASCII are legal delimiter, but we can't assume the file always follows the standard
-		//also the TEXT main contain some special characters , thus we want to make sure the replacement char is not used anywhere in FCS TEXT
-		char oddChar = 127;
-		for(; oddChar < 256; oddChar++)
-		{
-
-			if(oddChar==delimiter||txt.find(oddChar)!=std::string::npos)
-				continue;
-			else
-				break;
-		}
-		if(oddChar==256)
-			throw(domain_error("Can't find the unused odd character from ASCII(127-255) in FSC TEXT section!"));
-
-		std::string soddChar;
-		soddChar.push_back(oddChar);
-		/*
-		 *	when empty value is allowed, we have to take the assumption that there is no double delimiters in any keys or values,
-		 */
-		if(!emptyValue)//replace the double delimiter with the odd char
-			boost::replace_all(txt, doubleDelimiter, soddChar);
-		std::vector<std::string> tokens;
-		boost::split(tokens, txt, [delimiter](char c){return c == delimiter;});
-//		PRINT( txt + "\n");
-
-		unsigned j = isDelimiterEnd?tokens.size()-2:tokens.size()-1;//last token, skip the last empty one when end with delimiter
-		string key;
-		for(unsigned i = 1; i <= j; i++){//counter, start with 1 to skip the first empty tokens
-			std::string token = tokens[i];
-//				PRINT( token + " ");
-			if(!emptyValue){
-				/*
-				 * restore double delimiter when needed
-				 * (this slows down things quite a bit, but still a lot faster than R version,
-				 *  and this double delimiter logic is not normally invoked anyway)
-				 */
-				boost::replace_all(token, soddChar, doubleDelimiter);
-	//				std::PRINT( token;
-			}
-//				PRINT("\n");
-
-			if((i)%2 == 1)
-			{
-				if(token.empty())
-					// Rcpp::stop (temporarily switch from stop to range_error due to a bug in Rcpp 0.12.8)
-					throw std::range_error("Empty keyword name detected!If it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
-				boost::trim(token);
-				key = token;//set key
-			}
-			else{
-				keys[key] = token;//set value
-
-			}
-
-
-		}
-
-		/*
-		 * check if kw and value are paired
-		 */
-		 if(j%2 == 1){
-			 std::string serror = "uneven number of tokens: ";
-		     serror.append(boost::lexical_cast<std::string>(j));
-		     PRINT(serror + "\n");
-		     PRINT("The last keyword is dropped.!\nIf it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
-		 }
-
-
-
-	}
-
-	void read_fcs_txt(ifstream &in, bool emptyValue){
-		 in.seekg(header_.textstart);
-		    /**
-		     *  Certain software (e.g. FlowJo 8 on OS X) likes to put characters into
-		    files that readChar can't read, yet readBin, rawToChar and iconv can
-		     handle just fine.
-		     */
-	//	    txt <- readBin(con,"raw", offsets["textend"]-offsets["textstart"]+1)
-	//	    txt <- iconv(rawToChar(txt), "", "latin1", sub="byte")
-		 int nTxt = header_.textend - header_.textstart + 1;
-		 char * tmp = new char[nTxt + 1];
-		 in.read(tmp, nTxt);//can't use in.get since it will stop at newline '\n' which could be present in FCS TXT
-		 tmp[nTxt]='\0';//make it as c_string
-		 string txt(tmp);
-		 delete [] tmp;
-	     parse_fcs_text(txt, emptyValue);
-
-		if(keys.find("FCSversion")==keys.end())
-			keys["FCSversion"] = boost::lexical_cast<string>(header_.FCSversion);
-
-	}
-
 	/**
 	 * parse the FCS header and Text segment
 	 *
 	 * @param in (input) the file stream object opened from FCS file
-	 * @param header (output) the FCS_Header object to store the result of FCS header
-	 * @param keys (output) the KEY_WORDS object to store parsed keywords
-	 * @param params (output) cytoParam container to store the parsed parameters
 	 * @param config (input) FCS_READ_HEADER_PARAM object gives the parsing arguments for header
 	 */
-	void read_fcs_header_and_text(ifstream &in, const FCS_READ_HEADER_PARAM & config){
-
+	void read_fcs_header(ifstream &in, const FCS_READ_HEADER_PARAM & config){
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("Parsing FCS header \n");
 
 		 //search the stream for the header and txt of the nth DataSet
 		int nOffset = 0, nNextdata = 0;
@@ -767,8 +773,8 @@ public:
 		for(int i = 1; i <= n; i++)
 		{
 			nOffset += nNextdata;
-			read_fcs_header(in, nOffset);//read the header
-			read_fcs_txt(in, config.isEmptyKeyValue);//read the txt section
+			parse_fcs_header(in, nOffset);//read the header
+			parse_fcs_text_section(in, config.isEmptyKeyValue);//read the txt section
 
 			if(keys.find("$NEXTDATA")!=keys.end()){
 				string nd = keys["$NEXTDATA"];
@@ -936,6 +942,7 @@ public:
 		}
 
 
+		buildHash();
 
 
 	//	    origRange <- range

@@ -37,7 +37,8 @@ public:
 	 */
 	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config,  bool is_read_data, const string & h5_filename):filename_(h5_filename)
 	{
-		MemCytoFrame fr(fcs_filename, config, is_read_data);
+		MemCytoFrame fr(fcs_filename, config);
+		fr.read_fcs();
 		fr.writeH5(h5_filename);
 		*this = H5CytoFrame(h5_filename);
 	}

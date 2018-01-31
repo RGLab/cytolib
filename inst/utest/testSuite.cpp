@@ -61,7 +61,8 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 	string filename="../flowCore/misc/sample_1071.001";
 	FCS_READ_PARAM config;
 	config.data.num_threads = 4;
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
 	double runtime = (gettime() - start);// / (double)(CLOCKS_PER_SEC / 1000);
 		cout << runtime << endl;
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 8);
@@ -85,7 +86,8 @@ BOOST_AUTO_TEST_CASE(double_precision)
 
 	string filename="../flowCore/misc/double_precision/wishbone_thymus_panel1_rep1.fcs";
 	FCS_READ_PARAM config;
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
 	double runtime = (gettime() - start);
 	cout << runtime << endl;
 	BOOST_CHECK_EQUAL(cytofrm.nCol(), 35);
@@ -106,7 +108,9 @@ BOOST_AUTO_TEST_CASE(multidata1)
 //	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1244);
 
 	config.header.nDataset = 10;
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
+
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 955);
 
 	//pd
@@ -132,7 +136,9 @@ BOOST_AUTO_TEST_CASE(multidata2)
 //	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1244);
 
 //	config.header.nDataset = 10;
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
+
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 53691);
 }
 
@@ -145,7 +151,9 @@ BOOST_AUTO_TEST_CASE(oddbitwidth)
 
 	config.header.nDataset = 3;
 	double start = gettime();//clock();
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
+
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10000);
@@ -159,7 +167,9 @@ BOOST_AUTO_TEST_CASE(mixedEndian)
 	string filename="../flowCore/misc/mixedEndian.fcs";
 	FCS_READ_PARAM config;
 	double start = gettime();//clock();
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
+
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 30041);
@@ -174,7 +184,9 @@ BOOST_AUTO_TEST_CASE(specialDelimiter)
 	string filename="../flowCore/misc/specialDelimiter.fcs";
 	FCS_READ_PARAM config;
 	double start = gettime();//clock();
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
+
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 50146);
@@ -193,7 +205,9 @@ BOOST_AUTO_TEST_CASE(gigantic_file)
 		which_lines[i] = i;
 	config.data.which_lines = which_lines;
 	double start = gettime();//clock();
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs();
+
 	cout << gettime() - start << endl;
 
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1e3);
@@ -208,8 +222,10 @@ BOOST_AUTO_TEST_CASE(newline_in_txt)
 	string filename="../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs";
 	FCS_READ_PARAM config;
 
-	MemCytoFrame cytofrm(filename.c_str(), config,false);
-
+	MemCytoFrame cytofrm(filename.c_str(), config);
+	cytofrm.read_fcs_header();
+	BOOST_CHECK_EQUAL(cytofrm.nRow(), 0);
+	cytofrm.read_fcs_data();
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10045);
 	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 9220, 1e-6);
 
