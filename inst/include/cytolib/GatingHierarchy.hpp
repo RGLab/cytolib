@@ -264,7 +264,7 @@ public:
 			/**
 			 * compensate with spillover defined in keyword
 			 */
-			set_compensation(cytoframe.get_compensation());
+			set_compensation(cytoframe.get_compensation(), false);
 			//TODO:fix slash in compensation parameters for vX
 			//currently I have not figured out the clean way to pass is_fix_slash flag from ws
 			//this scenario may never occur so we won't bother the fix it until it bites us
@@ -668,9 +668,28 @@ public:
 	compensation get_compensation(){
 		return comp;
 	}
-	void set_compensation(const compensation & _comp)
+	void set_compensation(const compensation & _comp, bool is_update_prefix)
 	{
+		string prefix = comp.prefix;
+		string suffix = comp.suffix;
 		comp = _comp;
+		//restore prefix
+		if(!is_update_prefix)
+		{
+			comp.prefix = prefix;
+			comp.suffix = suffix;
+		}
+	}
+	void set_compensation(compensation && _comp, bool is_update_prefix)
+	{
+
+		swap(comp, _comp);
+		//restore prefix
+		if(!is_update_prefix)
+		{
+			comp.prefix = _comp.prefix;
+			comp.suffix = _comp.suffix;
+		}
 	}
 	void printLocalTrans(){
 		PRINT("\nget trans from gating hierarchy\n");

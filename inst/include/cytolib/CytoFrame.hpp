@@ -100,7 +100,7 @@ public:
 		{
 			int id = getColId(comp.marker[i], ColType::channel);
 			if(id < 0)
-				throw(domain_error(params[i].channel + " not found in compensation parameters!"));
+				throw(domain_error("compensation parameter '" + comp.marker[i] + " not found in cytoframe parameters!"));
 
 			indices[i] = id;
 		}

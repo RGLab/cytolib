@@ -972,7 +972,7 @@ public:
 
 			params[i-1].channel = keys_["$P" + pid + "N"];
 			if(config.is_fix_slash_in_channel_name)
-				boost::replace_all(params[i-1].channel, "/", ".");
+				boost::replace_all(params[i-1].channel, "/", "_");
 
 			it = keys_.find("$P" + pid + "S");
 			if(it!=keys_.end())
