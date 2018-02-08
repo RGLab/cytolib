@@ -40,6 +40,7 @@ class GatingSet{
 
 	typedef unordered_map<string,GatingHierarchy> gh_map;
 	gh_map ghs;
+	string guid_;
 public:
 	typedef typename gh_map::iterator iterator;
 	typedef typename gh_map::const_iterator const_iterator;
@@ -124,6 +125,8 @@ public:
 			 return ghs[sample_uid];
 	   }
 
+	string get_gatingset_id(){return guid_;}
+	void set_gatingset_id(const string & guid){guid_ = guid;}
 	/**
 	 * iterate through hash map to extract sample names
 	 * @return
@@ -185,7 +188,9 @@ public:
 
 	}
 
-	GatingSet(){};
+	GatingSet(){
+		guid_ = generate_guid(10);
+	};
 
 	/**
 	 * separate filename from dir to avoid to deal with path parsing in c++
