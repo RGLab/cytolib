@@ -469,6 +469,14 @@ public:
 	  		//load entire data section with one disk IO
 
 			in.read(bufPtr, nBytes); //load the bytes from file
+			if(in.fail())
+			{
+				string msg = "Failed to read " + to_string(nBytes) + " bytes from data section\n";
+				if(in.eof())
+					msg += "Data may be truncated!";
+				throw(domain_error(msg));
+			}
+
 	  	}
 	//	nEvents = nrow;
 		//how many element to return
