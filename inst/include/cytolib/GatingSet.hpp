@@ -12,6 +12,8 @@
 #include "GatingHierarchy.hpp"
 #include <string>
 #include <cytolib/delimitedMessage.hpp>
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 
 using namespace std;
 
@@ -526,22 +528,37 @@ public:
 		}
 	}
 
-	GatingSet(vector<string> sample_uids){
-		vector<string>::iterator it;
-		for(it=sample_uids.begin();it!=sample_uids.end();it++)
+	GatingSet(vector<pair<string,string>> sample_uid_vs_file_path, const FCS_READ_PARAM & config, string h5_dir):GatingSet()
+	{
+		fs::path h5_path = generate_h5_folder(fs::path(h5_dir));
+		for(const auto & it : sample_uid_vs_file_path)
 		{
-			string sample_uid=*it;
+
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... start adding GatingHierarchy for: "+sample_uid+"... \n");
+				PRINT("\n... start adding GatingHierarchy for: "+ it.first +"... \n");
 
 
-			GatingHierarchy & curGh=addGatingHierarchy(sample_uid);
-			curGh.addRoot();//add default root
+			GatingHierarchy & gh=addGatingHierarchy(it.first);
+			gh.addRoot();//add default root
+
+			string h5_filename = (h5_path/it.first).string() + ".h5";
+			MemCytoFrame fr(it.second,config);
+			fr.read_fcs();
+			fr.writeH5(h5_filename);
+			gh.set_cytoframe(h5_filename);
 
 		}
 	}
 
-
+	fs::path generate_h5_folder(fs::path h5_dir)
+	{
+		h5_dir /= guid_;
+		if(fs::exists(h5_dir))
+			throw(domain_error(h5_dir.string() + " already exists!"));
+		if(!create_directories(h5_dir))
+			throw(domain_error("Failed to create directory: " + h5_dir.string()));
+		return h5_dir;
+	}
 
 
 	/*
