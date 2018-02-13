@@ -145,6 +145,7 @@ class MemCytoFrame: public CytoFrame{
 		string key;
 		for(unsigned i = 1; i <= j; i++){//counter, start with 1 to skip the first empty tokens
 			std::string token = tokens[i];
+			boost::trim(token);
 //				PRINT( token + " ");
 			if(!emptyValue){
 				/*
@@ -162,12 +163,12 @@ class MemCytoFrame: public CytoFrame{
 				if(token.empty())
 					// Rcpp::stop (temporarily switch from stop to range_error due to a bug in Rcpp 0.12.8)
 					throw std::range_error("Empty keyword name detected!If it is due to the double delimiters in keyword value, please set emptyValue to FALSE and try again!");
-				boost::trim(token);
+
 				key = token;//set key
 			}
 			else{
 				keys_[key] = token;//set value
-
+//				PRINT( token + " ");
 			}
 
 
@@ -825,7 +826,7 @@ public:
 
 			if(keys_.find("$NEXTDATA")!=keys_.end()){
 				string nd = keys_["$NEXTDATA"];
-				boost::trim(nd);
+//				boost::trim(nd);
 				if(nd.size()==0)
 					throw(domain_error("empty value in $NEXTDATA"));
 				else
@@ -873,7 +874,7 @@ public:
 		   else
 		   {
 			   string bd = keys_["$BEGINDATA"];
-			   boost::trim(bd);
+//			   boost::trim(bd);
 			   datastart = stoi(bd);
 		   }
 
@@ -889,7 +890,7 @@ public:
 		   else
 		   {
 			   string ed = keys_["$ENDDATA"];
-			   boost::trim(ed);
+//			   boost::trim(ed);
 			   dataend = stoul(ed);
 		   }
 
@@ -985,7 +986,7 @@ public:
 			it = keys_.find("$P" + pid + "S");
 			if(it!=keys_.end())
 				params[i-1].marker = keys_["$P" + pid + "S"];
-			boost::trim(params[i-1].marker);
+//			boost::trim(params[i-1].marker);
 		}
 
 
