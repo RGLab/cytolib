@@ -469,12 +469,12 @@ public:
 	  		//load entire data section with one disk IO
 
 			in.read(bufPtr, nBytes); //load the bytes from file
-			if(in.fail())
+			int events_read = (in.gcount() * 8 / nRowSize);
+			int events_expected = boost::lexical_cast<int>(keys_["$TOT"]);
+			if(events_read != events_expected)//can't use nBytes derived from FCS header as the check point since it may have extra bytes than needed
 			{
-				string msg = "Failed to read " + to_string(nBytes) + " bytes from data section\n";
-				if(in.eof())
-					msg += "Data may be truncated!";
-				throw(domain_error(msg));
+				throw(domain_error("file " + filename_+ " seems to be corrupted. \n The actual number of cells in data section ("
+		                 + to_string(events_read) + ") is not consistent with keyword '$TOT' (" + to_string(events_expected) + ")"));
 			}
 
 	  	}

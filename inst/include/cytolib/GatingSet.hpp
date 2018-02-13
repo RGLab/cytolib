@@ -553,10 +553,11 @@ public:
 	fs::path generate_h5_folder(fs::path h5_dir)
 	{
 		h5_dir /= guid_;
+		const string sh5_dir = h5_dir.string();
 		if(fs::exists(h5_dir))
-			throw(domain_error(h5_dir.string() + " already exists!"));
+			throw(domain_error(sh5_dir + " already exists!"));
 		if(!create_directories(h5_dir))
-			throw(domain_error("Failed to create directory: " + h5_dir.string()));
+			throw(domain_error("Failed to create directory: " + sh5_dir));
 		return h5_dir;
 	}
 

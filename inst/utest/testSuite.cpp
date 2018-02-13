@@ -251,7 +251,8 @@ BOOST_AUTO_TEST_CASE(truncated_data_section)
 	FCS_READ_PARAM config;
 
 	MemCytoFrame cytofrm(filename.c_str(), config);
-	BOOST_CHECK_EXCEPTION(cytofrm.read_fcs(), domain_error, [](const exception & ex){return string(ex.what()).find("truncated") != string::npos;});
+
+	BOOST_CHECK_EXCEPTION(cytofrm.read_fcs(), domain_error, [](const exception & ex){return string(ex.what()).find("corrupted") != string::npos;});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
