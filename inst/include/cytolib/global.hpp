@@ -80,16 +80,14 @@ namespace cytolib
 	 */
 	inline string generate_guid(int len)
 	{
-		char s[len];
-		static const char alphanum[] =
-				"0123456789"
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				"abcdefghijklmnopqrstuvwxyz";
-
-		for (int i = 0; i < len; ++i) {
+		srand (time(NULL));
+		char s[len+1];
+		static const char alphanum[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		s[0] = alphanum[rand() % (sizeof(alphanum) - 11) + 10];
+		for (int i = 1; i < len; ++i) {
 			s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
 		}
-
+		s[len] = '\0';
 		return string(s);
 	}
 
