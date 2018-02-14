@@ -112,11 +112,8 @@ public:
 		  * forwarding APIs
 		  */
 		vector<string> getChannels(){return cytoframe_.getChannels();};
-
-
-		//* forward to the first element's getChannels
 		vector<string> getMarkers(){return cytoframe_.getMarkers();};
-
+		const string & get_h5_file_path(){return cytoframe_.get_h5_file_path();}
 		void setMarker(const string & _old, const string & _new){
 			cytoframe_.setMarker(_old, _new);
 		};
@@ -127,6 +124,7 @@ public:
 		}
 		int nCol(){return cytoframe_.nCol();}
 		int nRow(){return cytoframe_.nRow();}
+		const PDATA & get_pheno_data() const {return cytoframe_.get_pheno_data();}
 		/**
 		 * Get the reference of cytoFrame
 		 * @return

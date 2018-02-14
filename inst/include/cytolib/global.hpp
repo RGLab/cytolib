@@ -26,7 +26,8 @@
 using namespace std;
 extern unsigned short g_loglevel;// debug print is turned off by default
 extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
-
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 namespace cytolib
 {
 	#define CYTOLIB_INIT() \
@@ -90,6 +91,21 @@ namespace cytolib
 		s[len] = '\0';
 		return string(s);
 	}
+	inline string path_dir_name(const string & full_path)
+	{
+//		//TODO:handle windows path
+//		size_t i_last_slash = full_path.find_last_of('/');
+//		return full_path.substr(0,i_last_slash);
+		return fs::path(full_path).parent_path().string();
+	}
+	inline string path_base_name(const string & full_path)
+	{
+//		//TODO:handle windows path
+//		size_t i_last_slash = full_path.find_last_of('/');
+//		return full_path.substr(i_last_slash);
+		return fs::path(full_path).filename().string();
+	}
+
 
 };
 

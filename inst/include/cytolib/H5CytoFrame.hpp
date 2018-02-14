@@ -170,6 +170,9 @@ public:
 
 	}
 
+	const string & get_h5_file_path(){
+		return filename_;
+	}
 	unsigned nRow() const{
 		//read nEvents
 		return dims[1];

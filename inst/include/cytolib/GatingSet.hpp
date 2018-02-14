@@ -81,6 +81,7 @@ public:
 	};
 
 	int nCol(){return begin()->second.nCol();}
+	const string & get_h5_file_path(){return path_dir_name(begin()->second.get_h5_file_path());}
 
 	/**
 	 * validity checks on the frame to see if its data structure is consistent with cytoset
@@ -543,6 +544,8 @@ public:
 
 			string h5_filename = (h5_path/it.first).string() + ".h5";
 			MemCytoFrame fr(it.second,config);
+			//set pdata
+			fr.set_pheno_data("name", path_base_name(it.second));
 			fr.read_fcs();
 			fr.writeH5(h5_filename);
 			gh.set_cytoframe(h5_filename);
