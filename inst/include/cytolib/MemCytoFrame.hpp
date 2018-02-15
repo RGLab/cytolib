@@ -916,6 +916,9 @@ public:
 		   }
 
 		}
+		 string dattype = keys_["$DATATYPE"];
+		 if(dattype!="I"&&dattype!="F"&&dattype!="D")
+			 throw(domain_error("Don't know how to deal with $DATATYPE"));
 
 		 //parse important params from keys_
 		 string par = keys_["$PAR"];
@@ -940,7 +943,7 @@ public:
 			params[i-1].PnB = stoi(keys_["$P" + pid + "B"]);
 
 			it = keys_.find("$P" + pid + "E");
-			if(it==keys_.end())
+			if(it==keys_.end()||dattype != "I")
 			{
 				params[i-1].PnE[0] = 0;
 				params[i-1].PnE[1] = 0;

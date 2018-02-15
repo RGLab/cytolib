@@ -254,17 +254,17 @@ BOOST_AUTO_TEST_CASE(truncated_data_section)
 
 	BOOST_CHECK_EXCEPTION(cytofrm.read_fcs(), domain_error, [](const exception & ex){return string(ex.what()).find("corrupted") != string::npos;});
 }
-BOOST_AUTO_TEST_CASE(log_transformed)
+BOOST_AUTO_TEST_CASE(skip_log_transformed)
 {
 
 
-	string filename="../flowCore/misc/log_transformed.fcs";
+	string filename="../flowCore/misc/skip_non_zero_PnE_value.fcs";
 	FCS_READ_PARAM config;
 
 	MemCytoFrame cytofrm(filename.c_str(), config);
 	cytofrm.read_fcs();
 	BOOST_CHECK_EQUAL(cytofrm.nRow(), 183699);
-	BOOST_CHECK_CLOSE(cytofrm.get_range("Dy161Di", ColType::channel, RangeType::instrument).second, 767.008188, 1e-4);
+	BOOST_CHECK_CLOSE(cytofrm.get_range("Dy161Di", ColType::channel, RangeType::instrument).second, 766, 1e-6);
 
 }
 BOOST_AUTO_TEST_SUITE_END()
