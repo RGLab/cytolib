@@ -954,6 +954,8 @@ public:
 				boost::split(tokens, it->second, boost::is_any_of(","));
 				params[i-1].PnE[0] = stof(tokens[0]);
 				params[i-1].PnE[1] = stof(tokens[1]);
+				if(params[i-1].PnE[0] > 0 && params[i-1].PnE[1] == 0)//correct f2 for legacy FCS 2.0
+					params[i-1].PnE[1] = 1;
 			}
 
 			it = keys_.find("$P" + pid + "G");
