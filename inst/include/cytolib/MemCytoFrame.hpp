@@ -669,38 +669,21 @@ public:
 
 				  if(param.PnE[0] > 0)
 				  {
-		//				 # J.Spidlen, Nov 5, 2013: This was a very minor bug. The linearization transformation
-		//				 # for $PnE != "0,0" is defined as:
-		//				 # For $PnR/r/, r>0, $PnE/f,0/, f>0: n is a logarithmic parameter with channel values
-		//				 # from 0 to r-1. A channel value xc is converted to a scale value xs as xs=10^(f*xc/r).
-		//				 # Note the "r" instead of the "r-1" in the formula (which would admitedly make more sense)
-		//				 # However, this is the standard that apparently has been followed by BD and other companies
-		//				 # "forever" and it is therefore addoped as such by the ISAC DSTF (see FCS 3.1 specification)
-		//				 # To bring this to compliance, I am just changing
-		//				 # dat[,i] <- 10^((dat[,i]/(range[i]-1))*ampli[i,1])
-		//				 # to
-		//				 # dat[,i] <- 10^((dat[,i]/range[i])*ampli[i,1])
-					 outElement = pow(10,((outElement/param.max)*param.PnE[0]));
-	//				 param.max = pow(10,param.PnE.first);
+					 outElement = pow(10,outElement/param.max * param.PnE[0]) * param.PnE[1];
 				  }
 				  else if (fcsPnGtransform && param.PnG != 1) {
 					  outElement = outElement / param.PnG;
-	//				  param.max = (param.max-1) / param.PnG;
 				  }
-	//			  else
-	//				  param.max--;
 				}
 				if(scale)
 				{
 					if(param.PnE[0] > 0)
 					{
 						outElement = decade*((outElement-1)/(param.max-1));
-	//					param.max = decade*(param.max/param.max-1);
 					}
 					else
 					{
 						outElement = decade*((outElement)/(param.max));
-	//					param.max = decade;
 					}
 				}
 				realMin = realMin > outElement?outElement:realMin;
@@ -731,8 +714,8 @@ public:
 
 			  if(p.PnE[0] > 0)
 			  {
-				 p.min = pow(10,p.min/(p.max-1) * p.PnE[0]);
-				 p.max = pow(10,p.PnE[0]);
+				 p.min = pow(10,p.min/(p.max-1) * p.PnE[0]) * p.PnE[1];
+				 p.max = pow(10, p.PnE[0]) * p.PnE[1];
 			  }
 			  else if (fcsPnGtransform && p.PnG != 1)
 				  p.max = (p.max-1) / p.PnG;
