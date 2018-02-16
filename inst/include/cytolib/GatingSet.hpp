@@ -81,7 +81,7 @@ public:
 	};
 
 	int nCol(){return begin()->second.nCol();}
-	const string & get_h5_file_path(){return path_dir_name(begin()->second.get_h5_file_path());}
+	string get_h5_file_path(){return path_dir_name(begin()->second.get_h5_file_path());}
 
 	/**
 	 * validity checks on the frame to see if its data structure is consistent with cytoset
