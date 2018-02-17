@@ -101,112 +101,18 @@ private:
 						we can try uBlas for this simple task, but when cid=="-1",we still need to
 						do this in R since comp is extracted from FCS keyword (unless it can be optionally extracted from workspace keyword)
 	 	 	 	 	  */
-	H5CytoFrame cytoframe_;
 	populationTree tree; /**< the gating tree */
 
 	PARAM_VEC transFlag; /*< for internal use of parse flowJo workspace */
 	trans_local trans; /*< the transformation used for this particular GatingHierarchy object */
 
 public:
-	 /**
-		  * forwarding APIs
-		  */
-		vector<string> getChannels(){return cytoframe_.getChannels();};
-		vector<string> getMarkers(){return cytoframe_.getMarkers();};
-		const string & get_h5_file_path(){return cytoframe_.get_h5_file_path();}
-		void setMarker(const string & _old, const string & _new){
-			cytoframe_.setMarker(_old, _new);
-		};
-		void setChannel(const string & _old, const string & _new){
-
-			updateChannels(CHANNEL_MAP({{_old, _new}}));
-
-		}
-		int nCol(){return cytoframe_.nCol();}
-		int nRow(){return cytoframe_.nRow();}
-		const PDATA & get_pheno_data() const {return cytoframe_.get_pheno_data();}
-		/**
-		 * Get the reference of cytoFrame
-		 * @return
-		 */
-		CytoFrame & get_cytoframe_ref()
-		{
-			return cytoframe_;
-		}
-		/**
-		 * extract in-memory data from a node
-		 * @param nodeID node id
-		 * @return MemCytoFrame , which is a subset of the original data
-		 */
-	//	MemCytoFrame getData(VertexID nodeID)
-	//	{
-	//		loadData();
-	//
-	//		//subset the results by indices for non-root node
-	//		if(nodeID>0)
-	//		{
-	//
-	//		}
-	//		else
-	//			return *fdata;
-	//	}
-
-	/**
-	 * move setter
-	 * @param _frm
-	 */
-	void set_cytoframe(const H5CytoFrame & cytoframe)
-	{
-		cytoframe_ = cytoframe;
-	}
-	void set_cytoframe(const string & h5_file)
-	{
-		cytoframe_ = H5CytoFrame(h5_file);
-	}
-//	/**
-//	 * load the in-memory copy of frm
-//	 */
-//	void load_fdata_cache()
-//	{
-//		if(cytoframe_cache_.nRow()==0)
-//		{
-//			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-//				PRINT("loading data into memory..\n");
-//			cytoframe_cache_ = MemCytoFrame(cytoframe_);
-//		}
-//	}
-//
-//	void release_fdata_cache(bool flush)
-//	{
-//		{
-//
-//			if(cytoframe_cache_.nRow()>0)
-//			{
-//				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-//					PRINT("unloading raw data..\n");
-//				if(flush)
-//				{
-//					cytoframe_.setData(cytoframe_cache_.get_data());
-//					cytoframe_.set_params(cytoframe_cache_.get_params());
-//					cytoframe_.set_pheno_data(cytoframe_cache_.get_pheno_data());
-//				}
-//				cytoframe_cache_ = MemCytoFrame();
-//			}
-//
-//
-//
-//		}
-//	}
-//
 	/**
 	 * setter for channels
 	 * @param chnl_map
 	 */
 	void updateChannels(const CHANNEL_MAP & chnl_map)
 	{
-		//update flow data
-		cytoframe_.updateChannels(chnl_map);
-
 		//update comp
 		comp.updateChannels(chnl_map);
 
@@ -451,42 +357,6 @@ public:
 			}
 	}
 
-	/* since it contains non-copyable unique_ptr member
-		 * , customized copy and assignment constructor is required
-		 *
-		 */
-//	GatingHierarchy(const GatingHierarchy & _gh)
-//	{
-//		comp = _gh.comp;
-//
-//		tree = _gh.tree;
-//		transFlag = _gh.transFlag;
-//		trans = _gh.trans;
-////		cytoframe_.reset(_gh.cytoframe_.clone());
-//	}
-//	GatingHierarchy & operator=(GatingHierarchy && _gh){
-//			std::swap(comp, _gh.comp);
-//			std::swap(tree, _gh.tree);
-//			std::swap(transFlag, _gh.transFlag);
-//			std::swap(trans, _gh.trans);
-//
-////			swap(cytoframe_, _gh.cytoframe_);
-//			return *this;
-//
-//		}
-//
-//	GatingHierarchy & operator=(const GatingHierarchy & _gh){
-//		comp = _gh.comp;
-//
-//		tree = _gh.tree;
-//		transFlag = _gh.transFlag;
-//		trans = _gh.trans;
-//
-//
-////			swap(cytoframe_, _gh.cytoframe_);
-//			return *this;
-//
-//		}
 	/**
 	 * default constructor that creates an empty gating tree
 	 *

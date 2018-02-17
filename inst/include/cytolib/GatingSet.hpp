@@ -10,10 +10,9 @@
 #ifndef GATINGSET_HPP_
 #define GATINGSET_HPP_
 #include "GatingHierarchy.hpp"
+#include "CytoSet.hpp"
 #include <string>
 #include <cytolib/delimitedMessage.hpp>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
 
 using namespace std;
 
@@ -42,6 +41,7 @@ class GatingSet{
 
 	typedef unordered_map<string,GatingHierarchy> gh_map;
 	gh_map ghs;
+	CytoSet cytoset_;
 	string guid_;
 public:
 	typedef typename gh_map::iterator iterator;
@@ -61,27 +61,25 @@ public:
 	 /**
 	  * forward to the first element's getChannels
 	  */
-	vector<string> getChannels(){return begin()->second.getChannels();};
+	vector<string> getChannels(){return cytoset_.getChannels();};
 	/**
 	 * modify the channels for each individual frame
 	 * @param _old
 	 * @param _new
 	 */
 	void setChannel(const string & _old, const string & _new){
-		for(auto & p : ghs)
-			p.second.setChannel(_old, _new);
+		cytoset_.setChannel(_old, _new);
 	};
 
 	//* forward to the first element's getChannels
-	vector<string> getMarkers(){return begin()->second.getMarkers();};
+	vector<string> getMarkers(){return cytoset_.getMarkers();};
 
 	void setMarker(const string & _old, const string & _new){
-		for(auto & p : ghs)
-			p.second.setMarker(_old, _new);
+		cytoset_.setMarker(_old, _new);
 	};
 
-	int nCol(){return begin()->second.nCol();}
-	string get_h5_file_path(){return path_dir_name(begin()->second.get_h5_file_path());}
+	int nCol(){return cytoset_.nCol();}
+	string get_h5_file_path(){return cytoset_.get_h5_file_path();}
 
 	/**
 	 * validity checks on the frame to see if its data structure is consistent with cytoset
@@ -134,7 +132,7 @@ public:
 	 * iterate through hash map to extract sample names
 	 * @return
 	 */
-	vector<string> get_sample_uids(){
+	vector<string> get_sample_uids() const{
 		vector<string> res;
 		for(const auto & f : ghs)
 			res.push_back(f.first);
@@ -160,6 +158,7 @@ public:
 			erase(_old);
 			ghs[_new] = gh;
 		}
+		cytoset_.set_sample_uid(_old, _new);
 	};
 
 	~GatingSet()
@@ -529,29 +528,24 @@ public:
 		}
 	}
 
-	GatingSet(vector<pair<string,string>> sample_uid_vs_file_path, const FCS_READ_PARAM & config, string h5_dir):GatingSet()
+	GatingSet(const CytoSet & cytoset):GatingSet()
 	{
-		fs::path h5_path = generate_h5_folder(fs::path(h5_dir));
-		for(const auto & it : sample_uid_vs_file_path)
+		for(const auto & it : cytoset.get_sample_uids())
 		{
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... start adding GatingHierarchy for: "+ it.first +"... \n");
+				PRINT("\n... start adding GatingHierarchy for: "+ it +"... \n");
 
 
-			GatingHierarchy & gh=addGatingHierarchy(it.first);
+			GatingHierarchy & gh=addGatingHierarchy(it);
 			gh.addRoot();//add default root
 
-			string h5_filename = (h5_path/it.first).string() + ".h5";
-			MemCytoFrame fr(it.second,config);
-			//set pdata
-			fr.set_pheno_data("name", path_base_name(it.second));
-			fr.read_fcs();
-			fr.writeH5(h5_filename);
-			gh.set_cytoframe(h5_filename);
 
 		}
+		set_cytoset(cytoset);
 	}
+
+	void set_cytoset(const CytoSet & cytoset){cytoset_ = cytoset;};
 
 	fs::path generate_h5_folder(fs::path h5_dir)
 	{
@@ -625,6 +619,9 @@ public:
 				it.second.updateChannels(chnl_map);
 				//comp
 			}
+		//update flow data
+		cytoset_.updateChannels(chnl_map);
+
 	}
 
 	void set_gTrans(const trans_global_vec & _gTrans){gTrans = _gTrans;};
