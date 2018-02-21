@@ -65,15 +65,15 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 	cytofrm.read_fcs();
 	double runtime = (gettime() - start);// / (double)(CLOCKS_PER_SEC / 1000);
 		cout << runtime << endl;
-	BOOST_CHECK_EQUAL(cytofrm.nCol(), 8);
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 23981);
+	BOOST_CHECK_EQUAL(cytofrm.n_cols(), 8);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 23981);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
 
 	string h5file = "/loc/no-backup/mike/shared/test.h5";
-	cytofrm.writeH5(h5file);
+	cytofrm.write_h5(h5file);
 	H5CytoFrame h5fr(h5file);
-	BOOST_CHECK_EQUAL(h5fr.nCol(), 8);
-	BOOST_CHECK_EQUAL(h5fr.nRow(), 23981);
+	BOOST_CHECK_EQUAL(h5fr.n_cols(), 8);
+	BOOST_CHECK_EQUAL(h5fr.n_rows(), 23981);
 //	for(auto c: h5fr.getChannels())
 //		cout << c << endl;
 //	for(auto c: h5fr.getKeywords())
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE(double_precision)
 	cytofrm.read_fcs();
 	double runtime = (gettime() - start);
 	cout << runtime << endl;
-	BOOST_CHECK_EQUAL(cytofrm.nCol(), 35);
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 250170);
+	BOOST_CHECK_EQUAL(cytofrm.n_cols(), 35);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 250170);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
 
 }
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(multidata1)
 	MemCytoFrame cytofrm(filename.c_str(), config);
 	cytofrm.read_fcs();
 
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 955);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 955);
 
 	//pd
 	cytofrm.set_pheno_data("colA", "a1");
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(multidata1)
 	BOOST_CHECK_EQUAL(cytofrm.get_pheno_data("colA"), "a1");
 
 	string h5file = "/loc/no-backup/mike/shared/test.h5";
-	cytofrm.writeH5(h5file);
+	cytofrm.write_h5(h5file);
 	H5CytoFrame fr1(h5file);
 	BOOST_CHECK_EQUAL(fr1.get_pheno_data("colA"), "a1");
 }
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(multidata2)
 	MemCytoFrame cytofrm(filename.c_str(), config);
 	cytofrm.read_fcs();
 
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 53691);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 53691);
 }
 
 BOOST_AUTO_TEST_CASE(oddbitwidth)
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(oddbitwidth)
 
 	cout << gettime() - start << endl;
 
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10000);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 10000);
 	BOOST_CHECK_EQUAL(cytofrm.get_data()[1], 194);
 
 }
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(mixedEndian)
 
 	cout << gettime() - start << endl;
 
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 30041);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 30041);
 	BOOST_CHECK_EQUAL(cytofrm.get_data()[1], 7447226);
 
 }
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(specialDelimiter)
 
 	cout << gettime() - start << endl;
 
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 50146);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 50146);
 	BOOST_CHECK_EQUAL(cytofrm.get_data()[1], 9999998);
 
 }
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(gigantic_file)
 
 	cout << gettime() - start << endl;
 
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1e3);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 1e3);
 	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 63418.3242, 1e-6);
 
 }
@@ -224,9 +224,9 @@ BOOST_AUTO_TEST_CASE(newline_in_txt)
 
 	MemCytoFrame cytofrm(filename.c_str(), config);
 	cytofrm.read_fcs_header();
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 0);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 0);
 	cytofrm.read_fcs_data();
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 10045);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 10045);
 	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 9220, 1e-6);
 
 }
@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_CASE(samples_F1)
 
 	MemCytoFrame cytofrm(filename.c_str(), config);
 	cytofrm.read_fcs();
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 1000000);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 1000000);
 	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 60981.75, 1e-6);
 
 }
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(skip_log_transformed)
 
 	MemCytoFrame cytofrm(filename.c_str(), config);
 	cytofrm.read_fcs();
-	BOOST_CHECK_EQUAL(cytofrm.nRow(), 183699);
+	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 183699);
 	BOOST_CHECK_CLOSE(cytofrm.get_range("Dy161Di", ColType::channel, RangeType::instrument).second, 766, 1e-6);
 
 }

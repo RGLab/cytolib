@@ -61,24 +61,24 @@ public:
 	 /**
 	  * forward to the first element's getChannels
 	  */
-	vector<string> getChannels(){return cytoset_.getChannels();};
+	vector<string> get_channels(){return cytoset_.get_channels();};
 	/**
 	 * modify the channels for each individual frame
 	 * @param _old
 	 * @param _new
 	 */
-	void setChannel(const string & _old, const string & _new){
-		cytoset_.setChannel(_old, _new);
+	void set_channel(const string & _old, const string & _new){
+		cytoset_.set_channel(_old, _new);
 	};
 
 	//* forward to the first element's getChannels
-	vector<string> getMarkers(){return cytoset_.getMarkers();};
+	vector<string> get_markers(){return cytoset_.get_markers();};
 
-	void setMarker(const string & _old, const string & _new){
-		cytoset_.setMarker(_old, _new);
+	void set_marker(const string & _old, const string & _new){
+		cytoset_.set_marker(_old, _new);
 	};
 
-	int nCol(){return cytoset_.nCol();}
+	int n_cols(){return cytoset_.n_cols();}
 	string get_h5_file_path(){return cytoset_.get_h5_file_path();}
 
 	/**
@@ -599,7 +599,7 @@ public:
 	 * update channel information stored in GatingSet
 	 * @param chnl_map the mapping between the old and new channel names
 	 */
-	void updateChannels(const CHANNEL_MAP & chnl_map)
+	void update_channels(const CHANNEL_MAP & chnl_map)
 	{
 		//update trans
 		for(trans_global_vec::iterator it=gTrans.begin();it!=gTrans.end();it++)
@@ -607,7 +607,7 @@ public:
 
 			if(g_loglevel>=GATING_SET_LEVEL)
 				PRINT("\nupdate channels for transformation group:" + it->getGroupName()+ "\n");
-			it->updateChannels(chnl_map);
+			it->update_channels(chnl_map);
 
 		}
 
@@ -616,11 +616,11 @@ public:
 
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\nupdate channels for GatingHierarchy:"+it.first+"\n");
-				it.second.updateChannels(chnl_map);
+				it.second.update_channels(chnl_map);
 				//comp
 			}
 		//update flow data
-		cytoset_.updateChannels(chnl_map);
+		cytoset_.update_channels(chnl_map);
 
 	}
 

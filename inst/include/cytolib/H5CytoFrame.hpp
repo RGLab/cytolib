@@ -40,7 +40,7 @@ public:
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
-		fr.writeH5(h5_filename);
+		fr.write_h5(h5_filename);
 		*this = H5CytoFrame(h5_filename);
 	}
 	/**
@@ -110,7 +110,7 @@ public:
 			params[i].PnE[1] = pvec[i].PnE[1];
 			params[i].PnB = pvec[i].PnB;
 		}
-		buildHash();
+		build_hash();
 
 		/*
 		 * read keywords
@@ -173,7 +173,7 @@ public:
 	const string & get_h5_file_path(){
 		return filename_;
 	}
-	unsigned nRow() const{
+	unsigned n_rows() const{
 		//read nEvents
 		return dims[1];
 	}
@@ -183,16 +183,16 @@ public:
 	 * @return
 	 */
 	EVENT_DATA_VEC get_data() const{
-		EVENT_DATA_VEC data(nCol() * nRow());
+		EVENT_DATA_VEC data(n_cols() * n_rows());
 		dataset.read(data.data(), PredType::NATIVE_FLOAT);
 
 		return data;
 	}
 	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
-		int idx = getColId(colname, type);
+		int idx = get_col_idx(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
-		EVENT_DATA_VEC data(nRow());
+		EVENT_DATA_VEC data(n_rows());
 	//	hsize_t dim[1];
 		return data;
 
@@ -201,17 +201,17 @@ public:
 	 * copy setter
 	 * @param _data
 	 */
-	void setData(const EVENT_DATA_VEC & _data)
+	void set_data(const EVENT_DATA_VEC & _data)
 	{
 
 		dataset.write(_data.data(), PredType::NATIVE_FLOAT );
 
 	}
 
-	void setData(EVENT_DATA_VEC && _data)
+	void set_data(EVENT_DATA_VEC && _data)
 	{
 		EVENT_DATA_VEC data = _data;
-		setData(data);
+		set_data(data);
 	}
 };
 

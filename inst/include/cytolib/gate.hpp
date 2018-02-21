@@ -122,7 +122,7 @@ public:
 		return res;
 	}
 	void setName(string _n){name=_n;};
-	void updateChannels(const CHANNEL_MAP & chnl_map){
+	void update_channels(const CHANNEL_MAP & chnl_map){
 
 			CHANNEL_MAP::const_iterator itChnl = chnl_map.find(name);
 			if(itChnl!=chnl_map.end())
@@ -153,7 +153,7 @@ public:
 	void setVertices(vector<coordinate> _v){vertices=_v;};
 	vector<string>  getNameArray(){return params;};
 	void setName(vector<string> _params){params=_params;};
-	void updateChannels(const CHANNEL_MAP & chnl_map){
+	void update_channels(const CHANNEL_MAP & chnl_map){
 
 			for(vector<string>::iterator it = params.begin(); it != params.end(); it++)
 			{
@@ -249,7 +249,7 @@ public:
 	virtual vector<string> getParamNames(){throw(domain_error("undefined getParam function!"));};
 	virtual vertices_vector getVertices(){throw(domain_error("undefined getVertices function!"));};
 	virtual void transforming(trans_local &){throw(domain_error("undefined transforming function!"));};
-	virtual void updateChannels(const CHANNEL_MAP & chnl_map){throw(domain_error("undefined updateChannels function!"));};
+	virtual void update_channels(const CHANNEL_MAP & chnl_map){throw(domain_error("undefined update_channels function!"));};
 	virtual gate * clone()=0;
 	virtual bool isNegate(){return neg;};
 	virtual bool gained(){return isGained;};
@@ -314,7 +314,7 @@ public:
 	void extend(MemCytoFrame & fdata,float extend_val){
 		string pName=param.getName();
 		EVENT_DATA_TYPE * data_1d = fdata.subset(pName, ColType::channel);
-		int nSize = fdata.nRow();
+		int nSize = fdata.n_rows();
 		/*
 		 * get R_min
 		 */
@@ -365,7 +365,7 @@ public:
 	paramRange getParam(){return param;};
 	vector<string> getParamNames(){return param.getNameArray();};
 	void setParam(paramRange _param){param=_param;};
-	void updateChannels(const CHANNEL_MAP & chnl_map){param.updateChannels(chnl_map);};
+	void update_channels(const CHANNEL_MAP & chnl_map){param.update_channels(chnl_map);};
 	vertices_vector getVertices(){return param.toVector();};
 	rangeGate * clone(){return new rangeGate(*this);};
 };
@@ -399,7 +399,7 @@ public:
 		string y=param.yName();
 		EVENT_DATA_TYPE* xdata(fdata.subset(x, ColType::channel));
 		EVENT_DATA_TYPE* ydata(fdata.subset(y, ColType::channel));
-		int nSize = fdata.nRow();
+		int nSize = fdata.n_rows();
 		vector<coordinate> v=param.getVertices();
 		/*
 		 * get R_min
@@ -640,7 +640,7 @@ public:
 	}
 	virtual vertices_vector getVertices(){return param.toVector();};
 	void setParam(paramPoly _param){param=_param;};
-	void updateChannels(const CHANNEL_MAP & chnl_map){param.updateChannels(chnl_map);};
+	void update_channels(const CHANNEL_MAP & chnl_map){param.update_channels(chnl_map);};
 	virtual paramPoly getParam(){return param;};
 	virtual vector<string> getParamNames(){return param.getNameArray();};
 	virtual polygonGate * clone(){return new polygonGate(*this);};

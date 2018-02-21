@@ -55,7 +55,7 @@ public:
 		mat B(spillOver.data(), nMarker, nMarker);
 		return B.t();
 	}
-	void updateChannels(const CHANNEL_MAP & chnl_map){
+	void update_channels(const CHANNEL_MAP & chnl_map){
 
 		for(vector<string>::iterator it = marker.begin(); it != marker.end(); it++)
 		{

@@ -89,7 +89,7 @@ public:
 
 		int nMarker = comp.marker.size();
 		EVENT_DATA_VEC dat = get_data();
-		arma::mat A(dat.data(), nRow(), nCol(), false, true);//point to the original data
+		arma::mat A(dat.data(), n_rows(), n_cols(), false, true);//point to the original data
 //		A.rows(1,3).print("\ndata");
 		mat B = comp.get_spillover_mat();
 //		B.print("comp");
@@ -98,7 +98,7 @@ public:
 		uvec indices(nMarker);
 		for(int i = 0; i < nMarker; i++)
 		{
-			int id = getColId(comp.marker[i], ColType::channel);
+			int id = get_col_idx(comp.marker[i], ColType::channel);
 			if(id < 0)
 				throw(domain_error("compensation parameter '" + comp.marker[i] + " not found in cytoframe parameters!"));
 
@@ -108,7 +108,7 @@ public:
 //		A.submat(rind,indices).print("data ");
 		A.cols(indices) = A.cols(indices) * B;
 //		A.submat(rind,indices).print("data comp");
-		setData(dat);
+		set_data(dat);
 	}
 	/**
 	 * getter from cytoParam vector
@@ -129,7 +129,7 @@ public:
 	 *
 	 * @param filename the path of the output H5 file
 	 */
-	virtual void writeH5(const string & filename)
+	virtual void write_h5(const string & filename)
 	{
 		H5File file( filename, H5F_ACC_TRUNC );
 		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
@@ -154,7 +154,7 @@ public:
 		param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
 		param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
 
-		hsize_t dim_param[] = {nCol()};
+		hsize_t dim_param[] = {n_cols()};
 		DataSpace dsp_param(1, dim_param);
 	//	vector<const char *> cvec;
 	//	for(auto & c : params)
@@ -214,8 +214,8 @@ public:
 		* store events data as fixed
 		* size dataset.
 		*/
-		unsigned nEvents = nRow();
-		hsize_t dimsf[2] = {nCol(), nEvents};              // dataset dimensions
+		unsigned nEvents = n_rows();
+		hsize_t dimsf[2] = {n_cols(), nEvents};              // dataset dimensions
 		DSetCreatPropList plist;
 		hsize_t	chunk_dims[2] = {1, nEvents};
 		plist.setChunk(2, chunk_dims);
@@ -243,8 +243,8 @@ public:
 	 * @return
 	 */
 	virtual EVENT_DATA_VEC get_data(const string & colname, ColType type) const=0;
-	virtual void setData(const EVENT_DATA_VEC &)=0;
-	virtual void setData(EVENT_DATA_VEC &&)=0;
+	virtual void set_data(const EVENT_DATA_VEC &)=0;
+	virtual void set_data(EVENT_DATA_VEC &&)=0;
 	/**
 	 * extract all the keyword pairs
 	 *
@@ -283,7 +283,7 @@ public:
 	 *
 	 * @return
 	 */
-	virtual unsigned nCol() const
+	virtual unsigned n_cols() const
 	{
 		return params.size();
 	}
@@ -292,23 +292,23 @@ public:
 	 * get the number of rows(or events)
 	 * @return
 	 */
-	virtual unsigned nRow() const=0;
+	virtual unsigned n_rows() const=0;
 	/**
 	 * check if the hash map for channel and marker has been built
 	 * @return
 	 */
-	virtual bool isHashed() const
+	virtual bool is_hashed() const
 	{
-		return channel_vs_idx.size()==nCol();
+		return channel_vs_idx.size()==n_cols();
 	}
 
 	/**
 	 * build the hash map for channel and marker for the faster query
 	 *
 	 */
-	virtual void buildHash()
+	virtual void build_hash()
 	{
-		for(unsigned i = 0; i < nCol(); i++)
+		for(unsigned i = 0; i < n_cols(); i++)
 		{
 			channel_vs_idx[params[i].channel] = i;
 			marker_vs_idx[params[i].marker] = i;
@@ -319,19 +319,19 @@ public:
 	 * get all the channel names
 	 * @return
 	 */
-	virtual vector<string> getChannels() const
+	virtual vector<string> get_channels() const
 	{
-		vector<string> res(nCol());
-		for(unsigned i = 0; i < nCol(); i++)
+		vector<string> res(n_cols());
+		for(unsigned i = 0; i < n_cols(); i++)
 			res[i] = params[i].channel;
 		return res;
 	}
 
-	virtual void updateChannels(const CHANNEL_MAP & chnl_map)
+	virtual void update_channels(const CHANNEL_MAP & chnl_map)
 	{
 		for(auto & it : chnl_map)
 		{
-			setChannel(it.first, it.second);
+			set_channel(it.first, it.second);
 		}
 
 	}
@@ -339,10 +339,10 @@ public:
 	 * get all the marker names
 	 * @return
 	 */
-	virtual vector<string> getMarkers() const
+	virtual vector<string> get_markers() const
 	{
-		vector<string> res(nCol());
-			for(unsigned i = 0; i < nCol(); i++)
+		vector<string> res(n_cols());
+			for(unsigned i = 0; i < n_cols(); i++)
 				res[i] = params[i].marker;
 		return res;
 	}
@@ -353,9 +353,9 @@ public:
 	 * @param type the type of column
 	 * @return
 	 */
-	virtual int getColId(const string & colname, ColType type) const
+	virtual int get_col_idx(const string & colname, ColType type) const
 	{
-		if(!isHashed())
+		if(!is_hashed())
 			throw(domain_error("please call buildHash() first to build the hash map for column index!"));
 
 		switch(type)
@@ -396,9 +396,9 @@ public:
 
 	}
 
-	virtual void setChannel(const string & oldname, const string &newname)
+	virtual void set_channel(const string & oldname, const string &newname)
 	{
-		int id = getColId(oldname, ColType::channel);
+		int id = get_col_idx(oldname, ColType::channel);
 		if(id<0)
 			throw(domain_error("colname not found: " + oldname));
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -408,9 +408,9 @@ public:
 		channel_vs_idx[newname] = id;
 	}
 
-	virtual void setMarker(const string & oldname, const string & newname)
+	virtual void set_marker(const string & oldname, const string & newname)
 	{
-		int id = getColId(oldname, ColType::marker);
+		int id = get_col_idx(oldname, ColType::marker);
 		if(id<0)
 			throw(domain_error("colname not found: " + oldname));
 		params[id].marker=newname;
@@ -425,7 +425,7 @@ public:
 	 * @param new_range
 	 */
 	virtual void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range){
-		int idx = getColId(colname, ctype);
+		int idx = get_col_idx(colname, ctype);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
 		params[idx].min = new_range.first;
@@ -448,12 +448,12 @@ public:
 
 				EVENT_DATA_VEC vec = get_data(colname, ctype);
 				EVENT_DATA_TYPE * data = &vec[0];
-				auto res = minmax_element(data, data + nRow());
+				auto res = minmax_element(data, data + n_rows());
 				return make_pair(*res.first, *res.second);
 			}
 		case RangeType::instrument:
 		{
-			int idx = getColId(colname, ctype);
+			int idx = get_col_idx(colname, ctype);
 			if(idx<0)
 				throw(domain_error("colname not found: " + colname));
 			return make_pair(params[idx].min, params[idx].max);
@@ -538,7 +538,7 @@ public:
 	{
 		pheno_data_ = _pd;
 	}
-	void delPData(const string & name){pheno_data_.erase(name);}
+	void del_pheno_data(const string & name){pheno_data_.erase(name);}
 };
 };
 

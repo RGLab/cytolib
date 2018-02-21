@@ -978,7 +978,7 @@ public:
 		}
 
 
-		buildHash();
+		build_hash();
 
 
 	//	    origRange <- range
@@ -988,11 +988,11 @@ public:
 	}
 
 
-	unsigned nRow() const{
-		if(nCol()==0)
+	unsigned n_rows() const{
+		if(n_cols()==0)
 			return 0;
 		else
-			return data_.size()/nCol();
+			return data_.size()/n_cols();
 	}
 
 /**
@@ -1003,10 +1003,10 @@ public:
 		return data_;
 	}
 	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
-		int idx = getColId(colname, type);
+		int idx = get_col_idx(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
-		int nEvents = nRow();
+		int nEvents = n_rows();
 		EVENT_DATA_VEC res(nEvents);
 		memcpy(&res[0], &data_[0] + idx * nEvents, nEvents*sizeof(EVENT_DATA_TYPE));
 		return res ;
@@ -1015,7 +1015,7 @@ public:
 	 * copy setter
 	 * @param _data
 	 */
-	void setData(const EVENT_DATA_VEC & _data)
+	void set_data(const EVENT_DATA_VEC & _data)
 	{
 		data_ = _data;
 	}
@@ -1023,7 +1023,7 @@ public:
 	 * move setter
 	 * @param _data
 	 */
-	void setData(EVENT_DATA_VEC && _data)
+	void set_data(EVENT_DATA_VEC && _data)
 	{
 		data_ = _data;
 	}
@@ -1037,10 +1037,10 @@ public:
 	 * @return
 	 */
 	EVENT_DATA_TYPE * subset(const string & colname, ColType type = ColType::unknown){
-		int idx = getColId(colname, type);
+		int idx = get_col_idx(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
-		return data_.data() + idx * nRow();
+		return data_.data() + idx * n_rows();
 	}
 
 

@@ -34,30 +34,38 @@ namespace cytolib
 	 /**
 		  * forward to the first element's getChannels
 		  */
-		vector<string> getChannels(){return begin()->second.getChannels();};
+		vector<string> get_channels(){return begin()->second.get_channels();};
 		/**
 		 * modify the channels for each individual frame
 		 * @param _old
 		 * @param _new
 		 */
-		void setChannel(const string & _old, const string & _new){
+		void set_channel(const string & _old, const string & _new){
 			for(auto & p : frames_)
-				p.second.setChannel(_old, _new);
+				p.second.set_channel(_old, _new);
 		};
 
 		//* forward to the first element's getChannels
-		vector<string> getMarkers(){return begin()->second.getMarkers();};
+		vector<string> get_markers(){return begin()->second.get_markers();};
 
-		void setMarker(const string & _old, const string & _new){
+		void set_marker(const string & _old, const string & _new){
 			for(auto & p : frames_)
-				p.second.setMarker(_old, _new);
+				p.second.set_marker(_old, _new);
 		};
 
-		int nCol(){return begin()->second.nCol();}
+		int n_cols(){return begin()->second.n_cols();}
 
 		string get_h5_file_path(){return path_dir_name(begin()->second.get_h5_file_path());}
 
+		H5CytoFrame & get_cytoframe(string sample_uid)
+		{
 
+			iterator it=find(sample_uid);
+			if(it==end())
+				throw(domain_error(sample_uid + " not found in gating set!"));
+			else
+				return it->second;
+		}
 		void add_cytoframe(string sample_uid, const H5CytoFrame & frame){
 			if(find(sample_uid) != end())
 				throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
@@ -77,7 +85,7 @@ namespace cytolib
 				//set pdata
 				fr.set_pheno_data("name", path_base_name(it.second));
 				fr.read_fcs();
-				fr.writeH5(h5_filename);
+				fr.write_h5(h5_filename);
 				add_cytoframe(it.first, H5CytoFrame(h5_filename));
 
 			}
@@ -107,10 +115,10 @@ namespace cytolib
 			return res;
 
 		};
-		void updateChannels(const CHANNEL_MAP & chnl_map){
+		void update_channels(const CHANNEL_MAP & chnl_map){
 			//update gh
 			for(auto & it : frames_){
-					it.second.updateChannels(chnl_map);
+					it.second.update_channels(chnl_map);
 					//comp
 				}
 

@@ -111,10 +111,10 @@ public:
 	 * setter for channels
 	 * @param chnl_map
 	 */
-	void updateChannels(const CHANNEL_MAP & chnl_map)
+	void update_channels(const CHANNEL_MAP & chnl_map)
 	{
 		//update comp
-		comp.updateChannels(chnl_map);
+		comp.update_channels(chnl_map);
 
 		//update gates
 
@@ -132,17 +132,17 @@ public:
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT( "update channels for " +node.getName()+"\n");
 				if(g->getType()!=BOOLGATE&&g->getType()!=LOGICALGATE)
-					g->updateChannels(chnl_map);
+					g->update_channels(chnl_map);
 			}
 		}
 
 		//update local trans
-		trans.updateChannels(chnl_map);
+		trans.update_channels(chnl_map);
 
 
 		//update flag
 		for(PARAM_VEC::iterator it = transFlag.begin(); it != transFlag.end(); it++)
-			it->updateChannels(chnl_map);
+			it->update_channels(chnl_map);
 
 	}
 
@@ -185,7 +185,7 @@ public:
 
 		for(const string & old : comp.marker)
 		{
-			cytoframe.setChannel(old, comp.prefix + old + comp.suffix);
+			cytoframe.set_channel(old, comp.prefix + old + comp.suffix);
 		}
 
 
@@ -201,13 +201,13 @@ public:
 	{
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 			PRINT("start transforming data \n");
-		if(cytoframe.nRow()==0)
+		if(cytoframe.n_rows()==0)
 			throw(domain_error("data is not loaded yet!"));
 
 	//	unsigned nEvents=fdata.nEvents;
 	//	unsigned nChannls=fdata.nChannls;
-		vector<string> channels=cytoframe.getChannels();
-		int nEvents = cytoframe.nRow();
+		vector<string> channels=cytoframe.get_channels();
+		int nEvents = cytoframe.n_rows();
 		/*
 		 * transforming each marker
 		 */
@@ -335,7 +335,7 @@ public:
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\nstart extending Gates \n");
 
-			if(cytoframe.nRow()==0)
+			if(cytoframe.n_rows()==0)
 					throw(domain_error("data is not loaded yet!"));
 
 			VertexID_vec vertices=getVertices(0);
@@ -702,7 +702,7 @@ public:
 		nodeProperties & node=getNodeProperty(u);
 		if(u==0)
 		{
-			node.setIndices(cytoframe.nRow());
+			node.setIndices(cytoframe.n_rows());
 			node.computeStats();
 		}else
 		{

@@ -212,7 +212,7 @@ struct PARAM{
 		//EDIT: can't trust this info from xml
 //		EVENT_DATA_TYPE timestep;//only meaningful for time channel which is used to scale time channel (only for data, not for gates since gates are already stored at scaled value)
 		PARAM(){};
-		void updateChannels(const CHANNEL_MAP & chnl_map){
+		void update_channels(const CHANNEL_MAP & chnl_map){
 			CHANNEL_MAP::const_iterator itChnl = chnl_map.find(param);
 			if(itChnl!=chnl_map.end())
 				param = itChnl->second;
@@ -342,7 +342,7 @@ public:
 		}
 	}
 
-	void updateChannels(const CHANNEL_MAP & chnl_map){
+	void update_channels(const CHANNEL_MAP & chnl_map){
 
 		//iterate throiugh chnl_map instead of tp since tp iterator will be invalidated when erased
 		for(CHANNEL_MAP::const_iterator itChnl = chnl_map.begin(); itChnl != chnl_map.end(); itChnl++)
