@@ -28,9 +28,12 @@ protected:
 	DataSet dataset;
 	DataSpace dataspace;
 	hsize_t dims[2];              // dataset dimensions
+	arma::uvec row_idx;
+	bool is_row_indexed;
+
 public:
 	~H5CytoFrame(){};
-	H5CytoFrame(){};
+	H5CytoFrame():is_row_indexed(false){};
 	/**
 	 * constructor from FCS
 	 * @param fcs_filename
@@ -47,7 +50,7 @@ public:
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):filename_(h5_filename)
+	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):filename_(h5_filename),is_row_indexed(false)
 	{
 		file.openFile(filename_, flags);
 
@@ -175,7 +178,10 @@ public:
 	}
 	unsigned n_rows() const{
 		//read nEvents
-		return dims[1];
+		if(is_row_indexed)
+			return row_idx.size();
+		else
+			return dims[1];
 	}
 	/**
 	 * Read data from disk.
@@ -183,19 +189,43 @@ public:
 	 * @return
 	 */
 	EVENT_DATA_VEC get_data() const{
-		EVENT_DATA_VEC data(n_cols() * n_rows());
-		dataset.read(data.data(), PredType::NATIVE_FLOAT);
-
+		EVENT_DATA_VEC data(n_rows(),n_cols());
+		dataset.read(data.memptr(), PredType::NATIVE_FLOAT);
+		if(is_row_indexed)
+			data = data(row_idx);
 		return data;
 	}
 	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
 		int idx = get_col_idx(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
-		EVENT_DATA_VEC data(n_rows());
-	//	hsize_t dim[1];
+		unsigned nEvent = n_rows();
+		EVENT_DATA_VEC data(nEvent, 1);
+		hsize_t      offset[2];   // hyperslab offset in the file
+		hsize_t      count[2];    // size of the hyperslab in the file
+		offset[0] = idx;
+		offset[1] = 0;
+		count[0]  = 1;
+		count[1]  = nEvent;
+		dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
+
+		dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,DataSpace::ALL, dataspace);
+		if(is_row_indexed)
+			data = data(row_idx);
 		return data;
 
+	}
+	H5CytoFrame rows(vector<unsigned> row_idx)
+	{
+		H5CytoFrame res(*this);
+		res.update_row_idx(arma::conv_to<uvec>::from(row_idx));
+		return res;
+	}
+	void update_row_idx(uvec idx)
+	{
+		if(is_row_indexed && row_idx.size()!=idx.size())
+			throw(domain_error("The size of the new row index is not the same as the total number of events!"));
+		row_idx = idx;
 	}
 	/**
 	 * copy setter
@@ -204,7 +234,7 @@ public:
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
 
-		dataset.write(_data.data(), PredType::NATIVE_FLOAT );
+		dataset.write(_data.mem, PredType::NATIVE_FLOAT );
 
 	}
 

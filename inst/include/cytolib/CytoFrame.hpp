@@ -89,7 +89,7 @@ public:
 
 		int nMarker = comp.marker.size();
 		EVENT_DATA_VEC dat = get_data();
-		arma::mat A(dat.data(), n_rows(), n_cols(), false, true);//point to the original data
+		arma::mat A(dat.memptr(), n_rows(), n_cols(), false, true);//point to the original data
 //		A.rows(1,3).print("\ndata");
 		mat B = comp.get_spillover_mat();
 //		B.print("comp");
@@ -447,9 +447,8 @@ public:
 			{
 
 				EVENT_DATA_VEC vec = get_data(colname, ctype);
-				EVENT_DATA_TYPE * data = &vec[0];
-				auto res = minmax_element(data, data + n_rows());
-				return make_pair(*res.first, *res.second);
+
+				return make_pair(vec.min(), vec.max());
 			}
 		case RangeType::instrument:
 		{

@@ -221,7 +221,7 @@ public:
 				EVENT_DATA_TYPE timestep = cytoframe.get_time_step(curChannel);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("multiplying "+curChannel+" by :"+ to_string(timestep) + "\n");
-				EVENT_DATA_TYPE * x = cytoframe.subset(curChannel, ColType::channel);
+				EVENT_DATA_TYPE * x = cytoframe.get_data_memptr(curChannel, ColType::channel);
 				for(int i = 0; i < nEvents; i++)
 					x[i] = x[i] * timestep;
 				param_range.first = param_range.first * timestep;
@@ -237,7 +237,7 @@ public:
 							if(curTrans->gateOnly())
 								continue;
 
-							EVENT_DATA_TYPE * x = cytoframe.subset(curChannel, ColType::channel);
+							EVENT_DATA_TYPE * x = cytoframe.get_data_memptr(curChannel, ColType::channel);
 							if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 								PRINT("transforming "+curChannel+" with func:"+curTrans->getChannel()+"\n");
 

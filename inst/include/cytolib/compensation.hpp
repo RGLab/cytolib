@@ -7,10 +7,8 @@
 
 #ifndef INCLUDE_COMPENSATION_HPP_
 #define INCLUDE_COMPENSATION_HPP_
-#include <armadillo>
-#include "transformation.hpp"
 
-using namespace arma;
+#include "transformation.hpp"
 
 namespace cytolib
 {

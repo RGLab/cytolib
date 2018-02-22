@@ -547,6 +547,19 @@ public:
 
 	void set_cytoset(const CytoSet & cytoset){cytoset_ = cytoset;};
 
+	const CytoSet & get_cytoset(){
+		return cytoset_;
+	}
+
+	CytoSet get_cytoset(string node_path){
+		CytoSet view = cytoset_;
+		for(auto & it : view)
+		{
+			GatingHierarchy & gh = getGatingHierarchy(it.first);
+			it.second = it.second.rows(gh.getNodeProperty(gh.getNodeID(node_path)).getIndices_u());
+		}
+			return view;
+		}
 	fs::path generate_h5_folder(fs::path h5_dir)
 	{
 		h5_dir /= guid_;

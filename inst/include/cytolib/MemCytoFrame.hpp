@@ -482,8 +482,8 @@ public:
 	//	nEvents = nrow;
 		//how many element to return
 	  	size_t nElement = nrow * nCol;
-	//	EVENT_DATA_PTR output(new EVENT_DATA_TYPE[nElement]);
-	  	data_.resize(nElement);
+
+	  	data_.resize(nrow, nCol);
 
 	//	char *p = buf.get();//pointer to the current beginning byte location of the processing data element in the byte stream
 		float decade = pow(10, config.decades);
@@ -562,8 +562,8 @@ public:
 		    {
 		      //convert each element
 				  auto thisSize = param.PnB;
-				  size_t idx = element_offset + r;
-				  EVENT_DATA_TYPE & outElement = data_[idx];
+//				  size_t idx = element_offset + r;
+				  EVENT_DATA_TYPE & outElement = data_.at(r, c);
 				  size_t idx_bits = r * nRowSize + bits_offset;
 				  char *p = bufPtr + idx_bits/8;
 				  thisSize/=8;
@@ -992,9 +992,15 @@ public:
 		if(n_cols()==0)
 			return 0;
 		else
-			return data_.size()/n_cols();
+			return data_.n_rows;
 	}
 
+	MemCytoFrame rows(vector<unsigned> row_idx)
+	{
+		MemCytoFrame res(*this);
+		res.data_ = res.data_.rows(arma::conv_to<uvec>::from(row_idx));
+		return res;
+	}
 /**
  * Caller will receive a copy of data
  * @return
@@ -1006,10 +1012,9 @@ public:
 		int idx = get_col_idx(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
-		int nEvents = n_rows();
-		EVENT_DATA_VEC res(nEvents);
-		memcpy(&res[0], &data_[0] + idx * nEvents, nEvents*sizeof(EVENT_DATA_TYPE));
-		return res ;
+
+
+		return data_.col(idx) ;
 	}
 	/**
 	 * copy setter
@@ -1036,11 +1041,11 @@ public:
 	 * @param type
 	 * @return
 	 */
-	EVENT_DATA_TYPE * subset(const string & colname, ColType type = ColType::unknown){
+	EVENT_DATA_TYPE * get_data_memptr(const string & colname, ColType type){
 		int idx = get_col_idx(colname, type);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
-		return data_.data() + idx * n_rows();
+		return data_.colptr(idx);
 	}
 
 

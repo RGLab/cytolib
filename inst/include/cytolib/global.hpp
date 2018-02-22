@@ -23,6 +23,10 @@
 #include <memory>
 #include <ctype.h>
 #include <vector>
+
+#include <armadillo>
+using namespace arma;
+
 using namespace std;
 extern unsigned short g_loglevel;// debug print is turned off by default
 extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
@@ -57,8 +61,7 @@ namespace cytolib
 	#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
 
 	typedef double EVENT_DATA_TYPE;
-	typedef vector<EVENT_DATA_TYPE> EVENT_DATA_VEC;
-	typedef unique_ptr<EVENT_DATA_TYPE[] > EVENT_DATA_PTR;
+	typedef arma::Mat<EVENT_DATA_TYPE> EVENT_DATA_VEC;
 
 	#define PRT true
 
