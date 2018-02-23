@@ -84,6 +84,7 @@ public:
 			EVENT_DATA_TYPE min, max, PnG;
 			EVENT_DATA_TYPE PnE[2];
 			int PnB;
+			unsigned original_col_idx;
 
 		};
 		vector<cytoParam1> pvec(nParam);
@@ -96,7 +97,7 @@ public:
 		param_type.insertMember("PnG", HOFFSET(cytoParam1, PnG), datatype);
 		param_type.insertMember("PnE", HOFFSET(cytoParam1, PnE), pne);
 		param_type.insertMember("PnB", HOFFSET(cytoParam1, PnB), PredType::NATIVE_INT8);
-
+		param_type.insertMember("original_col_idx", HOFFSET(cytoParam1, original_col_idx), PredType::NATIVE_INT8);
 		ds_param.read(pvec.data(),param_type);
 		//cp back to param
 		params.resize(nParam);
@@ -112,6 +113,7 @@ public:
 			params[i].PnE[0] = pvec[i].PnE[0];
 			params[i].PnE[1] = pvec[i].PnE[1];
 			params[i].PnB = pvec[i].PnB;
+			params[i].original_col_idx = pvec[i].original_col_idx;
 		}
 		build_hash();
 
@@ -189,38 +191,63 @@ public:
 	 * @return
 	 */
 	EVENT_DATA_VEC get_data() const{
-		EVENT_DATA_VEC data(n_rows(),n_cols());
-		dataset.read(data.memptr(), PredType::NATIVE_FLOAT);
+		unsigned nrow = n_rows();
+		unsigned ncol = n_cols();
+		/*
+		 * Define the memory dataspace.
+		 */
+		hsize_t dimsm[] = {ncol, nrow};
+		DataSpace memspace(2,dimsm);
+		hsize_t      offset_mem[2];
+		hsize_t      count_mem[2];
+		EVENT_DATA_VEC data(nrow, ncol);
+		//reach one col at a time
+		for(unsigned i = 0; i < ncol; i++)
+		{
+			//select slab for h5 data space
+			unsigned idx = params[i].original_col_idx;
+			hsize_t      offset[] = {idx, 0};   // hyperslab offset in the file
+			hsize_t      count[] = {1, nrow};    // size of the hyperslab in the file
+			dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
+
+			//select slab for mem
+			offset_mem[0] = i;
+			offset_mem[1] = 0;
+			count_mem[0]  = 1;
+			count_mem[1]  = nrow;
+			memspace.selectHyperslab( H5S_SELECT_SET, count_mem, offset_mem );
+
+			dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,memspace, dataspace);
+		}
+
 		if(is_row_indexed)
 			data = data(row_idx);
 		return data;
 	}
-	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
-		int idx = get_col_idx(colname, type);
-		if(idx<0)
-			throw(domain_error("colname not found: " + colname));
-		unsigned nEvent = n_rows();
-		EVENT_DATA_VEC data(nEvent, 1);
-		hsize_t      offset[2];   // hyperslab offset in the file
-		hsize_t      count[2];    // size of the hyperslab in the file
-		offset[0] = idx;
-		offset[1] = 0;
-		count[0]  = 1;
-		count[1]  = nEvent;
-		dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
 
-		dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,DataSpace::ALL, dataspace);
-		if(is_row_indexed)
-			data = data(row_idx);
-		return data;
-
+	/*
+	 * This overloaded function exists so that data subsetting can be operated directly on abstract CytoFrame object
+	 */
+	EVENT_DATA_VEC get_data(vector<string> colnames, ColType col_type) const
+	{
+		return cols(colnames, col_type).get_data();
 	}
-	H5CytoFrame rows(vector<unsigned> row_idx)
+
+
+	H5CytoFrame rows(vector<unsigned> row_idx) const
 	{
 		H5CytoFrame res(*this);
 		res.update_row_idx(arma::conv_to<uvec>::from(row_idx));
 		return res;
 	}
+	H5CytoFrame cols(vector<string> colnames, ColType col_type) const
+	{
+		H5CytoFrame res(*this);
+		//update params
+		res.subset_by_col(get_col_idx(colnames, col_type));
+		return res;
+	}
+
 	void update_row_idx(uvec idx)
 	{
 		if(is_row_indexed && row_idx.size()!=idx.size())

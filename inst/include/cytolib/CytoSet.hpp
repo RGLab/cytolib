@@ -22,7 +22,7 @@ namespace cytolib
 		/*
 		 * forwarding APIs
 		 */
-		 size_t size(){return frames_.size();}
+		 size_t size() const{return frames_.size();}
 		 iterator end(){return frames_.end();}
 		 iterator begin(){return frames_.begin();}
 		 iterator find(const string &sample_uid){
@@ -57,7 +57,7 @@ namespace cytolib
 
 		string get_h5_file_path(){return path_dir_name(begin()->second.get_h5_file_path());}
 
-		H5CytoFrame & get_cytoframe(string sample_uid)
+		H5CytoFrame & operator[](string sample_uid)
 		{
 
 			iterator it=find(sample_uid);
@@ -66,12 +66,31 @@ namespace cytolib
 			else
 				return it->second;
 		}
+
+		CytoSet operator[](vector<string> sample_uids)
+		{
+			CytoSet res;
+			for(const auto & uid : sample_uids)
+				res.add_cytoframe(uid, (*this)[uid]);
+			return res;
+		}
+		CytoSet cols(vector<string> colnames, ColType col_type)
+		{
+			CytoSet res = *this;
+			for(auto & it : res)
+				it.second = it.second.cols(colnames, col_type);
+			return res;
+		}
 		void add_cytoframe(string sample_uid, const H5CytoFrame & frame){
 			if(find(sample_uid) != end())
 				throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
 			frames_[sample_uid] = frame;
 		}
-
+		void update_cytoframe(string sample_uid, const H5CytoFrame & frame){
+			if(find(sample_uid) == end())
+				throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
+			frames_[sample_uid] = frame;
+		}
 		CytoSet(){}
 
 		CytoSet(vector<pair<string,string>> sample_uid_vs_file_path, const FCS_READ_PARAM & config, string h5_dir)
@@ -115,7 +134,8 @@ namespace cytolib
 			return res;
 
 		};
-		void update_channels(const CHANNEL_MAP & chnl_map){
+
+				void update_channels(const CHANNEL_MAP & chnl_map){
 			//update gh
 			for(auto & it : frames_){
 					it.second.update_channels(chnl_map);

@@ -552,7 +552,7 @@ public:
 		 {
 			string pid = to_string(c+1);
 			EVENT_DATA_TYPE realMin = numeric_limits<EVENT_DATA_TYPE>::max();
-			size_t element_offset = nrow * c;
+//			size_t element_offset = nrow * c;
 			size_t bits_offset = accumulate(params.begin(), params.begin() + c, 0, [](size_t i, cytoParam p){return i + p.PnB;});
 			cytoParam & param = params[c];
 			int usedBits = ceil(log2(param.max));
@@ -995,7 +995,22 @@ public:
 			return data_.n_rows;
 	}
 
-	MemCytoFrame rows(vector<unsigned> row_idx)
+	MemCytoFrame cols(vector<string> colnames, ColType col_type) const
+	{
+		MemCytoFrame res(*this);
+		/*
+		 * subset data first
+		 */
+		uvec col_idx = get_col_idx(colnames, col_type);
+		res.data_ = res.data_.cols(col_idx);
+
+		//update params
+		res.subset_by_col(col_idx);
+		return res;
+	}
+
+
+	MemCytoFrame rows(vector<unsigned> row_idx) const
 	{
 		MemCytoFrame res(*this);
 		res.data_ = res.data_.rows(arma::conv_to<uvec>::from(row_idx));
@@ -1008,14 +1023,15 @@ public:
 	EVENT_DATA_VEC get_data() const{
 		return data_;
 	}
-	EVENT_DATA_VEC get_data(const string & colname, ColType type) const{
-		int idx = get_col_idx(colname, type);
-		if(idx<0)
-			throw(domain_error("colname not found: " + colname));
 
-
-		return data_.col(idx) ;
+	/*
+	 * This overloaded function exists so that data subsetting can be operated directly on abstract CytoFrame object
+	 */
+	EVENT_DATA_VEC get_data(vector<string> colnames, ColType col_type) const
+	{
+		return cols(colnames, col_type).get_data();
 	}
+
 	/**
 	 * copy setter
 	 * @param _data

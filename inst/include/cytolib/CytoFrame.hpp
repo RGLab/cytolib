@@ -153,6 +153,8 @@ public:
 		param_type.insertMember("PnG", HOFFSET(cytoParam, PnG), datatype);
 		param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
 		param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
+		param_type.insertMember("original_col_idx", HOFFSET(cytoParam, original_col_idx), PredType::NATIVE_INT8);
+
 
 		hsize_t dim_param[] = {n_cols()};
 		DataSpace dsp_param(1, dim_param);
@@ -165,6 +167,10 @@ public:
 	//
 	//	for(auto c : cvec)
 	//		cout << c << endl;
+
+		//record the col idx(the order of data cols in h5) for each param
+		for(unsigned i = 0; i < params.size(); i++)
+			params[i].original_col_idx = i;
 		DataSet ds_param = file.createDataSet( "params", param_type, dsp_param);
 		ds_param.write(params.data(), param_type );
 
@@ -234,15 +240,11 @@ public:
 	 * @return
 	 */
 	virtual EVENT_DATA_VEC get_data() const=0;
-	/**
-	 * get the data for the single channel
-	 *
-	 * @param colname the channel for marker name
-	 * @param type enum class indicates the type of colname, can be either ColType::channel or ColType::marker or ColType::unknown
-	 * when ColType::unknown, both types will be tried for the column match.
-	 * @return
+	/*
+	 * This function exist so that data subsetting can be operated directly on abstract CytoFrame object
 	 */
-	virtual EVENT_DATA_VEC get_data(const string & colname, ColType type) const=0;
+	virtual EVENT_DATA_VEC get_data(vector<string> colnames, ColType col_type) const=0;
+
 	virtual void set_data(const EVENT_DATA_VEC &)=0;
 	virtual void set_data(EVENT_DATA_VEC &&)=0;
 	/**
@@ -308,6 +310,8 @@ public:
 	 */
 	virtual void build_hash()
 	{
+		channel_vs_idx.clear();
+		marker_vs_idx.clear();
 		for(unsigned i = 0; i < n_cols(); i++)
 		{
 			channel_vs_idx[params[i].channel] = i;
@@ -395,7 +399,21 @@ public:
 		}
 
 	}
+	uvec get_col_idx(vector<string> colnames, ColType col_type) const
+	{
 
+		unsigned n = colnames.size();
+		uvec col_idx(n);
+		for(unsigned i = 0; i < n; i++)
+		{
+			int idx = get_col_idx(colnames[i], col_type);
+			if(idx<0)
+				throw(domain_error("colname not found: " + colnames[i]));
+			col_idx[i] = idx;
+
+		}
+		return col_idx;
+	}
 	virtual void set_channel(const string & oldname, const string &newname)
 	{
 		int id = get_col_idx(oldname, ColType::channel);
@@ -446,7 +464,7 @@ public:
 		case RangeType::data:
 			{
 
-				EVENT_DATA_VEC vec = get_data(colname, ctype);
+				EVENT_DATA_VEC vec = get_data({colname}, ctype);
 
 				return make_pair(vec.min(), vec.max());
 			}
@@ -498,6 +516,25 @@ public:
 		return ts;
 	}
 
+
+	void subset_by_col(uvec col_idx)
+	{
+		unsigned n = col_idx.size();
+		vector<cytoParam> params_new(n);
+		for(unsigned i = 0; i < n; i++)
+		{
+			params_new[i] = params[col_idx[i]];
+		}
+		params = params_new;
+		build_hash();//update idx table
+
+		//update keywords PnX
+//		for(unsigned i = 0; i < n; i++)
+//		{
+//			if(it.first)
+//		}
+
+	}
 
 	/**
 	 * Parse the time string with fractional seconds
