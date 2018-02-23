@@ -28,7 +28,7 @@ protected:
 	DataSet dataset;
 	DataSpace dataspace;
 	hsize_t dims[2];              // dataset dimensions
-	arma::uvec row_idx;
+	arma::uvec row_idx_;
 	bool is_row_indexed;
 
 public:
@@ -181,7 +181,7 @@ public:
 	unsigned n_rows() const{
 		//read nEvents
 		if(is_row_indexed)
-			return row_idx.size();
+			return row_idx_.size();
 		else
 			return dims[1];
 	}
@@ -221,7 +221,7 @@ public:
 		}
 
 		if(is_row_indexed)
-			data = data(row_idx);
+			data = data(row_idx_);
 		return data;
 	}
 
@@ -233,26 +233,40 @@ public:
 		return cols(colnames, col_type).get_data();
 	}
 
+	void cols_(vector<string> colnames, ColType col_type)
+	{
+
+		uvec col_idx = get_col_idx(colnames, col_type);
+
+		//update params
+		CytoFrame::cols_(col_idx);
+	}
+
+
+	void rows_(vector<unsigned> row_idx)
+	{
+		if(is_row_indexed && row_idx.size()!=row_idx_.size())
+			throw(domain_error("The size of the new row index is not the same as the total number of events!"));
+		row_idx_ = arma::conv_to<uvec>::from(row_idx);
+	}
 
 	H5CytoFrame rows(vector<unsigned> row_idx) const
 	{
 		H5CytoFrame res(*this);
-		res.update_row_idx(arma::conv_to<uvec>::from(row_idx));
-		return res;
-	}
-	H5CytoFrame cols(vector<string> colnames, ColType col_type) const
-	{
-		H5CytoFrame res(*this);
-		//update params
-		res.subset_by_col(get_col_idx(colnames, col_type));
+		res.rows_(row_idx);
 		return res;
 	}
 
-	void update_row_idx(uvec idx)
+	H5CytoFrame cols(vector<string> colnames, ColType col_type) const
 	{
-		if(is_row_indexed && row_idx.size()!=idx.size())
-			throw(domain_error("The size of the new row index is not the same as the total number of events!"));
-		row_idx = idx;
+		H5CytoFrame res(*this);
+		res.cols_(colnames, col_type);
+		return res;
+	}
+
+	CytoFrame * shallow_copy()
+	{
+		return new H5CytoFrame(*this);
 	}
 	/**
 	 * copy setter
@@ -267,8 +281,8 @@ public:
 
 	void set_data(EVENT_DATA_VEC && _data)
 	{
-		EVENT_DATA_VEC data = _data;
-		set_data(data);
+//		EVENT_DATA_VEC data = _data;
+		set_data(_data);
 	}
 };
 

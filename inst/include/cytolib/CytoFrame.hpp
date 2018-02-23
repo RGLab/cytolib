@@ -516,8 +516,9 @@ public:
 		return ts;
 	}
 
-
-	void subset_by_col(uvec col_idx)
+	virtual void rows_(vector<unsigned> row_idx)=0;
+	virtual void cols_(vector<string> colnames, ColType col_type)=0;
+	virtual void cols_(uvec col_idx)
 	{
 		unsigned n = col_idx.size();
 		vector<cytoParam> params_new(n);
@@ -535,6 +536,7 @@ public:
 //		}
 
 	}
+	virtual CytoFrame * shallow_copy()=0;
 
 	/**
 	 * Parse the time string with fractional seconds

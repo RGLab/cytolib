@@ -771,13 +771,8 @@ public:
 			oldguid = keys_["GUID"];
 			keys_["ORIGINALGUID"] = oldguid;
 		}
-		else
-			oldguid = filename_;
-		//strip dir
-//			vector<string> paths;
-//			boost::split(paths, oldguid, boost::is_any_of("/\\"));
-//			keys_["GUID"] = paths.back();
-		keys_["GUID"] = fs::path(oldguid).filename();
+
+		keys_["GUID"] = fs::path(filename_).filename();
 
 	}
 
@@ -998,25 +993,40 @@ public:
 	MemCytoFrame cols(vector<string> colnames, ColType col_type) const
 	{
 		MemCytoFrame res(*this);
-		/*
-		 * subset data first
-		 */
-		uvec col_idx = get_col_idx(colnames, col_type);
-		res.data_ = res.data_.cols(col_idx);
-
-		//update params
-		res.subset_by_col(col_idx);
+		res.cols_(colnames, col_type);
 		return res;
 	}
-
 
 	MemCytoFrame rows(vector<unsigned> row_idx) const
 	{
 		MemCytoFrame res(*this);
-		res.data_ = res.data_.rows(arma::conv_to<uvec>::from(row_idx));
+		res.rows_(row_idx);
 		return res;
 	}
-/**
+
+	void cols_(vector<string> colnames, ColType col_type)
+	{
+		/*
+		 * subset data first
+		 */
+		uvec col_idx = get_col_idx(colnames, col_type);
+		data_ = data_.cols(col_idx);
+
+		//update params
+		CytoFrame::cols_(col_idx);
+	}
+
+
+	void rows_(vector<unsigned> row_idx)
+	{
+		data_ = data_.rows(arma::conv_to<uvec>::from(row_idx));
+	}
+
+	CytoFrame * shallow_copy()
+	{
+		return new MemCytoFrame(*this);
+	}
+	/**
  * Caller will receive a copy of data
  * @return
  */

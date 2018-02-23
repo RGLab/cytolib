@@ -79,7 +79,6 @@ public:
 	};
 
 	int n_cols(){return cytoset_.n_cols();}
-	string get_h5_file_path(){return cytoset_.get_h5_file_path();}
 
 	/**
 	 * validity checks on the frame to see if its data structure is consistent with cytoset
@@ -546,7 +545,7 @@ public:
 	}
 
 	void set_cytoset(const CytoSet & cytoset){cytoset_ = cytoset;};
-
+	void set_cytoset(CytoSet && cytoset){swap(cytoset_ , cytoset);};
 	const CytoSet & get_cytoset(){
 		return cytoset_;
 	}
@@ -556,10 +555,11 @@ public:
 		for(auto & it : view)
 		{
 			GatingHierarchy & gh = getGatingHierarchy(it.first);
-			it.second = it.second.rows(gh.getNodeProperty(gh.getNodeID(node_path)).getIndices_u());
+			nodeProperties & node = gh.getNodeProperty(gh.getNodeID(node_path));
+			it.second->rows_(node.getIndices_u());
 		}
-			return view;
-		}
+		return view;
+	}
 	fs::path generate_h5_folder(fs::path h5_dir)
 	{
 		h5_dir /= guid_;
