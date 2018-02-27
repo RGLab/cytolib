@@ -33,7 +33,7 @@ namespace cytolib
 		 size_t erase ( const string& k ){return frames_.erase(k);}
 
 
-	 /**
+		 /**
 		  * forward to the first element's getChannels
 		  */
 		vector<string> get_channels(){return begin()->second->get_channels();};
@@ -57,6 +57,11 @@ namespace cytolib
 
 		int n_cols(){return begin()->second->n_cols();}
 
+		/**
+		 * Extract the single CytoFrame
+		 * @param sample_uid
+		 * @return
+		 */
 		CytoFrame & operator[](string sample_uid)
 		{
 
@@ -67,6 +72,11 @@ namespace cytolib
 				return *(it->second);
 		}
 
+		/**
+		 * Subset by samples
+		 * @param sample_uids
+		 * @return
+		 */
 		CytoSet operator[](vector<string> sample_uids)
 		{
 			CytoSet res;
@@ -74,6 +84,13 @@ namespace cytolib
 				res.add_cytoframe(uid, unique_ptr<CytoFrame>((*this)[uid].shallow_copy()));
 			return res;
 		}
+
+		/**
+		 * Subset by columns
+		 * @param colnames
+		 * @param col_type
+		 * @return
+		 */
 		CytoSet cols(vector<string> colnames, ColType col_type)
 		{
 			CytoSet res = *this;
@@ -81,24 +98,46 @@ namespace cytolib
 				it.second->cols_(colnames, col_type);
 			return res;
 		}
+
+		/**
+		 * Add sample
+		 * @param sample_uid
+		 * @param frame_ptr
+		 */
 		void add_cytoframe(string sample_uid, unique_ptr<CytoFrame> && frame_ptr){
 			if(find(sample_uid) != end())
 				throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
 			swap(frames_[sample_uid], frame_ptr);
 		}
+
+		/**
+		 * update sample
+		 * @param sample_uid
+		 * @param frame_ptr
+		 */
 		void update_cytoframe(string sample_uid, unique_ptr<CytoFrame> && frame_ptr){
 			if(find(sample_uid) == end())
 				throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
 			swap(frames_[sample_uid], frame_ptr);
 		}
+
 		CytoSet(){}
 
+		/**
+		 * Copy constructor (shallow copy)
+		 * @param cs
+		 */
 		CytoSet(const CytoSet & cs)
 		{
 			for(const auto & it : cs)
 				this->frames_[it.first] = unique_ptr<CytoFrame>(it.second->shallow_copy());
 		}
 
+		/**
+		 * Assignment operator (shallow copy)
+		 * @param cs
+		 * @return
+		 */
 		CytoSet & operator=(const CytoSet & cs)
 		{
 			for(const auto & it : cs)
@@ -106,6 +145,13 @@ namespace cytolib
 			return *this;
 		}
 
+		/**
+		 * Constructor from FCS files
+		 * @param sample_uid_vs_file_path
+		 * @param config
+		 * @param is_h5
+		 * @param h5_dir
+		 */
 		CytoSet(vector<pair<string,string>> sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
 		{
 			fs::path h5_path(h5_dir);
@@ -131,6 +177,11 @@ namespace cytolib
 			}
 		}
 
+		/**
+		 * Update sample id
+		 * @param _old
+		 * @param _new
+		 */
 		void set_sample_uid(const string & _old, const string & _new){
 			if(_old.compare(_new) != 0)
 			{
@@ -155,7 +206,7 @@ namespace cytolib
 
 		};
 
-				void update_channels(const CHANNEL_MAP & chnl_map){
+		void update_channels(const CHANNEL_MAP & chnl_map){
 			//update gh
 			for(auto & it : frames_){
 					it.second->update_channels(chnl_map);
