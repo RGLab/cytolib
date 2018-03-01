@@ -59,38 +59,38 @@ class MemCytoFrame: public CytoFrame{
 		string tmp2(" ",8);
 		in.get(tmp1, 9);
 		//skip whitespaces
-		copy(tmp1, tmp1+8, tmp2.begin());
+		std::copy(tmp1, tmp1+8, tmp2.begin());
 		boost::trim(tmp2);
 		header_.textstart = boost::lexical_cast<int>(tmp2) + nOffset;
 
 		in.get(tmp1, 9);
 		tmp2.resize(8);
-		copy(tmp1, tmp1+8, tmp2.begin());
+		std::copy(tmp1, tmp1+8, tmp2.begin());
 		boost::trim(tmp2);
 		header_.textend = boost::lexical_cast<int>(tmp2) + nOffset;
 
 		in.get(tmp1, 9);
 		tmp2.resize(8);
-		copy(tmp1, tmp1+8, tmp2.begin());
+		std::copy(tmp1, tmp1+8, tmp2.begin());
 		boost::trim(tmp2);
 		header_.datastart = boost::lexical_cast<int>(tmp2) + nOffset;
 
 		in.get(tmp1, 9);
 		tmp2.resize(8);
-		copy(tmp1, tmp1+8, tmp2.begin());
+		std::copy(tmp1, tmp1+8, tmp2.begin());
 		boost::trim(tmp2);
 		header_.dataend = boost::lexical_cast<int>(tmp2) + nOffset;
 
 		in.get(tmp1, 9);
 		tmp2.resize(8);
-		copy(tmp1, tmp1+8, tmp2.begin());
+		std::copy(tmp1, tmp1+8, tmp2.begin());
 		boost::trim(tmp2);
 		if(tmp2.size()>0)
 			header_.anastart = boost::lexical_cast<int>(tmp2) + nOffset;
 
 		in.get(tmp1, 9);
 		tmp2.resize(8);
-		copy(tmp1, tmp1+8, tmp2.begin());
+		std::copy(tmp1, tmp1+8, tmp2.begin());
 		boost::trim(tmp2);
 		if(tmp2.size()>0)
 			header_.anaend = boost::lexical_cast<int>(tmp2) + nOffset;
@@ -1022,7 +1022,7 @@ public:
 		data_ = data_.rows(arma::conv_to<uvec>::from(row_idx));
 	}
 
-	CytoFrame * shallow_copy()
+	CytoFrame * copy() const
 	{
 		return new MemCytoFrame(*this);
 	}

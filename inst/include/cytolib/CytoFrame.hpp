@@ -536,7 +536,7 @@ public:
 //		}
 
 	}
-	virtual CytoFrame * shallow_copy()=0;
+	virtual CytoFrame * copy() const=0;
 
 	/**
 	 * Parse the time string with fractional seconds

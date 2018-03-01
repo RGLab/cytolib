@@ -7,7 +7,7 @@
 
 #ifndef INST_INCLUDE_CYTOLIB_H5CYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_H5CYTOFRAME_HPP_
-#include <cytolib/CytoFrame.hpp>
+#include <cytolib/MemCytoFrame.hpp>
 
 
 namespace cytolib
@@ -264,7 +264,11 @@ public:
 		return res;
 	}
 
-	CytoFrame * shallow_copy()
+	/**
+	 * Doesn't create the H5 copy so the new H5CytoFrame shares the same H5 data with the original object.
+	 * @return
+	 */
+	CytoFrame * copy() const
 	{
 		return new H5CytoFrame(*this);
 	}

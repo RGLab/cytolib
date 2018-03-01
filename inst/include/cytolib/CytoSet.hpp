@@ -8,13 +8,20 @@
 #ifndef INST_INCLUDE_CYTOLIB_CYTOSET_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOSET_HPP_
 #include <cytolib/H5CytoFrame.hpp>
-
+#include <cytolib/MemCytoFrame.hpp>
 namespace cytolib
 {
 	class CytoSet
 	{
 		typedef unordered_map<string,unique_ptr<CytoFrame>> FrameMap;
 		FrameMap frames_;
+
+		unique_ptr<CytoFrame> & get_first_frame_ptr()
+		{
+			if(size() == 0)
+				throw(range_error("Empty CytoSet!"));
+			return begin()->second;
+		}
 	public:
 		typedef typename FrameMap::iterator iterator;
 		typedef typename FrameMap::const_iterator const_iterator;
@@ -36,7 +43,7 @@ namespace cytolib
 		 /**
 		  * forward to the first element's getChannels
 		  */
-		vector<string> get_channels(){return begin()->second->get_channels();};
+		vector<string> get_channels(){return get_first_frame_ptr()->get_channels();};
 		/**
 		 * modify the channels for each individual frame
 		 * @param _old
@@ -48,29 +55,14 @@ namespace cytolib
 		};
 
 		//* forward to the first element's getChannels
-		vector<string> get_markers(){return begin()->second->get_markers();};
+		vector<string> get_markers(){return get_first_frame_ptr()->get_markers();};
 
 		void set_marker(const string & _old, const string & _new){
 			for(auto & p : frames_)
 				p.second->set_marker(_old, _new);
 		};
 
-		int n_cols(){return begin()->second->n_cols();}
-
-		/**
-		 * Extract the single CytoFrame
-		 * @param sample_uid
-		 * @return
-		 */
-		CytoFrame & operator[](string sample_uid)
-		{
-
-			iterator it=find(sample_uid);
-			if(it==end())
-				throw(domain_error(sample_uid + " not found in gating set!"));
-			else
-				return *(it->second);
-		}
+		int n_cols(){return get_first_frame_ptr()->n_cols();}
 
 		/**
 		 * Subset by samples
@@ -81,7 +73,7 @@ namespace cytolib
 		{
 			CytoSet res;
 			for(const auto & uid : sample_uids)
-				res.add_cytoframe(uid, unique_ptr<CytoFrame>((*this)[uid].shallow_copy()));
+				res.add_cytoframe(uid, this->get_cytoframe(uid));
 			return res;
 		}
 
@@ -94,13 +86,40 @@ namespace cytolib
 		CytoSet cols(vector<string> colnames, ColType col_type)
 		{
 			CytoSet res = *this;
-			for(auto & it : res)
-				it.second->cols_(colnames, col_type);
+			res.cols_(colnames, col_type);
 			return res;
 		}
 
 		/**
-		 * Add sample
+		 * Subet set by columns (in place)
+		 * @param colnames
+		 * @param col_type
+		 * @return
+		 */
+		void cols_(vector<string> colnames, ColType col_type)
+		{
+
+			for(auto & it : frames_)
+				it.second->cols_(colnames, col_type);
+		}
+
+		/**
+		 * Extract the single CytoFrame
+		 * @param sample_uid
+		 * @return
+		 */
+		CytoFrame & get_cytoframe(string sample_uid)
+		{
+
+			iterator it=find(sample_uid);
+			if(it==end())
+				throw(domain_error(sample_uid + " not found in gating set!"));
+			else
+				return *(it->second);
+		}
+
+		/**
+		 * Add sample (move)
 		 * @param sample_uid
 		 * @param frame_ptr
 		 */
@@ -111,7 +130,15 @@ namespace cytolib
 		}
 
 		/**
-		 * update sample
+		 * Add sample (copy)
+		 * @param sample_uid
+		 * @param frame
+		 */
+		void add_cytoframe(string sample_uid, const CytoFrame & frame){
+			add_cytoframe(sample_uid, unique_ptr<CytoFrame>(frame.copy()));
+		}
+		/**
+		 * update sample (move)
 		 * @param sample_uid
 		 * @param frame_ptr
 		 */
@@ -119,6 +146,16 @@ namespace cytolib
 			if(find(sample_uid) == end())
 				throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
 			swap(frames_[sample_uid], frame_ptr);
+		}
+
+		/**
+		 * update sample (copy)
+		 * @param sample_uid
+		 * @param frame
+		 */
+		void update_cytoframe(string sample_uid, const CytoFrame & frame){
+			update_cytoframe(sample_uid, unique_ptr<CytoFrame>(frame.copy()));
+
 		}
 
 		CytoSet(){}
@@ -130,7 +167,7 @@ namespace cytolib
 		CytoSet(const CytoSet & cs)
 		{
 			for(const auto & it : cs)
-				this->frames_[it.first] = unique_ptr<CytoFrame>(it.second->shallow_copy());
+				this->frames_[it.first] = unique_ptr<CytoFrame>(it.second->copy());
 		}
 
 		/**
@@ -141,19 +178,34 @@ namespace cytolib
 		CytoSet & operator=(const CytoSet & cs)
 		{
 			for(const auto & it : cs)
-				this->frames_[it.first] = unique_ptr<CytoFrame>(it.second->shallow_copy());
+				this->frames_[it.first] = unique_ptr<CytoFrame>(it.second->copy());
 			return *this;
 		}
 
 		/**
 		 * Constructor from FCS files
-		 * @param sample_uid_vs_file_path
+		 * @param file_paths
 		 * @param config
 		 * @param is_h5
 		 * @param h5_dir
 		 */
-		CytoSet(vector<pair<string,string>> sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+		CytoSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
 		{
+			vector<pair<string,string>> map(file_paths.size());
+			transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
+			add_fcs(map, config, is_h5, h5_dir);
+
+
+		}
+
+		CytoSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+		{
+			add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
+		}
+
+		void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+		{
+
 			fs::path h5_path(h5_dir);
 			for(const auto & it : sample_uid_vs_file_path)
 			{

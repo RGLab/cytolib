@@ -1,57 +1,9 @@
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Suites
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/H5CytoFrame.hpp>
+#include "fixture.hpp"
 using namespace cytolib;
-CYTOLIB_INIT();
-struct globalFixture{
-	globalFixture(){
-//		cout << "Enter tolerance (e.g. 0.08):" << endl;
-//		cin >> gTol;
-//		gTol = 0.08;
-
-	};
-	~globalFixture(){};
-
-};
-BOOST_GLOBAL_FIXTURE(globalFixture);
-struct parseFCSFixture{
-	parseFCSFixture(): argc(boost::unit_test_framework::framework::master_test_suite().argc),
-	           argv(boost::unit_test_framework::framework::master_test_suite().argv)
-	{
-		/*
-		 * parse argv
-		 */
-		map<string, string> arg_map;
-		for(int i = 1; i < argc; i++){
-			string thisArg = argv[i];
-			vector<string> strSplit;
-			boost::split(strSplit,thisArg, boost::is_any_of("="));
-			if(strSplit.size() != 2)
-				throw(domain_error("invalid arguments!"));
-			else{
-				string argName = strSplit.at(0);
-				boost::replace_first(argName, "--", "");
-				string argValue = strSplit.at(1);
-				arg_map[argName] = argValue;
-			}
-		}
-		map<string, string>::iterator it;
-
-	};
-
-
-
-	~parseFCSFixture(){
-
-	};
-   int argc;
-   char **argv;
-//	testCase myTest;
-
-};
 
 BOOST_FIXTURE_TEST_SUITE(parseFCS,parseFCSFixture)
 BOOST_AUTO_TEST_CASE(sample_1071)
