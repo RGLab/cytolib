@@ -185,6 +185,34 @@ public:
 		else
 			return dims[1];
 	}
+
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt)
+	{
+		fr_pb.set_is_h5(true);
+
+		if(!fs::equivalent(fs::path(filename_).parent_path(), fs::path(h5_filename).parent_path()))
+		{
+			switch(h5_opt)
+			{
+			case H5Option::copy:
+				fs::copy(filename_, h5_filename);
+				break;
+			case H5Option::move:
+				fs::rename(filename_, h5_filename);
+				break;
+			case H5Option::link:
+				fs::create_hard_link(filename_, h5_filename);
+				break;
+			case H5Option::symlink:
+				fs::create_symlink(filename_, h5_filename);
+				break;
+			case H5Option::skip:
+				break;
+			}
+		}
+	}
+
+
 	/**
 	 * Read data from disk.
 	 * The caller will directly receive the data vector without the copy overhead thanks to the move semantics supported for vector container in c++11

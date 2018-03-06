@@ -18,6 +18,7 @@ namespace cytolib
 enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
+enum class H5Option {copy, move, skip, link, symlink};
 
 typedef unordered_map<string, string> PDATA;
 
@@ -83,6 +84,7 @@ public:
 		return comp;
 	}
 
+	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) = 0;
 
 	virtual void compensate(const compensation & comp)
 	{

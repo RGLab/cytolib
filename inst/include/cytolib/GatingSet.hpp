@@ -25,7 +25,6 @@ namespace cytolib
 #define BS false
 
 
-
 /**
  * \class GatingSet
  * \brief A container class that stores multiple GatingHierarchy objects.
@@ -198,12 +197,68 @@ public:
 	 * @param path the dir of filename
 	 * @param filename
 	 */
-	void serialize_pb(string filename)
+	void serialize_pb(string path, bool is_overwrite, H5Option h5_opt)
 	{
+		/*
+		 * validity check for path
+		 */
+		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
+		if(fs::exists(path))
+		{
+			if(is_overwrite)
+			{
+				fs::remove_all(path);
+				fs::create_directory(path);
+			}
+			else
+			{
+				fs::path pb_file;
+				unordered_set<string> h5_samples;
+				for(auto & e : fs::directory_iterator(path))
+				{
+					fs::path p = e.path();
+					string ext = p.extension();
+					if(ext == ".pb")
+					{
+						if(pb_file.empty())
+							pb_file = p;
+						else
+						  throw(domain_error(errmsg + "Multiple .pb files found!"));
+					}
+					else if(ext == ".h5")
+					{
+						string sample_uid = p.stem();
+						if(find(sample_uid) == end())
+						  throw(domain_error(errmsg + "h5 file not matched to any sample in GatingSet: " + p.string()));
+						else
+							h5_samples.insert(p.stem());
+					}
+					else
+					  throw(domain_error(errmsg + "File not recognized: " + p.string()));
+
+				}
+
+				if(pb_file.empty())
+				  throw(domain_error(errmsg + "No .pb file found!"));
+				else
+					if(pb_file.stem() != guid_)
+						throw(domain_error(errmsg + "The pb file doesn't match to the guid of GatingSet!"));
+		        for(const auto & it : ghs)
+		        {
+		        	if(h5_samples.find(it.first) == h5_samples.end())
+		        		throw(domain_error(errmsg + "h5 file missing for sample: " + it.first));
+		        }
+			}
+
+		}
+		else
+			fs::create_directory(path);
+
 		// Verify that the version of the library that we linked against is
 		// compatible with the version of the headers we compiled against.
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
 		//init the output stream
+		string filename = (fs::path(path) / guid_).string() + ".pb";
 		ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
 		google::protobuf::io::OstreamOutputStream raw_output(&output);
 
@@ -231,6 +286,14 @@ public:
 			pb::trans_local * tg = gs_pb.add_gtrans();
 			it.convertToPb(*tg, gs_pb);
 		}
+
+
+		//guid
+		gs_pb.set_guid(guid_);
+
+		//cs
+		pb::CytoSet * cs_pb = gs_pb.mutable_cs();
+		cytoset_.convertToPb(*cs_pb, path, h5_opt);
 
 		//add sample name
 		for(auto & it : ghs){

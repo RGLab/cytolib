@@ -14,7 +14,7 @@ Depends:
     R (>= 3.4)
 Suggests: knitr
 biocViews: FlowCytometry, DataImport, Preprocessing, DataRepresentation
-LinkingTo: BH(>= 1.62.0-1), RProtoBufLib(>= 1.1.2), Rhdf5lib
+LinkingTo: BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.4), Rhdf5lib
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11
 RoxygenNote: 6.0.1

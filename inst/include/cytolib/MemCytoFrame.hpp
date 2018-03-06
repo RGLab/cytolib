@@ -286,6 +286,13 @@ public:
 	 */
 	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){}
 
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt)
+	{
+		fr_pb.set_is_h5(false);
+		write_h5(h5_filename);
+	}
+
+
 	void read_fcs()
 	{
 		open_fcs_file();

@@ -40,6 +40,17 @@ namespace cytolib
 		 size_t erase ( const string& k ){return frames_.erase(k);}
 
 
+		 void convertToPb(pb::CytoSet & cs_pb, const string & path, H5Option h5_opt)
+		 {
+			 for(const auto & it : frames_)
+			 {
+				 cs_pb.add_samplename(it.first);
+				 pb::CytoFrame * fr_pb = cs_pb.add_frame();
+				 string h5_filename = (fs::path(path) / it.first).string() + ".h5";
+				 it.second->convertToPb(*fr_pb, h5_filename, h5_opt);
+
+			 }
+		 }
 		 /**
 		  * forward to the first element's getChannels
 		  */
