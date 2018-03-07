@@ -39,6 +39,26 @@ namespace cytolib
 		 }
 		 size_t erase ( const string& k ){return frames_.erase(k);}
 
+		 CytoSet(const pb::CytoSet & cs_pb, const string & path)
+		 {
+			 fs::path dir(path);
+			 for(int i = 0; i < cs_pb.samplename_size(); i++)
+			 {
+				 string uid = cs_pb.samplename(i);
+				 const pb::CytoFrame & fr = cs_pb.frame(i);
+				 string h5_filename = dir / (uid + ".h5");
+				 if(fs::exists(h5_filename))
+				 {
+					 frames_[uid] = unique_ptr<H5CytoFrame>(new H5CytoFrame(h5_filename));
+					 const CytoFrame & ref = *(frames_[uid]);
+					 if(!fr.is_h5())
+						 frames_[uid].reset(new MemCytoFrame(ref));
+				 }
+				 else
+					 throw(domain_error("H5 file missing for sample: " + uid));
+
+			 }
+		 }
 
 		 void convertToPb(pb::CytoSet & cs_pb, const string & path, H5Option h5_opt)
 		 {

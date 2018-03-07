@@ -336,10 +336,32 @@ public:
 	 * @param format
 	 * @param isPB
 	 */
-	GatingSet(string filename)
+	GatingSet(string path)
 	{
+		fs::path pb_file;
+		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
+		for(auto & e : fs::directory_iterator(path))
+		{
+			fs::path p = e.path();
+			string ext = p.extension();
+			if(ext == ".pb")
+			{
+				if(pb_file.empty())
+					pb_file = p;
+				else
+				  throw(domain_error(errmsg + "Multiple .pb files found!"));
+			}
+			else if(ext != ".h5")
+				throw(domain_error(errmsg + "File not recognized: " + p.string()));
+
+		}
+
+		if(pb_file.empty())
+		  throw(domain_error(errmsg + "No .pb file found!"));
+
+
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
-		ifstream input(filename.c_str(), ios::in | ios::binary);
+		ifstream input(pb_file.c_str(), ios::in | ios::binary);
 		if (!input) {
 			throw(invalid_argument("File not found.." ));
 		} else{
@@ -352,6 +374,8 @@ public:
 			if (!success) {
 				throw(domain_error("Failed to parse GatingSet."));
 			}
+
+			guid_ = pbGS.guid();
 
 			//parse global trans tbl from message
 			map<intptr_t, transformation *> trans_tbl;
@@ -430,6 +454,10 @@ public:
 
 				ghs[sn] = GatingHierarchy(gh_pb, trans_tbl);
 			}
+
+			cytoset_ = CytoSet(pbGS.cs(), path);
+
+
 		}
 
 	}
