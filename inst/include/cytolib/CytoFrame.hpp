@@ -32,6 +32,8 @@ struct TM_ext
 	EVENT_DATA_TYPE fractional_secs;
 };
 
+class CytoFrame;
+typedef shared_ptr<CytoFrame> CytoFramePtr;
 /**
  * The class representing a single FCS file
  */
@@ -538,7 +540,7 @@ public:
 //		}
 
 	}
-	virtual CytoFrame * copy() const=0;
+	virtual CytoFramePtr deep_copy() const=0;
 
 	/**
 	 * Parse the time string with fractional seconds

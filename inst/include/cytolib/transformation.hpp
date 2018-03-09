@@ -56,9 +56,8 @@ struct coordinate
 inline bool compare_x(coordinate i, coordinate j) { return i.x<j.x; }
 inline bool compare_y(coordinate i, coordinate j) { return i.y<j.y; }
 
-
-
-
+class transformation;
+typedef shared_ptr<transformation> TransPtr;
 class transformation{
 protected:
 	calibrationTable calTbl; //no longer have to store calTbl since we now can compute it from biexp even for mac workspace
@@ -118,7 +117,7 @@ public:
 	virtual void setChannel(string _channel){channel=_channel;};
 	virtual unsigned short getType(){return type;};
 	virtual void setType(unsigned short _type){type=_type;};
-	virtual transformation * clone(){return new transformation(*this);};
+	virtual TransPtr clone(){return TransPtr(new transformation(*this));};
 	transformation(const pb::transformation & trans_pb){
 		isComputed = trans_pb.iscomputed();
 		isGateOnly = trans_pb.isgateonly();
@@ -159,7 +158,7 @@ public:
 
 	}
 
-	virtual shared_ptr<transformation>  getInverseTransformation(){
+	virtual TransPtr  getInverseTransformation(){
 		if(!calTbl.isInterpolated()){
 			 /* calculate calibration table from the function
 			 */
@@ -179,7 +178,7 @@ public:
 		}
 
 		//clone the existing trans
-		shared_ptr<transformation>  inverse = shared_ptr<transformation>(new transformation(*this));
+		TransPtr  inverse = TransPtr(new transformation(*this));
 		//make sure to reset type to avoid type-discrepancy because
 		//it returns the base transformation type instead of the original one (e.g. biexp)
 		inverse->type = CALTBL;
@@ -201,7 +200,7 @@ public:
 	virtual int getTransformedScale(){throw(domain_error("getTransformedScale function not defined!"));};
 	virtual int getRawScale(){throw(domain_error("getRawScale function not defined!"));};
 };
-
+typedef shared_ptr<transformation> TransPtr;
 /*
  * directly translated from java routine from tree star
  */
@@ -336,7 +335,7 @@ public:
 
 	}
 
-	biexpTrans * clone(){return new biexpTrans(*this);};
+	TransPtr clone(){return TransPtr(new biexpTrans(*this));};
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);
 		trans_pb.set_trans_type(pb::PB_BIEXP);
@@ -419,7 +418,7 @@ public:
 	}
 
 
-	fasinhTrans * clone(){return new fasinhTrans(*this);};
+	TransPtr clone(){return TransPtr(new fasinhTrans(*this));};
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);
 		trans_pb.set_trans_type(pb::PB_FASIGNH);
@@ -438,7 +437,7 @@ public:
 		A = ft_pb.a();
 		M = ft_pb.m();
 	}
-	shared_ptr<transformation>  getInverseTransformation();
+	TransPtr  getInverseTransformation();
 
 	void setTransformedScale(int scale){maxRange = scale;};
 	int getTransformedScale(){return maxRange;};
@@ -460,16 +459,16 @@ public:
 			input[i] = sinh(((M + A) * log(10)) * input[i]/length - A * log(10)) * T / sinh(M * log(10));
 
 	}
-	shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
+	TransPtr getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
 //	fsinhTrans * clone(){return new fasinhTrans(*this);};
 //	void convertToPb(pb::transformation & trans_pb);
 //	fasinhTrans(const pb::transformation & trans_pb);
-//	shared_ptr<transformation> getInverseTransformation();
+//	TransPtr getInverseTransformation();
 //	void setTransformedScale(int scale){length = scale;};
 };
 
-inline shared_ptr<transformation>  fasinhTrans::getInverseTransformation(){
-		return shared_ptr<transformation>(new fsinhTrans(length, maxRange, T, A , M));
+inline TransPtr  fasinhTrans::getInverseTransformation(){
+		return TransPtr(new fsinhTrans(length, maxRange, T, A , M));
 	}
 
 /*
@@ -519,7 +518,7 @@ public:
 			}
 
 	}
-	logTrans * clone(){return new logTrans(*this);};
+	TransPtr clone(){return TransPtr(new logTrans(*this));};
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);
 		trans_pb.set_trans_type(pb::PB_LOG);
@@ -535,7 +534,7 @@ public:
 		T = lt_pb.t();
 	}
 
-	shared_ptr<transformation>  getInverseTransformation();
+	TransPtr  getInverseTransformation();
 
 	void setTransformedScale(int _scale){scale = _scale;};
 	int getTransformedScale(){return scale;};
@@ -562,8 +561,8 @@ public:
 
 };
 
-inline shared_ptr<transformation>  logTrans::getInverseTransformation(){
-		return shared_ptr<transformation>(new logInverseTrans(offset, decade,scale, T));
+inline TransPtr  logTrans::getInverseTransformation(){
+		return TransPtr(new logInverseTrans(offset, decade,scale, T));
 	}
 
 class linTrans:public transformation{
@@ -576,14 +575,14 @@ public:
 	                input[i]*=64;
 	}
 
-        linTrans * clone(){return new linTrans(*this);};
+		TransPtr clone(){return TransPtr(new linTrans(*this));};
         void convertToPb(pb::transformation & trans_pb){
         	transformation::convertToPb(trans_pb);
         	trans_pb.set_trans_type(pb::PB_LIN);
 
         }
         linTrans(const pb::transformation & trans_pb):transformation(trans_pb){}
-        shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
+        TransPtr getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
         void setTransformedScale(int scale){throw(domain_error("setTransformedScale function not defined!"));};
 
 };
@@ -605,10 +604,10 @@ public:
 			input[i]*=(t_scale/(EVENT_DATA_TYPE)r_scale);
 	}
 
-	scaleTrans * clone(){return new scaleTrans(*this);};
+	TransPtr clone(){return TransPtr(new scaleTrans(*this));};
 
-	shared_ptr<transformation> getInverseTransformation(){
-		return shared_ptr<transformation>(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
+	TransPtr getInverseTransformation(){
+		return TransPtr(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
 	}
 
 	void setTransformedScale(int _scale){t_scale = _scale;};
@@ -643,7 +642,7 @@ public:
 
 	}
 
-	flinTrans * clone(){return new flinTrans(*this);};
+	TransPtr clone(){return TransPtr(new flinTrans(*this));};
 
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);
@@ -657,7 +656,7 @@ public:
 		max = ft_pb.max();
 		min = ft_pb.min();
 	}
-	shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
+	TransPtr getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
 	void setTransformedScale(int scale){throw(domain_error("setTransformedScale function not defined!"));};
 
 };

@@ -292,13 +292,12 @@ public:
 		return res;
 	}
 
-	/**
-	 * Doesn't create the H5 copy so the new H5CytoFrame shares the same H5 data with the original object.
-	 * @return
-	 */
-	CytoFrame * copy() const
+	CytoFramePtr deep_copy(const string & h5_filename) const
 	{
-		return new H5CytoFrame(*this);
+		if(!fs::equivalent(filename_, h5_filename))
+			throw(domain_error("Can't make copy to itself: " + h5_filename));
+		fs::copy(filename_, h5_filename);
+		return CytoFramePtr(new H5CytoFrame(h5_filename));
 	}
 	/**
 	 * copy setter

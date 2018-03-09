@@ -13,7 +13,7 @@
 namespace cytolib
 {
 
-typedef map<string, shared_ptr<transformation>, ciLessBoost> trans_map;/* we always do case-insensitive searching for transformation lookup
+typedef map<string, TransPtr, ciLessBoost> trans_map;/* we always do case-insensitive searching for transformation lookup
 due to some of channel name discrepancies occured in flowJo workspaces*/
 struct PARAM{
 		string param;
@@ -78,8 +78,8 @@ public:
 	const trans_map getTransMap()const{return tp;};
 	void setTransMap(trans_map _tp){tp=_tp;};
 
-	shared_ptr<transformation> getTran(string channel)const{
-		shared_ptr<transformation> res(NULL);
+	TransPtr getTran(string channel)const{
+		TransPtr res(NULL);
 		if(channel!="Time"&&channel!="time")
 		{
 			trans_map::const_iterator it=tp.find(channel);
@@ -98,7 +98,7 @@ public:
 
 		for(trans_map::iterator it=tp.begin();it!=tp.end();it++)
 		{
-			shared_ptr<transformation> curTran=it->second;
+			TransPtr curTran=it->second;
 			if(curTran!=NULL)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
@@ -109,7 +109,7 @@ public:
 		return res;
 	}
 
-	void addTrans(string tName, shared_ptr<transformation> trans){tp[tName]=trans;};
+	void addTrans(string tName, TransPtr trans){tp[tName]=trans;};
 	trans_local(){};
 
 	virtual void convertToPb(pb::trans_local & lg_pb){
@@ -170,7 +170,7 @@ public:
 				if(g_loglevel>=GATING_SET_LEVEL)
 					PRINT("update transformation: "+ oldN + "-->" + newN +"\n");
 
-				shared_ptr<transformation> curTran = itTp->second;
+				TransPtr curTran = itTp->second;
 				curTran->setChannel(newN);
 				/*
 				 *
@@ -185,6 +185,14 @@ public:
 			}
 
 		}
+	}
+
+	trans_local deep_copy()
+	{
+		trans_local res;
+		for(const auto & it : tp)
+			res[it.first] = it.second->clone();
+		return res;
 	}
 };
 

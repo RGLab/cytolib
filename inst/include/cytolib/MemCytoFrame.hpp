@@ -1029,9 +1029,9 @@ public:
 		data_ = data_.rows(arma::conv_to<uvec>::from(row_idx));
 	}
 
-	CytoFrame * copy() const
+	CytoFramePtr deep_copy() const
 	{
-		return new MemCytoFrame(*this);
+		return CytoFramePtr(new MemCytoFrame(*this));
 	}
 	/**
  * Caller will receive a copy of data

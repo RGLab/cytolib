@@ -32,8 +32,7 @@ namespace cytolib
  */
 class GatingSet{
 
-	//	typedef shared_ptr<GatingHierarchy> gh_ptr;
-	typedef unordered_map<string, GatingHierarchy> gh_map;
+	typedef unordered_map<string, GatingHierarchyPtr> gh_map;
 	gh_map ghs;
 	CytoSet cytoset_;
 	string guid_;
@@ -110,13 +109,20 @@ public:
 //	CytoSet subset(const vector<string> & sampleNames);
 //	vector<PDATA> getPData();
 //	void setPData(const pData & pd);
-	 /**
-	  * insert
-	  * @param sampleName
-	  * @return
-	  */
-	 GatingHierarchy & operator [](const string & sample_uid){
-			 return ghs[sample_uid];
+
+	 GatingSet operator [](const vector<string> & sample_uids){
+		 	 GatingSet gs;
+		 	 gs.cytoset_ = cytoset_[sample_uids];
+		 	 for(const auto & s :sample_uids)
+		 	 {
+		 		 auto it = find(s);
+		 		 if(it == end())
+		 			 throw(domain_error("Sample not found in GatingSet: " + s));
+
+		 		gs.ghs[s] = it->second;
+		 	 }
+
+			 return gs;
 	   }
 
 	string get_gatingset_id(){return guid_;}
@@ -155,7 +161,7 @@ public:
 	};
 
 	GatingSet(){
-		guid_ = generate_guid(10);
+		guid_ = generate_guid(20);
 	};
 
 	/**
@@ -258,7 +264,7 @@ public:
 
 			for(auto & it :ghs){
 					string sn = it.first;
-					GatingHierarchy & gh =  it.second;
+					GatingHierarchy & gh =  *(it.second);
 
 					pb::GatingHierarchy pb_gh;
 					gh.convertToPb(pb_gh);
@@ -333,7 +339,7 @@ public:
 				}
 
 
-				ghs[sn] = GatingHierarchy(gh_pb);
+				ghs[sn].reset(new GatingHierarchy(gh_pb));
 			}
 
 			cytoset_ = CytoSet(pbGS.cs(), path);
@@ -349,7 +355,7 @@ public:
 	 * @param sampleName a string providing the sample name as the key
 	 * @return a pointer to the GatingHierarchy object
 	 */
-	GatingHierarchy & getGatingHierarchy(string sample_uid)
+	GatingHierarchyPtr getGatingHierarchy(string sample_uid)
 	{
 
 		iterator it=ghs.find(sample_uid);
@@ -363,50 +369,23 @@ public:
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet* clone(vector<string> sample_uids){
-		GatingSet * gs=new GatingSet();
+	GatingSet deep_copy(){
+		GatingSet gs;
 
-		//copy gh
+		gs.cytoset_ = cytoset_.deep_copy();
 
-		for(auto & it : sample_uids)
+		for(auto & it : ghs)
 		{
-			string curSampleName = it;
+			string curSampleName = it.first;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
-			//except trans, the entire gh object is copiable
-			GatingHierarchy curGh = getGatingHierarchy(curSampleName);
-
-			gs->ghs[curSampleName]=curGh;//add to the map
+			gs.ghs[curSampleName] = it.second->deep_copy();
 
 		}
 
 		return gs;
 	}
-	/*
-	 *
-	 * copy gating trees from self to the dest gs
-	 */
-	void add(GatingSet & gs,vector<string> sample_uids){
 
-
-		/*
-		 * use newTmap for all other new ghs
-		 */
-		vector<string>::iterator it;
-		for(it=sample_uids.begin();it!=sample_uids.end();it++)
-		{
-			string curSampleName=*it;
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... copying GatingHierarchy: "+curSampleName+"...\n ");
-
-
-			GatingHierarchy &toCopy=gs.getGatingHierarchy(curSampleName);
-
-			ghs[curSampleName]=toCopy.clone();
-
-
-		}
-	}
 	/*Defunct
 	 * TODO:current version of this contructor is based on gating template ,simply copying
 	 * compensation and transformation,more options can be allowed in future like providing different
@@ -422,8 +401,7 @@ public:
 				PRINT("\n... start cloning GatingHierarchy for: "+curSampleName+"... \n");
 
 
-			ghs[curSampleName] = gh_template.clone();
-	//		curGh->setNcPtr(&nc);//make sure to assign the global nc pointer to  GatingHierarchy
+			ghs[curSampleName] = gh_template.deep_copy();
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("Gating hierarchy cloned: "+curSampleName+"\n");
@@ -439,7 +417,7 @@ public:
 				PRINT("\n... start adding GatingHierarchy for: "+ it +"... \n");
 
 
-			GatingHierarchy & gh=addGatingHierarchy(it);
+			GatingHierarchy & gh=add_GatingHierarchy(it);
 			gh.addRoot();//add default root
 
 
@@ -454,14 +432,14 @@ public:
 	}
 
 	CytoSet get_cytoset(string node_path){
-		CytoSet view = cytoset_;
-		for(auto & it : view)
+		CytoSet cs = cytoset_;
+		for(auto & it : ghs)
 		{
-			GatingHierarchy & gh = getGatingHierarchy(it.first);
-			nodeProperties & node = gh.getNodeProperty(gh.getNodeID(node_path));
-			it.second->rows_(node.getIndices_u());
+			GatingHierarchyPtr gh = it.second;
+			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));
+			cs->rows_(it.first, node.getIndices_u());
 		}
-		return view;
+		return cs;
 	}
 	fs::path generate_h5_folder(fs::path h5_dir)
 	{
@@ -479,12 +457,12 @@ public:
 	 * insert an empty GatingHierarchy
 	 * @param sn
 	 */
-	GatingHierarchy & addGatingHierarchy(string sample_uid){
+	GatingHierarchyPtr add_GatingHierarchy(string sample_uid){
 		if(ghs.find(sample_uid)!=ghs.end())
 			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
 		return ghs[sample_uid];
 	}
-	void addGatingHierarchy(const GatingHierarchy & gh, string sample_uid){
+	void add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
 			if(ghs.find(sample_uid)!=ghs.end())
 				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
 			ghs[sample_uid] = gh;
@@ -503,7 +481,7 @@ public:
 
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\nupdate channels for GatingHierarchy:"+it.first+"\n");
-				it.second.update_channels(chnl_map);
+				it.second->update_channels(chnl_map);
 				//comp
 			}
 		//update flow data

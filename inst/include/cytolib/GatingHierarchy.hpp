@@ -81,6 +81,8 @@ struct OurVertexPropertyWriterR {
     populationTree &g;
 };
 
+class GatingHierarchy;
+typedef shared_ptr<GatingHierarchy> GatingHierarchyPtr;
 
 
 /**
@@ -230,7 +232,7 @@ public:
 			}
 			else
 			{
-				shared_ptr<transformation> curTrans=trans.getTran(curChannel);
+				TransPtr curTrans=trans.getTran(curChannel);
 
 						if(curTrans)
 						{
@@ -565,7 +567,7 @@ public:
 
 		for (trans_map::iterator it=trans.begin();it!=trans.end();it++)
 		{
-			shared_ptr<transformation> curTrans=it->second;
+			TransPtr curTrans=it->second;
 
 
 			if(!curTrans->isInterpolated())
@@ -1594,19 +1596,15 @@ public:
 	}
 	populationTree & getTree(){return tree;};
 
-	/*
-	 * TODO:this overloading function is a temporary solution:
-	 * difference from the above one is:
-	 * does not copy trans
-	 */
-	GatingHierarchy  clone() const{
 
-		GatingHierarchy res;
+	GatingHierarchyPtr  deep_copy() const{
 
-		res.comp=comp;
+		GatingHierarchyPtr res;
 
-		res.tree=tree;
-
+		res->comp=comp;
+		res->tree=tree;
+		res->transFlag = transFlag;
+		res->trans = trans.dee_copy();
 		return res;
 	}
 	/*

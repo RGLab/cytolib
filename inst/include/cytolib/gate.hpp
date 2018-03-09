@@ -280,7 +280,7 @@ public:
 		{
 			EVENT_DATA_TYPE vert[2] = {param.getMin(),param.getMax()};
 
-			shared_ptr<transformation> curTrans=trans.getTran(param.getName());
+			TransPtr curTrans=trans.getTran(param.getName());
 			if(curTrans)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
@@ -578,7 +578,7 @@ public:
 
 
 	/*
-	 * a wrapper that calls transforming(shared_ptr<transformation> , shared_ptr<transformation> )
+	 * a wrapper that calls transforming(TransPtr , TransPtr )
 	 */
 	virtual void transforming(trans_local & trans){
 
@@ -592,8 +592,8 @@ public:
 			/*
 			 * do the actual transformations
 			 */
-			shared_ptr<transformation> trans_x=trans.getTran(channel_x);
-			shared_ptr<transformation> trans_y=trans.getTran(channel_y);
+			TransPtr trans_x=trans.getTran(channel_x);
+			TransPtr trans_y=trans.getTran(channel_y);
 
 			transforming(trans_x, trans_y);
 	}
@@ -601,7 +601,7 @@ public:
 	/*
 	 * the actual transforming logic for polygonGate, that is shared by polyonGate and ellipsoidGate(due to the special scale)
 	 */
-	virtual void transforming(shared_ptr<transformation> trans_x, shared_ptr<transformation> trans_y){
+	virtual void transforming(TransPtr trans_x, TransPtr trans_y){
 		if(!Transformed())
 		{
 			vector<coordinate> vertices=param.getVertices();
@@ -1061,8 +1061,8 @@ public:
 			/*
 			 * do the actual transformations
 			 */
-			shared_ptr<transformation> trans_x=trans.getTran(channel_x);
-			shared_ptr<transformation> trans_y=trans.getTran(channel_y);
+			TransPtr trans_x=trans.getTran(channel_x);
+			TransPtr trans_y=trans.getTran(channel_y);
 
 
 			if(trans_x)
@@ -1152,8 +1152,8 @@ public:
 
 
 
-			shared_ptr<transformation> trans_x=trans.getTran(channel_x);
-			shared_ptr<transformation> trans_y=trans.getTran(channel_y);
+			TransPtr trans_x=trans.getTran(channel_x);
+			TransPtr trans_y=trans.getTran(channel_y);
 
 
 			/*
@@ -1177,8 +1177,8 @@ public:
 			trans_gate_y->setTransformedScale(256);
 
 			//get its inverse
-			shared_ptr<transformation> inverseTrans_x = trans_gate_x->getInverseTransformation();
-			shared_ptr<transformation> inverseTrans_y = trans_gate_y->getInverseTransformation();
+			TransPtr inverseTrans_x = trans_gate_x->getInverseTransformation();
+			TransPtr inverseTrans_y = trans_gate_y->getInverseTransformation();
 
 
 			/*
@@ -1325,14 +1325,14 @@ public:
 		 * transform intersect back to raw
 		 */
 
-		shared_ptr<transformation> trans_x = trans.getTran(x_chnl);
-		shared_ptr<transformation> trans_y = trans.getTran(y_chnl);
+		TransPtr trans_x = trans.getTran(x_chnl);
+		TransPtr trans_y = trans.getTran(y_chnl);
 
 
 		/*
 		 * and rescale raw to 256 space
 		 */
-		shared_ptr<transformation> trans_gate_x,trans_gate_y;
+		TransPtr trans_gate_x,trans_gate_y;
 		if(!trans_x)
 			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
 		else
@@ -1460,7 +1460,7 @@ public:
 		/*
 		 * scale back to the raw scale
 		 */
-		shared_ptr<transformation> inverseGate_x,inverseGate_y;
+		TransPtr inverseGate_x,inverseGate_y;
 		if(trans_gate_x){
 			inverseGate_x = trans_gate_x->getInverseTransformation();
 		}
