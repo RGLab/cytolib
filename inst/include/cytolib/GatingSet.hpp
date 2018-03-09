@@ -24,21 +24,16 @@ namespace cytolib
 #define PB true
 #define BS false
 
-
 /**
  * \class GatingSet
  * \brief A container class that stores multiple GatingHierarchy objects.
  *
- *  It also stores the global transformations.
  *
  */
 class GatingSet{
 
-	biexpTrans globalBiExpTrans; //default bi-exponential transformation functions
-	linTrans globalLinTrans;
-	trans_global_vec gTrans;//parsed from xml workspace
-
-	typedef unordered_map<string,GatingHierarchy> gh_map;
+	//	typedef shared_ptr<GatingHierarchy> gh_ptr;
+	typedef unordered_map<string, GatingHierarchy> gh_map;
 	gh_map ghs;
 	CytoSet cytoset_;
 	string guid_;
@@ -159,35 +154,6 @@ public:
 		cytoset_.set_sample_uid(_old, _new);
 	};
 
-	~GatingSet()
-	{
-		if(g_loglevel>=GATING_SET_LEVEL)
-			PRINT("\nstart to free GatingSet...\n");
-
-
-		for(trans_global_vec::iterator it=gTrans.begin();it!=gTrans.end();it++)
-		{
-			trans_map curTrans=it->getTransMap();
-			if(g_loglevel>=GATING_SET_LEVEL)
-				PRINT("\nstart to free transformatioin group:"+it->getGroupName()+"\n");
-			for(trans_map::iterator it1=curTrans.begin();it1!=curTrans.end();it1++)
-			{
-				transformation * curTran=it1->second;
-				if(curTran!=NULL)
-				{
-					if(g_loglevel>=GATING_SET_LEVEL)
-							PRINT("free transformatioin:"+curTran->getChannel()+"\n");
-
-					delete curTran;
-					curTran = NULL;
-				}
-
-			}
-
-		}
-
-	}
-
 	GatingSet(){
 		guid_ = generate_guid(10);
 	};
@@ -264,29 +230,6 @@ public:
 
 		//empty message for gs
 		pb::GatingSet gs_pb;
-
-		/*
-		 * add messages for trans
-		 */
-
-		//save the address of global biexp (as 1st entry)
-		pb::TRANS_TBL * trans_tbl_pb = gs_pb.add_trans_tbl();
-		intptr_t address = (intptr_t)&globalBiExpTrans;
-		trans_tbl_pb->set_trans_address(address);
-
-
-		//save the address of global lintrans(as 2nd entry)
-		trans_tbl_pb = gs_pb.add_trans_tbl();
-		address = (intptr_t)&globalLinTrans;
-		trans_tbl_pb->set_trans_address(address);
-
-
-		// cp trans group
-		BOOST_FOREACH(trans_global_vec::value_type & it, gTrans){
-			pb::trans_local * tg = gs_pb.add_gtrans();
-			it.convertToPb(*tg, gs_pb);
-		}
-
 
 		//guid
 		gs_pb.set_guid(guid_);
@@ -377,68 +320,6 @@ public:
 
 			guid_ = pbGS.guid();
 
-			//parse global trans tbl from message
-			map<intptr_t, transformation *> trans_tbl;
-
-			for(int i = 0; i < pbGS.trans_tbl_size(); i++){
-				const pb::TRANS_TBL & trans_tbl_pb = pbGS.trans_tbl(i);
-				const pb::transformation & trans_pb = trans_tbl_pb.trans();
-				intptr_t old_address = (intptr_t)trans_tbl_pb.trans_address();
-
-				/*
-				 * first two global trans do not need to be restored from archive
-				 * since they use the default parameters
-				 * simply add the new address
-				 */
-
-				switch(i)
-				{
-				case 0:
-					trans_tbl[old_address] = &globalBiExpTrans;
-					break;
-				case 1:
-					trans_tbl[old_address] = &globalLinTrans;
-					break;
-				default:
-					{
-						switch(trans_pb.trans_type())
-						{
-						case pb::PB_CALTBL:
-							trans_tbl[old_address] = new transformation(trans_pb);
-							break;
-						case pb::PB_BIEXP:
-							trans_tbl[old_address] = new biexpTrans(trans_pb);
-							break;
-						case pb::PB_FASIGNH:
-							trans_tbl[old_address] = new fasinhTrans(trans_pb);
-							break;
-						case pb::PB_FLIN:
-							trans_tbl[old_address] = new flinTrans(trans_pb);
-							break;
-						case pb::PB_LIN:
-							trans_tbl[old_address] = new linTrans(trans_pb);
-							break;
-						case pb::PB_LOG:
-							trans_tbl[old_address] = new logTrans(trans_pb);
-							break;
-	//					case pb::PB_SCALE:
-	//						trans_tbl[old_address] = new scaleTrans(trans_pb);
-	//						break;
-						default:
-							throw(domain_error("unknown type of transformation archive!"));
-						}
-					}
-				}
-
-			}
-			/*
-			 * recover the trans_global
-			 */
-
-			for(int i = 0; i < pbGS.gtrans_size(); i++){
-				const pb::trans_local & trans_local_pb = pbGS.gtrans(i);
-				gTrans.push_back(trans_global(trans_local_pb, trans_tbl));
-			}
 
 			//read gating hierarchy messages
 			for(int i = 0; i < pbGS.samplename_size(); i++){
@@ -452,7 +333,7 @@ public:
 				}
 
 
-				ghs[sn] = GatingHierarchy(gh_pb, trans_tbl);
+				ghs[sn] = GatingHierarchy(gh_pb);
 			}
 
 			cytoset_ = CytoSet(pbGS.cs(), path);
@@ -485,33 +366,6 @@ public:
 	GatingSet* clone(vector<string> sample_uids){
 		GatingSet * gs=new GatingSet();
 
-		//deep copying trans_global_vec
-		trans_global_vec new_gtrans;
-		map<transformation *, transformation * > trans_tbl;
-
-		for(auto & it : gTrans){
-			//copy trans_global
-			trans_global newTransGroup;
-
-			newTransGroup.setGroupName(it.getGroupName());
-			newTransGroup.setSampleIDs(it.getSampleIDs());
-
-			//clone trans_map
-			trans_map newTmap;
-			for(auto & v : it.getTransMap()){
-				transformation * orig = v.second;
-				transformation * trans = orig->clone();
-				newTmap[v.first] = trans;
-				//maintain a map between orig and new trans
-				trans_tbl[orig] =  trans;
-			}
-			//save map into trans_global
-			newTransGroup.setTransMap(newTmap);
-			//save new trans_global into trans_global_vec
-			new_gtrans.push_back(newTransGroup);
-		}
-		gs->set_gTrans(new_gtrans);
-
 		//copy gh
 
 		for(auto & it : sample_uids)
@@ -521,19 +375,6 @@ public:
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
 			//except trans, the entire gh object is copiable
 			GatingHierarchy curGh = getGatingHierarchy(curSampleName);
-
-			//update trans_local with new trans pointers
-			trans_map newTmap = curGh.getLocalTrans().getTransMap();
-			for(auto & v : newTmap){
-				transformation * orig = v.second;
-				auto trans_it = trans_tbl.find(orig);
-				if(trans_it == trans_tbl.end())
-					throw(logic_error("the current transformation is not found in global trans table!"));
-
-				transformation * trans = trans_it->second;
-				v.second = trans;
-			}
-			curGh.addTransMap(newTmap);
 
 			gs->ghs[curSampleName]=curGh;//add to the map
 
@@ -547,18 +388,6 @@ public:
 	 */
 	void add(GatingSet & gs,vector<string> sample_uids){
 
-
-		/*
-		 * copy trans from gh_template into gtrans
-		 * involve deep copying of transformation pointers
-		 */
-	//	if(g_loglevel>=GATING_SET_LEVEL)
-	//		PRINT("copying transformation from gh_template...\n");
-	//	trans_global newTransGroup;
-
-	//	trans_map newTmap=gh_template->getLocalTrans().cloneTransMap();
-	//	newTransGroup.setTransMap(newTmap);
-	//	gTrans.push_back(newTransGroup);
 
 		/*
 		 * use newTmap for all other new ghs
@@ -585,23 +414,6 @@ public:
 	 */
 	GatingSet(const GatingHierarchy & gh_template,vector<string> sample_uids){
 
-
-
-		/*
-		 * copy trans from gh_template into gtrans
-		 * involve deep copying of transformation pointers
-		 */
-		if(g_loglevel>=GATING_SET_LEVEL)
-			PRINT("copying transformation from gh_template...\n");
-		trans_global newTransGroup;
-	//	gh_template->printLocalTrans();
-		trans_map newTmap=gh_template.getLocalTrans().cloneTransMap();
-		newTransGroup.setTransMap(newTmap);
-		gTrans.push_back(newTransGroup);
-
-		/*
-		 * use newTmap for all other new ghs
-		 */
 		vector<string>::iterator it;
 		for(it=sample_uids.begin();it!=sample_uids.end();it++)
 		{
@@ -610,7 +422,7 @@ public:
 				PRINT("\n... start cloning GatingHierarchy for: "+curSampleName+"... \n");
 
 
-			ghs[curSampleName] = gh_template.clone(newTmap,&gTrans);
+			ghs[curSampleName] = gh_template.clone();
 	//		curGh->setNcPtr(&nc);//make sure to assign the global nc pointer to  GatingHierarchy
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -663,26 +475,6 @@ public:
 	}
 
 
-	/*
-	 * It is used by R API to add global transformation object during the auto gating.
-	 * @param tName transformation name (usually channel name)
-	 * @param tm trans_map
-	 */
-	void addTransMap(string gName,trans_map tm){
-		/*
-		 * assumption is there is either none transformation group exists before adding
-		 */
-		if(gTrans.size() == 0){
-
-			trans_global thisTransGroup = trans_global();
-			thisTransGroup.setGroupName(gName);
-			thisTransGroup.setTransMap(tm);
-			gTrans.push_back(thisTransGroup);
-		}
-		else
-			throw(domain_error("transformation group already exists!Can't add the second one."));
-
-	}
 	/**
 	 * insert an empty GatingHierarchy
 	 * @param sn
@@ -705,15 +497,6 @@ public:
 	 */
 	void update_channels(const CHANNEL_MAP & chnl_map)
 	{
-		//update trans
-		for(trans_global_vec::iterator it=gTrans.begin();it!=gTrans.end();it++)
-		{
-
-			if(g_loglevel>=GATING_SET_LEVEL)
-				PRINT("\nupdate channels for transformation group:" + it->getGroupName()+ "\n");
-			it->update_channels(chnl_map);
-
-		}
 
 		//update gh
 		for(auto & it : ghs){
@@ -728,9 +511,6 @@ public:
 
 	}
 
-	void set_gTrans(const trans_global_vec & _gTrans){gTrans = _gTrans;};
-	biexpTrans * get_globalBiExpTrans(){return &globalBiExpTrans;};
-	linTrans * get_globalLinTrans(){return &globalLinTrans;};
 
 };
 

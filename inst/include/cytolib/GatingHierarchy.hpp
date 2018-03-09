@@ -230,9 +230,9 @@ public:
 			}
 			else
 			{
-				transformation *curTrans=trans.getTran(curChannel);
+				shared_ptr<transformation> curTrans=trans.getTran(curChannel);
 
-						if(curTrans!=NULL)
+						if(curTrans)
 						{
 							if(curTrans->gateOnly())
 								continue;
@@ -402,7 +402,7 @@ public:
 
 	}
 
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, transformation *> & trans_tbl){
+	GatingHierarchy(pb::GatingHierarchy & pb_gh){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 
@@ -427,7 +427,7 @@ public:
 			transFlag.push_back(PARAM(pb_gh.transflag(i)));
 		}
 		//restore trans local
-		trans = trans_local(pb_gh.trans(), trans_tbl);
+		trans = trans_local(pb_gh.trans());
 	}
 
 	/**
@@ -565,7 +565,7 @@ public:
 
 		for (trans_map::iterator it=trans.begin();it!=trans.end();it++)
 		{
-			transformation * curTrans=it->second;
+			shared_ptr<transformation> curTrans=it->second;
 
 
 			if(!curTrans->isInterpolated())
@@ -1593,23 +1593,7 @@ public:
 		}
 	}
 	populationTree & getTree(){return tree;};
-	/*
-	 *TODO:to deal with trans copying (especially how to sync with gTrans)
-	  up to caller to free the memory
-	 */
-	GatingHierarchy clone(const trans_map & _trans,trans_global_vec * _gTrans) const{
 
-		GatingHierarchy res;
-
-
-		res.trans.setTransMap(_trans);
-
-		res.comp=comp;
-
-		res.tree=tree;
-
-		return res;
-	}
 	/*
 	 * TODO:this overloading function is a temporary solution:
 	 * difference from the above one is:

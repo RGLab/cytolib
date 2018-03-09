@@ -8,7 +8,7 @@
 #ifndef GATE_HPP_
 #define GATE_HPP_
 #include "MemCytoFrame.hpp"
-#include "transformation.hpp"
+#include "trans_group.hpp"
 #include "compensation.hpp"
 #include "ellipse2points.hpp"
 
@@ -280,8 +280,8 @@ public:
 		{
 			EVENT_DATA_TYPE vert[2] = {param.getMin(),param.getMax()};
 
-			transformation * curTrans=trans.getTran(param.getName());
-			if(curTrans!=NULL)
+			shared_ptr<transformation> curTrans=trans.getTran(param.getName());
+			if(curTrans)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("transforming "+param.getName()+"\n");
@@ -578,7 +578,7 @@ public:
 
 
 	/*
-	 * a wrapper that calls transforming(transformation * , transformation * )
+	 * a wrapper that calls transforming(shared_ptr<transformation> , shared_ptr<transformation> )
 	 */
 	virtual void transforming(trans_local & trans){
 
@@ -592,8 +592,8 @@ public:
 			/*
 			 * do the actual transformations
 			 */
-			transformation * trans_x=trans.getTran(channel_x);
-			transformation * trans_y=trans.getTran(channel_y);
+			shared_ptr<transformation> trans_x=trans.getTran(channel_x);
+			shared_ptr<transformation> trans_y=trans.getTran(channel_y);
 
 			transforming(trans_x, trans_y);
 	}
@@ -601,7 +601,7 @@ public:
 	/*
 	 * the actual transforming logic for polygonGate, that is shared by polyonGate and ellipsoidGate(due to the special scale)
 	 */
-	virtual void transforming(transformation * trans_x, transformation * trans_y){
+	virtual void transforming(shared_ptr<transformation> trans_x, shared_ptr<transformation> trans_y){
 		if(!Transformed())
 		{
 			vector<coordinate> vertices=param.getVertices();
@@ -616,7 +616,7 @@ public:
 			vertices_vector vert(vertices);
 
 
-			if(trans_x!=NULL)
+			if(trans_x)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("transforming: "+channel_x+"\n");;
@@ -624,7 +624,7 @@ public:
 				for(int i=0;i<nSize;i++)
 					vertices[i].x=vert.x[i];
 			}
-			if(trans_y!=NULL)
+			if(trans_y)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("transforming: "+channel_y+"\n");;
@@ -1061,11 +1061,11 @@ public:
 			/*
 			 * do the actual transformations
 			 */
-			transformation * trans_x=trans.getTran(channel_x);
-			transformation * trans_y=trans.getTran(channel_y);
+			shared_ptr<transformation> trans_x=trans.getTran(channel_x);
+			shared_ptr<transformation> trans_y=trans.getTran(channel_y);
 
 
-			if(trans_x!=NULL)
+			if(trans_x)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("transforming: "+channel_x+"\n");;
@@ -1074,7 +1074,7 @@ public:
 				for(int i=0;i<nSize;i++)
 					antipodal_vertices[i].x=vert.x[i];
 			}
-			if(trans_y!=NULL)
+			if(trans_y)
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("transforming: "+channel_y+"\n");;
@@ -1152,21 +1152,21 @@ public:
 
 
 
-			transformation * trans_x=trans.getTran(channel_x);
-			transformation * trans_y=trans.getTran(channel_y);
+			shared_ptr<transformation> trans_x=trans.getTran(channel_x);
+			shared_ptr<transformation> trans_y=trans.getTran(channel_y);
 
 
 			/*
 			 * re-construct the trans object that was used by flowJo to transform ellipsoid gate to 256 scale
 			 */
 			unique_ptr<transformation> trans_gate_x,trans_gate_y;
-			if(trans_x == NULL)
+			if(!trans_x)
 				throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_x));
 	//			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
 	//		else
 				trans_gate_x.reset(trans_x->clone()); //copy existing trans_x for non-linear
 	//
-			if(trans_y == NULL)
+			if(!trans_y)
 				throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_y));
 	//			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
 	//		else
@@ -1177,14 +1177,14 @@ public:
 			trans_gate_y->setTransformedScale(256);
 
 			//get its inverse
-			boost::shared_ptr<transformation> inverseTrans_x = trans_gate_x->getInverseTransformation();
-			boost::shared_ptr<transformation> inverseTrans_y = trans_gate_y->getInverseTransformation();
+			shared_ptr<transformation> inverseTrans_x = trans_gate_x->getInverseTransformation();
+			shared_ptr<transformation> inverseTrans_y = trans_gate_y->getInverseTransformation();
 
 
 			/*
 			 * transform the polygon from 256 to raw
 			 */
-			polygonGate::transforming(inverseTrans_x.get(), inverseTrans_y.get());
+			polygonGate::transforming(inverseTrans_x, inverseTrans_y);
 
 
 
@@ -1325,20 +1325,20 @@ public:
 		 * transform intersect back to raw
 		 */
 
-		transformation * trans_x = trans.getTran(x_chnl);
-		transformation * trans_y = trans.getTran(y_chnl);
+		shared_ptr<transformation> trans_x = trans.getTran(x_chnl);
+		shared_ptr<transformation> trans_y = trans.getTran(y_chnl);
 
 
 		/*
 		 * and rescale raw to 256 space
 		 */
-		unique_ptr<transformation> trans_gate_x,trans_gate_y;
-		if(trans_x == NULL)
+		shared_ptr<transformation> trans_gate_x,trans_gate_y;
+		if(!trans_x)
 			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
 		else
 			trans_gate_x.reset(trans_x->clone()); //copy existing trans_x for non-linear
 
-		if(trans_y == NULL)
+		if(!trans_y)
 			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
 		else
 			trans_gate_y.reset(trans_y->clone()); //copy existing trans_y for non-linear
@@ -1347,7 +1347,7 @@ public:
 		int displayScale = 255;
 		trans_gate_x->setTransformedScale(displayScale);
 		trans_gate_y->setTransformedScale(displayScale);
-		polygonGate::transforming(trans_gate_x.get(), trans_gate_y.get());
+		polygonGate::transforming(trans_gate_x, trans_gate_y);
 
 	//	/*
 	//	 * directly map from log scale to 225 space to make the curve smoother
@@ -1460,14 +1460,14 @@ public:
 		/*
 		 * scale back to the raw scale
 		 */
-		boost::shared_ptr<transformation> inverseGate_x,inverseGate_y;
+		shared_ptr<transformation> inverseGate_x,inverseGate_y;
 		if(trans_gate_x){
 			inverseGate_x = trans_gate_x->getInverseTransformation();
 		}
-		if(trans_gate_y!=NULL){
+		if(trans_gate_y){
 			inverseGate_y = trans_gate_y->getInverseTransformation();
 		}
-		polygonGate::transforming(inverseGate_x.get(), inverseGate_y.get());
+		polygonGate::transforming(inverseGate_x, inverseGate_y);
 		setTransformed(false);
 		interpolated = true;
 	}

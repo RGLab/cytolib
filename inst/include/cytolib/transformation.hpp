@@ -30,6 +30,15 @@ namespace cytolib
 //#define LOGICLE 1
 #define BIEXP 5
 
+/* case insensitive compare predicate*/
+struct ciLessBoost : std::binary_function<std::string, std::string, bool>
+{
+    bool operator() (const std::string & s1, const std::string & s2) const {
+        return lexicographical_compare(s1, s2, boost::is_iless());
+    }
+};
+
+typedef map<std::string, std::string, ciLessBoost> CHANNEL_MAP;
 
 struct coordinate
 {
@@ -150,7 +159,7 @@ public:
 
 	}
 
-	virtual boost::shared_ptr<transformation>  getInverseTransformation(){
+	virtual shared_ptr<transformation>  getInverseTransformation(){
 		if(!calTbl.isInterpolated()){
 			 /* calculate calibration table from the function
 			 */
@@ -170,7 +179,7 @@ public:
 		}
 
 		//clone the existing trans
-		boost::shared_ptr<transformation>  inverse = boost::shared_ptr<transformation>(new transformation(*this));
+		shared_ptr<transformation>  inverse = shared_ptr<transformation>(new transformation(*this));
 		//make sure to reset type to avoid type-discrepancy because
 		//it returns the base transformation type instead of the original one (e.g. biexp)
 		inverse->type = CALTBL;
@@ -192,217 +201,7 @@ public:
 	virtual int getTransformedScale(){throw(domain_error("getTransformedScale function not defined!"));};
 	virtual int getRawScale(){throw(domain_error("getRawScale function not defined!"));};
 };
-/* case insensitive compare predicate*/
-struct ciLessBoost : std::binary_function<std::string, std::string, bool>
-{
-    bool operator() (const std::string & s1, const std::string & s2) const {
-        return lexicographical_compare(s1, s2, boost::is_iless());
-    }
-};
 
-typedef map<string,transformation *, ciLessBoost> trans_map;/* we always do case-insensitive searching for transformation lookup
-due to some of channel name discrepancies occured in flowJo workspaces*/
-typedef map<std::string, std::string, ciLessBoost> CHANNEL_MAP;
-struct PARAM{
-		string param;
-		bool log;
-		unsigned range;
-		unsigned highValue;
-		unsigned calibrationIndex;
-		//EDIT: can't trust this info from xml
-//		EVENT_DATA_TYPE timestep;//only meaningful for time channel which is used to scale time channel (only for data, not for gates since gates are already stored at scaled value)
-		PARAM(){};
-		void update_channels(const CHANNEL_MAP & chnl_map){
-			CHANNEL_MAP::const_iterator itChnl = chnl_map.find(param);
-			if(itChnl!=chnl_map.end())
-				param = itChnl->second;
-		};
-		PARAM(const pb::PARAM & param_pb){
-			param = param_pb.param();
-			log = param_pb.log();
-			range = param_pb.range();
-			highValue = param_pb.highvalue();
-			calibrationIndex = param_pb.calibrationindex();
-//			timestep = param_pb.timestep();
-		};
-		 void convertToPb(pb::PARAM & param_pb){
-			 param_pb.set_param(param);
-			 param_pb.set_log(log);
-			 param_pb.set_range(range);
-			 param_pb.set_highvalue(highValue);
-			 param_pb.set_calibrationindex(calibrationIndex);
-//			 param_pb.set_timestep(timestep);
-		 };
-		};
-typedef vector<PARAM> PARAM_VEC;
-
-/**
- *
- * @param pVec
- * @param name  channel name (possibly prefixed by comp.prefix)
- * @param comp
- * @return
- */
-inline PARAM_VEC::const_iterator findTransFlag(const PARAM_VEC & pVec, const string & name, const string & prefix, const string & suffix){
-	PARAM_VEC::const_iterator it;
-	for(it=pVec.begin();it!=pVec.end();it++)
-	{
-		//	try both the bare and prefixed chnl ma,e
-		string chnl = it->param;
-		string chnl_comp = prefix + chnl + suffix;//append prefix
-		if(chnl.compare(name)==0||chnl_comp.compare(name)==0)
-			break;
-	}
-
-	return it;
-}
-
-
-class trans_local{
-private:
-	trans_map tp;
-public:
-	trans_map getTransMap(){return tp;};
-	void setTransMap(trans_map _tp){tp=_tp;};
-
-	transformation * getTran(string channel){
-		transformation * res;
-		if(channel.compare("Time")==0||channel.compare("time")==0)
-			res=NULL;
-
-
-		trans_map::iterator it=tp.find(channel);
-		if(it==tp.end())
-			res=NULL;
-		else
-			res=it->second;
-
-		return res;
-	}
-
-	trans_map cloneTransMap(){
-
-		trans_map res;
-		/*
-		 * clone trans map
-		 */
-
-		for(trans_map::iterator it=tp.begin();it!=tp.end();it++)
-		{
-			transformation * curTran=it->second;
-			if(curTran!=NULL)
-			{
-				if(g_loglevel>=POPULATION_LEVEL)
-					PRINT("cloning transformatioin:"+curTran->getChannel()+"\n");
-				res[it->first]=curTran->clone();
-			}
-		}
-		return res;
-	}
-
-	void addTrans(string tName,transformation* trans){tp[tName]=trans;};
-	trans_local(){};
-
-	virtual void convertToPb(pb::trans_local & lg_pb){
-
-		BOOST_FOREACH(trans_map::value_type & it, tp){
-			intptr_t address = (intptr_t)it.second;
-			pb::trans_pair * tp = lg_pb.add_tp();
-			tp->set_name(it.first);
-			tp->set_trans_address(address);
-		}
-	}
-	virtual void convertToPb(pb::trans_local & lg_pb, pb::GatingSet & gs_pb){
-		// save  address vs name pair and address(global) is to be referred in gh
-		convertToPb(lg_pb);
-
-		//save it to global mapping (address vs trans obj)
-		BOOST_FOREACH(trans_map::value_type & it, tp){
-				intptr_t address = (intptr_t)it.second;
-				pb::TRANS_TBL * tb = gs_pb.add_trans_tbl();
-				tb->set_trans_address(address);
-				pb::transformation * trans_pb = tb->mutable_trans();
-				transformation * trans = it.second;
-				trans->convertToPb(*trans_pb);
-			}
-	}
-	trans_local(const pb::trans_local & lg_pb, map<intptr_t, transformation *> & trans_tbl){
-
-		for(int i = 0; i < lg_pb.tp_size(); i ++){
-			const pb::trans_pair & tp_pb = lg_pb.tp(i);
-			intptr_t old_address = (intptr_t)tp_pb.trans_address();
-			//look up from the tbl for the new pointer
-			map<intptr_t, transformation *>::iterator it = trans_tbl.find(old_address);
-			if(it!=trans_tbl.end()){
-				tp[tp_pb.name()] = it->second;
-			}
-			else
-				throw(domain_error("the current archived transformation is not found in the global table!"));
-
-		}
-	}
-
-	void update_channels(const CHANNEL_MAP & chnl_map){
-
-		//iterate throiugh chnl_map instead of tp since tp iterator will be invalidated when erased
-		for(CHANNEL_MAP::const_iterator itChnl = chnl_map.begin(); itChnl != chnl_map.end(); itChnl++)
-		{
-
-			string oldN = itChnl->first;
-			trans_map::iterator itTp = tp.find(oldN);
-
-			if(itTp!=tp.end())
-			{
-				string newN = itChnl->second;
-				if(g_loglevel>=GATING_SET_LEVEL)
-					PRINT("update transformation: "+ oldN + "-->" + newN +"\n");
-
-				transformation * curTran = itTp->second;
-				curTran->setChannel(newN);
-				/*
-				 *
-				 * have to delete the old one before adding newN
-				 * because tp[newN] could be just updating existing tp[oldN]
-				 * instead of inserting new entry due to the fact tp trans_map is set to case insensitive key searching
-				 * otherwise, tp.erase would lead to losing the entry when oldN and newN are equivalent
-				 */
-				tp.erase(itTp);
-				tp[newN] = curTran; //add new entry
-
-			}
-
-		}
-	}
-};
-
-class trans_global:public trans_local{
-private:
-	string groupName;
-	vector<int> sampleIDs;
-public:
-	void setSampleIDs(vector<int> _sampleIDs){sampleIDs=_sampleIDs;}
-	vector<int> getSampleIDs(){return sampleIDs;}
-	string getGroupName(){return groupName;}
-	void setGroupName(string _groupName){groupName=_groupName;};
-	trans_global(){};
-
-
-	void convertToPb(pb::trans_local & tg_pb, pb::GatingSet & gs_pb){
-			trans_local::convertToPb(tg_pb, gs_pb);//pass gs_pb on to the base method
-			tg_pb.set_groupname(groupName);
-			BOOST_FOREACH(vector<int>::value_type & it,sampleIDs){
-				tg_pb.add_sampleids(it);
-			}
-
-	}
-	trans_global(const pb::trans_local & tg_pb, map<intptr_t, transformation *> & trans_tbl):trans_local(tg_pb, trans_tbl){
-		groupName = tg_pb.groupname();
-		for(int i = 0; i < tg_pb.sampleids_size(); i++)
-			sampleIDs.push_back(tg_pb.sampleids(i));
-
-	}
-
-};
 /*
  * directly translated from java routine from tree star
  */
@@ -446,7 +245,6 @@ inline EVENT_DATA_TYPE logRoot(EVENT_DATA_TYPE b, EVENT_DATA_TYPE w)
 	return d;
 }
 
-typedef vector<trans_global> trans_global_vec;
 
 class biexpTrans:public transformation{
 public:
@@ -640,7 +438,7 @@ public:
 		A = ft_pb.a();
 		M = ft_pb.m();
 	}
-	boost::shared_ptr<transformation>  getInverseTransformation();
+	shared_ptr<transformation>  getInverseTransformation();
 
 	void setTransformedScale(int scale){maxRange = scale;};
 	int getTransformedScale(){return maxRange;};
@@ -662,16 +460,16 @@ public:
 			input[i] = sinh(((M + A) * log(10)) * input[i]/length - A * log(10)) * T / sinh(M * log(10));
 
 	}
-	boost::shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
+	shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
 //	fsinhTrans * clone(){return new fasinhTrans(*this);};
 //	void convertToPb(pb::transformation & trans_pb);
 //	fasinhTrans(const pb::transformation & trans_pb);
-//	boost::shared_ptr<transformation> getInverseTransformation();
+//	shared_ptr<transformation> getInverseTransformation();
 //	void setTransformedScale(int scale){length = scale;};
 };
 
-inline boost::shared_ptr<transformation>  fasinhTrans::getInverseTransformation(){
-		return boost::shared_ptr<transformation>(new fsinhTrans(length, maxRange, T, A , M));
+inline shared_ptr<transformation>  fasinhTrans::getInverseTransformation(){
+		return shared_ptr<transformation>(new fsinhTrans(length, maxRange, T, A , M));
 	}
 
 /*
@@ -737,7 +535,7 @@ public:
 		T = lt_pb.t();
 	}
 
-	boost::shared_ptr<transformation>  getInverseTransformation();
+	shared_ptr<transformation>  getInverseTransformation();
 
 	void setTransformedScale(int _scale){scale = _scale;};
 	int getTransformedScale(){return scale;};
@@ -764,8 +562,8 @@ public:
 
 };
 
-inline boost::shared_ptr<transformation>  logTrans::getInverseTransformation(){
-		return boost::shared_ptr<transformation>(new logInverseTrans(offset, decade,scale, T));
+inline shared_ptr<transformation>  logTrans::getInverseTransformation(){
+		return shared_ptr<transformation>(new logInverseTrans(offset, decade,scale, T));
 	}
 
 class linTrans:public transformation{
@@ -785,7 +583,7 @@ public:
 
         }
         linTrans(const pb::transformation & trans_pb):transformation(trans_pb){}
-        boost::shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
+        shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
         void setTransformedScale(int scale){throw(domain_error("setTransformedScale function not defined!"));};
 
 };
@@ -809,8 +607,8 @@ public:
 
 	scaleTrans * clone(){return new scaleTrans(*this);};
 
-	boost::shared_ptr<transformation> getInverseTransformation(){
-		return boost::shared_ptr<transformation>(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
+	shared_ptr<transformation> getInverseTransformation(){
+		return shared_ptr<transformation>(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
 	}
 
 	void setTransformedScale(int _scale){t_scale = _scale;};
@@ -859,7 +657,7 @@ public:
 		max = ft_pb.max();
 		min = ft_pb.min();
 	}
-	boost::shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
+	shared_ptr<transformation> getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
 	void setTransformedScale(int scale){throw(domain_error("setTransformedScale function not defined!"));};
 
 };

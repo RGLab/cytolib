@@ -15,7 +15,6 @@ struct CSFixture{
 	};
 
 
-
 	~CSFixture(){
 
 	};
@@ -25,6 +24,22 @@ struct CSFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoSet_test,CSFixture)
+BOOST_AUTO_TEST_CASE(test)
+{
+//	class A{
+//	public:
+//		int & r_;
+//		A(int & r):r_(r){};
+//	};
+//	int * a = new int(3);
+//	A b(*a);
+//	b.r_ = 4;
+//	cout << *a << endl;
+//	delete a;
+//	b.r_ = 5;
+//	cout << b.r_ << endl;
+
+}
 BOOST_AUTO_TEST_CASE(constructor)
 {
 	file_paths[1] = file_paths[0];
