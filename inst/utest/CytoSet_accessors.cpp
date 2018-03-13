@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(subset_by_sample)
 
 	//subset
 	vector<string> select = {samples[0]};
-	CytoSet cs_new = cs[select];
+	CytoSet cs_new = cs.sub_samples(select);
 	BOOST_CHECK_EQUAL(cs_new.size(), 1);
 	vector<string> new_samples = cs_new.get_sample_uids();
 	sort(new_samples.begin(), new_samples.end());
@@ -81,11 +81,12 @@ BOOST_AUTO_TEST_CASE(subset_by_sample)
 BOOST_AUTO_TEST_CASE(cytoframe)
 {
 	vector<string> samples = cs.get_sample_uids();
-	CytoFrame & fr = cs.get_cytoframe(samples[1]);
+	sort(samples.begin(), samples.end());
+	CytoFramePtr fr = cs.get_cytoframe(samples[1]);
 
 	//get_cytoframe from subseted cs
 	vector<string> select = {samples[0]};
-	CytoSet cs_new = cs[select];
+	CytoSet cs_new = cs.sub_samples(select);
 	BOOST_CHECK_EXCEPTION(cs_new.get_cytoframe(samples[1]);;, domain_error, [](const exception & ex){return string(ex.what()).find("not found") != string::npos;});
 
 	//add frame

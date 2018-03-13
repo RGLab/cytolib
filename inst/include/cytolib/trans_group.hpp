@@ -103,7 +103,7 @@ public:
 			{
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT("cloning transformatioin:"+curTran->getChannel()+"\n");
-				res[it->first].reset(curTran->clone());
+				res[it->first] = curTran->clone();
 			}
 		}
 		return res;
@@ -191,7 +191,7 @@ public:
 	{
 		trans_local res;
 		for(const auto & it : tp)
-			res[it.first] = it.second->clone();
+			tp[it.first] = it.second->clone();
 		return res;
 	}
 };

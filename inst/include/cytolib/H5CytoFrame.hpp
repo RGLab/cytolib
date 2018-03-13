@@ -28,12 +28,62 @@ protected:
 	DataSet dataset;
 	DataSpace dataspace;
 	hsize_t dims[2];              // dataset dimensions
-	arma::uvec row_idx_;
-	bool is_row_indexed;
+
+	unsigned n_rows_() const{
+				return dims[1];
+		}
+
 
 public:
 	~H5CytoFrame(){};
-	H5CytoFrame():is_row_indexed(false){};
+
+	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
+	{
+		filename_ = frm.filename_;
+		file = frm.file;
+		dataset = frm.dataset;
+		dataspace = frm.dataspace;
+		memcpy(dims, frm.dims, sizeof(dims));
+
+	}
+	H5CytoFrame(H5CytoFrame && frm):CytoFrame(frm)
+	{
+//		swap(pheno_data_, frm.pheno_data_);
+//		swap(keys_, frm.keys_);
+//		swap(params, frm.params);
+//		swap(channel_vs_idx, frm.channel_vs_idx);
+//		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(filename_, frm.filename_);
+		swap(file, frm.file);
+		swap(dataset, frm.dataset);
+		swap(dataspace, frm.dataspace);
+		swap(dims, frm.dims);
+	}
+	H5CytoFrame & operator=(const H5CytoFrame & frm)
+	{
+		CytoFrame::operator=(frm);
+		filename_ = frm.filename_;
+		file = frm.file;
+		dataset = frm.dataset;
+		dataspace = frm.dataspace;
+		memcpy(dims, frm.dims, sizeof(dims));
+		return *this;
+	}
+	H5CytoFrame & operator=(H5CytoFrame && frm)
+	{
+//		swap(pheno_data_, frm.pheno_data_);
+//		swap(keys_, frm.keys_);
+//		swap(params, frm.params);
+//		swap(channel_vs_idx, frm.channel_vs_idx);
+//		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(filename_, frm.filename_);
+		swap(file, frm.file);
+		swap(dataset, frm.dataset);
+		swap(dataspace, frm.dataspace);
+		swap(dims, frm.dims);
+		return *this;
+	}
+
 	/**
 	 * constructor from FCS
 	 * @param fcs_filename
@@ -50,7 +100,7 @@ public:
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):filename_(h5_filename),is_row_indexed(false)
+	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):CytoFrame(),filename_(h5_filename)
 	{
 		file.openFile(filename_, flags);
 
@@ -178,13 +228,6 @@ public:
 	const string & get_h5_file_path(){
 		return filename_;
 	}
-	unsigned n_rows() const{
-		//read nEvents
-		if(is_row_indexed)
-			return row_idx_.size();
-		else
-			return dims[1];
-	}
 
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt)
 	{
@@ -247,11 +290,12 @@ public:
 
 			dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,memspace, dataspace);
 		}
-
 		if(is_row_indexed)
 			data = data(row_idx_);
+
 		return data;
 	}
+
 
 	/*
 	 * This overloaded function exists so that data subsetting can be operated directly on abstract CytoFrame object
@@ -261,22 +305,10 @@ public:
 		return cols(colnames, col_type).get_data();
 	}
 
-	void cols_(vector<string> colnames, ColType col_type)
-	{
-
-		uvec col_idx = get_col_idx(colnames, col_type);
-
-		//update params
-		CytoFrame::cols_(col_idx);
-	}
 
 
-	void rows_(vector<unsigned> row_idx)
-	{
-		if(is_row_indexed && row_idx.size()!=row_idx_.size())
-			throw(domain_error("The size of the new row index is not the same as the total number of events!"));
-		row_idx_ = arma::conv_to<uvec>::from(row_idx);
-	}
+
+
 
 	H5CytoFrame rows(vector<unsigned> row_idx) const
 	{
@@ -292,12 +324,22 @@ public:
 		return res;
 	}
 
-	CytoFramePtr deep_copy(const string & h5_filename) const
+	CytoFramePtr deep_copy(const string & h5_filename = "") const
 	{
-		if(!fs::equivalent(filename_, h5_filename))
-			throw(domain_error("Can't make copy to itself: " + h5_filename));
-		fs::copy(filename_, h5_filename);
-		return CytoFramePtr(new H5CytoFrame(h5_filename));
+		string new_filename = h5_filename;
+		if(new_filename == "")
+		{
+			new_filename = fs::temp_directory_path() / std::tmpnam(nullptr) ;
+			new_filename += ".h5";
+		}
+
+		if(fs::equivalent(filename_, new_filename))
+			throw(domain_error("Can't make copy to itself: " + new_filename));
+		if(is_row_indexed||is_col_indexed)
+			write_h5(new_filename);
+		else
+			fs::copy(filename_, new_filename);
+		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
 	/**
 	 * copy setter

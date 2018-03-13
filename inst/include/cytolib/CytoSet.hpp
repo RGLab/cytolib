@@ -101,7 +101,7 @@ namespace cytolib
 		 * @param sample_uids
 		 * @return
 		 */
-		CytoSet operator[](vector<string> sample_uids)
+		CytoSet sub_samples(vector<string> sample_uids)
 		{
 			CytoSet res;
 			for(const auto & uid : sample_uids)
@@ -178,11 +178,19 @@ namespace cytolib
 		 *
 		 * @param cs
 		 */
-		CytoSet deep_copy()
+		CytoSet deep_copy(const string & new_h5_dir = "")
 		{
 			CytoSet cs;
 			for(const auto & it : frames_)
-				cs.frames_[it.first] = it.second->deep_copy();
+			{
+				string new_h5 = "";
+				if(new_h5_dir != "")
+				{
+					new_h5 = fs::path(new_h5_dir) / (it.first + ".h5");
+				}
+				cs.frames_[it.first] = it.second->deep_copy(new_h5);
+			}
+
 			return cs;
 		}
 
@@ -218,7 +226,8 @@ namespace cytolib
 				CytoFramePtr fr_ptr(new MemCytoFrame(it.second,config));
 				//set pdata
 				fr_ptr->set_pheno_data("name", path_base_name(it.second));
-				fr_ptr->read_fcs();
+
+				dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
 				if(is_h5)
 				{
 					fr_ptr->write_h5(h5_filename);

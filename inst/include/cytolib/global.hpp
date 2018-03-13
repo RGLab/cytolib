@@ -27,6 +27,10 @@
 #include <armadillo>
 using namespace arma;
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
+
 using namespace std;
 extern unsigned short g_loglevel;// debug print is turned off by default
 extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
@@ -109,7 +113,33 @@ namespace cytolib
 		return fs::path(full_path).filename().string();
 	}
 
-
+	struct TM_ext
+	{
+		tm time;
+		EVENT_DATA_TYPE fractional_secs;
+	};
+	/**
+	 * Parse the time string with fractional seconds
+	 * std lib doesn't handle and boost::posix_time is not header-only
+	 * @param s_time time string "H:M:S.ss"
+	 * @return
+	 */
+	inline TM_ext parse_time_with_fractional_seconds(const string s_time){
+		TM_ext res;
+		vector<string> time_vec;
+		//split the H:M:S.ms by .
+		boost::split(time_vec, s_time, boost::is_any_of("."));
+		//using std lib to parse the first half
+		strptime(time_vec[0].c_str(), "%H:%M:%S", &(res.time));
+		 //parse the second half as fractional seconds
+		if(time_vec.size()==2)
+		{
+			res.fractional_secs = boost::lexical_cast<EVENT_DATA_TYPE>(time_vec[1]);
+		}
+		else
+			res.fractional_secs = 0;
+		return res;
+	}
 };
 
 #endif /* GLOBAL_HPP_ */

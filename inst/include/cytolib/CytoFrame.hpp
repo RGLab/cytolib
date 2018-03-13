@@ -26,11 +26,7 @@ using namespace H5;
 
 const H5std_string  DATASET_NAME( "data");
 
-struct TM_ext
-{
-	tm time;
-	EVENT_DATA_TYPE fractional_secs;
-};
+
 
 class CytoFrame;
 typedef shared_ptr<CytoFrame> CytoFramePtr;
@@ -44,9 +40,35 @@ protected:
 	vector<cytoParam> params;// parameters coerced from keywords and computed from data for quick query
 	unordered_map<string, int> channel_vs_idx;//hash map for query by channel
 	unordered_map<string, int> marker_vs_idx;//hash map for query by marker
+	arma::uvec row_idx_;
+	bool is_row_indexed;
+	bool is_col_indexed;
+
+	CytoFrame ():is_row_indexed(false),is_col_indexed(false){};
+	virtual unsigned n_rows_() const=0;
+	virtual bool is_hashed() const
+	{
+		return channel_vs_idx.size()==n_cols();
+	}
+
+	/**
+	 * build the hash map for channel and marker for the faster query
+	 *
+	 */
+	virtual void build_hash()
+	{
+		channel_vs_idx.clear();
+		marker_vs_idx.clear();
+		for(unsigned i = 0; i < n_cols(); i++)
+		{
+			channel_vs_idx[params[i].channel] = i;
+			marker_vs_idx[params[i].marker] = i;
+		}
+	}
+
 public:
 	virtual ~CytoFrame(){};
-	CytoFrame (){};
+
 	CytoFrame(const CytoFrame & frm)
 	{
 		pheno_data_ = frm.pheno_data_;
@@ -54,6 +76,65 @@ public:
 		params = frm.params;
 		channel_vs_idx = frm.channel_vs_idx;
 		marker_vs_idx = frm.marker_vs_idx;
+		is_row_indexed = frm.is_row_indexed;
+		is_col_indexed = frm.is_col_indexed;
+
+	}
+
+	CytoFrame & operator=(const CytoFrame & frm)
+	{
+		pheno_data_ = frm.pheno_data_;
+		keys_ = frm.keys_;
+		params = frm.params;
+		channel_vs_idx = frm.channel_vs_idx;
+		marker_vs_idx = frm.marker_vs_idx;
+		is_row_indexed = frm.is_row_indexed;
+		is_col_indexed = frm.is_col_indexed;
+		return *this;
+
+	}
+
+	CytoFrame & operator=(CytoFrame && frm)
+	{
+		swap(pheno_data_, frm.pheno_data_);
+		swap(keys_, frm.keys_);
+		swap(params, frm.params);
+		swap(channel_vs_idx, frm.channel_vs_idx);
+		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(is_row_indexed, frm.is_row_indexed);
+		swap(is_col_indexed, frm.is_col_indexed);
+		return *this;
+	}
+
+
+	CytoFrame(CytoFrame && frm)
+	{
+		swap(pheno_data_, frm.pheno_data_);
+		swap(keys_, frm.keys_);
+		swap(params, frm.params);
+		swap(channel_vs_idx, frm.channel_vs_idx);
+		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(is_row_indexed, frm.is_row_indexed);
+		swap(is_col_indexed, frm.is_col_indexed);
+
+	}
+
+	/**
+	 * Realize the delayed subsetting (i.e. cols() and rows()) operations
+	 * and clear the view
+	 */
+	virtual void flush_view()
+	{
+
+		set_data(get_data());
+
+		for(unsigned i = 0; i < params.size(); i++)
+			params[i].original_col_idx = i;
+		is_col_indexed = false;
+
+		row_idx_.clear();
+		is_row_indexed = false;
+
 
 	}
 
@@ -87,6 +168,7 @@ public:
 	}
 
 	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) = 0;
+
 
 	virtual void compensate(const compensation & comp)
 	{
@@ -133,7 +215,7 @@ public:
 	 *
 	 * @param filename the path of the output H5 file
 	 */
-	virtual void write_h5(const string & filename)
+	virtual void write_h5(const string & filename) const
 	{
 		H5File file( filename, H5F_ACC_TRUNC );
 		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
@@ -172,9 +254,6 @@ public:
 	//	for(auto c : cvec)
 	//		cout << c << endl;
 
-		//record the col idx(the order of data cols in h5) for each param
-		for(unsigned i = 0; i < params.size(); i++)
-			params[i].original_col_idx = i;
 		DataSet ds_param = file.createDataSet( "params", param_type, dsp_param);
 		ds_param.write(params.data(), param_type );
 
@@ -188,7 +267,7 @@ public:
 			key_t(const string & k, const string & v):key(k),value(v){};
 		};
 		vector<key_t> keyVec;
-		for(std::pair<std::string, string> e : keys_)
+		for(const auto & e : keys_)
 		{
 			keyVec.push_back(key_t(e.first, e.second));
 		}
@@ -244,6 +323,7 @@ public:
 	 * @return
 	 */
 	virtual EVENT_DATA_VEC get_data() const=0;
+
 	/*
 	 * This function exist so that data subsetting can be operated directly on abstract CytoFrame object
 	 */
@@ -298,30 +378,18 @@ public:
 	 * get the number of rows(or events)
 	 * @return
 	 */
-	virtual unsigned n_rows() const=0;
+	unsigned n_rows() const
+	{
+		//read nEvents
+		if(is_row_indexed)
+			return row_idx_.size();
+		else
+			return n_rows_();
+	}
 	/**
 	 * check if the hash map for channel and marker has been built
 	 * @return
 	 */
-	virtual bool is_hashed() const
-	{
-		return channel_vs_idx.size()==n_cols();
-	}
-
-	/**
-	 * build the hash map for channel and marker for the faster query
-	 *
-	 */
-	virtual void build_hash()
-	{
-		channel_vs_idx.clear();
-		marker_vs_idx.clear();
-		for(unsigned i = 0; i < n_cols(); i++)
-		{
-			channel_vs_idx[params[i].channel] = i;
-			marker_vs_idx[params[i].marker] = i;
-		}
-	}
 
 	/**
 	 * get all the channel names
@@ -520,8 +588,24 @@ public:
 		return ts;
 	}
 
-	virtual void rows_(vector<unsigned> row_idx)=0;
-	virtual void cols_(vector<string> colnames, ColType col_type)=0;
+	void rows_(vector<unsigned> row_idx)
+	{
+		if(is_row_indexed && row_idx.size()!=row_idx_.size())
+			throw(domain_error("The size of the new row index is not the same as the total number of events!"));
+		row_idx_ = arma::conv_to<uvec>::from(row_idx);
+		is_row_indexed = true;
+	}
+
+	void cols_(vector<string> colnames, ColType col_type)
+	{
+
+		uvec col_idx = get_col_idx(colnames, col_type);
+
+		//update params
+		CytoFrame::cols_(col_idx);
+
+	}
+
 	virtual void cols_(uvec col_idx)
 	{
 		unsigned n = col_idx.size();
@@ -533,6 +617,7 @@ public:
 		params = params_new;
 		build_hash();//update idx table
 
+		is_col_indexed = true;
 		//update keywords PnX
 //		for(unsigned i = 0; i < n; i++)
 //		{
@@ -540,30 +625,9 @@ public:
 //		}
 
 	}
-	virtual CytoFramePtr deep_copy() const=0;
+	virtual CytoFramePtr deep_copy(const string & h5_filename = "") const=0;
 
-	/**
-	 * Parse the time string with fractional seconds
-	 * std lib doesn't handle and boost::posix_time is not header-only
-	 * @param s_time time string "H:M:S.ss"
-	 * @return
-	 */
-	TM_ext parse_time_with_fractional_seconds(const string s_time){
-		TM_ext res;
-		vector<string> time_vec;
-		//split the H:M:S.ms by .
-		boost::split(time_vec, s_time, boost::is_any_of("."));
-		//using std lib to parse the first half
-		strptime(time_vec[0].c_str(), "%H:%M:%S", &(res.time));
-		 //parse the second half as fractional seconds
-		if(time_vec.size()==2)
-		{
-			res.fractional_secs = boost::lexical_cast<EVENT_DATA_TYPE>(time_vec[1]);
-		}
-		else
-			res.fractional_secs = 0;
-		return res;
-	}
+
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const {
 		auto it = pheno_data_.find(name);

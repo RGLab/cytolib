@@ -110,9 +110,9 @@ public:
 //	vector<PDATA> getPData();
 //	void setPData(const pData & pd);
 
-	 GatingSet operator [](const vector<string> & sample_uids){
+	 GatingSet sub_samples(const vector<string> & sample_uids){
 		 	 GatingSet gs;
-		 	 gs.cytoset_ = cytoset_[sample_uids];
+		 	 gs.cytoset_ = cytoset_.sub_samples(sample_uids);
 		 	 for(const auto & s :sample_uids)
 		 	 {
 		 		 auto it = find(s);
@@ -369,10 +369,10 @@ public:
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet deep_copy(){
+	GatingSet deep_copy(const string & new_h5_dir = ""){
 		GatingSet gs;
 
-		gs.cytoset_ = cytoset_.deep_copy();
+		gs.cytoset_ = cytoset_.deep_copy(new_h5_dir);
 
 		for(auto & it : ghs)
 		{

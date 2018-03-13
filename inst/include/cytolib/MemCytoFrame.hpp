@@ -222,6 +222,14 @@ class MemCytoFrame: public CytoFrame{
 				throw(domain_error("can't open the file: " + filename_ + "\nPlease check if the path is normalized to be recognized by c++!"));
 		}
 	}
+
+	unsigned n_rows_() const{
+			if(n_cols()==0)
+				return 0;
+			else
+				return data_.n_rows;
+		}
+
 public:
 	MemCytoFrame(){}
 	MemCytoFrame(const MemCytoFrame & frm):CytoFrame(frm)
@@ -230,39 +238,41 @@ public:
 		config_ = frm.config_;
 		header_ = frm.header_;
 		data_ = frm.data_;
+
+	}
+	MemCytoFrame(MemCytoFrame && frm):CytoFrame(frm)
+	{
+//		swap(pheno_data_, frm.pheno_data_);
+//		swap(keys_, frm.keys_);
+//		swap(params, frm.params);
+//		swap(channel_vs_idx, frm.channel_vs_idx);
+//		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(filename_, frm.filename_);
+		swap(config_, frm.config_);
+		swap(header_, frm.header_);
+		swap(data_, frm.data_);
 	}
 	MemCytoFrame & operator=(const MemCytoFrame & frm)
 	{
-		pheno_data_ = frm.pheno_data_;
-		keys_ = frm.keys_;
-		params = frm.params;
-		channel_vs_idx = frm.channel_vs_idx;
-		marker_vs_idx = frm.marker_vs_idx;
+		CytoFrame::operator=(frm);
+//		pheno_data_ = frm.pheno_data_;
+//		keys_ = frm.keys_;
+//		params = frm.params;
+//		channel_vs_idx = frm.channel_vs_idx;
+//		marker_vs_idx = frm.marker_vs_idx;
 		filename_ = frm.filename_;
 		config_ = frm.config_;
 		header_ = frm.header_;
 		data_ = frm.data_;
 		return *this;
 	}
-	MemCytoFrame(MemCytoFrame && frm)
-	{
-		swap(pheno_data_, frm.pheno_data_);
-		swap(keys_, frm.keys_);
-		swap(params, frm.params);
-		swap(channel_vs_idx, frm.channel_vs_idx);
-		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(filename_, frm.filename_);
-		swap(config_, frm.config_);
-		swap(header_, frm.header_);
-		swap(data_, frm.data_);
-	}
 	MemCytoFrame & operator=(MemCytoFrame && frm)
 	{
-		swap(pheno_data_, frm.pheno_data_);
-		swap(keys_, frm.keys_);
-		swap(params, frm.params);
-		swap(channel_vs_idx, frm.channel_vs_idx);
-		swap(marker_vs_idx, frm.marker_vs_idx);
+//		swap(pheno_data_, frm.pheno_data_);
+//		swap(keys_, frm.keys_);
+//		swap(params, frm.params);
+//		swap(channel_vs_idx, frm.channel_vs_idx);
+//		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(filename_, frm.filename_);
 		swap(config_, frm.config_);
 		swap(header_, frm.header_);
@@ -976,7 +986,8 @@ public:
 			it = keys_.find("$P" + pid + "S");
 			if(it!=keys_.end())
 				params[i-1].marker = keys_["$P" + pid + "S"];
-//			boost::trim(params[i-1].marker);
+
+			params[i].original_col_idx = i;
 		}
 
 
@@ -990,12 +1001,6 @@ public:
 	}
 
 
-	unsigned n_rows() const{
-		if(n_cols()==0)
-			return 0;
-		else
-			return data_.n_rows;
-	}
 
 	MemCytoFrame cols(vector<string> colnames, ColType col_type) const
 	{
@@ -1011,38 +1016,40 @@ public:
 		return res;
 	}
 
-	void cols_(vector<string> colnames, ColType col_type)
+
+	CytoFramePtr deep_copy(const string & h5_filename = "") const
 	{
-		/*
-		 * subset data first
-		 */
-		uvec col_idx = get_col_idx(colnames, col_type);
-		data_ = data_.cols(col_idx);
-
-		//update params
-		CytoFrame::cols_(col_idx);
-	}
-
-
-	void rows_(vector<unsigned> row_idx)
-	{
-		data_ = data_.rows(arma::conv_to<uvec>::from(row_idx));
-	}
-
-	CytoFramePtr deep_copy() const
-	{
-		return CytoFramePtr(new MemCytoFrame(*this));
+		CytoFramePtr res(new MemCytoFrame(*this));
+		res->flush_view();
+		return res;
 	}
 	/**
  * Caller will receive a copy of data
  * @return
  */
-	EVENT_DATA_VEC get_data() const{
-		return data_;
-	}
 
+	EVENT_DATA_VEC get_data() const
+	{
+		EVENT_DATA_VEC data = data_;
+
+		if(is_col_indexed)
+		{
+			unsigned ncol = n_cols();
+			uvec col_idx(ncol);
+			for(unsigned i = 0; i < ncol; i++)
+				col_idx[i] = params[i].original_col_idx;
+			data = data.cols(col_idx);
+		}
+
+
+		if(is_row_indexed)
+			data = data(row_idx_);
+
+		return data;
+	}
 	/*
-	 * This overloaded function exists so that data subsetting can be operated directly on abstract CytoFrame object
+	 * This overloaded function exists so that subsetted data can be directly extracted from the abstract CytoFrame object
+	 * because CytoFrame can't have cols() method
 	 */
 	EVENT_DATA_VEC get_data(vector<string> colnames, ColType col_type) const
 	{
@@ -1063,7 +1070,7 @@ public:
 	 */
 	void set_data(EVENT_DATA_VEC && _data)
 	{
-		data_ = _data;
+		swap(data_, _data);
 	}
 	/**
 	 * return the pointer of a particular data column

@@ -11,8 +11,6 @@
 #include <fstream>
 #include <cstring>
 #include "global.hpp"
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <vector>
 #include <numeric>
 #include <unordered_map>
@@ -49,6 +47,7 @@ public:
  iterator end() {return kw.end();}
  const_iterator end() const{return kw.end();}
  iterator begin(){return kw.begin();}
+ const_iterator begin() const{return kw.begin();}
  iterator find(const string &key){
          return std::find_if(kw.begin(), kw.end(), [key](const pair<string, string> & p){return p.first == key;});
  }
