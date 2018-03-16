@@ -345,9 +345,9 @@ public:
 	/*
 	 * The copy shares the same h5 file with the original one
 	 */
-	CytoFramePtr copy() const
+	unique_ptr<CytoFrame> copy() const
 	{
-		return CytoFramePtr(new H5CytoFrame(*this));
+		return unique_ptr<CytoFrame>(new H5CytoFrame(*this));
 	}
 	/**
 	 * copy setter

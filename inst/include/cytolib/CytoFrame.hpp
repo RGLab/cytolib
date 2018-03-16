@@ -627,7 +627,11 @@ public:
 	}
 	virtual CytoFramePtr deep_copy(const string & h5_filename = "") const=0;
 
-	virtual CytoFramePtr copy() const=0;
+	/**
+	 * Must use unique_ptr instead of shared_ptr because we need to release the raw pointer to R
+	 * @return
+	 */
+	virtual unique_ptr<CytoFrame> copy() const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const {

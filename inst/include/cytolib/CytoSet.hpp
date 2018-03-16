@@ -205,7 +205,7 @@ namespace cytolib
 			CytoSet cs;
 			for(const auto & it : frames_)
 			{
-				cs.frames_[it.first] = it.second->copy();
+				cs.frames_[it.first].reset(it.second->copy().release());
 			}
 
 			return cs;

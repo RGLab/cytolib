@@ -1024,9 +1024,9 @@ public:
 		return res;
 	}
 
-	CytoFramePtr copy() const
+	unique_ptr<CytoFrame> copy() const
 	{
-		return CytoFramePtr(new MemCytoFrame(*this));
+		return unique_ptr<CytoFrame>(new MemCytoFrame(*this));
 	}
 	/**
  * Caller will receive a copy of data
