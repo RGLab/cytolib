@@ -1604,7 +1604,7 @@ public:
 		res->comp=comp;
 		res->tree=tree;
 		res->transFlag = transFlag;
-		res->trans = trans.dee_copy();
+		res->trans = trans.deep_copy();
 		return res;
 	}
 	/*

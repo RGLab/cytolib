@@ -187,11 +187,11 @@ public:
 		}
 	}
 
-	trans_local deep_copy()
+	trans_local deep_copy() const
 	{
 		trans_local res;
 		for(const auto & it : tp)
-			tp[it.first] = it.second->clone();
+			res.tp[it.first] = it.second->clone();
 		return res;
 	}
 };

@@ -117,7 +117,7 @@ public:
 	virtual void setChannel(string _channel){channel=_channel;};
 	virtual unsigned short getType(){return type;};
 	virtual void setType(unsigned short _type){type=_type;};
-	virtual TransPtr clone(){return TransPtr(new transformation(*this));};
+	virtual TransPtr clone() const{return TransPtr(new transformation(*this));};
 	transformation(const pb::transformation & trans_pb){
 		isComputed = trans_pb.iscomputed();
 		isGateOnly = trans_pb.isgateonly();
@@ -335,7 +335,7 @@ public:
 
 	}
 
-	TransPtr clone(){return TransPtr(new biexpTrans(*this));};
+	TransPtr clone() const{return TransPtr(new biexpTrans(*this));};
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);
 		trans_pb.set_trans_type(pb::PB_BIEXP);
@@ -418,7 +418,7 @@ public:
 	}
 
 
-	TransPtr clone(){return TransPtr(new fasinhTrans(*this));};
+	TransPtr clone() const{return TransPtr(new fasinhTrans(*this));};
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);
 		trans_pb.set_trans_type(pb::PB_FASIGNH);
@@ -518,7 +518,7 @@ public:
 			}
 
 	}
-	TransPtr clone(){return TransPtr(new logTrans(*this));};
+	TransPtr clone() const{return TransPtr(new logTrans(*this));};
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);
 		trans_pb.set_trans_type(pb::PB_LOG);
@@ -575,7 +575,7 @@ public:
 	                input[i]*=64;
 	}
 
-		TransPtr clone(){return TransPtr(new linTrans(*this));};
+		TransPtr clone() const{return TransPtr(new linTrans(*this));};
         void convertToPb(pb::transformation & trans_pb){
         	transformation::convertToPb(trans_pb);
         	trans_pb.set_trans_type(pb::PB_LIN);
@@ -604,7 +604,7 @@ public:
 			input[i]*=(t_scale/(EVENT_DATA_TYPE)r_scale);
 	}
 
-	TransPtr clone(){return TransPtr(new scaleTrans(*this));};
+	TransPtr clone() const{return TransPtr(new scaleTrans(*this));};
 
 	TransPtr getInverseTransformation(){
 		return TransPtr(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
@@ -642,7 +642,7 @@ public:
 
 	}
 
-	TransPtr clone(){return TransPtr(new flinTrans(*this));};
+	TransPtr clone() const{return TransPtr(new flinTrans(*this));};
 
 	void convertToPb(pb::transformation & trans_pb){
 		transformation::convertToPb(trans_pb);

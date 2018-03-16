@@ -1159,18 +1159,18 @@ public:
 			/*
 			 * re-construct the trans object that was used by flowJo to transform ellipsoid gate to 256 scale
 			 */
-			unique_ptr<transformation> trans_gate_x,trans_gate_y;
+			TransPtr trans_gate_x,trans_gate_y;
 			if(!trans_x)
 				throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_x));
 	//			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
 	//		else
-				trans_gate_x.reset(trans_x->clone()); //copy existing trans_x for non-linear
+				trans_gate_x = trans_x->clone(); //copy existing trans_x for non-linear
 	//
 			if(!trans_y)
 				throw(domain_error("ellipsoidGate::transforming can't find transformation for " + channel_y));
 	//			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
 	//		else
-				trans_gate_y.reset(trans_y->clone()); //copy existing trans_y for non-linear
+				trans_gate_y = trans_y->clone(); //copy existing trans_y for non-linear
 
 			//set to scale 256
 			trans_gate_x->setTransformedScale(256);
@@ -1336,12 +1336,12 @@ public:
 		if(!trans_x)
 			trans_gate_x.reset(new scaleTrans()); //create default scale trans for linear, assuming the max value for linear scale is always 262144
 		else
-			trans_gate_x.reset(trans_x->clone()); //copy existing trans_x for non-linear
+			trans_gate_x = trans_x->clone(); //copy existing trans_x for non-linear
 
 		if(!trans_y)
 			trans_gate_y.reset(new scaleTrans()); //create default scale trans for linear
 		else
-			trans_gate_y.reset(trans_y->clone()); //copy existing trans_y for non-linear
+			trans_gate_y = trans_y->clone(); //copy existing trans_y for non-linear
 
 		//set to scale 256
 		int displayScale = 255;

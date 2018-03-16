@@ -417,8 +417,8 @@ public:
 				PRINT("\n... start adding GatingHierarchy for: "+ it +"... \n");
 
 
-			GatingHierarchy & gh=add_GatingHierarchy(it);
-			gh.addRoot();//add default root
+			GatingHierarchyPtr gh=add_GatingHierarchy(it);
+			gh->addRoot();//add default root
 
 
 		}
@@ -437,7 +437,7 @@ public:
 		{
 			GatingHierarchyPtr gh = it.second;
 			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));
-			cs->rows_(it.first, node.getIndices_u());
+			cs.get_cytoframe(it.first)->rows_(node.getIndices_u());
 		}
 		return cs;
 	}
