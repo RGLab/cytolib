@@ -110,6 +110,20 @@ namespace cytolib
 		}
 
 		/**
+		 * Subset by samples (in place)
+		 * @param sample_uids
+		 * @return
+		 */
+		void sub_samples_(vector<string> sample_uids)
+		{
+			FrameMap tmp;
+
+			for(const auto & uid : sample_uids)
+				tmp[uid] = this->get_cytoframe(uid);
+			swap(tmp, frames_);
+		}
+
+		/**
 		 * Subset by columns
 		 * Here the copy() is invoked to ensure the MemCytoFrame behave the same as flowFrame,
 		 *  i.e. subsetted cs always a copy, thus safe to modify without afffecting the original object

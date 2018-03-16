@@ -1048,7 +1048,7 @@ public:
 
 
 		if(is_row_indexed)
-			data = data(row_idx_);
+			data = data.rows(row_idx_);
 
 		return data;
 	}
