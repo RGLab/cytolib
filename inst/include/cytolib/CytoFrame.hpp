@@ -627,6 +627,7 @@ public:
 	}
 	virtual CytoFramePtr deep_copy(const string & h5_filename = "") const=0;
 
+	virtual CytoFramePtr copy() const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const {

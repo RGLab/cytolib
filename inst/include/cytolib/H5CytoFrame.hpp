@@ -341,6 +341,14 @@ public:
 			fs::copy(filename_, new_filename);
 		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
+
+	/*
+	 * The copy shares the same h5 file with the original one
+	 */
+	CytoFramePtr copy() const
+	{
+		return CytoFramePtr(new H5CytoFrame(*this));
+	}
 	/**
 	 * copy setter
 	 * @param _data

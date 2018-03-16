@@ -1023,6 +1023,11 @@ public:
 		res->flush_view();
 		return res;
 	}
+
+	CytoFramePtr copy() const
+	{
+		return CytoFramePtr(new MemCytoFrame(*this));
+	}
 	/**
  * Caller will receive a copy of data
  * @return
