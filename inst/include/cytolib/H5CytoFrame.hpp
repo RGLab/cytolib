@@ -291,7 +291,7 @@ public:
 			dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,memspace, dataspace);
 		}
 		if(is_row_indexed)
-			data = data(row_idx_);
+			data = data.rows(row_idx_);
 
 		return data;
 	}

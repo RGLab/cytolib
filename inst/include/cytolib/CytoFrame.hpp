@@ -71,6 +71,7 @@ public:
 
 	CytoFrame(const CytoFrame & frm)
 	{
+//		cout << "copy CytoFrame member" << endl;
 		pheno_data_ = frm.pheno_data_;
 		keys_ = frm.keys_;
 		params = frm.params;
@@ -78,7 +79,7 @@ public:
 		marker_vs_idx = frm.marker_vs_idx;
 		is_row_indexed = frm.is_row_indexed;
 		is_col_indexed = frm.is_col_indexed;
-
+		row_idx_ = frm.row_idx_;
 	}
 
 	CytoFrame & operator=(const CytoFrame & frm)
@@ -90,6 +91,7 @@ public:
 		marker_vs_idx = frm.marker_vs_idx;
 		is_row_indexed = frm.is_row_indexed;
 		is_col_indexed = frm.is_col_indexed;
+		row_idx_ = frm.row_idx_;
 		return *this;
 
 	}
@@ -103,6 +105,7 @@ public:
 		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(is_row_indexed, frm.is_row_indexed);
 		swap(is_col_indexed, frm.is_col_indexed);
+		swap(row_idx_, frm.row_idx_);
 		return *this;
 	}
 
@@ -116,7 +119,7 @@ public:
 		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(is_row_indexed, frm.is_row_indexed);
 		swap(is_col_indexed, frm.is_col_indexed);
-
+		swap(row_idx_, frm.row_idx_);
 	}
 
 	/**

@@ -234,6 +234,7 @@ public:
 	MemCytoFrame(){}
 	MemCytoFrame(const MemCytoFrame & frm):CytoFrame(frm)
 	{
+//		cout << "copy MemCytoFrame member" << endl;
 		filename_ = frm.filename_;
 		config_ = frm.config_;
 		header_ = frm.header_;
@@ -268,6 +269,8 @@ public:
 	}
 	MemCytoFrame & operator=(MemCytoFrame && frm)
 	{
+		CytoFrame::operator=(frm);
+
 //		swap(pheno_data_, frm.pheno_data_);
 //		swap(keys_, frm.keys_);
 //		swap(params, frm.params);
