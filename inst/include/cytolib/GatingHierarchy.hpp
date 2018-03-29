@@ -1597,14 +1597,14 @@ public:
 	populationTree & getTree(){return tree;};
 
 
-	GatingHierarchyPtr  deep_copy() const{
+	GatingHierarchyPtr  copy() const{
 
 		GatingHierarchyPtr res;
 
 		res->comp=comp;
 		res->tree=tree;
 		res->transFlag = transFlag;
-		res->trans = trans.deep_copy();
+		res->trans = trans.copy();
 		return res;
 	}
 	/*

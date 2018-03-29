@@ -369,17 +369,17 @@ public:
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet deep_copy(const string & new_h5_dir = ""){
+	GatingSet copy(const string & new_h5_dir = ""){
 		GatingSet gs;
 
-		gs.cytoset_ = cytoset_.deep_copy(new_h5_dir);
+		gs.cytoset_ = cytoset_.copy(new_h5_dir);
 
 		for(auto & it : ghs)
 		{
 			string curSampleName = it.first;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
-			gs.ghs[curSampleName] = it.second->deep_copy();
+			gs.ghs[curSampleName] = it.second->copy();
 
 		}
 
@@ -401,7 +401,7 @@ public:
 				PRINT("\n... start cloning GatingHierarchy for: "+curSampleName+"... \n");
 
 
-			ghs[curSampleName] = gh_template.deep_copy();
+			ghs[curSampleName] = gh_template.copy();
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("Gating hierarchy cloned: "+curSampleName+"\n");

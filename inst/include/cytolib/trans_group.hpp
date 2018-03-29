@@ -187,7 +187,7 @@ public:
 		}
 	}
 
-	trans_local deep_copy() const
+	trans_local copy() const
 	{
 		trans_local res;
 		for(const auto & it : tp)

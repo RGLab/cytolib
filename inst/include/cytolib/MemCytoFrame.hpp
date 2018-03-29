@@ -1005,31 +1005,11 @@ public:
 
 
 
-	MemCytoFrame cols(vector<string> colnames, ColType col_type) const
-	{
-		MemCytoFrame res(*this);
-		res.cols_(colnames, col_type);
-		return res;
-	}
-
-	MemCytoFrame rows(vector<unsigned> row_idx) const
-	{
-		MemCytoFrame res(*this);
-		res.rows_(row_idx);
-		return res;
-	}
-
-
-	CytoFramePtr deep_copy(const string & h5_filename = "") const
+	CytoFramePtr copy(const string & h5_filename = "") const
 	{
 		CytoFramePtr res(new MemCytoFrame(*this));
 		res->flush_view();
 		return res;
-	}
-
-	unique_ptr<CytoFrame> copy() const
-	{
-		return unique_ptr<CytoFrame>(new MemCytoFrame(*this));
 	}
 	/**
  * Caller will receive a copy of data
@@ -1055,16 +1035,8 @@ public:
 
 		return data;
 	}
-	/*
-	 * This overloaded function exists so that subsetted data can be directly extracted from the abstract CytoFrame object
-	 * because CytoFrame can't have cols() method
-	 */
-	EVENT_DATA_VEC get_data(vector<string> colnames, ColType col_type) const
-	{
-		return cols(colnames, col_type).get_data();
-	}
 
-	/**
+		/**
 	 * copy setter
 	 * @param _data
 	 */

@@ -327,10 +327,6 @@ public:
 	 */
 	virtual EVENT_DATA_VEC get_data() const=0;
 
-	/*
-	 * This function exist so that data subsetting can be operated directly on abstract CytoFrame object
-	 */
-	virtual EVENT_DATA_VEC get_data(vector<string> colnames, ColType col_type) const=0;
 
 	virtual void set_data(const EVENT_DATA_VEC &)=0;
 	virtual void set_data(EVENT_DATA_VEC &&)=0;
@@ -628,13 +624,7 @@ public:
 //		}
 
 	}
-	virtual CytoFramePtr deep_copy(const string & h5_filename = "") const=0;
-
-	/**
-	 * Must use unique_ptr instead of shared_ptr because we need to release the raw pointer to R
-	 * @return
-	 */
-	virtual unique_ptr<CytoFrame> copy() const=0;
+	virtual CytoFramePtr copy(const string & h5_filename = "") const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const {

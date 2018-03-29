@@ -297,34 +297,8 @@ public:
 	}
 
 
-	/*
-	 * This overloaded function exists so that data subsetting can be operated directly on abstract CytoFrame object
-	 */
-	EVENT_DATA_VEC get_data(vector<string> colnames, ColType col_type) const
-	{
-		return cols(colnames, col_type).get_data();
-	}
 
-
-
-
-
-
-	H5CytoFrame rows(vector<unsigned> row_idx) const
-	{
-		H5CytoFrame res(*this);
-		res.rows_(row_idx);
-		return res;
-	}
-
-	H5CytoFrame cols(vector<string> colnames, ColType col_type) const
-	{
-		H5CytoFrame res(*this);
-		res.cols_(colnames, col_type);
-		return res;
-	}
-
-	CytoFramePtr deep_copy(const string & h5_filename = "") const
+	CytoFramePtr copy(const string & h5_filename = "") const
 	{
 		string new_filename = h5_filename;
 		if(new_filename == "")
@@ -342,13 +316,7 @@ public:
 		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
 
-	/*
-	 * The copy shares the same h5 file with the original one
-	 */
-	unique_ptr<CytoFrame> copy() const
-	{
-		return unique_ptr<CytoFrame>(new H5CytoFrame(*this));
-	}
+
 	/**
 	 * copy setter
 	 * @param _data

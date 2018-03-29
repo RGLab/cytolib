@@ -124,21 +124,6 @@ namespace cytolib
 		}
 
 		/**
-		 * Subset by columns
-		 * Here the copy() is invoked to ensure the MemCytoFrame behave the same as flowFrame,
-		 *  i.e. subsetted cs always a copy, thus safe to modify without afffecting the original object
-		 * @param colnames
-		 * @param col_type
-		 * @return
-		 */
-		CytoSet cols(vector<string> colnames, ColType col_type)
-		{
-			CytoSet res = this->copy();
-			res.cols_(colnames, col_type);
-			return res;
-		}
-
-		/**
 		 * Subet set by columns (in place)
 		 * @param colnames
 		 * @param col_type
@@ -194,7 +179,7 @@ namespace cytolib
 		 *
 		 * @param cs
 		 */
-		CytoSet deep_copy(const string & new_h5_dir = "")
+		CytoSet copy(const string & new_h5_dir = "")
 		{
 			CytoSet cs;
 			for(const auto & it : frames_)
@@ -204,22 +189,7 @@ namespace cytolib
 				{
 					new_h5 = fs::path(new_h5_dir) / (it.first + ".h5");
 				}
-				cs.frames_[it.first] = it.second->deep_copy(new_h5);
-			}
-
-			return cs;
-		}
-		/**
-		 *
-		 * It is different from deep_copy() only for h5 version of CytoSet where this API doesn't copy H5 file
-		 *
-		 */
-		CytoSet copy()
-		{
-			CytoSet cs;
-			for(const auto & it : frames_)
-			{
-				cs.frames_[it.first].reset(it.second->copy().release());
+				cs.frames_[it.first] = it.second->copy(new_h5);
 			}
 
 			return cs;
