@@ -9,15 +9,16 @@
 #define INST_INCLUDE_CYTOLIB_CYTOSET_HPP_
 #include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
+#include <cytolib/CytoFrameView.hpp>
 namespace cytolib
 {
 
 	class CytoSet
 	{
-		typedef unordered_map<string,CytoFramePtr> FrameMap;
+		typedef unordered_map<string,CytoFrameView> FrameMap;
 		FrameMap frames_;
 
-		CytoFramePtr & get_first_frame_ptr()
+		CytoFrameView & get_first_frame_ptr()
 		{
 			if(size() == 0)
 				throw(range_error("Empty CytoSet!"));
@@ -48,12 +49,14 @@ namespace cytolib
 				 string uid = cs_pb.samplename(i);
 				 const pb::CytoFrame & fr = cs_pb.frame(i);
 				 string h5_filename = dir / (uid + ".h5");
+				 CytoFramePtr ptr;
 				 if(fs::exists(h5_filename))
 				 {
-					 frames_[uid].reset(new H5CytoFrame(h5_filename));
-					 const CytoFrame & ref = *(frames_[uid]);
+					 ptr.reset(new H5CytoFrame(h5_filename));
+					 const CytoFrame & ref = *(frames_[uid].get_cytoframe_ptr());
 					 if(!fr.is_h5())
-						 frames_[uid].reset(new MemCytoFrame(ref));
+						 ptr.reset(new MemCytoFrame(ref));
+					 frames_[uid] = CytoFrameView(ptr);
 				 }
 				 else
 					 throw(domain_error("H5 file missing for sample: " + uid));
@@ -61,21 +64,21 @@ namespace cytolib
 			 }
 		 }
 
-		 void convertToPb(pb::CytoSet & cs_pb, const string & path, H5Option h5_opt)
+		 void convertToPb(pb::CytoSet & cs_pb, const string & path, H5Option h5_opt) const
 		 {
 			 for(const auto & it : frames_)
 			 {
 				 cs_pb.add_samplename(it.first);
 				 pb::CytoFrame * fr_pb = cs_pb.add_frame();
 				 string h5_filename = (fs::path(path) / it.first).string() + ".h5";
-				 it.second->convertToPb(*fr_pb, h5_filename, h5_opt);
+				 it.second.convertToPb(*fr_pb, h5_filename, h5_opt);
 
 			 }
 		 }
 		 /**
 		  * forward to the first element's getChannels
 		  */
-		vector<string> get_channels(){return get_first_frame_ptr()->get_channels();};
+		vector<string> get_channels(){return get_first_frame_ptr().get_channels();};
 		/**
 		 * modify the channels for each individual frame
 		 * @param _old
@@ -83,18 +86,18 @@ namespace cytolib
 		 */
 		void set_channel(const string & _old, const string & _new){
 			for(auto & p : frames_)
-				p.second->set_channel(_old, _new);
+				p.second.set_channel(_old, _new);
 		};
 
 		//* forward to the first element's getChannels
-		vector<string> get_markers(){return get_first_frame_ptr()->get_markers();};
+		vector<string> get_markers(){return get_first_frame_ptr().get_markers();};
 
 		void set_marker(const string & _old, const string & _new){
 			for(auto & p : frames_)
-				p.second->set_marker(_old, _new);
+				p.second.set_marker(_old, _new);
 		};
 
-		int n_cols(){return get_first_frame_ptr()->n_cols();}
+		int n_cols(){return get_first_frame_ptr().n_cols();}
 
 		/**
 		 * Subset by samples
@@ -105,7 +108,7 @@ namespace cytolib
 		{
 			CytoSet res;
 			for(const auto & uid : sample_uids)
-				res.frames_[uid] = this->get_cytoframe(uid);
+				res.frames_[uid] = this->get_cytoframe_view(uid);
 			return res;
 		}
 
@@ -119,7 +122,7 @@ namespace cytolib
 			FrameMap tmp;
 
 			for(const auto & uid : sample_uids)
-				tmp[uid] = this->get_cytoframe(uid);
+				tmp[uid] = this->get_cytoframe_view(uid);
 			swap(tmp, frames_);
 		}
 
@@ -133,7 +136,7 @@ namespace cytolib
 		{
 
 			for(auto & it : frames_)
-				it.second->cols_(colnames, col_type);
+				it.second.cols_(colnames, col_type);
 		}
 
 		/**
@@ -141,7 +144,7 @@ namespace cytolib
 		 * @param sample_uid
 		 * @return
 		 */
-		CytoFramePtr get_cytoframe(string sample_uid)
+		CytoFrameView get_cytoframe_view(string sample_uid)
 		{
 
 			iterator it=find(sample_uid);
@@ -159,7 +162,7 @@ namespace cytolib
 		void add_cytoframe(string sample_uid, const CytoFramePtr & frame_ptr){
 			if(find(sample_uid) != end())
 				throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
-			frames_[sample_uid] = frame_ptr;
+			frames_[sample_uid] = CytoFrameView(frame_ptr);
 		}
 
 		/**
@@ -170,7 +173,7 @@ namespace cytolib
 		void update_cytoframe(string sample_uid, const CytoFramePtr & frame_ptr){
 			if(find(sample_uid) == end())
 				throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
-			frames_[sample_uid] = frame_ptr;
+			frames_[sample_uid] = CytoFrameView(frame_ptr);
 		}
 
 		CytoSet(){}
@@ -189,7 +192,7 @@ namespace cytolib
 				{
 					new_h5 = fs::path(new_h5_dir) / (it.first + ".h5");
 				}
-				cs.frames_[it.first] = it.second->copy(new_h5);
+				cs.frames_[it.first] = CytoFrameView(it.second.copy(new_h5));
 			}
 
 			return cs;
@@ -271,7 +274,7 @@ namespace cytolib
 		void update_channels(const CHANNEL_MAP & chnl_map){
 			//update gh
 			for(auto & it : frames_){
-					it.second->update_channels(chnl_map);
+					it.second.update_channels(chnl_map);
 					//comp
 				}
 

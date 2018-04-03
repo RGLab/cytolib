@@ -29,9 +29,39 @@ protected:
 	DataSpace dataspace;
 	hsize_t dims[2];              // dataset dimensions
 
-	unsigned n_rows_() const{
-				return dims[1];
+	EVENT_DATA_VEC read_data(uvec col_idx) const
+	{
+		unsigned nrow = n_rows();
+		unsigned ncol = col_idx.size();
+		/*
+		 * Define the memory dataspace.
+		 */
+		hsize_t dimsm[] = {ncol, nrow};
+		DataSpace memspace(2,dimsm);
+		hsize_t      offset_mem[2];
+		hsize_t      count_mem[2];
+		EVENT_DATA_VEC data(nrow, ncol);
+		//reach one col at a time
+		for(unsigned i = 0; i < ncol; i++)
+		{
+			//select slab for h5 data space
+			unsigned idx = col_idx[i];
+			hsize_t      offset[] = {idx, 0};   // hyperslab offset in the file
+			hsize_t      count[] = {1, nrow};    // size of the hyperslab in the file
+			dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
+
+			//select slab for mem
+			offset_mem[0] = i;
+			offset_mem[1] = 0;
+			count_mem[0]  = 1;
+			count_mem[1]  = nrow;
+			memspace.selectHyperslab( H5S_SELECT_SET, count_mem, offset_mem );
+
+			dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,memspace, dataspace);
 		}
+
+		return data;
+	}
 
 
 public:
@@ -83,6 +113,9 @@ public:
 		swap(dims, frm.dims);
 		return *this;
 	}
+	unsigned n_rows() const{
+				return dims[1];
+		}
 
 	/**
 	 * constructor from FCS
@@ -134,7 +167,6 @@ public:
 			EVENT_DATA_TYPE min, max, PnG;
 			EVENT_DATA_TYPE PnE[2];
 			int PnB;
-			unsigned original_col_idx;
 
 		};
 		vector<cytoParam1> pvec(nParam);
@@ -147,7 +179,6 @@ public:
 		param_type.insertMember("PnG", HOFFSET(cytoParam1, PnG), datatype);
 		param_type.insertMember("PnE", HOFFSET(cytoParam1, PnE), pne);
 		param_type.insertMember("PnB", HOFFSET(cytoParam1, PnB), PredType::NATIVE_INT8);
-		param_type.insertMember("original_col_idx", HOFFSET(cytoParam1, original_col_idx), PredType::NATIVE_INT8);
 		ds_param.read(pvec.data(),param_type);
 		//cp back to param
 		params.resize(nParam);
@@ -163,7 +194,6 @@ public:
 			params[i].PnE[0] = pvec[i].PnE[0];
 			params[i].PnE[1] = pvec[i].PnE[1];
 			params[i].PnB = pvec[i].PnB;
-			params[i].original_col_idx = pvec[i].original_col_idx;
 		}
 		build_hash();
 
@@ -229,7 +259,7 @@ public:
 		return filename_;
 	}
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt)
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
 	{
 		fr_pb.set_is_h5(true);
 
@@ -261,42 +291,24 @@ public:
 	 * The caller will directly receive the data vector without the copy overhead thanks to the move semantics supported for vector container in c++11
 	 * @return
 	 */
+
+
 	EVENT_DATA_VEC get_data() const{
-		unsigned nrow = n_rows();
-		unsigned ncol = n_cols();
-		/*
-		 * Define the memory dataspace.
-		 */
-		hsize_t dimsm[] = {ncol, nrow};
-		DataSpace memspace(2,dimsm);
-		hsize_t      offset_mem[2];
-		hsize_t      count_mem[2];
-		EVENT_DATA_VEC data(nrow, ncol);
-		//reach one col at a time
-		for(unsigned i = 0; i < ncol; i++)
-		{
-			//select slab for h5 data space
-			unsigned idx = params[i].original_col_idx;
-			hsize_t      offset[] = {idx, 0};   // hyperslab offset in the file
-			hsize_t      count[] = {1, nrow};    // size of the hyperslab in the file
-			dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
-
-			//select slab for mem
-			offset_mem[0] = i;
-			offset_mem[1] = 0;
-			count_mem[0]  = 1;
-			count_mem[1]  = nrow;
-			memspace.selectHyperslab( H5S_SELECT_SET, count_mem, offset_mem );
-
-			dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,memspace, dataspace);
-		}
-		if(is_row_indexed)
-			data = data.rows(row_idx_);
-
-		return data;
+		unsigned n = n_cols();
+		uvec col_idx(n);
+		for(unsigned i = 0; i < n; i++)
+			col_idx[i] = i;
+		return read_data(col_idx);
 	}
-
-
+	/**
+	 * Partial IO
+	 * @param col_idx
+	 * @return
+	 */
+	EVENT_DATA_VEC get_data(uvec col_idx) const
+	{
+		return read_data(col_idx);
+	}
 
 	CytoFramePtr copy(const string & h5_filename = "") const
 	{
@@ -309,10 +321,7 @@ public:
 
 		if(fs::equivalent(filename_, new_filename))
 			throw(domain_error("Can't make copy to itself: " + new_filename));
-		if(is_row_indexed||is_col_indexed)
-			write_h5(new_filename);
-		else
-			fs::copy(filename_, new_filename);
+		write_h5(new_filename);
 		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
 

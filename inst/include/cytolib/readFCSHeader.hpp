@@ -99,7 +99,6 @@ struct cytoParam{
 //	pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> PnE;//replace pair with simple array since it is not clear how to create compound type for pair
 	EVENT_DATA_TYPE PnE[2];
 	int PnB;
-	unsigned original_col_idx;//reserved for h5
 };
 
 

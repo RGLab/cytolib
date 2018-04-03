@@ -223,12 +223,6 @@ class MemCytoFrame: public CytoFrame{
 		}
 	}
 
-	unsigned n_rows_() const{
-			if(n_cols()==0)
-				return 0;
-			else
-				return data_.n_rows;
-		}
 
 public:
 	MemCytoFrame(){}
@@ -299,12 +293,18 @@ public:
 	 */
 	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){}
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt)
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
 	{
 		fr_pb.set_is_h5(false);
 		write_h5(h5_filename);
 	}
 
+	unsigned n_rows() const{
+			if(n_cols()==0)
+				return 0;
+			else
+				return data_.n_rows;
+		}
 
 	void read_fcs()
 	{
@@ -990,7 +990,6 @@ public:
 			if(it!=keys_.end())
 				params[i-1].marker = keys_["$P" + pid + "S"];
 
-			params[i].original_col_idx = i;
 		}
 
 
@@ -1008,7 +1007,6 @@ public:
 	CytoFramePtr copy(const string & h5_filename = "") const
 	{
 		CytoFramePtr res(new MemCytoFrame(*this));
-		res->flush_view();
 		return res;
 	}
 	/**
@@ -1018,25 +1016,16 @@ public:
 
 	EVENT_DATA_VEC get_data() const
 	{
-		EVENT_DATA_VEC data = data_;
-
-		if(is_col_indexed)
-		{
-			unsigned ncol = n_cols();
-			uvec col_idx(ncol);
-			for(unsigned i = 0; i < ncol; i++)
-				col_idx[i] = params[i].original_col_idx;
-			data = data.cols(col_idx);
-		}
-
-
-		if(is_row_indexed)
-			data = data.rows(row_idx_);
-
-		return data;
+		return data_;
 	}
 
-		/**
+
+	EVENT_DATA_VEC get_data(uvec col_idx) const
+	{
+		return data_.cols(col_idx);
+	}
+
+	/**
 	 * copy setter
 	 * @param _data
 	 */

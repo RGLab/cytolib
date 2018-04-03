@@ -30,6 +30,7 @@ const H5std_string  DATASET_NAME( "data");
 
 class CytoFrame;
 typedef shared_ptr<CytoFrame> CytoFramePtr;
+
 /**
  * The class representing a single FCS file
  */
@@ -40,12 +41,9 @@ protected:
 	vector<cytoParam> params;// parameters coerced from keywords and computed from data for quick query
 	unordered_map<string, int> channel_vs_idx;//hash map for query by channel
 	unordered_map<string, int> marker_vs_idx;//hash map for query by marker
-	arma::uvec row_idx_;
-	bool is_row_indexed;
-	bool is_col_indexed;
 
-	CytoFrame ():is_row_indexed(false),is_col_indexed(false){};
-	virtual unsigned n_rows_() const=0;
+
+	CytoFrame (){};
 	virtual bool is_hashed() const
 	{
 		return channel_vs_idx.size()==n_cols();
@@ -77,9 +75,6 @@ public:
 		params = frm.params;
 		channel_vs_idx = frm.channel_vs_idx;
 		marker_vs_idx = frm.marker_vs_idx;
-		is_row_indexed = frm.is_row_indexed;
-		is_col_indexed = frm.is_col_indexed;
-		row_idx_ = frm.row_idx_;
 	}
 
 	CytoFrame & operator=(const CytoFrame & frm)
@@ -89,9 +84,6 @@ public:
 		params = frm.params;
 		channel_vs_idx = frm.channel_vs_idx;
 		marker_vs_idx = frm.marker_vs_idx;
-		is_row_indexed = frm.is_row_indexed;
-		is_col_indexed = frm.is_col_indexed;
-		row_idx_ = frm.row_idx_;
 		return *this;
 
 	}
@@ -103,9 +95,6 @@ public:
 		swap(params, frm.params);
 		swap(channel_vs_idx, frm.channel_vs_idx);
 		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(is_row_indexed, frm.is_row_indexed);
-		swap(is_col_indexed, frm.is_col_indexed);
-		swap(row_idx_, frm.row_idx_);
 		return *this;
 	}
 
@@ -117,28 +106,6 @@ public:
 		swap(params, frm.params);
 		swap(channel_vs_idx, frm.channel_vs_idx);
 		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(is_row_indexed, frm.is_row_indexed);
-		swap(is_col_indexed, frm.is_col_indexed);
-		swap(row_idx_, frm.row_idx_);
-	}
-
-	/**
-	 * Realize the delayed subsetting (i.e. cols() and rows()) operations
-	 * and clear the view
-	 */
-	virtual void flush_view()
-	{
-
-		set_data(get_data());
-
-		for(unsigned i = 0; i < params.size(); i++)
-			params[i].original_col_idx = i;
-		is_col_indexed = false;
-
-		row_idx_.clear();
-		is_row_indexed = false;
-
-
 	}
 
 	compensation get_compensation(const string & key = "SPILL")
@@ -170,7 +137,7 @@ public:
 		return comp;
 	}
 
-	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) = 0;
+	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const = 0;
 
 
 	virtual void compensate(const compensation & comp)
@@ -242,7 +209,6 @@ public:
 		param_type.insertMember("PnG", HOFFSET(cytoParam, PnG), datatype);
 		param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
 		param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
-		param_type.insertMember("original_col_idx", HOFFSET(cytoParam, original_col_idx), PredType::NATIVE_INT8);
 
 
 		hsize_t dim_param[] = {n_cols()};
@@ -326,7 +292,11 @@ public:
 	 * @return
 	 */
 	virtual EVENT_DATA_VEC get_data() const=0;
-
+	virtual EVENT_DATA_VEC get_data(uvec col_idx) const=0;
+	virtual EVENT_DATA_VEC get_data(vector<string>cols, ColType col_type) const
+	{
+		return get_data(get_col_idx(cols, col_type));
+	}
 
 	virtual void set_data(const EVENT_DATA_VEC &)=0;
 	virtual void set_data(EVENT_DATA_VEC &&)=0;
@@ -377,14 +347,10 @@ public:
 	 * get the number of rows(or events)
 	 * @return
 	 */
-	unsigned n_rows() const
-	{
-		//read nEvents
-		if(is_row_indexed)
-			return row_idx_.size();
-		else
-			return n_rows_();
-	}
+	virtual unsigned n_rows() const=0;
+
+	virtual void rows_(vector<unsigned> row_idx) = 0;
+	virtual void cols_(vector<unsigned> col_idx) = 0;
 	/**
 	 * check if the hash map for channel and marker has been built
 	 * @return
@@ -587,43 +553,8 @@ public:
 		return ts;
 	}
 
-	void rows_(vector<unsigned> row_idx)
-	{
-		if(is_row_indexed && row_idx.size()!=row_idx_.size())
-			throw(domain_error("The size of the new row index is not the same as the total number of events!"));
-		row_idx_ = arma::conv_to<uvec>::from(row_idx);
-		is_row_indexed = true;
-	}
 
-	void cols_(vector<string> colnames, ColType col_type)
-	{
 
-		uvec col_idx = get_col_idx(colnames, col_type);
-
-		//update params
-		CytoFrame::cols_(col_idx);
-
-	}
-
-	virtual void cols_(uvec col_idx)
-	{
-		unsigned n = col_idx.size();
-		vector<cytoParam> params_new(n);
-		for(unsigned i = 0; i < n; i++)
-		{
-			params_new[i] = params[col_idx[i]];
-		}
-		params = params_new;
-		build_hash();//update idx table
-
-		is_col_indexed = true;
-		//update keywords PnX
-//		for(unsigned i = 0; i < n; i++)
-//		{
-//			if(it.first)
-//		}
-
-	}
 	virtual CytoFramePtr copy(const string & h5_filename = "") const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
