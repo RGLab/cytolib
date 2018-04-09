@@ -285,7 +285,6 @@ public:
 		}
 	}
 
-
 	/**
 	 * Read data from disk.
 	 * The caller will directly receive the data vector without the copy overhead thanks to the move semantics supported for vector container in c++11
@@ -324,7 +323,21 @@ public:
 		write_h5(new_filename);
 		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
+	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
+	{
 
+		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
+		EVENT_DATA_VEC data = ptr->get_data();
+		if(row_idx.size()>0)
+			data = data.rows(row_idx);
+
+		if(col_idx.size()>0)
+			data =data.cols(col_idx);
+		ptr->subset_parameters(col_idx);
+		ptr->set_data(data);
+		ptr->write_h5(h5_filename);
+		return CytoFramePtr(new H5CytoFrame(h5_filename));
+	}
 
 	/**
 	 * copy setter

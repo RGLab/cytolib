@@ -1009,6 +1009,22 @@ public:
 		CytoFramePtr res(new MemCytoFrame(*this));
 		return res;
 	}
+
+	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
+	{
+		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
+
+		EVENT_DATA_VEC data = ptr->get_data();
+		if(row_idx.size()>0)
+			data = data.rows(row_idx);
+
+		if(col_idx.size()>0)
+			data =data.cols(col_idx);
+		ptr->subset_parameters(col_idx);
+		ptr->set_data(data);
+		return CytoFramePtr(ptr.release());
+	}
+
 	/**
  * Caller will receive a copy of data
  * @return

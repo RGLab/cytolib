@@ -63,7 +63,6 @@ protected:
 			marker_vs_idx[params[i].marker] = i;
 		}
 	}
-
 public:
 	virtual ~CytoFrame(){};
 
@@ -349,8 +348,24 @@ public:
 	 */
 	virtual unsigned n_rows() const=0;
 
-	virtual void rows_(vector<unsigned> row_idx) = 0;
-	virtual void cols_(vector<unsigned> col_idx) = 0;
+	virtual void subset_parameters(uvec col_idx)
+	{
+			unsigned n = col_idx.size();
+			vector<cytoParam> params_new(n);
+			for(unsigned i = 0; i < n; i++)
+			{
+					params_new[i] = params[col_idx[i]];
+			}
+			params = params_new;
+			build_hash();//update idx table
+
+//			set_data(get_data(col_idx));
+			//update keywords PnX
+//          for(unsigned i = 0; i < n; i++)
+//          {
+//                  if(it.first)
+//          }
+	}
 	/**
 	 * check if the hash map for channel and marker has been built
 	 * @return
@@ -556,6 +571,8 @@ public:
 
 
 	virtual CytoFramePtr copy(const string & h5_filename = "") const=0;
+
+	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const {

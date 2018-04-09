@@ -164,7 +164,13 @@ public:
 
 	CytoFramePtr copy(const string & h5_filename = "") const
 	{
-		return ptr_->copy(h5_filename);
+		CytoFramePtr ptr = ptr_->copy(row_idx_, col_idx_, h5_filename);
+//		//TODO:optimize into one step for h5
+//		if(is_row_indexed())
+//			ptr->rows_(row_idx_);
+//		if(is_col_indexed())
+//			ptr->cols_(col_idx_);
+		return ptr;
 
 	}
 };
