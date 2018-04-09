@@ -332,8 +332,11 @@ public:
 			data = data.rows(row_idx);
 
 		if(col_idx.size()>0)
+		{
 			data =data.cols(col_idx);
-		ptr->subset_parameters(col_idx);
+			ptr->subset_parameters(col_idx);
+		}
+
 		ptr->set_data(data);
 		ptr->write_h5(h5_filename);
 		return CytoFramePtr(new H5CytoFrame(h5_filename));

@@ -1019,8 +1019,11 @@ public:
 			data = data.rows(row_idx);
 
 		if(col_idx.size()>0)
+		{
 			data =data.cols(col_idx);
-		ptr->subset_parameters(col_idx);
+			ptr->subset_parameters(col_idx);
+		}
+
 		ptr->set_data(data);
 		return CytoFramePtr(ptr.release());
 	}
