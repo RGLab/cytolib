@@ -11,7 +11,7 @@
 #include "readFCSHeader.hpp"
 #include "compensation.hpp"
 
-#include <c++/H5Cpp.h>
+#include <H5Cpp.h>
 
 namespace cytolib
 {
