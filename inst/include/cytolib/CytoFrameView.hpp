@@ -114,6 +114,7 @@ public:
 	}
 
 	const PDATA & get_pheno_data() const {return ptr_->get_pheno_data();}
+	void set_pheno_data(const string & name, const string & value) {ptr_->set_pheno_data(name, value);}
 	/*subsetting*/
 
 	void cols_(vector<string> colnames, ColType col_type)
