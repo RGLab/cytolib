@@ -29,6 +29,7 @@ using namespace arma;
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <chrono>
 
 
 using namespace std;
@@ -88,7 +89,14 @@ namespace cytolib
 	 */
 	inline string generate_guid(int len)
 	{
-		srand (time(NULL));
+//		int t = time(NULL);//this only returns second-wise precision, not sufficient for distinguishing multiple gatingsets that are generated within short period
+
+		chrono::milliseconds ms = chrono::duration_cast< chrono::milliseconds >(
+													chrono::system_clock::now().time_since_epoch()
+													);
+		int t = ms.count();
+//		cout << "random seed value: " << t << endl;
+		srand (t);
 		char s[len+1];
 		static const char alphanum[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 		s[0] = alphanum[rand() % (sizeof(alphanum) - 11) + 10];
