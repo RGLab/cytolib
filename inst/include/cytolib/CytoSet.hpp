@@ -39,6 +39,9 @@ namespace cytolib
 		 iterator find(const string &sample_uid){
 				 return frames_.find(sample_uid);
 		 }
+		 const_iterator find(const string &sample_uid) const{
+		 				 return frames_.find(sample_uid);
+		 		 }
 		 size_t erase ( const string& k ){return frames_.erase(k);}
 
 		 CytoSet(const pb::CytoSet & cs_pb, const string & path)
@@ -104,7 +107,7 @@ namespace cytolib
 		 * @param sample_uids
 		 * @return
 		 */
-		CytoSet sub_samples(vector<string> sample_uids)
+		CytoSet sub_samples(vector<string> sample_uids) const
 		{
 			CytoSet res;
 			for(const auto & uid : sample_uids)
@@ -144,10 +147,10 @@ namespace cytolib
 		 * @param sample_uid
 		 * @return
 		 */
-		CytoFrameView get_cytoframe_view(string sample_uid)
+		CytoFrameView get_cytoframe_view(string sample_uid) const
 		{
 
-			iterator it=find(sample_uid);
+			auto it=find(sample_uid);
 			if(it==end())
 				throw(domain_error(sample_uid + " not found in gating set!"));
 			else

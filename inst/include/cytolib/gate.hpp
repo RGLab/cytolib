@@ -36,14 +36,6 @@ struct BOOL_GATE_OP{
 		for(int i = 0; i < BOOL_GATE_OP_pb.path_size(); i++)
 			path.push_back(BOOL_GATE_OP_pb.path(i));
 	};
-	template<class Archive>
-				    void serialize(Archive &ar, const unsigned int version)
-				    {
-
-						ar & BOOST_SERIALIZATION_NVP(path);
-						ar & BOOST_SERIALIZATION_NVP(op);
-						ar & BOOST_SERIALIZATION_NVP(isNot);
-				    }
 
 } ;
 
