@@ -112,7 +112,8 @@ public:
 
 	 GatingSet sub_samples(const vector<string> & sample_uids){
 		 	 GatingSet gs;
-		 	 gs.cytoset_ = cytoset_.sub_samples(sample_uids);
+		 	 if(cytoset_.size() > 0)//avoid subsetting cs when gs is not gated
+		 		 gs.cytoset_ = cytoset_.sub_samples(sample_uids);
 		 	 for(const auto & s :sample_uids)
 		 	 {
 		 		 auto it = find(s);
