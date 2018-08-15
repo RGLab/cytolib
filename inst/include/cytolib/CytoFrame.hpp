@@ -466,7 +466,7 @@ public:
 		}
 		return col_idx;
 	}
-	virtual void set_channel(const string & oldname, const string &newname)
+	virtual void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true)
 	{
 		int id = get_col_idx(oldname, ColType::channel);
 		if(id<0)
@@ -476,6 +476,15 @@ public:
 		params[id].channel=newname;
 		channel_vs_idx.erase(oldname);
 		channel_vs_idx[newname] = id;
+
+		//update keywords(linear time, not sure how to improve it other than optionally skip it
+		if(is_update_keywords)
+		{
+			for(auto & it : keys_)
+				if(it.second == oldname)
+					it.second = newname;
+		}
+
 	}
 
 	virtual void set_marker(const string & oldname, const string & newname)

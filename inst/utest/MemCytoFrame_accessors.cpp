@@ -60,4 +60,16 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 	BOOST_CHECK_EQUAL(fr_copy->n_rows(), 3);
 
 }
+BOOST_AUTO_TEST_CASE(set_channel)
+{
+	vector<string> channels = fr.get_channels();
+
+	MemCytoFrame fr1 = fr;
+	string newname = "test";
+	fr1.set_channel(channels[2], newname);
+	string key = fr1.get_keyword("$P3N");
+	BOOST_CHECK_EQUAL(fr1.get_channels()[2], newname);
+	BOOST_CHECK_EQUAL(key, newname);
+
+}
 BOOST_AUTO_TEST_SUITE_END()
