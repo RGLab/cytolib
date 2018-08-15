@@ -156,6 +156,15 @@ namespace cytolib
 			else
 				return it->second;
 		}
+		CytoFrameView& get_cytoframe_view_ref(string sample_uid)
+		{
+
+			auto it=find(sample_uid);
+			if(it==end())
+				throw(domain_error(sample_uid + " not found in gating set!"));
+			else
+				return it->second;
+		}
 
 		/**
 		 * Add sample

@@ -438,7 +438,7 @@ public:
 		{
 			GatingHierarchyPtr gh = it.second;
 			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));
-			cs.get_cytoframe_view(it.first).rows_(node.getIndices_u());
+			cs.get_cytoframe_view_ref(it.first).rows_(node.getIndices_u());
 		}
 		return cs;
 	}
