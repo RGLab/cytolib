@@ -542,7 +542,7 @@ public:
 		  p_y_max = p2y;
 		  if(p1y > p2y)
 			  swap(p_y_min, p_y_max);
-		  if(ydata[i] >= p_y_min && ydata[i] <= p_y_max &&xdata[i] <= max(p1x, p2x))
+		  if(ydata[i] >= p_y_min && ydata[i] <= p_y_max &&xdata[i] <= max(p1x, p2x) && p2y != p1y)
 		  {
 			  xinters = (ydata[i]-p1y)*(p2x-p1x)/(p2y-p1y)+p1x;
 			/*if intersection x coordinate == point x coordinate it lies on the
