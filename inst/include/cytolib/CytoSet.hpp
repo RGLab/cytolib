@@ -171,10 +171,10 @@ namespace cytolib
 		 * @param sample_uid
 		 * @param frame_ptr
 		 */
-		void add_cytoframe(string sample_uid, const CytoFramePtr & frame_ptr){
+		void add_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 			if(find(sample_uid) != end())
 				throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
-			frames_[sample_uid] = CytoFrameView(frame_ptr);
+			frames_[sample_uid] = frame_view;
 		}
 
 		/**
@@ -182,10 +182,10 @@ namespace cytolib
 		 * @param sample_uid
 		 * @param frame_ptr
 		 */
-		void update_cytoframe(string sample_uid, const CytoFramePtr & frame_ptr){
+		void update_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 			if(find(sample_uid) == end())
 				throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
-			frames_[sample_uid] = CytoFrameView(frame_ptr);
+			frames_[sample_uid] = frame_view;
 		}
 
 		CytoSet(){}
@@ -249,7 +249,7 @@ namespace cytolib
 					fr_ptr.reset(new H5CytoFrame(h5_filename));
 				}
 
-				add_cytoframe(it.first, fr_ptr);
+				add_cytoframe_view(it.first, CytoFrameView(fr_ptr));
 
 			}
 		}
