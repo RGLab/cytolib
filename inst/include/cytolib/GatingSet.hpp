@@ -370,10 +370,11 @@ public:
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet copy(const string & new_h5_dir = ""){
+	GatingSet copy(const string & new_h5_dir = fs::temp_directory_path().string()){
 		GatingSet gs;
+		fs::path h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
 
-		gs.cytoset_ = cytoset_.copy(new_h5_dir);
+		gs.cytoset_ = cytoset_.copy(h5_dir.string());
 
 		for(auto & it : ghs)
 		{

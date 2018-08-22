@@ -1599,7 +1599,7 @@ public:
 
 	GatingHierarchyPtr  copy() const{
 
-		GatingHierarchyPtr res;
+		GatingHierarchyPtr res(new GatingHierarchy());
 
 		res->comp=comp;
 		res->tree=tree;

@@ -200,10 +200,10 @@ namespace cytolib
 			for(const auto & it : frames_)
 			{
 				string new_h5 = "";
-				if(new_h5_dir != "")
-				{
+//				if(new_h5_dir != "")
+//				{
 					new_h5 = fs::path(new_h5_dir) / (it.first + ".h5");
-				}
+//				}
 				cs.frames_[it.first] = CytoFrameView(it.second.copy(new_h5));
 			}
 
