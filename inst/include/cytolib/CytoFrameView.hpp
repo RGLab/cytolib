@@ -24,6 +24,9 @@ public:
 	/*forwarded apis
 	 *
 	 */
+	string get_h5_file_path() const{
+			return ptr_->get_h5_file_path();
+		}
 	vector<string> get_channels() const{
 		vector<string> orig = ptr_->get_channels();
 		unsigned n = col_idx_.size();

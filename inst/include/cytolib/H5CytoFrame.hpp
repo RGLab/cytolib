@@ -255,7 +255,7 @@ public:
 
 	}
 
-	const string & get_h5_file_path(){
+	string get_h5_file_path() const{
 		return filename_;
 	}
 

@@ -580,7 +580,7 @@ public:
 
 
 	virtual CytoFramePtr copy(const string & h5_filename = "") const=0;
-
+	virtual string get_h5_file_path() const=0;
 	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}

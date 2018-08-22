@@ -1075,7 +1075,9 @@ public:
 			throw(domain_error("colname not found: " + colname));
 		return data_.colptr(idx);
 	}
-
+	string get_h5_file_path() const{
+		return "";
+	}
 
 };
 
