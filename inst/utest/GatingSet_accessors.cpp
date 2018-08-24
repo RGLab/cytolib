@@ -46,6 +46,16 @@ BOOST_AUTO_TEST_CASE(subset_cs_by_node) {
 	BOOST_CHECK_EQUAL(frv.n_rows(), 119531);
 
 }
+BOOST_AUTO_TEST_CASE(copy) {
+	GatingSet gs1 = gs.copy();
+	vector<string> samples = gs.get_sample_uids();
+	const CytoSet & cs = gs.get_cytoset();
+	const CytoSet & cs1 = gs1.get_cytoset();
+	CytoFrameView fv = cs.get_cytoframe_view(samples[0]);
+	CytoFrameView fv1 = cs1.get_cytoframe_view(samples[0]);
+	BOOST_CHECK_CLOSE(fv.get_data()[1], fv1.get_data()[1], 1e-6);
+	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
+}
 //
 //BOOST_AUTO_TEST_CASE(subset_by_sample) {
 //	//check get_sample_uids

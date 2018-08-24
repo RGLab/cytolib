@@ -43,6 +43,14 @@ BOOST_AUTO_TEST_CASE(constructor) {
 	;, domain_error,
 			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
 }
+BOOST_AUTO_TEST_CASE(copy) {
+	CytoSet cs1 = cs.copy();
+	vector<string> samples = cs.get_sample_uids();
+	CytoFrameView fv = cs.get_cytoframe_view(samples[1]);
+	CytoFrameView fv1 = cs1.get_cytoframe_view(samples[1]);
+	BOOST_CHECK_CLOSE(fv.get_data()[1], fv1.get_data()[1], 1e-6);
+	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
+}
 BOOST_AUTO_TEST_CASE(subset_by_cols) {
 	vector<string> channels = cs.get_channels();
 	vector<string> markers = cs.get_markers();
@@ -92,12 +100,12 @@ BOOST_AUTO_TEST_CASE(cytoframe) {
 			[](const exception & ex) {return string(ex.what()).find("not found") != string::npos;});
 
 	//add frame
-	BOOST_CHECK_EXCEPTION(cs_new.add_cytoframe(samples[0], fr), domain_error,
+	BOOST_CHECK_EXCEPTION(cs_new.add_cytoframe_view(samples[0], CytoFrameView(fr)), domain_error,
 			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
-	BOOST_CHECK_EXCEPTION(cs_new.update_cytoframe(samples[1], fr), domain_error,
+	BOOST_CHECK_EXCEPTION(cs_new.update_cytoframe_view(samples[1], CytoFrameView(fr)), domain_error,
 			[](const exception & ex) {return string(ex.what()).find("doesn't exists") != string::npos;});
 
-	cs_new.add_cytoframe(samples[1], fr);
+	cs_new.add_cytoframe_view(samples[1], CytoFrameView(fr));
 	BOOST_CHECK_EQUAL(cs_new.size(), 2);
 	vector<string> new_samples = cs_new.get_sample_uids();
 	sort(new_samples.begin(), new_samples.end());
