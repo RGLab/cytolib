@@ -60,6 +60,7 @@ const EVENT_DATA_TYPE pi = 3.1415926535897;
 #define RECTGATE 5
 #define LOGICALGATE 6
 #define CURLYQUADGATE 7
+#define CLUSTERGATE 8
 
 #define AND 1
 #define OR 2
@@ -1253,7 +1254,7 @@ public:
 /**
  * \class logicalGate
  * \brief a special boolGate
- *
+ * (Now deprecated by the dedicated clusterGate
  * This is mainly used to deal with the situation where the gating algorithm (typically clustering based gating) doesn't generate any type of gate object.
  * In order still be able to record the gating results (i.e. the logical indices), this logicalGate can be used as the dummy gate to be added to the node.
  * Because nodeProperties requires a population node to have a gate to be associated with.
@@ -1272,6 +1273,28 @@ public:
 	logicalGate(const pb::gate & gate_pb):boolGate(gate_pb){};
 
 	logicalGate():boolGate(){};
+};
+
+class clusterGate:public boolGate {
+private:
+	string cluster_method_name_;
+	unsigned short getType(){return CLUSTERGATE; }
+	clusterGate * clone(){return new clusterGate(*this);};
+
+public:
+	string get_cluster_method_name(){return cluster_method_name_;}
+	void convertToPb(pb::gate & gate_pb){
+		boolGate::convertToPb(gate_pb);
+		gate_pb.set_type(pb::CLUSTER_GATE);
+		//cp nested gate
+		pb::clusterGate * g_pb = gate_pb.mutable_cg();
+
+		g_pb->set_cluster_method(cluster_method_name_);
+
+	}
+	clusterGate(const pb::gate & gate_pb):boolGate(gate_pb), cluster_method_name_(gate_pb.cg().cluster_method()){};
+
+	clusterGate(string cluster_method_name):boolGate(),cluster_method_name_(cluster_method_name){};
 };
 
 enum QUAD{
