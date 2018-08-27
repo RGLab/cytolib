@@ -133,7 +133,7 @@ public:
 					throw(domain_error("no gate available for this node"));
 				if(g_loglevel>=POPULATION_LEVEL)
 					PRINT( "update channels for " +node.getName()+"\n");
-				if(g->getType()!=BOOLGATE&&g->getType()!=LOGICALGATE)
+				if(g->getType()!=BOOLGATE&&g->getType()!=LOGICALGATE&&g->getType()!=CLUSTERGATE)
 					g->update_channels(chnl_map);
 			}
 		}
@@ -317,6 +317,7 @@ public:
 				break;
 			}
 		case LOGICALGATE://skip any gating operation since the indice is already set once the gate is added
+		case CLUSTERGATE:
 			node.computeStats();
 			return;
 		default:
