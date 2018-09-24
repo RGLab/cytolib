@@ -57,7 +57,7 @@ protected:
 			count_mem[1]  = nrow;
 			memspace.selectHyperslab( H5S_SELECT_SET, count_mem, offset_mem );
 
-			dataset.read(data.memptr(), PredType::NATIVE_FLOAT ,memspace, dataspace);
+			dataset.read(data.memptr(), EVENT_DATA_TYPE_H5 ,memspace, dataspace);
 		}
 
 		return data;

@@ -30,13 +30,15 @@ using namespace arma;
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <chrono>
-
+#include <H5Cpp.h>
 
 using namespace std;
 extern unsigned short g_loglevel;// debug print is turned off by default
 extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
+using namespace H5;
+
 namespace cytolib
 {
 	#define CYTOLIB_INIT() \
@@ -67,6 +69,7 @@ namespace cytolib
 
 	typedef double EVENT_DATA_TYPE;
 	typedef arma::Mat<EVENT_DATA_TYPE> EVENT_DATA_VEC;
+	#define EVENT_DATA_TYPE_H5 PredType::NATIVE_DOUBLE
 
 	#define PRT true
 

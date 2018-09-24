@@ -11,7 +11,7 @@
 #include "readFCSHeader.hpp"
 #include "compensation.hpp"
 
-#include <H5Cpp.h>
+
 
 namespace cytolib
 {
@@ -22,7 +22,6 @@ enum class H5Option {copy, move, skip, link, symlink};
 
 typedef unordered_map<string, string> PDATA;
 
-using namespace H5;
 
 const H5std_string  DATASET_NAME( "data");
 
@@ -283,7 +282,7 @@ public:
 		* Write the data to the dataset using default memory space, file
 		* space, and transfer properties.
 		*/
-		dataset.write(&get_data()[0], PredType::NATIVE_FLOAT );
+		dataset.write(&get_data()[0], EVENT_DATA_TYPE_H5);
 	}
 
 	/**
