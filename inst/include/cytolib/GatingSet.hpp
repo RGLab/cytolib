@@ -468,7 +468,9 @@ public:
 	GatingHierarchyPtr add_GatingHierarchy(string sample_uid){
 		if(ghs.find(sample_uid)!=ghs.end())
 			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
-		return ghs[sample_uid];
+		GatingHierarchyPtr gh(new GatingHierarchy());
+		ghs[sample_uid] = gh;
+		return gh;
 	}
 	void add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
 			if(ghs.find(sample_uid)!=ghs.end())
