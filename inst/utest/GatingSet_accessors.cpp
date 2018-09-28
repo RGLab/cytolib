@@ -56,6 +56,39 @@ BOOST_AUTO_TEST_CASE(copy) {
 	BOOST_CHECK_CLOSE(fv.get_data()[1], fv1.get_data()[1], 1e-6);
 	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
 }
+BOOST_AUTO_TEST_CASE(legacy_gs) {
+	GatingSet gs1 = GatingSet("../flowWorkspaceData/inst/extdata/gs_manual_legacy/jzgmkCmwZR.pb",CytoSet());
+	vector<string> samples = gs1.get_sample_uids();
+	BOOST_CHECK_EQUAL(samples[0], "CytoTrol_CytoTrol_1.fcs");
+
+	GatingHierarchyPtr gh = gs1.getGatingHierarchy(samples[0]);
+	VertexID_vec vid = gh->getVertices();
+	BOOST_CHECK_EQUAL(vid.size(), 24);
+	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
+
+	//save legacy to new format
+	string tmp = std::tmpnam(nullptr);
+	cout << tmp << endl;
+	gs1.serialize_pb(tmp, true, H5Option::skip);
+	gs1 = GatingSet(tmp);
+	gh = gs1.getGatingHierarchy(samples[0]);
+	vid = gh->getVertices();
+	BOOST_CHECK_EQUAL(vid.size(), 24);
+	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
+
+	//save new to new format
+	tmp = std::tmpnam(nullptr);
+	cout << tmp << endl;
+	gs.serialize_pb(tmp, true, H5Option::copy);
+	tmp = "/tmp/file5Ue88R";
+	gs1 = GatingSet(tmp);
+	gh = gs1.getGatingHierarchy(samples[0]);
+	vid = gh->getVertices();
+	BOOST_CHECK_EQUAL(vid.size(), 24);
+	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
+
+
+}
 //
 //BOOST_AUTO_TEST_CASE(subset_by_sample) {
 //	//check get_sample_uids

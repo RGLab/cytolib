@@ -154,6 +154,22 @@ public:
 				}
 			}
 	}
+	//legacy archive
+	trans_local(const pb::trans_local & lg_pb, map<intptr_t, TransPtr> & trans_tbl){
+
+		for(int i = 0; i < lg_pb.tp_size(); i ++){
+			const pb::trans_pair & tp_pb = lg_pb.tp(i);
+			intptr_t old_address = (intptr_t)tp_pb.trans_address();
+			//look up from the tbl for the new pointer
+			map<intptr_t, TransPtr>::iterator it = trans_tbl.find(old_address);
+			if(it!=trans_tbl.end()){
+				tp[tp_pb.name()] = it->second;
+			}
+			else
+				throw(domain_error("the current archived transformation is not found in the global table!"));
+
+		}
+	}
 
 	void update_channels(const CHANNEL_MAP & chnl_map){
 

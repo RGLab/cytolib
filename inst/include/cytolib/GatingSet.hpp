@@ -349,6 +349,109 @@ public:
 		}
 
 	}
+	/**
+	 * constructor from the legacy archives (de-serialization)
+	 * @param filename
+	 * @param format
+	 * @param isPB
+	 */
+	GatingSet(string pb_file, const CytoSet & cs):GatingSet()
+	{
+		GOOGLE_PROTOBUF_VERIFY_VERSION;
+		ifstream input(pb_file.c_str(), ios::in | ios::binary);
+		if (!input) {
+			throw(invalid_argument("File not found.." ));
+		} else{
+			 pb::GatingSet pbGS;
+
+			 google::protobuf::io::IstreamInputStream raw_input(&input);
+			 //read gs message
+			 bool success = readDelimitedFrom(raw_input, pbGS);
+
+			if (!success) {
+				throw(domain_error("Failed to parse GatingSet."));
+			}
+
+			//parse global trans tbl from message
+			map<intptr_t, TransPtr> trans_tbl;
+
+			for(int i = 0; i < pbGS.trans_tbl_size(); i++){
+				const pb::TRANS_TBL & trans_tbl_pb = pbGS.trans_tbl(i);
+				const pb::transformation & trans_pb = trans_tbl_pb.trans();
+				intptr_t old_address = (intptr_t)trans_tbl_pb.trans_address();
+
+				/*
+				 * first two global trans do not need to be restored from archive
+				 * since they use the default parameters
+				 * simply add the new address
+				 */
+
+				switch(i)
+				{
+				case 0:
+					trans_tbl[old_address] = TransPtr(new biexpTrans());
+					break;
+				case 1:
+					trans_tbl[old_address] = TransPtr(new linTrans());
+					break;
+				default:
+					{
+						switch(trans_pb.trans_type())
+						{
+						case pb::PB_CALTBL:
+							trans_tbl[old_address] = TransPtr(new transformation(trans_pb));
+							break;
+						case pb::PB_BIEXP:
+							trans_tbl[old_address] = TransPtr(new biexpTrans(trans_pb));
+							break;
+						case pb::PB_FASIGNH:
+							trans_tbl[old_address] = TransPtr(new fasinhTrans(trans_pb));
+							break;
+						case pb::PB_FLIN:
+							trans_tbl[old_address] = TransPtr(new flinTrans(trans_pb));
+							break;
+						case pb::PB_LIN:
+							trans_tbl[old_address] = TransPtr(new linTrans(trans_pb));
+							break;
+						case pb::PB_LOG:
+							trans_tbl[old_address] = TransPtr(new logTrans(trans_pb));
+							break;
+	//					case pb::PB_SCALE:
+	//						trans_tbl[old_address] = new scaleTrans(trans_pb);
+	//						break;
+						default:
+							throw(domain_error("unknown type of transformation archive!"));
+						}
+					}
+				}
+
+			}
+			/*
+			 * recover the trans_global
+			 */
+
+//			for(int i = 0; i < pbGS.gtrans_size(); i++){
+//				const pb::trans_local & trans_local_pb = pbGS.gtrans(i);
+//				gTrans.push_back(trans_global(trans_local_pb, trans_tbl));
+//			}
+			//read gating hierarchy messages
+			for(int i = 0; i < pbGS.samplename_size(); i++){
+				string sn = pbGS.samplename(i);
+				//gh message is stored as the same order as sample name vector in gs
+				pb::GatingHierarchy gh_pb;
+				bool success = readDelimitedFrom(raw_input, gh_pb);
+
+				if (!success) {
+					throw(domain_error("Failed to parse GatingHierarchy."));
+				}
+
+
+				ghs[sn].reset(new GatingHierarchy(gh_pb, trans_tbl));
+			}
+			cytoset_ = cs;
+		}
+
+	}
 
 	/**
 	 * Retrieve the GatingHierarchy object from GatingSet by sample name.
