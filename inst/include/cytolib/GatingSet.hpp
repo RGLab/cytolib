@@ -170,7 +170,7 @@ public:
 	 * @param path the dir of filename
 	 * @param filename
 	 */
-	void serialize_pb(string path, bool is_overwrite, H5Option h5_opt)
+	void serialize_pb(string path, H5Option h5_opt)
 	{
 		/*
 		 * validity check for path
@@ -180,13 +180,13 @@ public:
 		{
 			if(!fs::is_empty(fs::path(path)))
 			{
-				if(is_overwrite)
-				{
-					fs::remove_all(path);
-					fs::create_directory(path);
-				}
-				else
-				{
+//				if(is_overwrite)
+//				{
+//					fs::remove_all(path);
+//					fs::create_directory(path);
+//				}
+//				else
+//				{
 					fs::path pb_file;
 					unordered_set<string> h5_samples;
 					for(auto & e : fs::directory_iterator(path))
@@ -214,8 +214,6 @@ public:
 					}
 
 					if(!pb_file.empty())
-//					  throw(domain_error(errmsg + "No .pb file found in this non-empty folder!"));
-//					else
 						if(pb_file.stem() != guid_)
 							throw(domain_error(errmsg + "The pb file doesn't match to the guid of GatingSet!"));
 					for(const auto & it : ghs)
@@ -223,7 +221,7 @@ public:
 						if(h5_samples.find(it.first) == h5_samples.end())
 							throw(domain_error(errmsg + "h5 file missing for sample: " + it.first));
 					}
-				}
+//				}
 			}
 		}
 		else
