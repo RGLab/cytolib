@@ -178,51 +178,53 @@ public:
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
 		if(fs::exists(path))
 		{
-			if(is_overwrite)
+			if(!fs::is_empty(fs::path(path)))
 			{
-				fs::remove_all(path);
-				fs::create_directory(path);
-			}
-			else
-			{
-				fs::path pb_file;
-				unordered_set<string> h5_samples;
-				for(auto & e : fs::directory_iterator(path))
+				if(is_overwrite)
 				{
-					fs::path p = e.path();
-					string ext = p.extension();
-					if(ext == ".pb")
-					{
-						if(pb_file.empty())
-							pb_file = p;
-						else
-						  throw(domain_error(errmsg + "Multiple .pb files found!"));
-					}
-					else if(ext == ".h5")
-					{
-						string sample_uid = p.stem();
-						if(find(sample_uid) == end())
-						  throw(domain_error(errmsg + "h5 file not matched to any sample in GatingSet: " + p.string()));
-						else
-							h5_samples.insert(p.stem());
-					}
-					else
-					  throw(domain_error(errmsg + "File not recognized: " + p.string()));
-
+					fs::remove_all(path);
+					fs::create_directory(path);
 				}
-
-				if(pb_file.empty())
-				  throw(domain_error(errmsg + "No .pb file found!"));
 				else
-					if(pb_file.stem() != guid_)
-						throw(domain_error(errmsg + "The pb file doesn't match to the guid of GatingSet!"));
-		        for(const auto & it : ghs)
-		        {
-		        	if(h5_samples.find(it.first) == h5_samples.end())
-		        		throw(domain_error(errmsg + "h5 file missing for sample: " + it.first));
-		        }
-			}
+				{
+					fs::path pb_file;
+					unordered_set<string> h5_samples;
+					for(auto & e : fs::directory_iterator(path))
+					{
+						fs::path p = e.path();
+						string ext = p.extension();
+						if(ext == ".pb")
+						{
+							if(pb_file.empty())
+								pb_file = p;
+							else
+							  throw(domain_error(errmsg + "Multiple .pb files found!"));
+						}
+						else if(ext == ".h5")
+						{
+							string sample_uid = p.stem();
+							if(find(sample_uid) == end())
+							  throw(domain_error(errmsg + "h5 file not matched to any sample in GatingSet: " + p.string()));
+							else
+								h5_samples.insert(p.stem());
+						}
+						else
+						  throw(domain_error(errmsg + "File not recognized: " + p.string()));
 
+					}
+
+					if(!pb_file.empty())
+//					  throw(domain_error(errmsg + "No .pb file found in this non-empty folder!"));
+//					else
+						if(pb_file.stem() != guid_)
+							throw(domain_error(errmsg + "The pb file doesn't match to the guid of GatingSet!"));
+					for(const auto & it : ghs)
+					{
+						if(h5_samples.find(it.first) == h5_samples.end())
+							throw(domain_error(errmsg + "h5 file missing for sample: " + it.first));
+					}
+				}
+			}
 		}
 		else
 			fs::create_directory(path);
