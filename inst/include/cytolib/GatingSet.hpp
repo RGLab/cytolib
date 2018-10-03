@@ -479,7 +479,7 @@ public:
 		{
 			fs::path h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
 
-			gs.cytoset_ = cytoset_.copy(h5_dir.string());
+			gs.cytoset_ = cytoset_.copy_realized(h5_dir.string());
 		}
 		else
 			gs.cytoset_ = cytoset_;

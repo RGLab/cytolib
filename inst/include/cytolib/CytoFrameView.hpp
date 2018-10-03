@@ -200,15 +200,12 @@ public:
 
 	}
 	/**
-	 * Realize the delayed subsetting (i.e. cols() and rows()) operations
+	 * Realize the delayed subsetting (i.e. cols() and rows()) operations to the underlying data
 	 * and clear the view
 	 */
-	void flush_view()
+	CytoFrameView copy_realized(const string & h5_filename = "") const
 	{
-
-		ptr_->set_data(get_data());
-
-		reset_view();
+		return ptr_->copy_realized(row_idx_, col_idx_, h5_filename);;
 	}
 
 	EVENT_DATA_VEC get_data() const
@@ -226,15 +223,11 @@ public:
 		return data;
 	}
 
-	CytoFramePtr copy(const string & h5_filename = "") const
+	CytoFrameView copy(const string & h5_filename = "") const
 	{
-		CytoFramePtr ptr = ptr_->copy(row_idx_, col_idx_, h5_filename);
-//		//TODO:optimize into one step for h5
-//		if(is_row_indexed())
-//			ptr->rows_(row_idx_);
-//		if(is_col_indexed())
-//			ptr->cols_(col_idx_);
-		return ptr;
+		CytoFrameView cv(*this);
+		cv.ptr_ = ptr_->copy(h5_filename);
+		return cv;
 
 	}
 };

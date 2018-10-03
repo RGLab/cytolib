@@ -73,6 +73,17 @@ namespace cytolib
 
 	#define PRT true
 
+	inline string generate_temp_filename(string dir = "/tmp")
+	{
+		char tmp[15] = "/tmp/XXXXXX.h5";
+		int fid = mkstemps(tmp, 3);
+		if(fid == -1)
+			throw(domain_error("Can't create the unique temp file: " + string(tmp)));
+
+		close(fid);
+		return tmp;
+	}
+
 	/**
 	 * Generate time stamp as string
 	 * @return

@@ -194,7 +194,7 @@ namespace cytolib
 		 *
 		 * @param cs
 		 */
-		CytoSet copy(const string & new_h5_dir = fs::temp_directory_path().string())
+		CytoSet copy_realized(const string & new_h5_dir = fs::temp_directory_path().string())
 		{
 			CytoSet cs;
 			for(const auto & it : frames_)
@@ -204,7 +204,7 @@ namespace cytolib
 //				{
 					new_h5 = fs::path(new_h5_dir) / (it.first + ".h5");
 //				}
-				cs.frames_[it.first] = CytoFrameView(it.second.copy(new_h5));
+				cs.frames_[it.first] = it.second.copy_realized(new_h5);
 			}
 
 			return cs;

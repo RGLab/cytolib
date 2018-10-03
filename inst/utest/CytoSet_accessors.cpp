@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(constructor) {
 			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
 }
 BOOST_AUTO_TEST_CASE(copy) {
-	CytoSet cs1 = cs.copy();
+	CytoSet cs1 = cs.copy_realized();
 	vector<string> samples = cs.get_sample_uids();
 	CytoFrameView fv = cs.get_cytoframe_view(samples[1]);
 	CytoFrameView fv1 = cs1.get_cytoframe_view(samples[1]);

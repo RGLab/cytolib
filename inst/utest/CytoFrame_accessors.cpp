@@ -12,9 +12,7 @@ struct CFFixture{
 		fr = MemCytoFrame(file_path, config);
 		fr.read_fcs();
 
-		char tmp[15] = "/tmp/XXXXXX.h5";
-		int fid = mkstemps(tmp, 3);
-		close(fid);
+		string tmp = generate_temp_filename();
 		fr.write_h5(tmp);
 		fr_h5.reset(new H5CytoFrame(tmp));
 	};
@@ -62,8 +60,8 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 	EVENT_DATA_VEC mat = cr_new.get_data();
 	BOOST_CHECK_EQUAL(mat.n_rows, 3);
 
-	CytoFramePtr fr_copy = cr_new.copy();
-	BOOST_CHECK_EQUAL(fr_copy->n_rows(), 3);
+	CytoFrameView fr_copy = cr_new.copy();
+	BOOST_CHECK_EQUAL(fr_copy.n_rows(), 3);
 
 }
 BOOST_AUTO_TEST_CASE(set_channel)
@@ -126,6 +124,32 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 
 	BOOST_CHECK_CLOSE(fr1->get_data()[100], dat[100], 1e-6);
 	BOOST_CHECK_CLOSE(fr_h5->get_data()[100], old_val, 1e-6);
+
+	//copy_realized
+
 }
 
+BOOST_AUTO_TEST_CASE(CytoFrameView_copy)
+{
+	//
+	CytoFrameView fr1(fr_h5->copy());
+
+	//subset data
+	fr1.rows_(vector<unsigned> ({1, 2, 3}));
+	fr1.cols_(vector<unsigned> ({2, 4}));
+
+	CytoFrameView fr3 = fr1.copy();// deep view cp
+	CytoFrameView fr4 = fr1.copy_realized();// realized view cp
+	BOOST_CHECK_EQUAL(fr3.n_rows(), 3);
+	BOOST_CHECK_EQUAL(fr3.n_cols(), 2);
+	BOOST_CHECK_EQUAL(fr4.n_rows(), 3);
+	BOOST_CHECK_EQUAL(fr4.n_cols(), 2);
+
+	//bypass view and directlycheck the underlying data
+	BOOST_CHECK_EQUAL(fr3.get_cytoframe_ptr()->n_rows(), 10045);
+	BOOST_CHECK_EQUAL(fr3.get_cytoframe_ptr()->n_cols(), 9);
+	BOOST_CHECK_EQUAL(fr4.get_cytoframe_ptr()->n_rows(), 3);
+	BOOST_CHECK_EQUAL(fr4.get_cytoframe_ptr()->n_cols(), 2);
+
+}
 BOOST_AUTO_TEST_SUITE_END()

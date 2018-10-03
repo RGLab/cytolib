@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(copy) {
 	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
 }
 BOOST_AUTO_TEST_CASE(legacy_gs) {
-	GatingSet gs1 = GatingSet("../flowWorkspaceData/inst/extdata/gs_manual_legacy/jzgmkCmwZR.pb",CytoSet());
+	GatingSet gs1 = GatingSet("../flowWorkspaceData/inst/extdata/legacy_gs/gs_manual/jzgmkCmwZR.pb",CytoSet());
 	vector<string> samples = gs1.get_sample_uids();
 	BOOST_CHECK_EQUAL(samples[0], "CytoTrol_CytoTrol_1.fcs");
 
@@ -67,10 +67,9 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
 
 	//save legacy to new format
-	char tmp[15] = "/tmp/XXXXXX.h5";
-	int fid = mkstemps(tmp, 3);
-	close(fid);
-	gs1.serialize_pb(string(tmp), H5Option::skip);
+	string tmp = std::tmpnam(0);
+
+	gs1.serialize_pb(tmp, H5Option::skip);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();
@@ -78,8 +77,8 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
 
 	//save new to new format
-	close(mkstemps(tmp, 3));
-	gs.serialize_pb(string(tmp), H5Option::copy);
+	tmp = std::tmpnam(0);
+	gs.serialize_pb(tmp, H5Option::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();
@@ -88,7 +87,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 
 
 }
-//
+
 //BOOST_AUTO_TEST_CASE(subset_by_sample) {
 //	//check get_sample_uids
 //	vector<string> samples = gs.get_sample_uids();

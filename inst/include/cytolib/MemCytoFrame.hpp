@@ -1010,21 +1010,32 @@ public:
 		return res;
 	}
 
-	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
+	/**
+	 * realize in place
+	 * @param row_idx
+	 * @param col_idx
+	 * @param h5_filename
+	 * @return
+	 */
+	void realize_(uvec row_idx, uvec col_idx)
 	{
-		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
 
-		EVENT_DATA_VEC data = ptr->get_data();
 		if(row_idx.size()>0)
-			data = data.rows(row_idx);
+			data_ = data_.rows(row_idx);
 
 		if(col_idx.size()>0)
 		{
-			data =data.cols(col_idx);
-			ptr->subset_parameters(col_idx);
+			data_ =data_.cols(col_idx);
+			subset_parameters(col_idx);
 		}
 
-		ptr->set_data(data);
+	}
+
+	CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
+	{
+		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
+		ptr->realize_(row_idx, col_idx);
+
 		return CytoFramePtr(ptr.release());
 	}
 

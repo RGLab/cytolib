@@ -314,37 +314,25 @@ public:
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
-			char tmp[15] = "/tmp/XXXXXX.h5";
-			int fid = mkstemps(tmp, 3);
-			if(fid == -1)
-				throw(domain_error("Can't create the unique temp file: " + string(tmp)));
-
-			close(fid);
-			new_filename.append(tmp);
+			new_filename = generate_temp_filename();
+			fs::remove(new_filename);
 		}
-		//equivalent check require the paths already exist in fs
-		if(fs::equivalent(filename_, new_filename))
-			throw(domain_error("Can't make copy to itself: " + new_filename));
-		write_h5(new_filename);
+		fs::copy_file(filename_, new_filename);
 		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
-	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
+	CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
 	{
 
-		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
-		EVENT_DATA_VEC data = ptr->get_data();
-		if(row_idx.size()>0)
-			data = data.rows(row_idx);
-
-		if(col_idx.size()>0)
-		{
-			data =data.cols(col_idx);
-			ptr->subset_parameters(col_idx);
-		}
-		return ptr->copy(h5_filename);
-//		ptr->set_data(data);
-//		ptr->write_h5(h5_filename);
-//		return CytoFramePtr(new H5CytoFrame(h5_filename));
+		string new_filename = h5_filename;
+		if(new_filename == "")
+			new_filename = generate_temp_filename();
+		//if view is empty, then simply invoke copy
+		if(row_idx.size() == 0 && col_idx.size() == 0)
+			return copy(new_filename);
+		//otherwise, realize it to memory and write back to new file
+		MemCytoFrame fr(*this);
+		fr.copy_realized(row_idx, col_idx)->write_h5(new_filename);
+		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
 
 	/**
