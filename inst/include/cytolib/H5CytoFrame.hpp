@@ -133,7 +133,7 @@ public:
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):CytoFrame(),filename_(h5_filename)
+	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDWR):CytoFrame(),filename_(h5_filename)
 	{
 		file.openFile(filename_, flags);
 
@@ -316,9 +316,11 @@ public:
 		{
 			char tmp[15] = "/tmp/XXXXXX.h5";
 			int fid = mkstemps(tmp, 3);
+			if(fid == -1)
+				throw(domain_error("Can't create the unique temp file: " + string(tmp)));
+
 			close(fid);
 			new_filename.append(tmp);
-			new_filename += ".h5";
 		}
 		//equivalent check require the paths already exist in fs
 		if(fs::equivalent(filename_, new_filename))
