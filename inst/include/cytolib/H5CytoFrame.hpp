@@ -352,7 +352,7 @@ public:
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
 
-		dataset.write(_data.mem, PredType::NATIVE_FLOAT );
+		dataset.write(_data.mem, EVENT_DATA_TYPE_H5);
 
 	}
 
