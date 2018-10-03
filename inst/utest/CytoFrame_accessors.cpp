@@ -12,17 +12,23 @@ struct CFFixture{
 		fr = MemCytoFrame(file_path, config);
 		fr.read_fcs();
 
+		char tmp[15] = "/tmp/XXXXXX.h5";
+		int fid = mkstemps(tmp, 3);
+		close(fid);
+		fr.write_h5(tmp);
+		fr_h5.reset(new H5CytoFrame(tmp));
 	};
 
 	~CFFixture(){
 
 	};
 	MemCytoFrame fr;
+	unique_ptr<H5CytoFrame> fr_h5;
    string file_path;
    FCS_READ_PARAM config;
 };
 
-BOOST_FIXTURE_TEST_SUITE(MemCytoFrame_test,CFFixture)
+BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 
 BOOST_AUTO_TEST_CASE(subset_by_cols)
 {
@@ -72,4 +78,54 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(key, newname);
 
 }
+BOOST_AUTO_TEST_CASE(shallow_copy)
+{
+	CytoFramePtr fr_orig = fr_h5->copy();
+	H5CytoFrame fr1 = *(dynamic_cast<H5CytoFrame*>(fr_orig.get()));
+
+	//update meta data
+	string oldname = fr1.get_channels()[2];
+	string newname = "test";
+	fr1.set_channel(oldname, newname);
+	string key = fr1.get_keyword("$P3N");
+	BOOST_CHECK_EQUAL(fr1.get_channels()[2], newname);
+	BOOST_CHECK_EQUAL(key, newname);
+	//meta data is not changed for original cp
+	BOOST_CHECK_EQUAL(fr_orig->get_channels()[2], oldname);
+	BOOST_CHECK_EQUAL(fr_orig->get_keyword("$P3N"), oldname);
+
+	//update data
+	EVENT_DATA_VEC dat = fr1.get_data();
+	dat[100] = 100;
+	fr1.set_data(dat);
+	BOOST_CHECK_CLOSE(fr1.get_data()[100], dat[100], 1e-6);//fr1 is updated
+	BOOST_CHECK_CLOSE(fr_orig->get_data()[100], dat[100], 1e-6);//original cp is also updated
+}
+
+BOOST_AUTO_TEST_CASE(deep_copy)
+{
+	//deep cp
+	CytoFramePtr fr1 = fr_h5->copy();
+
+	//update meta data
+	string oldname = fr1->get_channels()[2];
+	string newname = "test";
+	fr1->set_channel(oldname, newname);
+	string key = fr1->get_keyword("$P3N");
+	//update data
+	EVENT_DATA_VEC dat = fr1->get_data();
+	float old_val = dat[100];
+	dat[100] = 100;
+	fr1->set_data(dat);
+	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
+	BOOST_CHECK_EQUAL(key, newname);
+
+	//original cp is not affected by any change in meta and event data
+	BOOST_CHECK_EQUAL(fr_h5->get_channels()[2], oldname);
+	BOOST_CHECK_EQUAL(fr_h5->get_keyword("$P3N"), oldname);
+
+	BOOST_CHECK_CLOSE(fr1->get_data()[100], dat[100], 1e-6);
+	BOOST_CHECK_CLOSE(fr_h5->get_data()[100], old_val, 1e-6);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

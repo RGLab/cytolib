@@ -67,9 +67,10 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
 
 	//save legacy to new format
-	string tmp = std::tmpnam(nullptr);
-	cout << tmp << endl;
-	gs1.serialize_pb(tmp, true, H5Option::skip);
+	char tmp[15] = "/tmp/XXXXXX.h5";
+	int fid = mkstemps(tmp, 3);
+	close(fid);
+	gs1.serialize_pb(string(tmp), H5Option::skip);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();
@@ -77,10 +78,8 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
 
 	//save new to new format
-	tmp = std::tmpnam(nullptr);
-	cout << tmp << endl;
-	gs.serialize_pb(tmp, true, H5Option::copy);
-	tmp = "/tmp/file5Ue88R";
+	close(mkstemps(tmp, 3));
+	gs.serialize_pb(string(tmp), H5Option::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();

@@ -282,7 +282,8 @@ public:
 		* Write the data to the dataset using default memory space, file
 		* space, and transfer properties.
 		*/
-		dataset.write(&get_data()[0], EVENT_DATA_TYPE_H5);
+		EVENT_DATA_VEC dat = get_data();
+		dataset.write(dat.mem, EVENT_DATA_TYPE_H5);
 	}
 
 	/**

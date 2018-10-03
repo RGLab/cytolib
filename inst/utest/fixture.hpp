@@ -7,6 +7,7 @@
 
 #ifndef INST_UTEST_FIXTURE_HPP_
 #define INST_UTEST_FIXTURE_HPP_
+#include <boost/test/floating_point_comparison.hpp>
 
 struct parseFCSFixture{
 	parseFCSFixture(): argc(boost::unit_test_framework::framework::master_test_suite().argc),

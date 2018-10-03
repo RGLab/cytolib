@@ -314,10 +314,13 @@ public:
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
-			new_filename = fs::temp_directory_path() / std::tmpnam(nullptr) ;
+			char tmp[15] = "/tmp/XXXXXX.h5";
+			int fid = mkstemps(tmp, 3);
+			close(fid);
+			new_filename.append(tmp);
 			new_filename += ".h5";
 		}
-
+		//equivalent check require the paths already exist in fs
 		if(fs::equivalent(filename_, new_filename))
 			throw(domain_error("Can't make copy to itself: " + new_filename));
 		write_h5(new_filename);
@@ -336,10 +339,10 @@ public:
 			data =data.cols(col_idx);
 			ptr->subset_parameters(col_idx);
 		}
-
-		ptr->set_data(data);
-		ptr->write_h5(h5_filename);
-		return CytoFramePtr(new H5CytoFrame(h5_filename));
+		return ptr->copy(h5_filename);
+//		ptr->set_data(data);
+//		ptr->write_h5(h5_filename);
+//		return CytoFramePtr(new H5CytoFrame(h5_filename));
 	}
 
 	/**
