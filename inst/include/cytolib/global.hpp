@@ -69,7 +69,7 @@ namespace cytolib
 
 	typedef double EVENT_DATA_TYPE;
 	typedef arma::Mat<EVENT_DATA_TYPE> EVENT_DATA_VEC;
-	#define EVENT_DATA_TYPE_H5 PredType::NATIVE_DOUBLE
+	#define EVENT_DATA_TYPE_IN_MEM_H5 PredType::NATIVE_DOUBLE
 
 	#define PRT true
 

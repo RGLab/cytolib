@@ -7,11 +7,11 @@ using namespace cytolib;
 struct CFFixture{
 	CFFixture()
 	{
-
+		//
 		file_path = "../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs";
 		fr = MemCytoFrame(file_path, config);
 		fr.read_fcs();
-
+		//create h5 version
 		string tmp = generate_temp_filename();
 		fr.write_h5(tmp);
 		fr_h5.reset(new H5CytoFrame(tmp));
@@ -68,17 +68,49 @@ BOOST_AUTO_TEST_CASE(set_channel)
 {
 	vector<string> channels = fr.get_channels();
 
-	MemCytoFrame fr1 = fr;
+	MemCytoFrame fr1 = *fr.copy();
+	string oldname = channels[2];
 	string newname = "test";
-	fr1.set_channel(channels[2], newname);
+	fr1.set_channel(oldname, newname);
 	string key = fr1.get_keyword("$P3N");
 	BOOST_CHECK_EQUAL(fr1.get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
 
+	fr1 = *fr.copy_realized({}, {});
+	newname = "test1";
+	fr1.set_channel(oldname, newname);
+	key = fr1.get_keyword("$P3N");
+	BOOST_CHECK_EQUAL(fr1.get_channels()[2], newname);
+	BOOST_CHECK_EQUAL(key, newname);
+
+	//h5
+	CytoFramePtr fr2 = fr_h5->copy();
+	fr2->set_channel(oldname, newname);
+	key = fr2->get_keyword("$P3N");
+	BOOST_CHECK_EQUAL(fr2->get_channels()[2], newname);
+	BOOST_CHECK_EQUAL(key, newname);
+
+	string tmp = generate_temp_filename();
+	fr2 = fr_h5->copy_realized({1,2,3}, {1,2}, tmp);//channel order may change
+	fr2->set_channel(oldname, newname);
+	key = fr2->get_keyword("$P3N");
+	BOOST_CHECK_GT(fr2->get_col_idx(newname, ColType::channel), 0);
+	BOOST_CHECK_EQUAL(key, newname);
+
+	//h5 is not synced by setter immediately
+	H5CytoFrame fr3(tmp);
+	BOOST_CHECK_EQUAL(fr3.get_col_idx(newname, ColType::channel), -1);
+	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), oldname);
+	//until cached meta data is flushed to h5 when the object is destroyed
+	fr2.reset();
+	fr3 = H5CytoFrame(tmp);
+	BOOST_CHECK_GT(fr3.get_col_idx(newname, ColType::channel), 0);
+	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), newname);
 }
 BOOST_AUTO_TEST_CASE(shallow_copy)
 {
-	CytoFramePtr fr_orig = fr_h5->copy();
+	CytoFramePtr fr_orig = fr_h5->copy();//create a safe copy to test with by deep copying
+	//perform shallow copy
 	H5CytoFrame fr1 = *(dynamic_cast<H5CytoFrame*>(fr_orig.get()));
 
 	//update meta data
@@ -94,10 +126,11 @@ BOOST_AUTO_TEST_CASE(shallow_copy)
 
 	//update data
 	EVENT_DATA_VEC dat = fr1.get_data();
-	dat[100] = 100;
+	float newval = 100;
+	dat[100] = newval;
 	fr1.set_data(dat);
-	BOOST_CHECK_CLOSE(fr1.get_data()[100], dat[100], 1e-6);//fr1 is updated
-	BOOST_CHECK_CLOSE(fr_orig->get_data()[100], dat[100], 1e-6);//original cp is also updated
+	BOOST_CHECK_CLOSE(fr1.get_data()[100], newval, 1e-6);//fr1 is updated
+	BOOST_CHECK_CLOSE(fr_orig->get_data()[100], newval, 1e-6);//original cp is also updated
 }
 
 BOOST_AUTO_TEST_CASE(deep_copy)
@@ -113,7 +146,8 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 	//update data
 	EVENT_DATA_VEC dat = fr1->get_data();
 	float old_val = dat[100];
-	dat[100] = 100;
+	float newval = 100;
+	dat[100] = newval;
 	fr1->set_data(dat);
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
@@ -122,10 +156,10 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 	BOOST_CHECK_EQUAL(fr_h5->get_channels()[2], oldname);
 	BOOST_CHECK_EQUAL(fr_h5->get_keyword("$P3N"), oldname);
 
-	BOOST_CHECK_CLOSE(fr1->get_data()[100], dat[100], 1e-6);
+	BOOST_CHECK_CLOSE(fr1->get_data()[100], newval, 1e-6);
 	BOOST_CHECK_CLOSE(fr_h5->get_data()[100], old_val, 1e-6);
 
-	//copy_realized
+
 
 }
 

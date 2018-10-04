@@ -41,7 +41,7 @@ public:
  typedef KW_PAIR::iterator iterator;
  typedef KW_PAIR::const_iterator const_iterator;
  void resize(size_t n){kw.resize(n);}
- size_t size(){return kw.size();}
+ size_t size() const{return kw.size();}
  const KW_PAIR & getPairs() const{return kw;}
  void setPairs(const KW_PAIR & _kw){kw = _kw;}
  iterator end() {return kw.end();}

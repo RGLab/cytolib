@@ -28,7 +28,10 @@ protected:
 	DataSet dataset;
 	DataSpace dataspace;
 	hsize_t dims[2];              // dataset dimensions
-
+	//flags indicating if cached meta data needs to be flushed to h5
+	bool is_dirty_params;
+	bool is_dirty_keys;
+	bool is_dirty_pdata;
 	EVENT_DATA_VEC read_data(uvec col_idx) const
 	{
 		unsigned nrow = n_rows();
@@ -57,7 +60,7 @@ protected:
 			count_mem[1]  = nrow;
 			memspace.selectHyperslab( H5S_SELECT_SET, count_mem, offset_mem );
 
-			dataset.read(data.memptr(), EVENT_DATA_TYPE_H5 ,memspace, dataspace);
+			dataset.read(data.memptr(), EVENT_DATA_TYPE_IN_MEM_H5 ,memspace, dataspace);
 		}
 
 		return data;
@@ -65,7 +68,61 @@ protected:
 
 
 public:
-	~H5CytoFrame(){};
+
+	~H5CytoFrame(){
+		flush_meta();
+
+	};
+	void flush_meta(){
+		//flush the cached meta data from CytoFrame into h5
+		if(is_dirty_params)
+			flush_params();
+		if(is_dirty_keys)
+			flush_keys();
+		if(is_dirty_pdata)
+			flush_pheno_data();
+	}
+	void flush_params()
+	{
+		CompType param_type = get_h5_datatype_params();
+		DataSet ds = file.openDataSet("params");
+		ds.write(params.data(), param_type );
+		is_dirty_params = false;
+	}
+
+	void flush_keys()
+	{
+		CompType key_type = get_h5_datatype_keys();
+		DataSet ds = file.openDataSet("keywords");
+
+		//convert to vector
+		vector<KEY_WORDS_SIMPLE> keyVec;
+		for(const auto & e : keys_)
+		{
+			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
+		}
+
+
+		ds.write(&keyVec[0], key_type );
+		is_dirty_keys = false;
+	}
+	void flush_pheno_data()
+	{
+		CompType key_type = get_h5_datatype_keys();
+		DataSet ds = file.openDataSet("pdata");
+
+		//convert to vector
+
+		vector<KEY_WORDS_SIMPLE> keyVec;
+		for(std::pair<std::string, string> e : pheno_data_)
+		{
+			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
+		}
+
+
+		ds.write(&keyVec[0], key_type );
+		is_dirty_pdata = false;
+	}
 
 	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
 	{
@@ -73,6 +130,9 @@ public:
 		file = frm.file;
 		dataset = frm.dataset;
 		dataspace = frm.dataspace;
+		is_dirty_params = frm.is_dirty_params;
+		is_dirty_keys = frm.is_dirty_keys;
+		is_dirty_pdata = frm.is_dirty_pdata;
 		memcpy(dims, frm.dims, sizeof(dims));
 
 	}
@@ -88,6 +148,10 @@ public:
 		swap(dataset, frm.dataset);
 		swap(dataspace, frm.dataspace);
 		swap(dims, frm.dims);
+
+		swap(is_dirty_params, frm.is_dirty_params);
+		swap(is_dirty_keys, frm.is_dirty_keys);
+		swap(is_dirty_pdata, frm.is_dirty_pdata);
 	}
 	H5CytoFrame & operator=(const H5CytoFrame & frm)
 	{
@@ -96,33 +160,42 @@ public:
 		file = frm.file;
 		dataset = frm.dataset;
 		dataspace = frm.dataspace;
+		is_dirty_params = frm.is_dirty_params;
+		is_dirty_keys = frm.is_dirty_keys;
+		is_dirty_pdata = frm.is_dirty_pdata;
 		memcpy(dims, frm.dims, sizeof(dims));
 		return *this;
 	}
 	H5CytoFrame & operator=(H5CytoFrame && frm)
 	{
-//		swap(pheno_data_, frm.pheno_data_);
-//		swap(keys_, frm.keys_);
-//		swap(params, frm.params);
-//		swap(channel_vs_idx, frm.channel_vs_idx);
-//		swap(marker_vs_idx, frm.marker_vs_idx);
+		CytoFrame::operator=(frm);
 		swap(filename_, frm.filename_);
 		swap(file, frm.file);
 		swap(dataset, frm.dataset);
 		swap(dataspace, frm.dataspace);
 		swap(dims, frm.dims);
+
+		swap(is_dirty_params, frm.is_dirty_params);
+		swap(is_dirty_keys, frm.is_dirty_keys);
+		swap(is_dirty_pdata, frm.is_dirty_pdata);
 		return *this;
 	}
 	unsigned n_rows() const{
 				return dims[1];
 		}
-
+	void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true)
+	{
+		CytoFrame::set_channel(oldname, newname, is_update_keywords);
+		is_dirty_params = true;
+		if(is_update_keywords)
+			is_dirty_keys = true;
+	}
 	/**
 	 * constructor from FCS
 	 * @param fcs_filename
 	 * @param h5_filename
 	 */
-	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename):filename_(h5_filename)
+	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
@@ -133,7 +206,7 @@ public:
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDWR):CytoFrame(),filename_(h5_filename)
+	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDWR):CytoFrame(),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		file.openFile(filename_, flags);
 
@@ -147,8 +220,7 @@ public:
 
 		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
 
-		FloatType datatype( PredType::NATIVE_FLOAT );
-		datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
+		FloatType datatype = get_h5_datatype_data();
 
 		/*
 		 * read params as array of compound type
@@ -318,20 +390,27 @@ public:
 			fs::remove(new_filename);
 		}
 		fs::copy_file(filename_, new_filename);
-		return CytoFramePtr(new H5CytoFrame(new_filename));
+		CytoFramePtr ptr(new H5CytoFrame(new_filename));
+		//copy cached meta
+		ptr->set_params(get_params());
+		ptr->set_keywords(get_keywords());
+		ptr->set_pheno_data(get_pheno_data());
+		return ptr;
 	}
 	CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
 	{
 
 		string new_filename = h5_filename;
 		if(new_filename == "")
+		{
 			new_filename = generate_temp_filename();
-		//if view is empty, then simply invoke copy
+			fs::remove(new_filename);
+		}		//if view is empty, then simply invoke copy
 		if(row_idx.size() == 0 && col_idx.size() == 0)
 			return copy(new_filename);
 		//otherwise, realize it to memory and write back to new file
 		MemCytoFrame fr(*this);
-		fr.copy_realized(row_idx, col_idx)->write_h5(new_filename);
+		fr.copy_realized(row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
 		return CytoFramePtr(new H5CytoFrame(new_filename));
 	}
 
@@ -342,7 +421,7 @@ public:
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
 
-		dataset.write(_data.mem, EVENT_DATA_TYPE_H5);
+		dataset.write(_data.mem, EVENT_DATA_TYPE_IN_MEM_H5);
 
 	}
 

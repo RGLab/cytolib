@@ -25,7 +25,14 @@ typedef unordered_map<string, string> PDATA;
 
 const H5std_string  DATASET_NAME( "data");
 
-
+/*
+ * simple vector version of keyword type
+ * used for communicate with h5 since h5 doesn't support customized container data type
+ */
+struct KEY_WORDS_SIMPLE{
+			string key, value;
+			KEY_WORDS_SIMPLE(const string & k, const string & v):key(k),value(v){};
+		};
 
 class CytoFrame;
 typedef shared_ptr<CytoFrame> CytoFramePtr;
@@ -178,24 +185,22 @@ public:
 		params = _params;
 	}
 //	virtual void writeFCS(const string & filename);
-	/**
-	 * save the CytoFrame as HDF5 format
-	 *
-	 * @param filename the path of the output H5 file
-	 */
-	virtual void write_h5(const string & filename) const
-	{
-		H5File file( filename, H5F_ACC_TRUNC );
-		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
 
+	FloatType get_h5_datatype_data() const
+	{
 		FloatType datatype( PredType::NATIVE_FLOAT );
 		datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
+		return datatype;
+	}
+	CompType get_h5_datatype_params() const
+	{
+		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
 
 		/*
-		 * write params as array of compound type
+		 * define params as array of compound type
 		 */
 
-
+		FloatType datatype= get_h5_datatype_data();
 		hsize_t dim_pne[] = {2};
 		ArrayType pne(datatype, 1, dim_pne);
 
@@ -208,63 +213,82 @@ public:
 		param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
 		param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
 
+		return param_type;
 
+	}
+	CompType get_h5_datatype_keys() const
+	{
+		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
+
+		CompType key_type(sizeof(KEY_WORDS_SIMPLE));
+		key_type.insertMember("key", HOFFSET(KEY_WORDS_SIMPLE, key), str_type);
+		key_type.insertMember("value", HOFFSET(KEY_WORDS_SIMPLE, value), str_type);
+		return key_type;
+
+	}
+	virtual void write_h5_params(H5File file) const
+	{
+		CompType param_type = get_h5_datatype_params();
 		hsize_t dim_param[] = {n_cols()};
 		DataSpace dsp_param(1, dim_param);
-	//	vector<const char *> cvec;
-	//	for(auto & c : params)
-	//	{
-	//		cvec.push_back(c.channel.c_str());
-	////		cout << c.channel << ":" <<cvec.back() << endl;
-	//	}
-	//
-	//	for(auto c : cvec)
-	//		cout << c << endl;
+		DataSet ds = file.createDataSet( "params", param_type, dsp_param);
 
-		DataSet ds_param = file.createDataSet( "params", param_type, dsp_param);
-		ds_param.write(params.data(), param_type );
+		ds.write(params.data(), param_type );
 
-		/*
-		 * write keywords
-		 */
+	}
+
+	virtual void write_h5_keys(H5File file) const
+	{
+		CompType key_type = get_h5_datatype_keys();
+		hsize_t dim_key[] = {keys_.size()};
+		DataSpace dsp_key(1, dim_key);
+		DataSet ds = file.createDataSet( "keywords", key_type, dsp_key);
+
 		//convert to vector
-
-		struct key_t{
-			string key, value;
-			key_t(const string & k, const string & v):key(k),value(v){};
-		};
-		vector<key_t> keyVec;
+		vector<KEY_WORDS_SIMPLE> keyVec;
 		for(const auto & e : keys_)
 		{
-			keyVec.push_back(key_t(e.first, e.second));
+			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
 		}
 
 
-		CompType key_type(sizeof(key_t));
-		key_type.insertMember("key", HOFFSET(key_t, key), str_type);
-		key_type.insertMember("value", HOFFSET(key_t, value), str_type);
+		ds.write(&keyVec[0], key_type );
 
-		hsize_t dim_key[] = {keyVec.size()};
-		DataSpace dsp_key(1, dim_key);
+	}
+	virtual void write_h5_pheno_data(H5File file) const
+	{
+		CompType key_type = get_h5_datatype_keys();
+		hsize_t dim_pd[] = {pheno_data_.size()};
+		DataSpace dsp_pd(1, dim_pd);
+		DataSet ds = file.createDataSet( "pdata", key_type, dsp_pd);
 
-		DataSet ds_key = file.createDataSet( "keywords", key_type, dsp_key);
-		ds_key.write(&keyVec[0], key_type );
+		//convert to vector
 
-		/*
-		 * write pdata
-		 */
-		keyVec.clear();//reuse keyVec and key_type for pd
+		vector<KEY_WORDS_SIMPLE> keyVec;
 		for(std::pair<std::string, string> e : pheno_data_)
 		{
-			keyVec.push_back(key_t(e.first, e.second));
+			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
 		}
 
 
-		hsize_t dim_pd[] = {keyVec.size()};
-		DataSpace dsp_pd(1, dim_pd);
+		ds.write(&keyVec[0], key_type );
 
-		DataSet ds_pd = file.createDataSet( "pdata", key_type, dsp_pd);
-		ds_pd.write(&keyVec[0], key_type );
+	}
+	/**
+	 * save the CytoFrame as HDF5 format
+	 *
+	 * @param filename the path of the output H5 file
+	 */
+	virtual void write_h5(const string & filename) const
+	{
+		H5File file( filename, H5F_ACC_TRUNC );
+
+		write_h5_params(file);
+
+		write_h5_keys(file);
+
+		write_h5_pheno_data(file);
+
 
 		 /*
 		* store events data as fixed
@@ -277,13 +301,13 @@ public:
 		plist.setChunk(2, chunk_dims);
 	//	plist.setFilter()
 		DataSpace dataspace( 2, dimsf);
-		DataSet dataset = file.createDataSet( DATASET_NAME, datatype, dataspace, plist);
+		DataSet dataset = file.createDataSet( DATASET_NAME, get_h5_datatype_data(), dataspace, plist);
 		/*
 		* Write the data to the dataset using default memory space, file
 		* space, and transfer properties.
 		*/
 		EVENT_DATA_VEC dat = get_data();
-		dataset.write(dat.mem, EVENT_DATA_TYPE_H5);
+		dataset.write(dat.mem, EVENT_DATA_TYPE_IN_MEM_H5);
 	}
 
 	/**
@@ -307,6 +331,9 @@ public:
 	 virtual const KEY_WORDS & get_keywords() const{
 		return keys_;
 	}
+	 virtual void set_keywords(const KEY_WORDS & keys){
+			keys_ = keys;
+		}
 	/**
 	 * extract the value of the single keyword by keyword name
 	 *
