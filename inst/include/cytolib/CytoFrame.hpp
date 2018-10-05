@@ -498,20 +498,26 @@ public:
 		int id = get_col_idx(oldname, ColType::channel);
 		if(id<0)
 			throw(domain_error("colname not found: " + oldname));
-		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-			PRINT(oldname + "-->"  + newname + "\n");
-		params[id].channel=newname;
-		channel_vs_idx.erase(oldname);
-		channel_vs_idx[newname] = id;
-
-		//update keywords(linear time, not sure how to improve it other than optionally skip it
-		if(is_update_keywords)
+		if(oldname!=newname)
 		{
-			for(auto & it : keys_)
-				if(it.second == oldname)
-					it.second = newname;
-		}
 
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT(oldname + "-->"  + newname + "\n");
+			if(get_col_idx(newname, ColType::channel)>=0)
+				throw(domain_error("colname already exists: " + newname));
+			params[id].channel=newname;
+			channel_vs_idx.erase(oldname);
+			channel_vs_idx[newname] = id;
+
+			//update keywords(linear time, not sure how to improve it other than optionally skip it
+			if(is_update_keywords)
+			{
+				for(auto & it : keys_)
+					if(it.second == oldname)
+						it.second = newname;
+			}
+
+		}
 	}
 
 	virtual void set_marker(const string & oldname, const string & newname)
@@ -519,9 +525,14 @@ public:
 		int id = get_col_idx(oldname, ColType::marker);
 		if(id<0)
 			throw(domain_error("colname not found: " + oldname));
-		params[id].marker=newname;
-		marker_vs_idx.erase(oldname);
-		marker_vs_idx[newname] = id;
+		if(oldname!=newname)
+		{
+			if(get_col_idx(newname, ColType::marker)>=0)
+				throw(domain_error("marker already exists: " + newname));
+			params[id].marker=newname;
+			marker_vs_idx.erase(oldname);
+			marker_vs_idx[newname] = id;
+		}
 	}
 
 	/**

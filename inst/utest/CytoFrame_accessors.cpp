@@ -70,6 +70,8 @@ BOOST_AUTO_TEST_CASE(set_channel)
 
 	MemCytoFrame fr1 = *fr.copy();
 	string oldname = channels[2];
+	BOOST_CHECK_EXCEPTION(fr1.set_channel(oldname, channels[1]), domain_error,
+			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
 	string newname = "test";
 	fr1.set_channel(oldname, newname);
 	string key = fr1.get_keyword("$P3N");

@@ -38,8 +38,7 @@ BOOST_AUTO_TEST_CASE(test) {
 BOOST_AUTO_TEST_CASE(constructor) {
 	file_paths[1] = file_paths[0];
 
-	BOOST_CHECK_EXCEPTION(CytoSet(file_paths, config, false, "")
-	;, domain_error,
+	BOOST_CHECK_EXCEPTION(CytoSet(file_paths, config, false, "");, domain_error,
 			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
 }
 BOOST_AUTO_TEST_CASE(copy) {
