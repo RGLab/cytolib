@@ -90,7 +90,7 @@ typedef shared_ptr<GatingHierarchy> GatingHierarchyPtr;
  **
  ** \brief The class that holds the gating tree.
  **
- ** It stores the transformation, compensation and gating information as well as the flow data (transiently).
+ ** It stores the transformation, compensation and gating information as well as the flow data
 	Each FCS file is associated with one GatingHierarchy object.
 	It can also serves as a gating template when data is empty.
  */
@@ -107,8 +107,9 @@ private:
 
 	PARAM_VEC transFlag; /*< for internal use of parse flowJo workspace */
 	trans_local trans; /*< the transformation used for this particular GatingHierarchy object */
-
+	CytoFrameView frame_;
 public:
+	CytoFrameView & get_data_ref(){return frame_;}
 	/**
 	 * setter for channels
 	 * @param chnl_map

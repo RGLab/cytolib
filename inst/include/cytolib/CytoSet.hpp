@@ -15,14 +15,15 @@ namespace cytolib
 
 	class CytoSet
 	{
-		typedef unordered_map<string,CytoFrameView> FrameMap;
+	protected:
+		typedef unordered_map<string, GatingHierarchyPtr> FrameMap;
 		FrameMap frames_;
 
-		CytoFrameView & get_first_frame_ptr()
+		CytoFrameView & get_first_frame_ref()
 		{
 			if(size() == 0)
 				throw(range_error("Empty CytoSet!"));
-			return begin()->second;
+			return begin()->second->get_data_ref();
 		}
 	public:
 		typedef typename FrameMap::iterator iterator;
@@ -81,7 +82,7 @@ namespace cytolib
 		 /**
 		  * forward to the first element's getChannels
 		  */
-		vector<string> get_channels(){return get_first_frame_ptr().get_channels();};
+		vector<string> get_channels(){return get_first_frame_ref().get_channels();};
 		/**
 		 * modify the channels for each individual frame
 		 * @param _old
@@ -93,14 +94,14 @@ namespace cytolib
 		};
 
 		//* forward to the first element's getChannels
-		vector<string> get_markers(){return get_first_frame_ptr().get_markers();};
+		vector<string> get_markers(){return get_first_frame_ref().get_markers();};
 
 		void set_marker(const string & _old, const string & _new){
 			for(auto & p : frames_)
 				p.second.set_marker(_old, _new);
 		};
 
-		int n_cols(){return get_first_frame_ptr().n_cols();}
+		int n_cols(){return get_first_frame_ref().n_cols();}
 
 		/**
 		 * Subset by samples

@@ -30,48 +30,10 @@ namespace cytolib
  *
  *
  */
-class GatingSet{
+class GatingSet:public CytoSet{
 
-	typedef unordered_map<string, GatingHierarchyPtr> gh_map;
-	gh_map ghs;
-	CytoSet cytoset_;
 	string guid_;
 public:
-	typedef typename gh_map::iterator iterator;
-	typedef typename gh_map::const_iterator const_iterator;
-
-	/*
-	 * forwarding APIs
-	 */
-	 size_t size(){return ghs.size();}
-	 iterator end(){return ghs.end();}
-	 iterator begin(){return ghs.begin();}
-	 iterator find(const string &sample_uid){
-			 return ghs.find(sample_uid);
-	 }
-	 size_t erase ( const string& k ){return ghs.erase(k);}
-
-	 /**
-	  * forward to the first element's getChannels
-	  */
-	vector<string> get_channels(){return cytoset_.get_channels();};
-	/**
-	 * modify the channels for each individual frame
-	 * @param _old
-	 * @param _new
-	 */
-	void set_channel(const string & _old, const string & _new){
-		cytoset_.set_channel(_old, _new);
-	};
-
-	//* forward to the first element's getChannels
-	vector<string> get_markers(){return cytoset_.get_markers();};
-
-	void set_marker(const string & _old, const string & _new){
-		cytoset_.set_marker(_old, _new);
-	};
-
-	int n_cols(){return cytoset_.n_cols();}
 
 	/**
 	 * validity checks on the frame to see if its data structure is consistent with cytoset
@@ -120,7 +82,7 @@ public:
 		 		 if(it == end())
 		 			 throw(domain_error("Sample not found in GatingSet: " + s));
 
-		 		gs.ghs[s] = it->second;
+		 		gs.frames_[s] = it->second;
 		 	 }
 
 			 return gs;
@@ -128,38 +90,6 @@ public:
 
 	string get_gatingset_id(){return guid_;}
 	void set_gatingset_id(const string & guid){guid_ = guid;}
-	/**
-	 * iterate through hash map to extract sample names
-	 * @return
-	 */
-	vector<string> get_sample_uids() const{
-		vector<string> res;
-		for(const auto & f : ghs)
-			res.push_back(f.first);
-		return res;
-
-	};
-	/**
-	 * modify the name of one sample , which involves delete/insert the existing frame
-	 * @param _old
-	 * @param _new
-	 */
-	void set_sample_uid(const string & _old, const string & _new){
-		if(_old.compare(_new) != 0)
-		{
-			auto it = find(_new);
-			if(it!=end())
-				throw(range_error(_new + " already exists!"));
-			it = find(_old);
-			if(it==end())
-				throw(range_error(_old + " not found!"));
-
-			auto gh = it->second;
-			erase(_old);
-			ghs[_new] = gh;
-		}
-		cytoset_.set_sample_uid(_old, _new);
-	};
 
 	GatingSet(){
 		guid_ = generate_guid(20);
@@ -216,7 +146,7 @@ public:
 					if(!pb_file.empty())
 						if(pb_file.stem() != guid_)
 							throw(domain_error(errmsg + "The pb file doesn't match to the guid of GatingSet!"));
-					for(const auto & it : ghs)
+					for(const auto & it : frames_)
 					{
 						if(h5_samples.find(it.first) == h5_samples.end())
 							throw(domain_error(errmsg + "h5 file missing for sample: " + it.first));
@@ -246,7 +176,7 @@ public:
 		cytoset_.convertToPb(*cs_pb, path, h5_opt);
 
 		//add sample name
-		for(auto & it : ghs){
+		for(auto & it : frames_){
 				string sn = it.first;
 				gs_pb.add_samplename(sn);
 		}
@@ -263,7 +193,7 @@ public:
 			 * write pb message for each sample
 			 */
 
-			for(auto & it :ghs){
+			for(auto & it :frames_){
 					string sn = it.first;
 					GatingHierarchy & gh =  *(it.second);
 
@@ -340,7 +270,7 @@ public:
 				}
 
 
-				ghs[sn].reset(new GatingHierarchy(gh_pb));
+				frames_[sn].reset(new GatingHierarchy(gh_pb));
 			}
 
 			cytoset_ = CytoSet(pbGS.cs(), path);
@@ -446,7 +376,7 @@ public:
 				}
 
 
-				ghs[sn].reset(new GatingHierarchy(gh_pb, trans_tbl));
+				frames_[sn].reset(new GatingHierarchy(gh_pb, trans_tbl));
 			}
 			cytoset_ = cs;
 		}
@@ -462,8 +392,8 @@ public:
 	GatingHierarchyPtr getGatingHierarchy(string sample_uid)
 	{
 
-		iterator it=ghs.find(sample_uid);
-		if(it==ghs.end())
+		iterator it=frames_.find(sample_uid);
+		if(it==frames_.end())
 			throw(domain_error(sample_uid + " not found in gating set!"));
 		else
 			return it->second;
@@ -485,12 +415,12 @@ public:
 			gs.cytoset_ = cytoset_;
 
 
-		for(auto & it : ghs)
+		for(auto & it : frames_)
 		{
 			string curSampleName = it.first;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
-			gs.ghs[curSampleName] = it.second->copy();
+			gs.frames_[curSampleName] = it.second->copy();
 
 		}
 
@@ -512,7 +442,7 @@ public:
 				PRINT("\n... start cloning GatingHierarchy for: "+curSampleName+"... \n");
 
 
-			ghs[curSampleName] = gh_template.copy();
+			frames_[curSampleName] = gh_template.copy();
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("Gating hierarchy cloned: "+curSampleName+"\n");
@@ -544,7 +474,7 @@ public:
 
 	CytoSet get_cytoset(string node_path){
 		CytoSet cs = cytoset_;
-		for(auto & it : ghs)
+		for(auto & it : frames_)
 		{
 			GatingHierarchyPtr gh = it.second;
 			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));
@@ -569,16 +499,16 @@ public:
 	 * @param sn
 	 */
 	GatingHierarchyPtr add_GatingHierarchy(string sample_uid){
-		if(ghs.find(sample_uid)!=ghs.end())
+		if(frames_.find(sample_uid)!=frames_.end())
 			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
 		GatingHierarchyPtr gh(new GatingHierarchy());
-		ghs[sample_uid] = gh;
+		frames_[sample_uid] = gh;
 		return gh;
 	}
 	void add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
-			if(ghs.find(sample_uid)!=ghs.end())
+			if(frames_.find(sample_uid)!=frames_.end())
 				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
-			ghs[sample_uid] = gh;
+			frames_[sample_uid] = gh;
 	}
 
 	/**
@@ -590,7 +520,7 @@ public:
 	{
 
 		//update gh
-		for(auto & it : ghs){
+		for(auto & it : frames_){
 
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\nupdate channels for GatingHierarchy:"+it.first+"\n");
