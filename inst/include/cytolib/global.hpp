@@ -101,7 +101,7 @@ namespace cytolib
 	 * Generate uniquely identifiable id (pseudo guid)
 	 * @return
 	 */
-	inline string generate_guid(int len)
+	inline string generate_uid(int len)
 	{
 //		int t = time(NULL);//this only returns second-wise precision, not sufficient for distinguishing multiple gatingsets that are generated within short period
 

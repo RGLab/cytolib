@@ -109,7 +109,8 @@ private:
 	trans_local trans; /*< the transformation used for this particular GatingHierarchy object */
 	CytoFrameView frame_;
 public:
-	CytoFrameView & get_data_ref(){return frame_;}
+
+	CytoFrameView & get_cytoframe_view_ref(){return frame_;}
 	/**
 	 * setter for channels
 	 * @param chnl_map
@@ -371,7 +372,7 @@ public:
 	 */
 	GatingHierarchy(){}
 	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
-	void convertToPb(pb::GatingHierarchy & gh_pb){
+	void convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, H5Option h5_opt){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
 		 * cp tree
@@ -402,11 +403,13 @@ public:
 			pb::PARAM * tflag_pb = gh_pb.add_transflag();
 			it.convertToPb(*tflag_pb);
 		}
-
+		//fr
+		pb::CytoFrame * fr_pb = gh_pb.mutable_frame();
+		frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
 
 	}
 
-	GatingHierarchy(pb::GatingHierarchy & pb_gh){
+	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 
@@ -432,6 +435,19 @@ public:
 		}
 		//restore trans local
 		trans = trans_local(pb_gh.trans());
+
+		//restore fr
+		CytoFramePtr ptr;
+		if(fs::exists(h5_filename))
+		{
+		 ptr.reset(new H5CytoFrame(h5_filename));
+
+		 if(!fr.is_h5())
+			 ptr.reset(new MemCytoFrame(*ptr));
+		 frame_ = CytoFrameView(ptr);
+		}
+		else
+		 throw(domain_error("H5 file missing for sample: " + uid));
 	}
 
 	//load legacy pb
