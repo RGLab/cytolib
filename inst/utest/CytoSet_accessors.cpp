@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include <cytolib/CytoSet.hpp>
+#include <cytolib/GatingSet.hpp>
 
 #include "fixture.hpp"
 using namespace cytolib;
@@ -7,19 +7,19 @@ struct CSFixture {
 	CSFixture() {
 
 		file_paths = {"../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs", "../flowWorkspace/wsTestSuite/curlyQuad/example1/A2002.001.fcs"};
-		cs = CytoSet(file_paths, config, false, "");
+		cs = GatingSet(file_paths, config, false, "");
 
 	};
 
 	~CSFixture() {
 
 	};
-	CytoSet cs;
+	GatingSet cs;
 	vector<string> file_paths;
 	FCS_READ_PARAM config;
 };
 
-BOOST_FIXTURE_TEST_SUITE(CytoSet_test,CSFixture)
+BOOST_FIXTURE_TEST_SUITE(GatingSet_test,CSFixture)
 BOOST_AUTO_TEST_CASE(test) {
 //	class A{
 //	public:
@@ -38,14 +38,14 @@ BOOST_AUTO_TEST_CASE(test) {
 BOOST_AUTO_TEST_CASE(constructor) {
 	file_paths[1] = file_paths[0];
 
-	BOOST_CHECK_EXCEPTION(CytoSet(file_paths, config, false, "");, domain_error,
+	BOOST_CHECK_EXCEPTION(GatingSet(file_paths, config, false, "");, domain_error,
 			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
 }
 BOOST_AUTO_TEST_CASE(copy) {
-	CytoSet cs1 = cs.copy_realized();
+	GatingSet cs1 = cs.copy();
 	vector<string> samples = cs.get_sample_uids();
-	CytoFrameView fv = cs.get_cytoframe_view(samples[1]);
-	CytoFrameView fv1 = cs1.get_cytoframe_view(samples[1]);
+	CytoFrameView fv = cs.get_cytoframe_view_ref(samples[1]);
+	CytoFrameView fv1 = cs1.get_cytoframe_view_ref(samples[1]);
 	BOOST_CHECK_CLOSE(fv.get_data()[1], fv1.get_data()[1], 1e-6);
 	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
 }
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(subset_by_cols) {
 	vector<string> markers = cs.get_markers();
 	vector<string> sub_channels = { channels[3], channels[1] };
 	vector<string> sub_markers = { markers[3], markers[1] };
-	CytoSet cs_new = cs;
+	GatingSet cs_new = cs;
 	cs_new.cols_(sub_channels, ColType::channel);
 
 	BOOST_CHECK_EQUAL(cs_new.n_cols(), sub_channels.size());
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(subset_by_sample) {
 
 	//subset
 	vector<string> select = { samples[0] };
-	CytoSet cs_new = cs.sub_samples(select);
+	GatingSet cs_new = cs.sub_samples(select);
 	BOOST_CHECK_EQUAL(cs_new.size(), 1);
 	vector<string> new_samples = cs_new.get_sample_uids();
 	sort(new_samples.begin(), new_samples.end());
@@ -87,14 +87,14 @@ BOOST_AUTO_TEST_CASE(subset_by_sample) {
 BOOST_AUTO_TEST_CASE(cytoframe) {
 	vector<string> samples = cs.get_sample_uids();
 	sort(samples.begin(), samples.end());
-	CytoFrameView fv = cs.get_cytoframe_view(samples[1]);
+	CytoFrameView fv = cs.get_cytoframe_view_ref(samples[1]);
 	CytoFramePtr fr = fv.get_cytoframe_ptr();
 
 	//get_cytoframe from subseted cs
 	vector<string>
 	select = {samples[0]};
-	CytoSet cs_new = cs.sub_samples(select);
-	BOOST_CHECK_EXCEPTION(cs_new.get_cytoframe_view(samples[1]);;, domain_error,
+	GatingSet cs_new = cs.sub_samples(select);
+	BOOST_CHECK_EXCEPTION(cs_new.get_cytoframe_view_ref(samples[1]);;, domain_error,
 			[](const exception & ex) {return string(ex.what()).find("not found") != string::npos;});
 
 	//add frame

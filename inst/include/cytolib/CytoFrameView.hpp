@@ -53,7 +53,7 @@ public:
 			return res;
 		}
 	}
-	void update_channels(const CHANNEL_MAP & chnl_map){ptr_->update_channels(chnl_map);}
+	void set_channels(const CHANNEL_MAP & chnl_map){ptr_->set_channels(chnl_map);}
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{ptr_->convertToPb(fr_pb, h5_filename, h5_opt);};
 	void set_channel(const string & oldname, const string &newname)
 	{

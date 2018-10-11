@@ -32,15 +32,15 @@ namespace cytolib
  *
  *
  */
-class GatingSet:public CytoSet{
+class GatingSet{
 	typedef unordered_map<string, GatingHierarchyPtr> ghMap;
 	ghMap ghs_;
 	vector<string> sample_names_;
-	CytoFrameView & get_first_frame_ref()
+	GatingHierarchyPtr get_first_gh() const
 	{
 		if(size() == 0)
-			throw(range_error("Empty CytoSet!"));
-		return begin()->second->get_data_ref();
+			throw(range_error("Empty GatingSet!"));
+		return begin()->second;
 	}
 
 	string uid_;
@@ -70,7 +70,7 @@ public:
 	GatingSet(){
 		uid_ = generate_uid(20);
 	};
-
+	bool is_cytoFrame_only() const{return get_first_gh()->is_cytoFrame_only();};
 	/**
 	 * separate filename from dir to avoid to deal with path parsing in c++
 	 * @param path the dir of filename
@@ -145,7 +145,7 @@ public:
 		pb::GatingSet gs_pb;
 
 		//uid
-		gs_pb.set_uid(uid_);
+		gs_pb.set_guid(uid_);
 
 		/*
 		 *save sn and gh
@@ -220,13 +220,13 @@ public:
 				throw(domain_error("Failed to parse GatingSet."));
 			}
 
-			uid_ = pbGS.uid();
+			uid_ = pbGS.guid();
 
 
 			//read gating hierarchy messages
 			for(int i = 0; i < pbGS.samplename_size(); i++){
 				string sn = pbGS.samplename(i);
-				sample_names_.pop_back(sn);
+				sample_names_.push_back(sn);
 				//gh message is stored as the same order as sample name vector in gs
 				pb::GatingHierarchy gh_pb;
 				bool success = readDelimitedFrom(raw_input, gh_pb);
@@ -352,24 +352,16 @@ public:
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet copy(bool is_copy_data = true, const string & new_h5_dir = fs::temp_directory_path().string()){
+	GatingSet copy(bool is_copy_data = true, bool is_realize_data = true, const string & new_h5_dir = fs::temp_directory_path().string()){
 		GatingSet gs;
-		if(is_copy_data)
-		{
-			fs::path h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
-
-			gs.cytoset_ = cytoset_.copy_realized(h5_dir.string());
-		}
-		else
-			gs.cytoset_ = cytoset_;
-
-
+		gs.sample_names_ = sample_names_;
+		fs::path h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
 		for(auto & it : ghs_)
 		{
-			string curSampleName = it.first;
+			string sn = it.first;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... copying GatingHierarchy: "+curSampleName+"... \n");
-			gs.ghs_[curSampleName] = it.second->copy();
+				PRINT("\n... copying GatingHierarchy: "+sn+"... \n");
+			gs.ghs_[sn] = it.second->copy(is_copy_data, is_realize_data, h5_dir/sn);
 
 		}
 
@@ -386,50 +378,72 @@ public:
 		vector<string>::iterator it;
 		for(it=sample_uids.begin();it!=sample_uids.end();it++)
 		{
-			string curSampleName=*it;
+			string sn=*it;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... start cloning GatingHierarchy for: "+curSampleName+"... \n");
+				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
 
 
-			ghs_[curSampleName] = gh_template.copy();
+			ghs_[sn] = gh_template.copy(false, false, "");
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("Gating hierarchy cloned: "+curSampleName+"\n");
+				PRINT("Gating hierarchy cloned: "+sn+"\n");
 		}
 	}
 
-	GatingSet(const CytoSet & cytoset):GatingSet()
-	{
-		for(const auto & it : cytoset.get_sample_uids())
+	/**
+	 * assign the flow data from the source gs
+	 * @param gs typically it is a root-only GatingSet that only carries cytoFrames
+	 */
+	void set_cytoset(const GatingSet & gs){
+		if(!gs.is_cytoFrame_only())
+			throw(domain_error("The input gs is not data-only object! "));
+
+		for(const string & sn : sample_names_)
 		{
-
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... start adding GatingHierarchy for: "+ it +"... \n");
-
-
-			GatingHierarchyPtr gh=add_GatingHierarchy(it);
-			gh->addRoot();//add default root
-
-
+			const auto & it = gs.find(sn);
+			if(it==gs.end())
+				throw(domain_error("The data to be assigned is missing sample: " + sn));
+			GatingHierarchy & gh = *ghs_[sn];
+			gh.set_cytoFrame_view(it->second->get_cytoframe_view_ref());
 		}
-		set_cytoset(cytoset);
-	}
+	};
 
-	void set_cytoset(const CytoSet & cytoset){cytoset_ = cytoset;};
-	void set_cytoset(CytoSet && cytoset){swap(cytoset_ , cytoset);};
-	const CytoSet & get_cytoset(){
-		return cytoset_;
-	}
-
-	CytoSet get_cytoset(string node_path){
-		CytoSet cs = cytoset_;
+	/**
+	 * Extract the ungated data
+	 * @param node_path
+	 * @return
+	 */
+	GatingSet get_cytoset(){
+		GatingSet gs;
+		gs.sample_names_ = sample_names_;
 		for(auto & it : ghs_)
 		{
+			string sn = it.first;
+			GatingHierarchyPtr gh = it.second;
+
+			gs.add_cytoframe_view(sn, gh->get_cytoframe_view_ref());
+		}
+		return gs;
+	}
+
+	/**
+	 * extract gated data
+	 * @param node_path
+	 * @return a root-only GatingSet that carries the subsetted cytoframes
+	 */
+	GatingSet get_cytoset(string node_path){
+		GatingSet gs;
+		gs.sample_names_ = sample_names_;
+		for(auto & it : ghs_)
+		{
+			string sn = it.first;
 			GatingHierarchyPtr gh = it.second;
 			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));
-			cs.get_cytoframe_view_ref(it.first).rows_(node.getIndices_u());
+			GatingHierarchyPtr gh_new = gs.add_GatingHierarchy(sn);
+
+			gh_new->get_cytoframe_view_ref().rows_(node.getIndices_u());
 		}
-		return cs;
+		return gs;
 	}
 	fs::path generate_h5_folder(fs::path h5_dir)
 	{
@@ -447,7 +461,7 @@ public:
 	 * @param sampleName a string providing the sample name as the key
 	 * @return a pointer to the GatingHierarchy object
 	 */
-	GatingHierarchyPtr getGatingHierarchy(string sample_uid)
+	GatingHierarchyPtr getGatingHierarchy(string sample_uid) const
 	{
 
 		iterator it=ghs_.find(sample_uid);
@@ -456,8 +470,8 @@ public:
 		else
 			return it->second;
 	}
-
-
+	CytoFrameView & get_cytoframe_view_ref(string sample_uid){return getGatingHierarchy(sample_uid)->get_cytoframe_view_ref();}
+	CytoFrameView get_cytoframe_view(string sample_uid) const{return getGatingHierarchy(sample_uid)->get_cytoframe_view();}
 	/**
 	 * insert an empty GatingHierarchy
 	 * @param sn
@@ -475,12 +489,26 @@ public:
 			ghs_[sample_uid] = gh;
 	}
 
+	 /**
+	  * forward to the first element's getChannels
+	  */
+	vector<string> get_channels(){return get_first_gh()->get_channels();};
+	/**
+	 * modify the channels for each individual fh
+	 * @param _old
+	 * @param _new
+	 */
+	void set_channel(const string & _old, const string & _new){
+		for(auto & p : ghs_)
+			p.second->set_channel(_old, _new);
+	};
+
 	/**
 	 *
 	 * update channel information stored in GatingSet
 	 * @param chnl_map the mapping between the old and new channel names
 	 */
-	void update_channels(const CHANNEL_MAP & chnl_map)
+	void set_channels(const CHANNEL_MAP & chnl_map)
 	{
 
 		//update gh
@@ -488,206 +516,165 @@ public:
 
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\nupdate channels for GatingHierarchy:"+it.first+"\n");
-				it.second->update_channels(chnl_map);
+				it.second->set_channels(chnl_map);
 				//comp
 			}
-		//update flow data
-		cytoset_.update_channels(chnl_map);
 
+	}
+//* forward to the first element's getChannels
+	vector<string> get_markers(){return get_first_gh()->get_markers();};
+
+	void set_marker(const string & _old, const string & _new){
+		for(auto & p : ghs_)
+			p.second->set_marker(_old, _new);
+	};
+
+	int n_cols(){return get_first_gh()->n_cols();}
+
+	/**
+	 * Subset by samples
+	 * @param sample_uids
+	 * @return
+	 */
+	GatingSet sub_samples(const vector<string> & sample_uids) const
+	{
+		GatingSet res(*this);
+		res.sub_samples_(sample_uids);
+		return res;
+	}
+
+	/**
+	 * Subset by samples (in place)
+	 * @param sample_uids
+	 * @return
+	 */
+	void sub_samples_(const vector<string> & sample_uids)
+	{
+		//validity check
+		for(const auto & uid : sample_uids)
+			if(find(uid)==end())
+				throw(domain_error("The data to be assigned is missing sample: " + uid));
+		sample_names_ = sample_uids;
+	}
+
+	/**
+	 * Subet set by columns (in place)
+	 * @param colnames
+	 * @param col_type
+	 * @return
+	 */
+	void cols_(vector<string> colnames, ColType col_type)
+	{
+
+		for(auto & it : ghs_)
+		{
+			if(!it.second->is_cytoFrame_only())
+				throw(domain_error("Can't subset by cols when gh is not data-only object! "));
+			it.second->get_cytoframe_view_ref().cols_(colnames, col_type);
+
+		}
 	}
 
 
-			 /**
-			  * forward to the first element's getChannels
-			  */
-			vector<string> get_channels(){return get_first_frame_ref().get_channels();};
-			/**
-			 * modify the channels for each individual frame
-			 * @param _old
-			 * @param _new
-			 */
-			void set_channel(const string & _old, const string & _new){
-				for(auto & p : ghs_)
-					p.second.set_channel(_old, _new);
-			};
+	/**
+	 * Add sample
+	 * @param sample_uid
+	 * @param frame_ptr
+	 */
+	void add_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
+		if(!is_cytoFrame_only())
+			throw(domain_error("Can't add cytoframes to gs when it is not data-only object! "));
+		if(find(sample_uid) != end())
+			throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
+		ghs_[sample_uid].reset(new GatingHierarchy(frame_view));
+	}
 
-			//* forward to the first element's getChannels
-			vector<string> get_markers(){return get_first_frame_ref().get_markers();};
+	/**
+	 * update sample (move)
+	 * @param sample_uid
+	 * @param frame_ptr
+	 */
+	void update_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
+		if(find(sample_uid) == end())
+			throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
+		ghs_[sample_uid].reset(new GatingHierarchy(frame_view));
+	}
 
-			void set_marker(const string & _old, const string & _new){
-				for(auto & p : ghs_)
-					p.second.set_marker(_old, _new);
-			};
+	/**
+	 * Constructor from FCS files
+	 * @param file_paths
+	 * @param config
+	 * @param is_h5
+	 * @param h5_dir
+	 */
+	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+	{
+		vector<pair<string,string>> map(file_paths.size());
+		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
+		add_fcs(map, config, is_h5, h5_dir);
 
-			int n_cols(){return get_first_frame_ref().n_cols();}
 
-			/**
-			 * Subset by samples
-			 * @param sample_uids
-			 * @return
-			 */
-			CytoSet sub_samples(vector<string> sample_uids) const
+	}
+
+	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+	{
+		add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
+	}
+
+	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+	{
+
+		fs::path h5_path(h5_dir);
+		for(const auto & it : sample_uid_vs_file_path)
+		{
+
+			string h5_filename = (h5_path/it.first).string() + ".h5";
+			CytoFramePtr fr_ptr(new MemCytoFrame(it.second,config));
+			//set pdata
+			fr_ptr->set_pheno_data("name", path_base_name(it.second));
+
+			dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
+			if(is_h5)
 			{
-				CytoSet res;
-				for(const auto & uid : sample_uids)
-					res.ghs_[uid] = this->get_cytoframe_view(uid);
-				return res;
+				fr_ptr->write_h5(h5_filename);
+				fr_ptr.reset(new H5CytoFrame(h5_filename));
 			}
 
-			/**
-			 * Subset by samples (in place)
-			 * @param sample_uids
-			 * @return
-			 */
-			void sub_samples_(vector<string> sample_uids)
-			{
-				ghMap tmp;
+			add_cytoframe_view(it.first, CytoFrameView(fr_ptr));
 
-				for(const auto & uid : sample_uids)
-					tmp[uid] = this->get_cytoframe_view(uid);
-				swap(tmp, ghs_);
-			}
+		}
+	}
 
-			/**
-			 * Subet set by columns (in place)
-			 * @param colnames
-			 * @param col_type
-			 * @return
-			 */
-			void cols_(vector<string> colnames, ColType col_type)
-			{
+	/**
+	 * Update sample id
+	 * @param _old
+	 * @param _new
+	 */
+	void set_sample_uid(const string & _old, const string & _new){
+		if(_old.compare(_new) != 0)
+		{
+			auto it = find(_new);
+			if(it!=end())
+				throw(range_error(_new + " already exists!"));
+			it = find(_old);
+			if(it==end())
+				throw(range_error(_old + " not found!"));
 
-				for(auto & it : ghs_)
-					it.second.cols_(colnames, col_type);
-			}
+			ghs_[_new] = it->second;
+			erase(_old);
+		}
 
+	};
 
-			/**
-			 * Add sample
-			 * @param sample_uid
-			 * @param frame_ptr
-			 */
-			void add_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
-				if(find(sample_uid) != end())
-					throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
-				ghs_[sample_uid] = frame_view;
-			}
+	vector<string> get_sample_uids() const{
+		vector<string> res;
+		for(const auto & f : ghs_)
+			res.push_back(f.first);
+		return res;
 
-			/**
-			 * update sample (move)
-			 * @param sample_uid
-			 * @param frame_ptr
-			 */
-			void update_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
-				if(find(sample_uid) == end())
-					throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
-				ghs_[sample_uid] = frame_view;
-			}
+	};
 
-			CytoSet(){}
-
-			/**
-			 *
-			 * @param cs
-			 */
-			CytoSet copy_realized(const string & new_h5_dir = fs::temp_directory_path().string())
-			{
-				CytoSet cs;
-				for(const auto & it : ghs_)
-				{
-					string new_h5 = "";
-	//				if(new_h5_dir != "")
-	//				{
-						new_h5 = fs::path(new_h5_dir) / (it.first + ".h5");
-	//				}
-					cs.ghs_[it.first] = it.second.copy_realized(new_h5);
-				}
-
-				return cs;
-			}
-			/**
-			 * Constructor from FCS files
-			 * @param file_paths
-			 * @param config
-			 * @param is_h5
-			 * @param h5_dir
-			 */
-			CytoSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
-			{
-				vector<pair<string,string>> map(file_paths.size());
-				transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
-				add_fcs(map, config, is_h5, h5_dir);
-
-
-			}
-
-			CytoSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
-			{
-				add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
-			}
-
-			void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
-			{
-
-				fs::path h5_path(h5_dir);
-				for(const auto & it : sample_uid_vs_file_path)
-				{
-
-					string h5_filename = (h5_path/it.first).string() + ".h5";
-					CytoFramePtr fr_ptr(new MemCytoFrame(it.second,config));
-					//set pdata
-					fr_ptr->set_pheno_data("name", path_base_name(it.second));
-
-					dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
-					if(is_h5)
-					{
-						fr_ptr->write_h5(h5_filename);
-						fr_ptr.reset(new H5CytoFrame(h5_filename));
-					}
-
-					add_cytoframe_view(it.first, CytoFrameView(fr_ptr));
-
-				}
-			}
-
-			/**
-			 * Update sample id
-			 * @param _old
-			 * @param _new
-			 */
-			void set_sample_uid(const string & _old, const string & _new){
-				if(_old.compare(_new) != 0)
-				{
-					auto it = find(_new);
-					if(it!=end())
-						throw(range_error(_new + " already exists!"));
-					it = find(_old);
-					if(it==end())
-						throw(range_error(_old + " not found!"));
-
-					ghs_[_new] = it->second;
-					erase(_old);
-				}
-
-			};
-
-			vector<string> get_sample_uids() const{
-				vector<string> res;
-				for(const auto & f : ghs_)
-					res.push_back(f.first);
-				return res;
-
-			};
-
-			void update_channels(const CHANNEL_MAP & chnl_map){
-				//update gh
-				for(auto & it : ghs_){
-						it.second.update_channels(chnl_map);
-						//comp
-					}
-
-			}
-		};
+};
 
 
 /**

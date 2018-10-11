@@ -410,7 +410,7 @@ public:
 		return res;
 	}
 
-	virtual void update_channels(const CHANNEL_MAP & chnl_map)
+	virtual void set_channels(const CHANNEL_MAP & chnl_map)
 	{
 		for(auto & it : chnl_map)
 		{

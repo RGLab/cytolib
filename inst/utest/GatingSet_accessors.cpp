@@ -37,27 +37,27 @@ BOOST_AUTO_TEST_CASE(test) {
 }
 BOOST_AUTO_TEST_CASE(subset_cs_by_node) {
 
-	CytoSet cs = gs.get_cytoset("CD8");
-	CytoFrameView frv = cs.begin()->second;
+	GatingSet cs = gs.get_cytoset("CD8");
+	GatingHierarchy frv = *cs.begin()->second;
 	BOOST_CHECK_EQUAL(frv.n_rows(), 14564);
 
 	cs = gs.get_cytoset();
 	BOOST_CHECK_EQUAL(cs.get_channels().size(), 12);
-	frv = cs.begin()->second;
+	frv = *cs.begin()->second;
 	BOOST_CHECK_EQUAL(frv.n_rows(), 119531);
 }
 BOOST_AUTO_TEST_CASE(copy) {
 	GatingSet gs1 = gs.copy();
 	vector<string> samples = gs.get_sample_uids();
-	const CytoSet & cs = gs.get_cytoset();
-	const CytoSet & cs1 = gs1.get_cytoset();
+	const GatingSet & cs = gs.get_cytoset();
+	const GatingSet & cs1 = gs1.get_cytoset();
 	CytoFrameView fv = cs.get_cytoframe_view(samples[0]);
 	CytoFrameView fv1 = cs1.get_cytoframe_view(samples[0]);
 	BOOST_CHECK_CLOSE(fv.get_data()[1], fv1.get_data()[1], 1e-6);
 	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
 }
 BOOST_AUTO_TEST_CASE(legacy_gs) {
-	GatingSet gs1 = GatingSet("../flowWorkspaceData/inst/extdata/legacy_gs/gs_manual/jzgmkCmwZR.pb",CytoSet());
+	GatingSet gs1 = GatingSet("../flowWorkspaceData/inst/extdata/legacy_gs/gs_manual/jzgmkCmwZR.pb",GatingSet());
 	vector<string> samples = gs1.get_sample_uids();
 	BOOST_CHECK_EQUAL(samples[0], "CytoTrol_CytoTrol_1.fcs");
 

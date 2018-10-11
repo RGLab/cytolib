@@ -21,6 +21,7 @@
 #include <boost/graph/breadth_first_search.hpp>
 #include "MemCytoFrame.hpp"
 #include "H5CytoFrame.hpp"
+#include "CytoFrameView.hpp"
 using namespace std;
 
 namespace cytolib
@@ -109,13 +110,28 @@ private:
 	trans_local trans; /*< the transformation used for this particular GatingHierarchy object */
 	CytoFrameView frame_;
 public:
-
+	bool is_cytoFrame_only() const{return tree.m_vertices.size()==0;};
 	CytoFrameView & get_cytoframe_view_ref(){return frame_;}
+	CytoFrameView get_cytoframe_view() const{return frame_;}
+	void set_cytoFrame_view(CytoFrameView fr){
+		frame_ = fr;
+	}
+	/*
+	 * forwarding cytoFrameView APIs
+	 */
+	unsigned n_rows() const{return get_cytoframe_view().n_rows();}
+	int n_cols() const{return get_cytoframe_view().n_cols();}
+	vector<string> get_markers() const{return get_cytoframe_view().get_markers();};
+	vector<string> get_channels() const{return get_cytoframe_view().get_channels();};
+	void set_marker(const string & _old, const string & _new){get_cytoframe_view_ref().set_marker(_old, _new);}
+	void set_channel(const string & _old, const string & _new){get_cytoframe_view_ref().set_channel(_old, _new);}
+
+
 	/**
 	 * setter for channels
 	 * @param chnl_map
 	 */
-	void update_channels(const CHANNEL_MAP & chnl_map)
+	void set_channels(const CHANNEL_MAP & chnl_map)
 	{
 		//update comp
 		comp.update_channels(chnl_map);
@@ -148,6 +164,8 @@ public:
 		for(PARAM_VEC::iterator it = transFlag.begin(); it != transFlag.end(); it++)
 			it->update_channels(chnl_map);
 
+		//update fr
+		frame_.set_channels(chnl_map);
 	}
 
 
@@ -371,6 +389,7 @@ public:
 	 * \endcode
 	 */
 	GatingHierarchy(){}
+	GatingHierarchy(const CytoFrameView & frame_view):frame_(frame_view){};
 	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
 	void convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, H5Option h5_opt){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
@@ -441,13 +460,13 @@ public:
 		if(fs::exists(h5_filename))
 		{
 		 ptr.reset(new H5CytoFrame(h5_filename));
-
+		 pb::CytoFrame fr = *pb_gh.mutable_frame();
 		 if(!fr.is_h5())
 			 ptr.reset(new MemCytoFrame(*ptr));
 		 frame_ = CytoFrameView(ptr);
 		}
 		else
-		 throw(domain_error("H5 file missing for sample: " + uid));
+		 throw(domain_error("H5 file missing for sample: " + h5_filename));
 	}
 
 	//load legacy pb
@@ -1643,7 +1662,7 @@ public:
 	populationTree & getTree(){return tree;};
 
 
-	GatingHierarchyPtr  copy() const{
+	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & h5_filename) const{
 
 		GatingHierarchyPtr res(new GatingHierarchy());
 
@@ -1651,6 +1670,13 @@ public:
 		res->tree=tree;
 		res->transFlag = transFlag;
 		res->trans = trans.copy();
+		if(is_copy_data)
+			if(is_realize_data)
+				res->frame_ = frame_.copy_realized(h5_filename);
+			else
+				res->frame_ = frame_.copy(h5_filename);
+		else
+			res->frame_ = frame_;
 		return res;
 	}
 	/*
