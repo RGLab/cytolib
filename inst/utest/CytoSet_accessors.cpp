@@ -19,7 +19,7 @@ struct CSFixture {
 	FCS_READ_PARAM config;
 };
 
-BOOST_FIXTURE_TEST_SUITE(GatingSet_test,CSFixture)
+BOOST_FIXTURE_TEST_SUITE(cs_test,CSFixture)
 BOOST_AUTO_TEST_CASE(test) {
 //	class A{
 //	public:

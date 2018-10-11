@@ -70,7 +70,7 @@ public:
 	GatingSet(){
 		uid_ = generate_uid(20);
 	};
-	bool is_cytoFrame_only() const{return get_first_gh()->is_cytoFrame_only();};
+	bool is_cytoFrame_only() const{return size() == 0||get_first_gh()->is_cytoFrame_only();};
 	/**
 	 * separate filename from dir to avoid to deal with path parsing in c++
 	 * @param path the dir of filename
@@ -388,6 +388,7 @@ public:
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("Gating hierarchy cloned: "+sn+"\n");
 		}
+		sample_names_ = sample_uids;
 	}
 
 	/**
@@ -464,7 +465,7 @@ public:
 	GatingHierarchyPtr getGatingHierarchy(string sample_uid) const
 	{
 
-		iterator it=ghs_.find(sample_uid);
+		const_iterator it=ghs_.find(sample_uid);
 		if(it==ghs_.end())
 			throw(domain_error(sample_uid + " not found!"));
 		else
@@ -477,16 +478,15 @@ public:
 	 * @param sn
 	 */
 	GatingHierarchyPtr add_GatingHierarchy(string sample_uid){
-		if(ghs_.find(sample_uid)!=ghs_.end())
-			throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
 		GatingHierarchyPtr gh(new GatingHierarchy());
-		ghs_[sample_uid] = gh;
+		add_GatingHierarchy(gh, sample_uid);
 		return gh;
 	}
 	void add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
 			if(ghs_.find(sample_uid)!=ghs_.end())
 				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
 			ghs_[sample_uid] = gh;
+			sample_names_.push_back(sample_uid);
 	}
 
 	 /**
@@ -550,11 +550,18 @@ public:
 	 */
 	void sub_samples_(const vector<string> & sample_uids)
 	{
+		ghMap ghs_new;
 		//validity check
 		for(const auto & uid : sample_uids)
-			if(find(uid)==end())
+		{
+			const auto & it = find(uid);
+			if(it==end())
 				throw(domain_error("The data to be assigned is missing sample: " + uid));
+			else
+				ghs_new[uid] = it->second;
+		}
 		sample_names_ = sample_uids;
+		ghs_ = ghs_new;
 	}
 
 	/**
@@ -584,9 +591,8 @@ public:
 	void add_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 		if(!is_cytoFrame_only())
 			throw(domain_error("Can't add cytoframes to gs when it is not data-only object! "));
-		if(find(sample_uid) != end())
-			throw(domain_error("Can't add new cytoframe since it already exists for: " + sample_uid));
-		ghs_[sample_uid].reset(new GatingHierarchy(frame_view));
+		add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(frame_view)), sample_uid);
+
 	}
 
 	/**
@@ -667,10 +673,7 @@ public:
 	};
 
 	vector<string> get_sample_uids() const{
-		vector<string> res;
-		for(const auto & f : ghs_)
-			res.push_back(f.first);
-		return res;
+		return sample_names_;
 
 	};
 
