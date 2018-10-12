@@ -154,17 +154,7 @@ public:
 		for(auto & sn : sample_names_)
 		{
 			gs_pb.add_samplename(sn);
-			string h5_filename = (fs::path(path) / sn).string() + ".h5";
-
-			pb::GatingHierarchy pb_gh;
-			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, h5_opt);
-
-			//write each gh as a separate message to stream due to the pb message size limit
-			bool success = writeDelimitedTo(pb_gh, raw_output);
-			if (!success)
-				throw(domain_error("Failed to write GatingHierarchy."));
 		}
-
 		//write gs message to stream
 		bool success = writeDelimitedTo(gs_pb, raw_output);
 
@@ -172,7 +162,22 @@ public:
 			google::protobuf::ShutdownProtobufLibrary();
 			throw(domain_error("Failed to write GatingSet."));
 		}
-		// Optional:  Delete all global objects allocated by libprotobuf.
+
+		//write each gh as a separate message to stream due to the pb message size limit
+		for(auto & sn : sample_names_)
+		{
+			string h5_filename = (fs::path(path) / sn).string() + ".h5";
+
+			pb::GatingHierarchy pb_gh;
+			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, h5_opt);
+
+
+			bool success = writeDelimitedTo(pb_gh, raw_output);
+			if (!success)
+				throw(domain_error("Failed to write GatingHierarchy."));
+		}
+
+				// Optional:  Delete all global objects allocated by libprotobuf.
 		google::protobuf::ShutdownProtobufLibrary();
 	}
 	/**
