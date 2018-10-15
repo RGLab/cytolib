@@ -686,6 +686,16 @@ public:
 
 			ghs_[_new] = it->second;
 			erase(_old);
+
+			//update sample view
+			auto it1 = std::find(sample_names_.begin(), sample_names_.end(),_new);
+			if(it1 != sample_names_.end())
+				throw(range_error(_new + " already exists!"));
+			it1 = std::find(sample_names_.begin(), sample_names_.end(),_old);
+			if(it1==sample_names_.end())
+				throw(range_error(_old + " not found!"));
+			*it1 = _new;
+
 		}
 
 	};
