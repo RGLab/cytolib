@@ -424,12 +424,15 @@ public:
 			it.convertToPb(*tflag_pb);
 		}
 		//fr
-		pb::CytoFrame * fr_pb = gh_pb.mutable_frame();
-		frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
+		if(h5_opt != H5Option::skip)
+		{
+			pb::CytoFrame * fr_pb = gh_pb.mutable_frame();
+			frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
+		}
 
 	}
 
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename){
+	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 
@@ -457,17 +460,21 @@ public:
 		trans = trans_local(pb_gh.trans());
 
 		//restore fr
-		CytoFramePtr ptr;
-		if(fs::exists(h5_filename))
+		if(!is_skip_data)
 		{
-		 ptr.reset(new H5CytoFrame(h5_filename));
-		 pb::CytoFrame fr = *pb_gh.mutable_frame();
-		 if(!fr.is_h5())
-			 ptr.reset(new MemCytoFrame(*ptr));
-		 frame_ = CytoFrameView(ptr);
+			CytoFramePtr ptr;
+
+			if(fs::exists(h5_filename))
+			{
+			 ptr.reset(new H5CytoFrame(h5_filename));
+			 pb::CytoFrame fr = *pb_gh.mutable_frame();
+			 if(!fr.is_h5())
+				 ptr.reset(new MemCytoFrame(*ptr));
+			 frame_ = CytoFrameView(ptr);
+			}
+			else
+			 throw(domain_error("H5 file missing for sample: " + h5_filename));
 		}
-		else
-		 throw(domain_error("H5 file missing for sample: " + h5_filename));
 	}
 
 	//load legacy pb

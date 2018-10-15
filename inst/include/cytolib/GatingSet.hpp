@@ -180,13 +180,13 @@ public:
 				// Optional:  Delete all global objects allocated by libprotobuf.
 		google::protobuf::ShutdownProtobufLibrary();
 	}
+
 	/**
 	 * constructor from the archives (de-serialization)
-	 * @param filename
-	 * @param format
-	 * @param isPB
+	 * @param path
+	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
 	 */
-	GatingSet(string path)
+	GatingSet(string path, bool is_skip_data = false)
 	{
 		fs::path pb_file;
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -243,7 +243,7 @@ public:
 				pb::CytoFrame fr = *gh_pb.mutable_frame();
 				string h5_filename = fs::path(path) / (sn + ".h5");
 
-				ghs_[sn].reset(new GatingHierarchy(gh_pb, h5_filename));
+				ghs_[sn].reset(new GatingHierarchy(gh_pb, h5_filename, is_skip_data));
 			}
 
 		}
@@ -337,6 +337,8 @@ public:
 			//read gating hierarchy messages
 			for(int i = 0; i < pbGS.samplename_size(); i++){
 				string sn = pbGS.samplename(i);
+				sample_names_.push_back(sn);
+
 				//gh message is stored as the same order as sample name vector in gs
 				pb::GatingHierarchy gh_pb;
 				bool success = readDelimitedFrom(raw_input, gh_pb);
@@ -348,7 +350,13 @@ public:
 
 				ghs_[sn].reset(new GatingHierarchy(gh_pb, trans_tbl));
 			}
-			set_cytoset(gs_data);
+
+			if(gs_data.size()>0)
+			{
+				set_cytoset(gs_data);
+				sample_names_ = gs_data.get_sample_uids();//update sample view from the data
+			}
+
 		}
 
 	}
@@ -408,7 +416,7 @@ public:
 		{
 			const auto & it = gs.find(sn);
 			if(it==gs.end())
-				throw(domain_error("The data to be assigned is missing sample: " + sn));
+				throw(domain_error("Sample '"  + sn + "' is missing from the data to be assigned!"));
 			GatingHierarchy & gh = *ghs_[sn];
 			gh.set_cytoFrame_view(it->second->get_cytoframe_view_ref());
 		}
@@ -442,12 +450,13 @@ public:
 		gs.sample_names_ = sample_names_;
 		for(auto & it : ghs_)
 		{
+			//copy data
 			string sn = it.first;
 			GatingHierarchyPtr gh = it.second;
+			CytoFrameView & fr = gs.add_cytoframe_view(sn, gh->get_cytoframe_view());
+			//subset by node
 			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));
-			GatingHierarchyPtr gh_new = gs.add_GatingHierarchy(sn);
-
-			gh_new->get_cytoframe_view_ref().rows_(node.getIndices_u());
+			fr.rows_(node.getIndices_u());
 		}
 		return gs;
 	}
@@ -487,11 +496,12 @@ public:
 		add_GatingHierarchy(gh, sample_uid);
 		return gh;
 	}
-	void add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
+	GatingHierarchyPtr add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
 			if(ghs_.find(sample_uid)!=ghs_.end())
 				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
 			ghs_[sample_uid] = gh;
 			sample_names_.push_back(sample_uid);
+			return ghs_[sample_uid];
 	}
 
 	 /**
@@ -593,10 +603,11 @@ public:
 	 * @param sample_uid
 	 * @param frame_ptr
 	 */
-	void add_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
+	CytoFrameView & add_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 		if(!is_cytoFrame_only())
 			throw(domain_error("Can't add cytoframes to gs when it is not data-only object! "));
-		add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(frame_view)), sample_uid);
+		GatingHierarchyPtr gh = add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(frame_view)), sample_uid);
+		return gh->get_cytoframe_view_ref();
 
 	}
 

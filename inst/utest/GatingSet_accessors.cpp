@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	string tmp = std::tmpnam(0);
 
 	gs1.serialize_pb(tmp, H5Option::skip);
-	gs1 = GatingSet(tmp);
+	gs1 = GatingSet(tmp, true);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();
 	BOOST_CHECK_EQUAL(vid.size(), 24);
