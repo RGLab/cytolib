@@ -26,6 +26,7 @@ namespace cytolib
 #define PB true
 #define BS false
 
+#define GS_ID_LEN 20
 /**
  * \class GatingSet
  * \brief A container class that stores multiple GatingHierarchy objects.
@@ -68,7 +69,7 @@ public:
 	void set_uid(const string & uid){uid_ = uid;}
 
 	GatingSet(){
-		uid_ = generate_uid(20);
+		uid_ = generate_uid(GS_ID_LEN);
 	};
 	bool is_cytoFrame_only() const{return size() == 0||get_first_gh()->is_cytoFrame_only();};
 	/**
@@ -386,7 +387,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,vector<string> sample_uids){
+	GatingSet(const GatingHierarchy & gh_template,vector<string> sample_uids):GatingSet(){
 
 		vector<string>::iterator it;
 		for(it=sample_uids.begin();it!=sample_uids.end();it++)
@@ -555,6 +556,7 @@ public:
 	{
 		GatingSet res(*this);
 		res.sub_samples_(sample_uids);
+		res.uid_ = generate_uid(GS_ID_LEN);
 		return res;
 	}
 
@@ -629,7 +631,7 @@ public:
 	 * @param is_h5
 	 * @param h5_dir
 	 */
-	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir):GatingSet()
 	{
 		vector<pair<string,string>> map(file_paths.size());
 		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
@@ -638,7 +640,7 @@ public:
 
 	}
 
-	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir):GatingSet()
 	{
 		add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
 	}
