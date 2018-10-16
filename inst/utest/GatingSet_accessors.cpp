@@ -53,6 +53,7 @@ BOOST_AUTO_TEST_CASE(copy) {
 	const GatingSet & cs1 = gs1.get_cytoset();
 	CytoFrameView fv = cs.get_cytoframe_view(samples[0]);
 	CytoFrameView fv1 = cs1.get_cytoframe_view(samples[0]);
+	BOOST_CHECK_NE(fv.get_h5_file_path(), fv1.get_h5_file_path());
 	BOOST_CHECK_CLOSE(fv.get_data()[1], fv1.get_data()[1], 1e-6);
 	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
 }

@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(shallow_copy)
 	//meta data is not changed for original cp
 	BOOST_CHECK_EQUAL(fr_orig->get_channels()[2], oldname);
 	BOOST_CHECK_EQUAL(fr_orig->get_keyword("$P3N"), oldname);
-
+	BOOST_CHECK_EQUAL(fr_orig->get_h5_file_path(), fr1.get_h5_file_path());
 	//update data
 	EVENT_DATA_VEC dat = fr1.get_data();
 	float newval = 100;
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 	fr1->set_data(dat);
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
-
+	BOOST_CHECK_NE(fr_h5->get_h5_file_path(), fr1->get_h5_file_path());
 	//original cp is not affected by any change in meta and event data
 	BOOST_CHECK_EQUAL(fr_h5->get_channels()[2], oldname);
 	BOOST_CHECK_EQUAL(fr_h5->get_keyword("$P3N"), oldname);

@@ -296,7 +296,8 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
 	{
 		fr_pb.set_is_h5(false);
-		write_h5(h5_filename);
+		if(h5_opt != H5Option::skip)
+			write_h5(h5_filename);
 	}
 
 	unsigned n_rows() const{

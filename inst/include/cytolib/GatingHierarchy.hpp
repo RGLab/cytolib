@@ -424,11 +424,8 @@ public:
 			it.convertToPb(*tflag_pb);
 		}
 		//fr
-		if(h5_opt != H5Option::skip)
-		{
-			pb::CytoFrame * fr_pb = gh_pb.mutable_frame();
-			frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
-		}
+		pb::CytoFrame * fr_pb = gh_pb.mutable_frame();
+		frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
 
 	}
 
