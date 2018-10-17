@@ -124,23 +124,44 @@ public:
 	void cols_(vector<string> colnames, ColType col_type)
 	{
 
-		uvec col_idx = ptr_->get_col_idx(colnames, col_type);
+		uvec col_idx = ptr_->get_col_idx(colnames, col_type);//idx from original frame
+		if(is_col_indexed())//convert abs idex to relative indx
+		{
+			for(unsigned i = 0; i < col_idx.size(); i++)
+			{
 
+				auto it = std::find(col_idx_.begin(), col_idx_.end(), col_idx[i]);
+				if(it == col_idx_.end())
+					throw(domain_error(colnames[i] + " not present in the current cytoframeView!"));
+
+				col_idx[i] = it - col_idx_.begin();
+			}
+
+		}
 		//update params
 		CytoFrameView::cols_(col_idx);
 
 	}
 
+	/**
+	 *
+	 * @param col_idx column index relative to view
+	 */
 	void cols_(uvec col_idx)
 	{
 		unsigned max_idx = col_idx.max();
 		unsigned min_idx = col_idx.min();
 		if(max_idx >= n_cols() || min_idx < 0)
-			throw(domain_error("The size of the new row index is not within the original mat size!"));
-		if(is_col_indexed())
+			throw(domain_error("The size of the new col index is not within the original mat size!"));
+		if(is_col_indexed())//covert relative idx to abs idx
 		{
+//			cout << "indexing " << endl;
 			for(auto & i : col_idx)
+			{
+//				cout << "relative idx: " << i << " abs: " << col_idx_[i] << endl;
 				i = col_idx_[i];
+			}
+
 
 		}
 		col_idx_ = col_idx;

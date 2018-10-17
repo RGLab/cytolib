@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(subset_by_cols) {
 	vector<string> markers = cs.get_markers();
 	vector<string> sub_channels = { channels[3], channels[1] };
 	vector<string> sub_markers = { markers[3], markers[1] };
-	GatingSet cs_new = cs;
+	GatingSet cs_new = cs.copy();
 	cs_new.cols_(sub_channels, ColType::channel);
 
 	BOOST_CHECK_EQUAL(cs_new.n_cols(), sub_channels.size());
@@ -62,6 +62,21 @@ BOOST_AUTO_TEST_CASE(subset_by_cols) {
 	vector<string> markers_new = cs_new.get_markers();
 	BOOST_CHECK_EQUAL_COLLECTIONS(markers_new.begin(), markers_new.end(),
 			sub_markers.begin(), sub_markers.end());
+
+//reorder
+	vector<string> chnls_sort = channels;
+	sort(chnls_sort.begin(), chnls_sort.end());
+	cs_new = cs.copy();
+	cs_new.cols_(chnls_sort, ColType::channel);
+	vector<string> chnls_new = cs_new.get_channels();
+	BOOST_CHECK_EQUAL_COLLECTIONS(chnls_new.begin(), chnls_new.end(),
+			chnls_sort.begin(), chnls_sort.end());
+	//restore
+	cs_new.cols_(channels, ColType::channel);
+	chnls_new = cs_new.get_channels();
+	BOOST_CHECK_EQUAL_COLLECTIONS(chnls_new.begin(), chnls_new.end(),
+			channels.begin(), channels.end());
+
 
 }
 BOOST_AUTO_TEST_CASE(subset_by_sample) {
