@@ -152,7 +152,8 @@ public:
 		 *save sn and gh
 		 *gh message is stored in the same order as sample_names_ vector
 		 */
-		for(auto & sn : sample_names_)
+		const vector<string> sample_names = get_sample_uids();
+		for(auto & sn : sample_names)
 		{
 			gs_pb.add_samplename(sn);
 		}
@@ -165,7 +166,7 @@ public:
 		}
 
 		//write each gh as a separate message to stream due to the pb message size limit
-		for(auto & sn : sample_names_)
+		for(auto & sn : sample_names)
 		{
 			string h5_filename = (fs::path(path) / sn).string() + ".h5";
 
@@ -232,7 +233,7 @@ public:
 			//read gating hierarchy messages
 			for(int i = 0; i < pbGS.samplename_size(); i++){
 				string sn = pbGS.samplename(i);
-				sample_names_.push_back(sn);
+
 				//gh message is stored as the same order as sample name vector in gs
 				pb::GatingHierarchy gh_pb;
 				bool success = readDelimitedFrom(raw_input, gh_pb);
@@ -244,7 +245,7 @@ public:
 				pb::CytoFrame fr = *gh_pb.mutable_frame();
 				string h5_filename = fs::path(path) / (sn + ".h5");
 
-				ghs_[sn].reset(new GatingHierarchy(gh_pb, h5_filename, is_skip_data));
+				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data)), sn);
 			}
 
 		}
@@ -338,7 +339,6 @@ public:
 			//read gating hierarchy messages
 			for(int i = 0; i < pbGS.samplename_size(); i++){
 				string sn = pbGS.samplename(i);
-				sample_names_.push_back(sn);
 
 				//gh message is stored as the same order as sample name vector in gs
 				pb::GatingHierarchy gh_pb;
@@ -348,14 +348,17 @@ public:
 					throw(domain_error("Failed to parse GatingHierarchy."));
 				}
 
-
-				ghs_[sn].reset(new GatingHierarchy(gh_pb, trans_tbl));
+				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, trans_tbl)), sn);
 			}
 
 			if(gs_data.size()>0)
 			{
 				set_cytoset(gs_data);
-				sample_names_ = gs_data.get_sample_uids();//update sample view from the data
+				/*
+				 * update sample view from the data, this direct operation on sample_names_is typically not recommended
+				 * and herer only done for legacy gs where fs was separately stored and its sample order can be different from pb
+				 */
+				sample_names_ = gs_data.get_sample_uids();
 			}
 
 		}
@@ -368,14 +371,14 @@ public:
 	 */
 	GatingSet copy(bool is_copy_data = true, bool is_realize_data = true, const string & new_h5_dir = fs::temp_directory_path().string()){
 		GatingSet gs;
-		gs.sample_names_ = sample_names_;
 		fs::path h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
-		for(auto & it : ghs_)
+		for(const string & sn : get_sample_uids())
 		{
-			string sn = it.first;
+			GatingHierarchyPtr gh = getGatingHierarchy(sn);
+
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+sn+"... \n");
-			gs.ghs_[sn] = it.second->copy(is_copy_data, is_realize_data, h5_dir/sn);
+			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, h5_dir/sn), sn);
 
 		}
 
@@ -390,19 +393,17 @@ public:
 	GatingSet(const GatingHierarchy & gh_template,vector<string> sample_uids):GatingSet(){
 
 		vector<string>::iterator it;
-		for(it=sample_uids.begin();it!=sample_uids.end();it++)
+		for(const string & sn : sample_uids)
 		{
-			string sn=*it;
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
 
 
-			ghs_[sn] = gh_template.copy(false, false, "");
+			add_GatingHierarchy(gh_template.copy(false, false, ""), sn);
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("Gating hierarchy cloned: "+sn+"\n");
 		}
-		sample_names_ = sample_uids;
 	}
 
 	/**
@@ -413,7 +414,7 @@ public:
 		if(!gs.is_cytoFrame_only())
 			throw(domain_error("The input gs is not data-only object! "));
 
-		for(const string & sn : sample_names_)
+		for(const string & sn : get_sample_uids())
 		{
 			const auto & it = gs.find(sn);
 			if(it==gs.end())
@@ -430,11 +431,10 @@ public:
 	 */
 	GatingSet get_cytoset(){
 		GatingSet gs;
-		gs.sample_names_ = sample_names_;
-		for(auto & it : ghs_)
+
+		for(const string & sn : get_sample_uids())
 		{
-			string sn = it.first;
-			GatingHierarchyPtr gh = it.second;
+			GatingHierarchyPtr gh = getGatingHierarchy(sn);
 
 			gs.add_cytoframe_view(sn, gh->get_cytoframe_view_ref());
 		}
@@ -448,12 +448,10 @@ public:
 	 */
 	GatingSet get_cytoset(string node_path){
 		GatingSet gs;
-		gs.sample_names_ = sample_names_;
-		for(auto & it : ghs_)
+		for(const string & sn : get_sample_uids())
 		{
-			//copy data
-			string sn = it.first;
-			GatingHierarchyPtr gh = it.second;
+			GatingHierarchyPtr gh = getGatingHierarchy(sn);
+
 			CytoFrameView & fr = gs.add_cytoframe_view(sn, gh->get_cytoframe_view());
 			//subset by node
 			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));

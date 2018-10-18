@@ -20,19 +20,11 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
-BOOST_AUTO_TEST_CASE(test) {
-//	class A{
-//	public:
-//		int & r_;
-//		A(int & r):r_(r){};
-//	};
-//	int * a = new int(3);
-//	A b(*a);
-//	b.r_ = 4;
-//	cout << *a << endl;
-//	delete a;
-//	b.r_ = 5;
-//	cout << b.r_ << endl;
+BOOST_AUTO_TEST_CASE(get_cytoset) {
+	GatingSet cs = gs.get_cytoset();
+	BOOST_CHECK_EQUAL(cs.get_sample_uids().size(), gs.size());
+	GatingSet cs1(cs);
+	BOOST_CHECK_EQUAL(cs1.get_sample_uids().size(), gs.size());
 
 }
 BOOST_AUTO_TEST_CASE(subset_cs_by_node) {
