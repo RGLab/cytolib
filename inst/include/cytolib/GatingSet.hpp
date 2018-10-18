@@ -75,9 +75,9 @@ public:
 	/**
 	 * separate filename from dir to avoid to deal with path parsing in c++
 	 * @param path the dir of filename
-	 * @param filename
+	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void serialize_pb(string path, H5Option h5_opt)
+	void serialize_pb(string path, H5Option h5_opt, bool is_skip_data = false)
 	{
 		/*
 		 * validity check for path
@@ -171,7 +171,7 @@ public:
 			string h5_filename = (fs::path(path) / sn).string() + ".h5";
 
 			pb::GatingHierarchy pb_gh;
-			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, h5_opt);
+			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, h5_opt, is_skip_data);
 
 
 			bool success = writeDelimitedTo(pb_gh, raw_output);
