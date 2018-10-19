@@ -219,6 +219,7 @@ public:
 
 	/**
 	 * transform the data
+	 * The reason we pass in MemCytoFrame is because the data member frame_ may not be finalized yet at this stage of parsing.
 	 */
 	void transform_data(MemCytoFrame & cytoframe)
 	{

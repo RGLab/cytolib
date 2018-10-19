@@ -58,9 +58,10 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	VertexID_vec vid = gh->getVertices();
 	BOOST_CHECK_EQUAL(vid.size(), 24);
 	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
+//	BOOST_CHECK_EQUAL(gh->get_cytoframe_view().get_keyword("$BEGINDATA"), "3264");
 
 	//save legacy to new format
-	string tmp = std::tmpnam(0);
+	string tmp = generate_temp_filename();
 	bool is_skip_data = true;
 	gs1.serialize_pb(tmp, H5Option::skip, is_skip_data);
 	gs1 = GatingSet(tmp, is_skip_data);
@@ -70,7 +71,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
 
 	//save new to new format
-	tmp = std::tmpnam(0);
+	tmp = generate_temp_filename();
 	gs.serialize_pb(tmp, H5Option::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);
@@ -80,7 +81,23 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 
 
 }
+BOOST_AUTO_TEST_CASE(template_constructor) {
+	GatingHierarchy gh=*gs.getGatingHierarchy(gs.get_sample_uids()[0]);
 
+	/*
+	 * used gh as the template to clone multiple ghs in the new gs
+	 */
+	vector<pair<string, string>> id_vs_path;
+	id_vs_path.push_back(make_pair("aa", "../flowWorkspaceData/inst/extdata/CytoTrol_CytoTrol_2.fcs"));
+	GatingSet cs(id_vs_path);
+	GatingSet gs1 = GatingSet(gh, cs);
+
+	BOOST_CHECK_EQUAL(gs1.get_sample_uids()[0], "aa");
+	GatingHierarchyPtr gh1 = gs1.getGatingHierarchy("aa");
+	VertexID_vec vid = gh1->getVertices();
+	BOOST_CHECK_EQUAL(vid.size(), 24);
+	BOOST_CHECK_EQUAL(gh1->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
+}
 //BOOST_AUTO_TEST_CASE(subset_by_sample) {
 //	//check get_sample_uids
 //	vector<string> samples = gs.get_sample_uids();

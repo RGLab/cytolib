@@ -390,20 +390,36 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,vector<string> sample_uids):GatingSet(){
+	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs):GatingSet(){
 
-		vector<string>::iterator it;
-		for(const string & sn : sample_uids)
+		fs::path h5_dir = generate_h5_folder(fs::temp_directory_path());
+
+		for(const string & sn : cs.get_sample_uids())
 		{
+
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
-
-
-			add_GatingHierarchy(gh_template.copy(false, false, ""), sn);
-
+			GatingHierarchyPtr gh = add_GatingHierarchy(gh_template.copy(false, false, ""), sn);
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("Gating hierarchy cloned: "+sn+"\n");
+				PRINT("\n... load flow data: "+sn+"... \n");
+			MemCytoFrame fr = MemCytoFrame(*(cs.get_cytoframe_view(sn).get_cytoframe_ptr()));
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("\n... compensate: "+sn+"... \n");
+			gh->compensate(fr);
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("\n... transform_data: "+sn+"... \n");
+			gh->transform_data(fr);
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("\n... gating: "+sn+"... \n");
+			gh->gating(fr, 0, true, true);
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("\n... save flow data: "+sn+"... \n");
+			string h5_filename = (h5_dir/sn).string() + ".h5";
+			fr.write_h5(h5_filename);
+			//attach to gh
+			gh->set_cytoFrame_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename))));
 		}
+
 	}
 
 	/**
@@ -629,7 +645,7 @@ public:
 	 * @param is_h5
 	 * @param h5_dir
 	 */
-	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir):GatingSet()
+	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config= FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = fs::temp_directory_path()):GatingSet()
 	{
 		vector<pair<string,string>> map(file_paths.size());
 		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
@@ -638,7 +654,7 @@ public:
 
 	}
 
-	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir):GatingSet()
+	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config = FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = fs::temp_directory_path()):GatingSet()
 	{
 		add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
 	}
