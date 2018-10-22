@@ -26,7 +26,6 @@ namespace cytolib
 #define PB true
 #define BS false
 
-#define GS_ID_LEN 20
 /**
  * \class GatingSet
  * \brief A container class that stores multiple GatingHierarchy objects.
@@ -69,7 +68,7 @@ public:
 	void set_uid(const string & uid){uid_ = uid;}
 
 	GatingSet(){
-		uid_ = generate_uid(GS_ID_LEN);
+		uid_ = generate_uid();
 	};
 	bool is_cytoFrame_only() const{return size() == 0||get_first_gh()->is_cytoFrame_only();};
 	/**
@@ -570,7 +569,7 @@ public:
 	{
 		GatingSet res(*this);
 		res.sub_samples_(sample_uids);
-		res.uid_ = generate_uid(GS_ID_LEN);
+		res.uid_ = generate_uid();
 		return res;
 	}
 

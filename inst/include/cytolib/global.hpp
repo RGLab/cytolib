@@ -31,7 +31,8 @@ using namespace arma;
 #include <boost/algorithm/string.hpp>
 #include <chrono>
 #include <H5Cpp.h>
-
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 using namespace std;
 extern unsigned short g_loglevel;// debug print is turned off by default
 extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
@@ -98,10 +99,14 @@ namespace cytolib
 		return string(out);
 	}
 	/**
-	 * Generate uniquely identifiable id (pseudo guid)
+	 * Generate uniquely identifiable id
 	 * @return
 	 */
-	inline string generate_uid(int len)
+	inline string generate_uid()
+	{
+		return to_string(boost::uuids::random_generator()());
+	}
+	inline string generate_uid_old(int len)//(pseudo guid)
 	{
 //		int t = time(NULL);//this only returns second-wise precision, not sufficient for distinguishing multiple gatingsets that are generated within short period
 

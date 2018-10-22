@@ -29,6 +29,9 @@ BOOST_AUTO_TEST_CASE(get_cytoset) {
 }
 BOOST_AUTO_TEST_CASE(subset_cs_by_node) {
 
+	GatingSet gs1 = gs.sub_samples(gs.get_sample_uids());
+//	cout << gs1.get_uid() << endl;
+	BOOST_CHECK_NE(gs.get_uid(), gs1.get_uid());
 	GatingSet cs = gs.get_cytoset("CD8");
 	GatingHierarchy frv = *cs.begin()->second;
 	BOOST_CHECK_EQUAL(frv.n_rows(), 14564);
