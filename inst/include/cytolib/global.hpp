@@ -74,17 +74,28 @@ namespace cytolib
 
 	#define PRT true
 
-	inline string generate_temp_filename(string dir = "/tmp")
+	inline string generate_unique_filename(const string & dir, const string & prefix, const string & suffix)
 	{
-		char tmp[15] = "/tmp/XXXXXX.h5";
-		int fid = mkstemps(tmp, 3);
+
+		string tmp = dir + "/" + prefix + "XXXXXX" + suffix;
+		int fid = mkstemps(&tmp[0], suffix.size());
 		if(fid == -1)
-			throw(domain_error("Can't create the unique temp file: " + string(tmp)));
+			throw(domain_error("Can't create the unique file: " + tmp));
 
 		close(fid);
 		return tmp;
 	}
 
+	inline string generate_unique_dir(const string & dir, const string & prefix)
+	{
+
+		string tmp = dir + "/" + prefix + "XXXXXX";
+		char * res = mkdtemp(&tmp[0]);
+		if(!res)
+			throw(domain_error("Can't create the unique dir: " + tmp));
+
+		return tmp;
+	}
 	/**
 	 * Generate time stamp as string
 	 * @return

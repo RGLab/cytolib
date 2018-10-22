@@ -386,7 +386,7 @@ public:
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
-			new_filename = generate_temp_filename();
+			new_filename = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
 			fs::remove(new_filename);
 		}
 		fs::copy_file(filename_, new_filename);
@@ -403,7 +403,7 @@ public:
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
-			new_filename = generate_temp_filename();
+			new_filename = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
 			fs::remove(new_filename);
 		}		//if view is empty, then simply invoke copy
 		if(row_idx.size() == 0 && col_idx.size() == 0)

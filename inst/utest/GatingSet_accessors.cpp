@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 //	BOOST_CHECK_EQUAL(gh->get_cytoframe_view().get_keyword("$BEGINDATA"), "3264");
 
 	//save legacy to new format
-	string tmp = generate_temp_filename();
+	string tmp = generate_unique_dir(fs::temp_directory_path(), "gs");
 	bool is_skip_data = true;
 	gs1.serialize_pb(tmp, H5Option::skip, is_skip_data);
 	gs1 = GatingSet(tmp, is_skip_data);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	BOOST_CHECK_EQUAL(gh->getNodePath(vid[16]), "/not debris/singlets/CD3+/CD8/38+ DR-");
 
 	//save new to new format
-	tmp = generate_temp_filename();
+	tmp = generate_unique_dir(fs::temp_directory_path(), "gs");
 	gs.serialize_pb(tmp, H5Option::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);

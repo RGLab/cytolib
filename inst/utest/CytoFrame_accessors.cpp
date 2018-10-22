@@ -12,7 +12,7 @@ struct CFFixture{
 		fr = MemCytoFrame(file_path, config);
 		fr.read_fcs();
 		//create h5 version
-		string tmp = generate_temp_filename();
+		string tmp = generate_unique_filename(fs::temp_directory_path(), "", ".h5");;
 		fr.write_h5(tmp);
 		fr_h5.reset(new H5CytoFrame(tmp));
 	};
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(fr2->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
 
-	string tmp = generate_temp_filename();
+	string tmp = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
 	fr2 = fr_h5->copy_realized({1,2,3}, {1,2}, tmp);//channel order may change
 	fr2->set_channel(oldname, newname);
 	key = fr2->get_keyword("$P3N");
