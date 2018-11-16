@@ -83,6 +83,7 @@ public:
 		for(int i = 0; i < comp_pb.spillover_size(); i++)
 				spillOver.push_back(comp_pb.spillover(i));
 	}
+	bool empty(){return marker.size() == 0;}
 };
 
 };
