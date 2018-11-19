@@ -370,13 +370,13 @@ public:
 
 
 
-		 string dattype = keys_["$DATATYPE"];
-		 if(dattype!="I"&&dattype!="F"&&dattype!="D")
-			 throw(domain_error("Don't know how to deal with $DATATYPE"));
+		string dattype = keys_["$DATATYPE"];
+		if(dattype!="I"&&dattype!="F"&&dattype!="D")
+			throw(domain_error("Don't know how to deal with $DATATYPE"));
 
 
-	    if (keys_["$MODE"] != "L")
-	    	throw(domain_error("Don't know how to deal with $MODE " + keys_["$MODE"]));
+		if(keys_["$MODE"] != "L")
+			throw(domain_error("Don't know how to deal with $MODE " + keys_["$MODE"]));
 
 
 		fcsPnGtransform = keys_.find("flowCore_fcsPnGtransform")!= keys_.end() && keys_["flowCore_fcsPnGtransform"] == "linearize-with-PnG-scaling";
