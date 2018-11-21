@@ -255,6 +255,11 @@ public:
 		calTbl.setInterpolated(false);
 	}
 
+	biexpTrans(int channelRange_,EVENT_DATA_TYPE pos_, EVENT_DATA_TYPE neg_, EVENT_DATA_TYPE widthBasis_, EVENT_DATA_TYPE maxValue_):transformation(false, BIEXP),channelRange(channelRange_), pos(pos_), neg(neg_), widthBasis(widthBasis_),maxValue(maxValue_){
+			setComputeFlag(false);
+			calTbl.setInterpolated(false);
+		}
+
 	 /*
 	  * directly translated from java routine from tree star
 	  * potential segfault risk: the inappropriate biexp parameters can cause
