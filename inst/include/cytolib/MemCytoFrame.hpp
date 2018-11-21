@@ -225,6 +225,7 @@ class MemCytoFrame: public CytoFrame{
 
 
 public:
+	void close_h5(){};
 	MemCytoFrame(){}
 	MemCytoFrame(const MemCytoFrame & frm):CytoFrame(frm)
 	{

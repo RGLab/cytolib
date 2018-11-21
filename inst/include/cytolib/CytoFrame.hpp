@@ -71,7 +71,7 @@ protected:
 	}
 public:
 	virtual ~CytoFrame(){};
-
+	virtual void close_h5() =0;
 	CytoFrame(const CytoFrame & frm)
 	{
 //		cout << "copy CytoFrame member" << endl;

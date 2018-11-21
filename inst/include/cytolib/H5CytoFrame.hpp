@@ -73,6 +73,11 @@ public:
 		flush_meta();
 
 	};
+	void close_h5(){
+		dataspace.close();
+		dataset.close();
+		file.close();
+	}
 	void flush_meta(){
 		//flush the cached meta data from CytoFrame into h5
 		if(is_dirty_params)
