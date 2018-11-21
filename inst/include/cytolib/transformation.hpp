@@ -698,7 +698,6 @@ class logicleTrans:public transformation
 	logicle_params p;
 
 public:
-	static const double DEFAULT_DECADES;
 	logicleTrans (double T, double W, double M, double A, int bins = 0, bool isInverse = false):transformation(false,FASINH)
 	{
 		calTbl.setInterpolated(true);
@@ -768,7 +767,7 @@ public:
 
 
 	// f(w,b) = 2 * (ln(d) - ln(b)) + w * (b + d)
-	double logicle_fn(double x,void*info) {
+	static double logicle_fn(double x,void*info) {
 		struct sfun_info *p = (struct sfun_info *)info;
 		double B = 2 * (log(x) - log(p->b)) + p->w * (p->b + x);
 	    return (B);
