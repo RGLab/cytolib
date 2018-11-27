@@ -132,9 +132,9 @@ public:
 	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
 	{
 		filename_ = frm.filename_;
-		file = frm.file;
-		dataset = frm.dataset;
-		dataspace = frm.dataspace;
+		file = frm.file;//safe to copy due to refcount during copy constructor provided by h5
+		dataset = frm.dataset;//safe to copy due to refcount during copy constructor provided by h5
+		dataspace = frm.dataspace;//safe to copy due to explicit copy through its assignment operator provided by h5
 		is_dirty_params = frm.is_dirty_params;
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;

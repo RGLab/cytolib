@@ -142,6 +142,10 @@ BOOST_AUTO_TEST_CASE(shallow_copy)
 	fr1.set_data(dat);
 	BOOST_CHECK_CLOSE(fr1.get_data()[100], newval, 1e-6);//fr1 is updated
 	BOOST_CHECK_CLOSE(fr_orig->get_data()[100], newval, 1e-6);//original cp is also updated
+
+	//delete fr_orig to ensure its copy still has valid access to h5 data
+	fr_orig.reset();
+	BOOST_CHECK_CLOSE(fr1.get_data()[100], newval, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(deep_copy)
