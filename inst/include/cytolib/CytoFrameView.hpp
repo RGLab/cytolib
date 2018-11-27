@@ -79,9 +79,18 @@ public:
 	{
 		ptr_->write_h5(filename);
 	}
-	const KEY_WORDS & get_keywords() const{
-		return ptr_->get_keywords();
-	}
+	//TODO: we currently do this filtering in R
+//	const KEY_WORDS & get_keywords() const{
+//		KEY_WORDS res = ptr_->get_keywords();
+//		if(is_col_indexed())//filter out the PnX based on the col_idx
+//		{
+//
+//			    pat <- paste(to.del, collapse = "|")
+//			    pat <- paste0("^\\$P(", pat , ")[A-Z]$")
+//			    sel <- grep(pat, names(kw))
+//		}
+//		return res;
+//	}
 	/**
 	 * extract the value of the single keyword by keyword name
 	 *
@@ -195,7 +204,22 @@ public:
 		row_idx_ = row_idx;
 
 	}
+	/**
+	 * Corresponding to the original $Pn FCS TEXT
+	 * @return
+	 */
+	vector<unsigned> get_original_col_ids() const
+	{
+		unsigned n = n_cols();
+		vector<unsigned> res(n);
+		for(unsigned i = 0; i < n; i++)
+			if(is_col_indexed())
+				res[i] = col_idx_[i];
+			else
+				res[i] = i;
+		return res;
 
+	}
 	unsigned n_cols() const
 	{
 		if(is_col_indexed())
