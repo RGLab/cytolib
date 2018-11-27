@@ -60,7 +60,7 @@ protected:
 			count_mem[1]  = nrow;
 			memspace.selectHyperslab( H5S_SELECT_SET, count_mem, offset_mem );
 
-			dataset.read(data.memptr(), EVENT_DATA_TYPE_IN_MEM_H5 ,memspace, dataspace);
+			dataset.read(data.memptr(), h5_datatype_data(DataTypeLocation::MEM) ,memspace, dataspace);
 		}
 
 		return data;
@@ -89,7 +89,7 @@ public:
 	}
 	void flush_params()
 	{
-		CompType param_type = get_h5_datatype_params();
+		CompType param_type = get_h5_datatype_params(DataTypeLocation::MEM);
 		DataSet ds = file.openDataSet("params");
 		ds.write(params.data(), param_type );
 		is_dirty_params = false;
@@ -225,7 +225,7 @@ public:
 
 		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
 
-		FloatType datatype = get_h5_datatype_data();
+		FloatType datatype = h5_datatype_data(DataTypeLocation::MEM);
 
 		/*
 		 * read params as array of compound type
@@ -426,7 +426,7 @@ public:
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
 
-		dataset.write(_data.mem, EVENT_DATA_TYPE_IN_MEM_H5);
+		dataset.write(_data.mem, h5_datatype_data(DataTypeLocation::MEM));
 
 	}
 

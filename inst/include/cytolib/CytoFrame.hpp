@@ -19,7 +19,7 @@ enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
 enum class H5Option {copy, move, skip, link, symlink};
-
+enum DataTypeLocation {MEM, H5};
 typedef unordered_map<string, string> PDATA;
 
 
@@ -186,13 +186,18 @@ public:
 	}
 //	virtual void writeFCS(const string & filename);
 
-	FloatType get_h5_datatype_data() const
+	FloatType h5_datatype_data(DataTypeLocation storage_type) const
 	{
-		FloatType datatype( PredType::NATIVE_FLOAT );
-		datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
-		return datatype;
+		if(storage_type)
+		{
+			FloatType datatype( PredType::NATIVE_FLOAT );
+			datatype.setOrder(is_host_big_endian()?H5T_ORDER_BE:H5T_ORDER_LE );
+			return datatype;
+		}
+		else
+			return FloatType(PredType::NATIVE_DOUBLE);
 	}
-	CompType get_h5_datatype_params() const
+	CompType get_h5_datatype_params(DataTypeLocation storage_type) const
 	{
 		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
 
@@ -200,7 +205,7 @@ public:
 		 * define params as array of compound type
 		 */
 
-		FloatType datatype= get_h5_datatype_data();
+		FloatType datatype= h5_datatype_data(storage_type);
 		hsize_t dim_pne[] = {2};
 		ArrayType pne(datatype, 1, dim_pne);
 
@@ -228,12 +233,12 @@ public:
 	}
 	virtual void write_h5_params(H5File file) const
 	{
-		CompType param_type = get_h5_datatype_params();
 		hsize_t dim_param[] = {n_cols()};
 		DataSpace dsp_param(1, dim_param);
-		DataSet ds = file.createDataSet( "params", param_type, dsp_param);
+		DataSet ds = file.createDataSet( "params", get_h5_datatype_params(DataTypeLocation::H5), dsp_param);
 
-		ds.write(params.data(), param_type );
+		ds.write(&params[0], get_h5_datatype_params(DataTypeLocation::MEM));
+
 
 	}
 
@@ -301,13 +306,13 @@ public:
 		plist.setChunk(2, chunk_dims);
 	//	plist.setFilter()
 		DataSpace dataspace( 2, dimsf);
-		DataSet dataset = file.createDataSet( DATASET_NAME, get_h5_datatype_data(), dataspace, plist);
+		DataSet dataset = file.createDataSet( DATASET_NAME, h5_datatype_data(DataTypeLocation::H5), dataspace, plist);
 		/*
 		* Write the data to the dataset using default memory space, file
 		* space, and transfer properties.
 		*/
 		EVENT_DATA_VEC dat = get_data();
-		dataset.write(dat.mem, EVENT_DATA_TYPE_IN_MEM_H5);
+		dataset.write(dat.mem, h5_datatype_data(DataTypeLocation::MEM));
 	}
 
 	/**

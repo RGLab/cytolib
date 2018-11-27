@@ -12,7 +12,8 @@ struct CFFixture{
 		fr = MemCytoFrame(file_path, config);
 		fr.read_fcs();
 		//create h5 version
-		string tmp = generate_unique_filename(fs::temp_directory_path(), "", ".h5");;
+		string tmp = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
+//		cout << tmp << endl;
 		fr.write_h5(tmp);
 		fr_h5.reset(new H5CytoFrame(tmp));
 	};
@@ -27,6 +28,14 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+
+BOOST_AUTO_TEST_CASE(h5_vs_mem)
+{
+	//check if h5 version is consistent with mem
+	BOOST_CHECK_EQUAL(fr.get_params().size(), fr_h5->get_params().size());
+	BOOST_CHECK_EQUAL(fr.get_params().begin()->max, fr_h5->get_params().begin()->max);
+
+}
 
 BOOST_AUTO_TEST_CASE(subset_by_cols)
 {
