@@ -79,9 +79,10 @@ public:
 	{
 		ptr_->write_h5(filename);
 	}
-	//TODO: we currently do this filtering in R
-//	const KEY_WORDS & get_keywords() const{
-//		KEY_WORDS res = ptr_->get_keywords();
+
+	KEY_WORDS get_keywords() const{
+		KEY_WORDS res = ptr_->get_keywords();
+		//TODO: we currently do this filtering in R
 //		if(is_col_indexed())//filter out the PnX based on the col_idx
 //		{
 //
@@ -89,8 +90,8 @@ public:
 //			    pat <- paste0("^\\$P(", pat , ")[A-Z]$")
 //			    sel <- grep(pat, names(kw))
 //		}
-//		return res;
-//	}
+		return res;
+	}
 	/**
 	 * extract the value of the single keyword by keyword name
 	 *
