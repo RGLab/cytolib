@@ -256,7 +256,26 @@ public:
 	{
 		return ptr_->copy_realized(row_idx_, col_idx_, h5_filename);;
 	}
+	void set_data(const EVENT_DATA_VEC & data_in){
+		//fetch the original view of data
+		EVENT_DATA_VEC data_orig = ptr_->get_data();
+		//update it
+		if(is_col_indexed()&&is_row_indexed())
+			data_orig.submat(row_idx_, col_idx_) = data_in;
+		else if(is_row_indexed())
+			data_orig.rows(row_idx_) = data_in;
+		else if(is_col_indexed())
+			data_orig.cols(col_idx_) = data_in;
+		else
+			if(data_orig.n_cols!=data_in.n_cols||data_orig.n_rows!=data_in.n_rows)
+				throw(domain_error("The size of theinput data is different from the cytoframeview!"));
+			else
+				data_orig = data_in;
 
+
+		//write back to ptr_
+		ptr_->set_data(data_orig);
+	}
 	EVENT_DATA_VEC get_data() const
 	{
 		EVENT_DATA_VEC data;
