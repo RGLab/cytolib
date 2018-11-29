@@ -644,7 +644,7 @@ public:
 	 * @param is_h5
 	 * @param h5_dir
 	 */
-	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config= FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = generate_unique_dir(fs::temp_directory_path(), "gs")):GatingSet()
+	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config= FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = fs::temp_directory_path()):GatingSet()
 	{
 		vector<pair<string,string>> map(file_paths.size());
 		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
@@ -653,7 +653,7 @@ public:
 
 	}
 
-	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config = FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = generate_unique_dir(fs::temp_directory_path(), "gs")):GatingSet()
+	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config = FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = fs::temp_directory_path()):GatingSet()
 	{
 		add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
 	}
@@ -661,7 +661,7 @@ public:
 	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
 	{
 
-		fs::path h5_path(h5_dir);
+		fs::path h5_path= generate_h5_folder(h5_dir);
 		for(const auto & it : sample_uid_vs_file_path)
 		{
 
