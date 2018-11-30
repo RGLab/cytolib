@@ -117,6 +117,10 @@ public:
 	{
 		ptr_->set_keyword(key, value);
 	}
+	void set_keywords(const KEY_WORDS & keys){
+		ptr_->set_keywords(keys);
+	}
+
 	void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range){
 		ptr_->set_range(colname, ctype, new_range);
 	}
