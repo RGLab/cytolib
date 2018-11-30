@@ -529,7 +529,7 @@ public:
 	{
 		int id = get_col_idx(oldname, ColType::marker);
 		if(id<0)
-			throw(domain_error("colname not found: " + oldname));
+			throw(domain_error("marker not found: " + oldname));
 		if(oldname!=newname)
 		{
 			if(get_col_idx(newname, ColType::marker)>=0)
