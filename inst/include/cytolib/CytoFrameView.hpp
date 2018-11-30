@@ -62,6 +62,10 @@ public:
 	{
 		ptr_->set_channel(oldname, newname);
 	}
+	string get_marker(const string & channel)
+	{
+		return ptr_->get_marker(channel);
+	}
 
 	void set_marker(const string & oldname, const string & newname)
 	{

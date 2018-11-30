@@ -434,6 +434,19 @@ public:
 				res[i] = params[i].marker;
 		return res;
 	}
+	/**
+	 * Look up marker by channel info
+	 * @param channel
+	 * @return
+	 */
+	string get_marker(const string & channel)
+	{
+		int idx = get_col_idx(channel, ColType::channel);
+		if(idx<0)
+			throw(domain_error("colname not found: " + channel));
+		return params[idx].marker;
+	}
+
 
 	/**
 	 * get the numeric index for the given column
