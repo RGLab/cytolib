@@ -113,7 +113,7 @@ public:
 	bool is_cytoFrame_only() const{return tree.m_vertices.size()==0;};
 	CytoFrameView & get_cytoframe_view_ref(){return frame_;}
 	CytoFrameView get_cytoframe_view() const{return frame_;}
-	void set_cytoFrame_view(CytoFrameView fr){
+	void set_cytoframe_view(CytoFrameView fr){
 		frame_ = fr;
 	}
 	/*

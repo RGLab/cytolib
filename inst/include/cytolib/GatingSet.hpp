@@ -416,7 +416,7 @@ public:
 			string h5_filename = (h5_dir/sn).string() + ".h5";
 			fr.write_h5(h5_filename);
 			//attach to gh
-			gh->set_cytoFrame_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename))));
+			gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename))));
 		}
 
 	}
@@ -435,7 +435,7 @@ public:
 			if(it==gs.end())
 				throw(domain_error("Sample '"  + sn + "' is missing from the data to be assigned!"));
 			GatingHierarchy & gh = *ghs_[sn];
-			gh.set_cytoFrame_view(it->second->get_cytoframe_view_ref());
+			gh.set_cytoframe_view(it->second->get_cytoframe_view_ref());
 		}
 	};
 
