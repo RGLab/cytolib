@@ -441,7 +441,7 @@ public:
 
 	}
 
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data){
+	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data, unsigned int flags = H5F_ACC_RDONLY){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 
@@ -475,7 +475,7 @@ public:
 
 			if(fs::exists(h5_filename))
 			{
-			 ptr.reset(new H5CytoFrame(h5_filename));
+			 ptr.reset(new H5CytoFrame(h5_filename, flags));
 			 pb::CytoFrame fr = *pb_gh.mutable_frame();
 			 if(!fr.is_h5())
 				 ptr.reset(new MemCytoFrame(*ptr));

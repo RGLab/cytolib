@@ -24,9 +24,9 @@ public:
 	/*forwarded apis
 	 *
 	 */
-	void close_h5(){
-		ptr_->close_h5();
-	}
+//	void close_h5(){
+//		ptr_->close_h5();
+//	}
 	string get_h5_file_path() const{
 			return ptr_->get_h5_file_path();
 		}

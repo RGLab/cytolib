@@ -36,7 +36,69 @@ BOOST_AUTO_TEST_CASE(h5_vs_mem)
 	BOOST_CHECK_EQUAL(fr.get_params().begin()->max, fr_h5->get_params().begin()->max);
 
 }
+BOOST_AUTO_TEST_CASE(flags)
+{
+	//get a safe cp
+	string h5file = fr_h5->copy()->get_h5_file_path();
+	//load it by default readonly flag
+	unique_ptr<H5CytoFrame> fr1(new H5CytoFrame(h5file));
+	//update meta data
+	string oldname = fr1->get_channels()[2];
+	string newname = "test";
+	fr1->set_channel(oldname, newname);
 
+	//save error handler
+//	H5E_auto2_t func;
+//	void* client_data;
+//	H5::Exception::getAutoPrint(func, &client_data);
+	//turn off auto print
+	H5::Exception::dontPrint();
+
+	//try to flush to disk
+	BOOST_CHECK_EXCEPTION(fr1->flush_meta(), H5::DataSetIException,
+				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("H5Dwrite failed") != string::npos;});
+	fr1.reset();
+
+	//load it again to check if meta data is intact
+	unique_ptr<H5CytoFrame> fr2(new H5CytoFrame(h5file));
+	//no change to disk
+	BOOST_CHECK_EQUAL(fr2->get_channels()[2], oldname);
+	string key = fr2->get_keyword("$P3N");
+	BOOST_CHECK_EQUAL(key, oldname);
+
+	//update data
+	EVENT_DATA_VEC dat = fr2->get_data();
+	float oldval = dat[100];
+	float newval = 100;
+	dat[100] = newval;
+
+	BOOST_CHECK_EXCEPTION(fr2->set_data(dat);, H5::DataSetIException,
+				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("H5Dwrite failed") != string::npos;});
+
+	BOOST_CHECK_CLOSE(fr2->get_data()[100], oldval, 1e-6);
+
+
+	/**
+	 * try another open with different flag
+	 */
+
+	BOOST_CHECK_EXCEPTION(H5CytoFrame fr3(h5file, H5F_ACC_RDWR);, H5::FileIException,
+					[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fopen failed") != string::npos;});
+
+
+	//close readonly objects
+
+	fr2.reset();
+	//turn on error report
+//	H5::Exception::setAutoPrint(func, client_data);
+	//clear previous errors from stacks resulted from write attempts
+//	H5::Exception::clearErrorStack();
+	//try open again
+	H5CytoFrame fr3(h5file, H5F_ACC_RDWR);
+	fr3.set_data(dat);
+	BOOST_CHECK_CLOSE(fr3.get_data()[100], newval, 1e-6);//fr1 is updated
+
+}
 BOOST_AUTO_TEST_CASE(subset_by_cols)
 {
 	vector<string> channels = fr.get_channels();

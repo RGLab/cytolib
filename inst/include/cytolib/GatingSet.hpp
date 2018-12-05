@@ -389,7 +389,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs):GatingSet(){
+	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, unsigned int flags = H5F_ACC_RDONLY):GatingSet(){
 
 		fs::path h5_dir = generate_h5_folder(fs::temp_directory_path());
 
@@ -416,7 +416,7 @@ public:
 			string h5_filename = (h5_dir/sn).string() + ".h5";
 			fr.write_h5(h5_filename);
 			//attach to gh
-			gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename))));
+			gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename, flags))));
 		}
 
 	}
@@ -658,7 +658,7 @@ public:
 		add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
 	}
 
-	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir)
+	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, unsigned int flags = H5F_ACC_RDWR)
 	{
 
 		fs::path h5_path= generate_h5_folder(h5_dir);
@@ -674,7 +674,7 @@ public:
 			if(is_h5)
 			{
 				fr_ptr->write_h5(h5_filename);
-				fr_ptr.reset(new H5CytoFrame(h5_filename));
+				fr_ptr.reset(new H5CytoFrame(h5_filename, flags));
 			}
 
 			add_cytoframe_view(it.first, CytoFrameView(fr_ptr));

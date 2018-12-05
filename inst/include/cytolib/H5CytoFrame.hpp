@@ -20,7 +20,9 @@ namespace cytolib
 class H5CytoFrame:public CytoFrame{
 protected:
 	string filename_;
-	/*
+	/*EDIT: We now do not maintain these handlers, instead treat each IO as atomic operations
+	 * Because it is not easy to accomplish the resource sharing among multiple H5CytoFrame objects solely depending on H5's mechanisms.
+	 * e.g. a second openFile call with H5F_ACC_RDWR will overwrite the previous H5F_ACC_RDONLY, thus cause the unexpected data tampering
 	 * these H5 handlers remain open during the life cycle of H5CytoFrame
 	 * for faster accessing the data
 	 */
@@ -73,11 +75,15 @@ public:
 		flush_meta();
 
 	};
-	void close_h5(){
-		dataspace.close();
-		dataset.close();
-		file.close();
-	}
+	/*
+	 * for simplicity, we don't want to handle the object that has all the h5 handler closed
+	 * because it will require lots of validity checks before each disk IO operations
+	 */
+//	void close_h5(){
+//		dataspace.close();
+//		dataset.close();
+//		file.close();
+//	}
 	void flush_meta(){
 		//flush the cached meta data from CytoFrame into h5
 		if(is_dirty_params)
@@ -200,18 +206,18 @@ public:
 	 * @param fcs_filename
 	 * @param h5_filename
 	 */
-	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename, unsigned int flags = H5F_ACC_RDWR):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
 		fr.write_h5(h5_filename);
-		*this = H5CytoFrame(h5_filename);
+		*this = H5CytoFrame(h5_filename, flags);
 	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDWR):CytoFrame(),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):CytoFrame(),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		file.openFile(filename_, flags);
 
@@ -395,7 +401,7 @@ public:
 			fs::remove(new_filename);
 		}
 		fs::copy_file(filename_, new_filename);
-		CytoFramePtr ptr(new H5CytoFrame(new_filename));
+		CytoFramePtr ptr(new H5CytoFrame(new_filename, H5F_ACC_RDWR));
 		//copy cached meta
 		ptr->set_params(get_params());
 		ptr->set_keywords(get_keywords());
@@ -416,7 +422,7 @@ public:
 		//otherwise, realize it to memory and write back to new file
 		MemCytoFrame fr(*this);
 		fr.copy_realized(row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new H5CytoFrame(new_filename));
+		return CytoFramePtr(new H5CytoFrame(new_filename, H5F_ACC_RDWR));
 	}
 
 	/**
