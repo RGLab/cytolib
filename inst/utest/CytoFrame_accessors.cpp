@@ -57,25 +57,23 @@ BOOST_AUTO_TEST_CASE(flags)
 	//try to flush to disk
 	BOOST_CHECK_EXCEPTION(fr1->flush_meta(), H5::DataSetIException,
 				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("H5Dwrite failed") != string::npos;});
-	fr1.reset();
-
 	//load it again to check if meta data is intact
-	unique_ptr<H5CytoFrame> fr2(new H5CytoFrame(h5file));
+	fr1->load_meta();
 	//no change to disk
-	BOOST_CHECK_EQUAL(fr2->get_channels()[2], oldname);
-	string key = fr2->get_keyword("$P3N");
+	BOOST_CHECK_EQUAL(fr1->get_channels()[2], oldname);
+	string key = fr1->get_keyword("$P3N");
 	BOOST_CHECK_EQUAL(key, oldname);
 
 	//update data
-	EVENT_DATA_VEC dat = fr2->get_data();
+	EVENT_DATA_VEC dat = fr1->get_data();
 	float oldval = dat[100];
 	float newval = 100;
 	dat[100] = newval;
 
-	BOOST_CHECK_EXCEPTION(fr2->set_data(dat);, H5::DataSetIException,
+	BOOST_CHECK_EXCEPTION(fr1->set_data(dat);, H5::DataSetIException,
 				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("H5Dwrite failed") != string::npos;});
 
-	BOOST_CHECK_CLOSE(fr2->get_data()[100], oldval, 1e-6);
+	BOOST_CHECK_CLOSE(fr1->get_data()[100], oldval, 1e-6);
 
 
 	/**
@@ -88,7 +86,7 @@ BOOST_AUTO_TEST_CASE(flags)
 
 	//close readonly objects
 
-	fr2.reset();
+	fr1.reset();
 	//turn on error report
 //	H5::Exception::setAutoPrint(func, client_data);
 	//clear previous errors from stacks resulted from write attempts

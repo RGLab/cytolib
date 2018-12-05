@@ -220,6 +220,18 @@ public:
 	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):CytoFrame(),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		file.openFile(filename_, flags);
+		load_meta();
+		//open dataset for event data
+
+		dataset = file.openDataSet(DATASET_NAME);
+		dataspace = dataset.getSpace();
+		dataspace.getSimpleExtentDims(dims);
+
+	}
+	/**
+	 * abandon the changes to the meta data in cache by reloading them from disk
+	 */
+	void load_meta(){
 
 		DataSet ds_param = file.openDataSet("params");
 	//	DataType param_type = ds_param.getDataType();
@@ -279,7 +291,7 @@ public:
 			params[i].PnB = pvec[i].PnB;
 		}
 		build_hash();
-
+		is_dirty_params = false;
 		/*
 		 * read keywords
 		 */
@@ -313,7 +325,9 @@ public:
 //			keys[i].second = keyVec[i].value;
 //			delete [] keyVec[i].value;
 		}
+		is_dirty_keys = false;
 		/*
+		 *
 		 * read pdata
 		 */
 		DataSet ds_pd = file.openDataSet( "pdata");
@@ -330,11 +344,7 @@ public:
 			delete [] keyVec[i].key;
 			delete [] keyVec[i].value;
 		}
-		//open dataset for event data
-
-		dataset = file.openDataSet(DATASET_NAME);
-		dataspace = dataset.getSpace();
-		dataspace.getSimpleExtentDims(dims);
+		is_dirty_pdata = false;
 
 	}
 
