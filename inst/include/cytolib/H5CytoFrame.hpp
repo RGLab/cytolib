@@ -72,7 +72,19 @@ protected:
 public:
 
 	~H5CytoFrame(){
-		flush_meta();
+		/*
+		 * catch the exception to prevent the destructor from throwing, which could crash the application
+		 */
+		string msg = "Warning: failed to flush the meta data to h5!Changes to meta are unsaved.";
+
+		try{
+			flush_meta();
+		}catch(const H5::DataSetIException &e){
+			PRINT(e.getDetailMsg() + "\n");
+			PRINT(msg);
+		}catch(...){
+			PRINT(msg);
+		}
 
 	};
 	/*

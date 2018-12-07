@@ -84,8 +84,11 @@ BOOST_AUTO_TEST_CASE(flags)
 					[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fopen failed") != string::npos;});
 
 
-	//close readonly objects
-
+	//load it as readonly and make meta dirty
+	fr1.reset(new H5CytoFrame(h5file));
+	fr1->set_channel(oldname, newname);
+//			BOOST_CHECK_;
+	//destroy it to expect succeed with warning
 	fr1.reset();
 	//turn on error report
 //	H5::Exception::setAutoPrint(func, client_data);
