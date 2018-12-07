@@ -17,7 +17,12 @@ class CytoFrameView{
 public:
 	CytoFrameView(){};
 	CytoFrameView(CytoFramePtr ptr):ptr_(ptr){};
-	CytoFramePtr get_cytoframe_ptr(){return ptr_;}
+	CytoFramePtr get_cytoframe_ptr() const{
+		if(ptr_)
+			return ptr_;
+		else
+			throw(domain_error("Empty CytoFrameView!"));
+	}
 	bool is_row_indexed() const{return row_idx_.size()>0;};
 	bool is_col_indexed() const{return col_idx_.size()>0;};
 
@@ -25,13 +30,13 @@ public:
 	 *
 	 */
 //	void close_h5(){
-//		ptr_->close_h5();
+//		get_cytoframe_ptr()->close_h5();
 //	}
 	string get_h5_file_path() const{
-			return ptr_->get_h5_file_path();
+			return get_cytoframe_ptr()->get_h5_file_path();
 		}
 	vector<string> get_channels() const{
-		vector<string> orig = ptr_->get_channels();
+		vector<string> orig = get_cytoframe_ptr()->get_channels();
 		unsigned n = col_idx_.size();
 		if(n == 0)
 			return orig;
@@ -44,7 +49,7 @@ public:
 		}
 	}
 	vector<string> get_markers() const{
-		vector<string> orig = ptr_->get_markers();
+		vector<string> orig = get_cytoframe_ptr()->get_markers();
 		unsigned n = col_idx_.size();
 		if(n == 0)
 			return orig;
@@ -56,36 +61,36 @@ public:
 			return res;
 		}
 	}
-	void set_channels(const CHANNEL_MAP & chnl_map){ptr_->set_channels(chnl_map);}
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{ptr_->convertToPb(fr_pb, h5_filename, h5_opt);};
+	void set_channels(const CHANNEL_MAP & chnl_map){get_cytoframe_ptr()->set_channels(chnl_map);}
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);};
 	void set_channel(const string & oldname, const string &newname)
 	{
-		ptr_->set_channel(oldname, newname);
+		get_cytoframe_ptr()->set_channel(oldname, newname);
 	}
 	string get_marker(const string & channel)
 	{
-		return ptr_->get_marker(channel);
+		return get_cytoframe_ptr()->get_marker(channel);
 	}
 
 	void set_marker(const string & oldname, const string & newname)
 	{
-		ptr_->set_marker(oldname, newname);
+		get_cytoframe_ptr()->set_marker(oldname, newname);
 	}
 	void compensate(const compensation & comp)
 	{
-			ptr_->compensate(comp);
+			get_cytoframe_ptr()->compensate(comp);
 	}
 	compensation get_compensation(const string & key = "SPILL")
 	{
-		return	ptr_->get_compensation(key);
+		return	get_cytoframe_ptr()->get_compensation(key);
 	}
 	void write_h5(const string & filename) const
 	{
-		ptr_->write_h5(filename);
+		get_cytoframe_ptr()->write_h5(filename);
 	}
 
 	KEY_WORDS get_keywords() const{
-		KEY_WORDS res = ptr_->get_keywords();
+		KEY_WORDS res = get_cytoframe_ptr()->get_keywords();
 		//TODO: we currently do this filtering in R
 //		if(is_col_indexed())//filter out the PnX based on the col_idx
 //		{
@@ -104,7 +109,7 @@ public:
 	 */
 	string get_keyword(const string & key) const
 	{
-		return ptr_->get_keyword(key);
+		return get_cytoframe_ptr()->get_keyword(key);
 
 	}
 
@@ -115,14 +120,14 @@ public:
 	 */
 	void set_keyword(const string & key, const string & value)
 	{
-		ptr_->set_keyword(key, value);
+		get_cytoframe_ptr()->set_keyword(key, value);
 	}
 	void set_keywords(const KEY_WORDS & keys){
-		ptr_->set_keywords(keys);
+		get_cytoframe_ptr()->set_keywords(keys);
 	}
 
 	void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range){
-		ptr_->set_range(colname, ctype, new_range);
+		get_cytoframe_ptr()->set_range(colname, ctype, new_range);
 	}
 	/**
 	 * the range of a specific column
@@ -134,18 +139,18 @@ public:
 	pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> get_range(const string & colname, ColType ctype, RangeType rtype) const
 	{
 
-		return ptr_->get_range(colname, ctype	, rtype);
+		return get_cytoframe_ptr()->get_range(colname, ctype	, rtype);
 	}
 
-	const PDATA & get_pheno_data() const {return ptr_->get_pheno_data();}
-	void set_pheno_data(const string & name, const string & value) {ptr_->set_pheno_data(name, value);}
-	void set_pheno_data(const PDATA & _pd) {ptr_->set_pheno_data(_pd);}
+	const PDATA & get_pheno_data() const {return get_cytoframe_ptr()->get_pheno_data();}
+	void set_pheno_data(const string & name, const string & value) {get_cytoframe_ptr()->set_pheno_data(name, value);}
+	void set_pheno_data(const PDATA & _pd) {get_cytoframe_ptr()->set_pheno_data(_pd);}
 	/*subsetting*/
 
 	void cols_(vector<string> colnames, ColType col_type)
 	{
 
-		uvec col_idx = ptr_->get_col_idx(colnames, col_type);//idx from original frame
+		uvec col_idx = get_cytoframe_ptr()->get_col_idx(colnames, col_type);//idx from original frame
 		if(is_col_indexed())//convert abs idex to relative indx
 		{
 			for(unsigned i = 0; i < col_idx.size(); i++)
@@ -234,7 +239,7 @@ public:
 		if(is_col_indexed())
 			return col_idx_.size();
 		else
-			return ptr_->n_cols();
+			return get_cytoframe_ptr()->n_cols();
 	}
 	/**
 	 * get the number of rows(or events)
@@ -246,7 +251,7 @@ public:
 		if(is_row_indexed())
 			return row_idx_.size();
 		else
-			return ptr_->n_rows();
+			return get_cytoframe_ptr()->n_rows();
 	}
 	/**
 	 * clear the row and column index
@@ -262,11 +267,11 @@ public:
 	 */
 	CytoFrameView copy_realized(const string & h5_filename = "") const
 	{
-		return ptr_->copy_realized(row_idx_, col_idx_, h5_filename);;
+		return get_cytoframe_ptr()->copy_realized(row_idx_, col_idx_, h5_filename);;
 	}
 	void set_data(const EVENT_DATA_VEC & data_in){
 		//fetch the original view of data
-		EVENT_DATA_VEC data_orig = ptr_->get_data();
+		EVENT_DATA_VEC data_orig = get_cytoframe_ptr()->get_data();
 		//update it
 		if(is_col_indexed()&&is_row_indexed())
 			data_orig.submat(row_idx_, col_idx_) = data_in;
@@ -282,16 +287,16 @@ public:
 
 
 		//write back to ptr_
-		ptr_->set_data(data_orig);
+		get_cytoframe_ptr()->set_data(data_orig);
 	}
 	EVENT_DATA_VEC get_data() const
 	{
 		EVENT_DATA_VEC data;
 
 		if(is_col_indexed())
-			data = ptr_->get_data(col_idx_);
+			data = get_cytoframe_ptr()->get_data(col_idx_);
 		else
-			data = ptr_->get_data();
+			data = get_cytoframe_ptr()->get_data();
 
 		if(is_row_indexed())
 			data = data.rows(row_idx_);
@@ -302,7 +307,7 @@ public:
 	CytoFrameView copy(const string & h5_filename = "") const
 	{
 		CytoFrameView cv(*this);
-		cv.ptr_ = ptr_->copy(h5_filename);
+		cv.ptr_ = get_cytoframe_ptr()->copy(h5_filename);
 		return cv;
 
 	}
