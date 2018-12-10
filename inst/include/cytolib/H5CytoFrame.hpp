@@ -20,9 +20,9 @@ namespace cytolib
 class H5CytoFrame:public CytoFrame{
 protected:
 	string filename_;
-	/*EDIT: We now do not maintain these handlers, instead treat each IO as atomic operations
+	/*TODO: We may not want to maintain these handlers, instead treat each IO as atomic operations
 	 * Because it is not easy to accomplish the resource sharing among multiple H5CytoFrame objects solely depending on H5's mechanisms.
-	 * e.g. a second openFile call with H5F_ACC_RDWR will overwrite the previous H5F_ACC_RDONLY, thus cause the unexpected data tampering
+	 * e.g. a second openFile call with H5F_ACC_RDONLY will NOT overwrite the previous H5F_ACC_RDWR , thus cause the unexpected data tampering
 	 * these H5 handlers remain open during the life cycle of H5CytoFrame
 	 * for faster accessing the data
 	 */
@@ -197,7 +197,6 @@ public:
 		swap(dataset, frm.dataset);
 		swap(dataspace, frm.dataspace);
 		swap(dims, frm.dims);
-
 		swap(is_dirty_params, frm.is_dirty_params);
 		swap(is_dirty_keys, frm.is_dirty_keys);
 		swap(is_dirty_pdata, frm.is_dirty_pdata);
@@ -231,6 +230,9 @@ public:
 	 */
 	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):CytoFrame(),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
+		readonly_ = flags == H5F_ACC_RDONLY;
+
+
 		file.openFile(filename_, flags);
 		load_meta();
 		//open dataset for event data

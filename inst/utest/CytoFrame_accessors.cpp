@@ -45,18 +45,19 @@ BOOST_AUTO_TEST_CASE(flags)
 	//update meta data
 	string oldname = fr1->get_channels()[2];
 	string newname = "test";
-	fr1->set_channel(oldname, newname);
+	BOOST_CHECK_EXCEPTION(fr1->set_channel(oldname, newname), domain_error,
+				[](const domain_error & ex) {return string(ex.what()).find("read-only") != string::npos;});
 
 	//save error handler
-//	H5E_auto2_t func;
-//	void* client_data;
-//	H5::Exception::getAutoPrint(func, &client_data);
+	H5E_auto2_t func;
+	void* client_data;
+	H5::Exception::getAutoPrint(func, &client_data);
 	//turn off auto print
 	H5::Exception::dontPrint();
 
 	//try to flush to disk
-	BOOST_CHECK_EXCEPTION(fr1->flush_meta(), H5::DataSetIException,
-				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("H5Dwrite failed") != string::npos;});
+//	BOOST_CHECK_EXCEPTION(fr1->flush_meta(), H5::DataSetIException,
+//				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("H5Dwrite failed") != string::npos;});
 	//load it again to check if meta data is intact
 	fr1->load_meta();
 	//no change to disk
@@ -85,10 +86,10 @@ BOOST_AUTO_TEST_CASE(flags)
 
 
 	//load it as readonly and make meta dirty
-	fr1.reset(new H5CytoFrame(h5file));
-	fr1->set_channel(oldname, newname);
+//	fr1.reset(new H5CytoFrame(h5file));
+//	fr1->set_channel(oldname, newname);
 //			BOOST_CHECK_;
-	//destroy it to expect succeed with warning
+	//destroy it to expect succeed
 	fr1.reset();
 	//turn on error report
 //	H5::Exception::setAutoPrint(func, client_data);
@@ -98,6 +99,14 @@ BOOST_AUTO_TEST_CASE(flags)
 	H5CytoFrame fr3(h5file, H5F_ACC_RDWR);
 	fr3.set_data(dat);
 	BOOST_CHECK_CLOSE(fr3.get_data()[100], newval, 1e-6);//fr1 is updated
+
+//	try{
+//		fr3.write_h5(h5file);
+//	}catch(H5::FileIException & ex){
+//		cout << ex.getDetailMsg() << endl;
+//	}
+	BOOST_CHECK_EXCEPTION(fr3.write_h5(h5file);, H5::FileIException,
+						[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fcreate failed") != string::npos;});
 
 }
 BOOST_AUTO_TEST_CASE(subset_by_cols)
