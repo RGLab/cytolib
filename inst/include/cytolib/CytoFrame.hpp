@@ -419,7 +419,15 @@ public:
 	{
 		for(auto & it : chnl_map)
 		{
-			set_channel(it.first, it.second);
+			try//catch the unmatched col error so that it can proceed the rest
+			{
+				set_channel(it.first, it.second);
+			}catch (const domain_error & e){
+				string msg = e.what();
+				if(msg.find("colname not found") == string::npos)
+					throw(e);
+			}
+
 		}
 
 	}

@@ -129,7 +129,7 @@ public:
 
 
 	/**
-	 * setter for channels
+	 * setter for channels (dedicated fro Rcpp API and  it won't throw on the unmatched old channel name)
 	 * @param chnl_map
 	 */
 	void set_channels(const CHANNEL_MAP & chnl_map)
