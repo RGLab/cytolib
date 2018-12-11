@@ -7,7 +7,7 @@ struct CSFixture {
 	CSFixture() {
 
 		file_paths = {"../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs", "../flowWorkspace/wsTestSuite/curlyQuad/example1/A2002.001.fcs"};
-		cs = GatingSet(file_paths, config, false, "");
+		cs = GatingSet(file_paths, config, false);
 
 	};
 

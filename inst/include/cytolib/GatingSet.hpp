@@ -661,11 +661,13 @@ public:
 	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, unsigned int flags = H5F_ACC_RDWR)
 	{
 
-		fs::path h5_path= generate_h5_folder(h5_dir);
+		fs::path h5_path;
+		if(is_h5)
+			h5_path = generate_h5_folder(h5_dir);
 		for(const auto & it : sample_uid_vs_file_path)
 		{
 
-			string h5_filename = (h5_path/it.first).string() + ".h5";
+
 			CytoFramePtr fr_ptr(new MemCytoFrame(it.second,config));
 			//set pdata
 			fr_ptr->set_pheno_data("name", path_base_name(it.second));
@@ -673,6 +675,7 @@ public:
 			dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
 			if(is_h5)
 			{
+				string h5_filename = (h5_path/it.first).string() + ".h5";
 				fr_ptr->write_h5(h5_filename);
 				fr_ptr.reset(new H5CytoFrame(h5_filename, flags));
 			}
