@@ -370,7 +370,9 @@ public:
 	 */
 	GatingSet copy(bool is_copy_data = true, bool is_realize_data = true, const string & new_h5_dir = fs::temp_directory_path().string()){
 		GatingSet gs;
-		fs::path h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
+		fs::path h5_dir;
+		if(is_copy_data)
+			h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
 		for(const string & sn : get_sample_uids())
 		{
 			GatingHierarchyPtr gh = getGatingHierarchy(sn);
