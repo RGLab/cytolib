@@ -187,7 +187,7 @@ public:
 	 * @param path
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
 	 */
-	GatingSet(string path, bool is_skip_data = false)
+	GatingSet(string path, bool is_skip_data = false, unsigned int h5_flags = H5F_ACC_RDONLY)
 	{
 		fs::path pb_file;
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -244,7 +244,7 @@ public:
 				pb::CytoFrame fr = *gh_pb.mutable_frame();
 				string h5_filename = fs::path(path) / (sn + ".h5");
 
-				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data)), sn);
+				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, h5_flags)), sn);
 			}
 
 		}
@@ -389,7 +389,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, unsigned int flags = H5F_ACC_RDONLY):GatingSet(){
+	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, unsigned int flags = H5F_ACC_RDWR):GatingSet(){
 
 		fs::path h5_dir = generate_h5_folder(fs::temp_directory_path());
 
