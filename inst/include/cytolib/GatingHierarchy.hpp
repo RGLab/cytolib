@@ -176,7 +176,7 @@ public:
 	 * or FCS TEXT keyword
 	 * add prefix (e.g. Comp_ or <>) to channel name of the data
 	 */
-	void compensate(MemCytoFrame & cytoframe)
+	void compensate(CytoFrame & cytoframe)
 	{
 		if(comp.cid == "-2" || comp.cid == "")
 		{
