@@ -698,7 +698,8 @@ class logicleTrans:public transformation
 	logicle_params p;
 
 public:
-	logicleTrans (double T, double W, double M, double A, int bins = 0, bool isInverse = false):transformation(false,FASINH)
+	logicle_params get_params(){return p;}
+	logicleTrans (double T, double W, double M, double A, int bins = 0, bool isInverse = false):transformation(false,LOGICLE)
 	{
 		calTbl.setInterpolated(true);
 
