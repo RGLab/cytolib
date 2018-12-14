@@ -645,14 +645,13 @@ public:
 	 * @param config
 	 * @param is_h5
 	 * @param h5_dir
+	 * @param is_add_root whether add root node. When false, gs is used as cytoset without gating tree
 	 */
 	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config= FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = fs::temp_directory_path()):GatingSet()
 	{
 		vector<pair<string,string>> map(file_paths.size());
 		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
 		add_fcs(map, config, is_h5, h5_dir);
-
-
 	}
 
 	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config = FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = fs::temp_directory_path()):GatingSet()

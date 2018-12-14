@@ -110,7 +110,7 @@ private:
 	trans_local trans; /*< the transformation used for this particular GatingHierarchy object */
 	CytoFrameView frame_;
 public:
-	bool is_cytoFrame_only() const{return tree.m_vertices.size()==0;};
+	bool is_cytoFrame_only() const{return tree.m_vertices.size()==1;};
 	CytoFrameView & get_cytoframe_view_ref(){return frame_;}
 	CytoFrameView get_cytoframe_view() const{return frame_;}
 	void set_cytoframe_view(CytoFrameView fr){
@@ -390,9 +390,11 @@ public:
 	 * 	GatingHierarchy *curGh=new GatingHierarchy();
 	 * \endcode
 	 */
-	GatingHierarchy(){}
-	GatingHierarchy(const CytoFrameView & frame_view):frame_(frame_view){};
-	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {};
+	GatingHierarchy(){
+		addRoot();//add default root to avoid the risk of crashing on accessing the empty boost graph
+		}
+	GatingHierarchy(const CytoFrameView & frame_view):frame_(frame_view){addRoot();};
+	GatingHierarchy(compensation _comp, PARAM_VEC _transFlag, trans_local _trans):comp(_comp), transFlag(_transFlag),trans(_trans) {addRoot();};
 	/**
 	 *
 	 * @param gh_pb
