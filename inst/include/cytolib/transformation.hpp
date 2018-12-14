@@ -704,19 +704,19 @@ public:
 		calTbl.setInterpolated(true);
 
 	  	if (T <= 0)
-			throw "IllegalParameter: T is not positive";
+			throw domain_error("IllegalParameter: T is not positive");
 			//throw IllegalParameter("T is not positive");
 		if (W < 0)
-	        throw "IllegalParameter: W is not positive";
+	        throw domain_error("IllegalParameter: W is not positive");
 	        //throw IllegalParameter("W is not positive");
 		if (M <= 0)
-			throw "IllegalParameter: M is not positive";
+			throw domain_error("IllegalParameter: M is not positive");
 	        //throw IllegalParameter("M is not positive");
 		if (2 * W > M)
-			throw "IllegalParameter: W is too large";
+			throw domain_error("IllegalParameter: W is too large");
 	        //throw IllegalParameter("W is too large");
 		if (-A > W || A + W > M - W)
-	        throw "IllegalParameter: A is too large";
+	        throw domain_error("IllegalParameter: A is too large");
 	        //throw IllegalParameter("A is too large");
 
 		// if we're going to bin the data make sure that
