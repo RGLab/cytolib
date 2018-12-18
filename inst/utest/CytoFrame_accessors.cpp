@@ -109,6 +109,21 @@ BOOST_AUTO_TEST_CASE(flags)
 						[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fcreate failed") != string::npos;});
 
 }
+
+BOOST_AUTO_TEST_CASE(set_range)
+{
+	MemCytoFrame fr1 = *fr.copy();
+
+	string channel = fr1.get_channels()[1];
+	pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> p = make_pair(-1.1, 1.1);
+	fr1.set_range(channel, ColType::channel, p);
+	auto p1 = fr1.get_range(channel, ColType::channel, RangeType::instrument);
+	BOOST_CHECK_EQUAL(p1.first, p.first);
+	BOOST_CHECK_EQUAL(p1.second, p.second);
+	int idx = fr1.get_col_idx(channel, ColType::channel);
+	string key = "flowCore_$P" + to_string(idx + 1) + "Rmax";
+	BOOST_CHECK_EQUAL(fr1.get_keyword(key), boost::lexical_cast<string>(p.second));
+}
 BOOST_AUTO_TEST_CASE(subset_by_cols)
 {
 	vector<string> channels = fr.get_channels();

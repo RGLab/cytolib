@@ -582,7 +582,7 @@ public:
 	 * @param ctype
 	 * @param new_range
 	 */
-	virtual void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range){
+	virtual void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range, bool is_update_keywords = true){
 		if(readonly_)
 			throw(domain_error("Can't modify the read-only CytoFrame object!"));
 		int idx = get_col_idx(colname, ctype);
@@ -590,6 +590,13 @@ public:
 			throw(domain_error("colname not found: " + colname));
 		params[idx].min = new_range.first;
 		params[idx].max = new_range.second;
+
+		if(is_update_keywords)
+		{
+			string pid = to_string(idx+1);
+			set_keyword("flowCore_$P" + pid + "Rmin", boost::lexical_cast<string>(new_range.first));
+			set_keyword("flowCore_$P" + pid + "Rmax", boost::lexical_cast<string>(new_range.second));
+		}
 	}
 	/**
 	 * the range of a specific column
