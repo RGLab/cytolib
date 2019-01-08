@@ -471,7 +471,9 @@ public:
 
 			CytoFrameView & fr = gs.add_cytoframe_view(sn, gh->get_cytoframe_view());
 			//subset by node
-			nodeProperties & node = gh->getNodeProperty(gh->getNodeID(node_path));
+			auto u = gh->getNodeID(node_path);
+			gh->check_ungated_bool_node(u);
+			nodeProperties & node = gh->getNodeProperty(u);
 			fr.rows_(node.getIndices_u());
 		}
 		return gs;

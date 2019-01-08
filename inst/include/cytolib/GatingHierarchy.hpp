@@ -751,6 +751,17 @@ public:
 				}
 			}
 	}
+	void check_ungated_bool_node(VertexID u){
+		nodeProperties & node = getNodeProperty(u);
+		if(!node.isGated())
+		{
+			if(node.getGate()->getType()==BOOLGATE)
+			{
+				MemCytoFrame fr;
+				gating(fr, u);//pass dummy frame since boolgating doesn't need it once the initial gating was completed thus all the ref nodes are guaranteed to be gated
+			}
+		}
+	}
 	/*
 	 * traverse the tree to gate each pops
 	 * assuming data have already been compensated and transformed
