@@ -317,9 +317,9 @@ public:
 						case pb::PB_LOG:
 							trans_tbl[old_address] = TransPtr(new logTrans(trans_pb));
 							break;
-	//					case pb::PB_SCALE:
-	//						trans_tbl[old_address] = new scaleTrans(trans_pb);
-	//						break;
+						case pb::PB_LOGICLE:
+							trans_tbl[old_address] = TransPtr(new logicleTrans(trans_pb));
+							break;
 						default:
 							throw(domain_error("unknown type of transformation archive!"));
 						}

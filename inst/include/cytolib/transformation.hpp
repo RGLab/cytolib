@@ -696,10 +696,11 @@ class logicleTrans:public transformation
 	const int TAYLOR_LENGTH = 16;
 
 	logicle_params p;
+	bool isGml2;
 
 public:
 	logicle_params get_params(){return p;}
-	logicleTrans (double T, double W, double M, double A, int bins = 0, bool isInverse = false):transformation(false,LOGICLE)
+	logicleTrans (double T, double W, double M, double A, bool _isGml2, int bins = 0, bool isInverse = false):transformation(false,LOGICLE)
 	{
 		calTbl.setInterpolated(true);
 
@@ -727,7 +728,7 @@ public:
 			zero = floor(zero * bins + .5) / bins;
 			A = (M * zero - W) / (1 - zero);
 		}
-
+		isGml2 = _isGml2;
 		// standard parameters
 		p.T = T;
 		p.M = M;
@@ -1032,12 +1033,13 @@ public:
 	}
 
 	virtual void transforming(EVENT_DATA_TYPE * input, int nSize){
+		float m = isGml2?1:p.M;//set scale to (0,1) for Gml2 version
 		if(p.isInverse)
 			for(int i=0;i<nSize;i++)
-				input[i] = inverse(input[i]/p.M);
+				input[i] = inverse(input[i]/m);
 		else
 			for(int i=0;i<nSize;i++)
-				input[i] = scale(input[i]) * p.M;
+				input[i] = scale(input[i]) * m;
 
 		}
 
@@ -1052,6 +1054,7 @@ public:
 		lt_pb->set_m(p.M);
 		lt_pb->set_bins(p.bins);
 		lt_pb->set_t(p.T);
+		lt_pb->set_isgml2(isGml2);
 		//no need to store isInverse flag assuming the inverse won't be used/stored directly by gs
 	}
 	logicleTrans(const pb::transformation & trans_pb):transformation(trans_pb){
@@ -1061,6 +1064,7 @@ public:
 		p.T = lt_pb.t();
 		p.A = lt_pb.a();
 		p.M = lt_pb.m();
+		isGml2 = lt_pb.isgml2();
 	}
 	TransPtr  getInverseTransformation(){
 		logicleTrans tt = *this;
@@ -1068,8 +1072,11 @@ public:
 		return TransPtr(new logicleTrans(tt));
 	}
 
-	void setTransformedScale(int scale){p.M = scale;};
-	int getTransformedScale(){return p.M;};
+	void setTransformedScale(int scale){
+		if(isGml2)
+			throw(logic_error("can't set scale for logicleGml2!"));
+		p.M = scale;};
+	int getTransformedScale(){return isGml2?1:p.M;};
 	int getRawScale(){return p.T;};
 };
 
