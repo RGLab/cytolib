@@ -346,8 +346,9 @@ public:
 				if (!success) {
 					throw(domain_error("Failed to parse GatingHierarchy."));
 				}
-
-				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, trans_tbl)), sn);
+				//only add the sample that is present in gs_data(in case fs was subsetted when gs was archived in legacy pb)
+				if(gs_data.find(sn)!=gs_data.end())
+					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, trans_tbl)), sn);
 			}
 
 			if(gs_data.size()>0)
