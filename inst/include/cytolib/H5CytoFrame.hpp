@@ -455,6 +455,7 @@ public:
 	 */
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
+		check_write_permission();
 
 		dataset.write(_data.mem, h5_datatype_data(DataTypeLocation::MEM));
 
@@ -462,7 +463,7 @@ public:
 
 	void set_data(EVENT_DATA_VEC && _data)
 	{
-//		EVENT_DATA_VEC data = _data;
+		check_write_permission();
 		set_data(_data);
 	}
 };

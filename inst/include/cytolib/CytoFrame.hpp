@@ -69,6 +69,11 @@ protected:
 			marker_vs_idx[params[i].marker] = i;
 		}
 	}
+	void check_write_permission(){
+		if(readonly_)
+			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+
+	}
 public:
 	virtual ~CytoFrame(){};
 //	virtual void close_h5() =0;
@@ -188,8 +193,7 @@ public:
 
 	void set_params(const vector<cytoParam> & _params)
 	{
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		params = _params;
 	}
 //	virtual void writeFCS(const string & filename);
@@ -345,8 +349,7 @@ public:
 		return keys_;
 	}
 	 virtual void set_keywords(const KEY_WORDS & keys){
-			if(readonly_)
-				throw(domain_error("Can't modify the read-only CytoFrame object!"));
+			check_write_permission();
 			keys_ = keys;
 		}
 	/**
@@ -371,8 +374,7 @@ public:
 	 */
 	virtual void set_keyword(const string & key, const string & value)
 	{
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		keys_[key] = value;
 	}
 
@@ -429,8 +431,7 @@ public:
 
 	virtual void set_channels(const CHANNEL_MAP & chnl_map)
 	{
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		for(auto & it : chnl_map)
 		{
 			try//catch the unmatched col error so that it can proceed the rest
@@ -535,8 +536,7 @@ public:
 	}
 	virtual void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true)
 	{
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		int id = get_col_idx(oldname, ColType::channel);
 		if(id<0)
 			throw(domain_error("colname not found: " + oldname));
@@ -564,8 +564,7 @@ public:
 
 	virtual void set_marker(const string & oldname, const string & newname)
 	{
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		int id = get_col_idx(oldname, ColType::marker);
 		if(id<0)
 			throw(domain_error("marker not found: " + oldname));
@@ -586,8 +585,7 @@ public:
 	 * @param new_range
 	 */
 	virtual void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range, bool is_update_keywords = true){
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		int idx = get_col_idx(colname, ctype);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));
@@ -688,19 +686,16 @@ public:
 
 	}
 	void set_pheno_data(const string & name, const string & value){
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		pheno_data_[name] = value;
 	}
 	void set_pheno_data(const PDATA & _pd)
 	{
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		pheno_data_ = _pd;
 	}
 	void del_pheno_data(const string & name){
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
+		check_write_permission();
 		pheno_data_.erase(name);}
 };
 };
