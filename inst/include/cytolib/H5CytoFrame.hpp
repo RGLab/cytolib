@@ -205,12 +205,54 @@ public:
 	unsigned n_rows() const{
 				return dims[1];
 		}
+
+	void set_params(const vector<cytoParam> & _params)
+	{
+		CytoFrame::set_params(_params);
+		is_dirty_params = true;
+
+	}
+	void set_keywords(const KEY_WORDS & keys){
+		CytoFrame::set_keywords(keys);
+		is_dirty_keys = true;
+
+	}
+	void set_keyword(const string & key, const string & value){
+		CytoFrame::set_keyword(key, value);
+		is_dirty_keys = true;
+
+	}
 	void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true)
 	{
 		CytoFrame::set_channel(oldname, newname, is_update_keywords);
 		is_dirty_params = true;
 		if(is_update_keywords)
 			is_dirty_keys = true;
+	}
+	void set_marker(const string & oldname, const string & newname)
+	{
+		CytoFrame::set_marker(oldname, newname);
+		is_dirty_params = true;
+	}
+	void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range, bool is_update_keywords = true){
+		CytoFrame::set_range(colname, ctype, new_range, is_update_keywords);
+		is_dirty_params = true;
+		if(is_update_keywords)
+			is_dirty_keys = true;
+
+	}
+	void set_pheno_data(const string & name, const string & value){
+		CytoFrame::set_pheno_data(name, value);
+		is_dirty_pdata = true;
+	}
+	void set_pheno_data(const PDATA & _pd)
+	{
+		CytoFrame::set_pheno_data(_pd);
+		is_dirty_pdata = true;
+	}
+	void del_pheno_data(const string & name){
+		CytoFrame::del_pheno_data(name);
+		is_dirty_pdata = true;
 	}
 	/**
 	 * constructor from FCS

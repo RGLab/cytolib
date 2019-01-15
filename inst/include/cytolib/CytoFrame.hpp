@@ -191,7 +191,7 @@ public:
 		return params;
 	}
 
-	void set_params(const vector<cytoParam> & _params)
+	virtual void set_params(const vector<cytoParam> & _params)
 	{
 		check_write_permission();
 		params = _params;
@@ -685,16 +685,16 @@ public:
 			return it->second;
 
 	}
-	void set_pheno_data(const string & name, const string & value){
+	virtual void set_pheno_data(const string & name, const string & value){
 		check_write_permission();
 		pheno_data_[name] = value;
 	}
-	void set_pheno_data(const PDATA & _pd)
+	virtual void set_pheno_data(const PDATA & _pd)
 	{
 		check_write_permission();
 		pheno_data_ = _pd;
 	}
-	void del_pheno_data(const string & name){
+	virtual void del_pheno_data(const string & name){
 		check_write_permission();
 		pheno_data_.erase(name);}
 };
