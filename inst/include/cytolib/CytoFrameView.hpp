@@ -29,9 +29,15 @@ public:
 	/*forwarded apis
 	 *
 	 */
-//	void close_h5(){
-//		get_cytoframe_ptr()->close_h5();
-//	}
+	void set_readonly(bool flag){
+		get_cytoframe_ptr()->set_readonly(flag);
+	}
+	virtual void flush_meta(){
+		get_cytoframe_ptr()->flush_meta();
+	};
+	virtual void load_meta(){
+		get_cytoframe_ptr()->load_meta();
+	};
 	string get_h5_file_path() const{
 			return get_cytoframe_ptr()->get_h5_file_path();
 		}

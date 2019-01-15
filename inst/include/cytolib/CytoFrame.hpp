@@ -147,6 +147,9 @@ public:
 
 	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const = 0;
 
+	void set_readonly(bool flag){
+		readonly_ = flag;
+	}
 
 	virtual void compensate(const compensation & comp)
 	{
@@ -669,6 +672,10 @@ public:
 
 	virtual CytoFramePtr copy(const string & h5_filename = "") const=0;
 	virtual string get_h5_file_path() const=0;
+	virtual void flush_meta(){};
+	virtual void load_meta(){};
+
+
 	virtual CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
