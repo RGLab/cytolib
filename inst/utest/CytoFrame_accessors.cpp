@@ -264,6 +264,35 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 
 
 }
+BOOST_AUTO_TEST_CASE(flush_meta)
+{
+	//deep cp
+	CytoFramePtr fr1 = fr_h5->copy();
+	string h5file = fr1->get_h5_file_path();
+	//update meta data
+	string oldname = fr1->get_channels()[2];
+	string newname = "test";
+	fr1->set_channel(oldname, newname);
+	//discard change
+	fr1->load_meta();
+	BOOST_CHECK_EQUAL(fr1->get_channels()[2], oldname);
+	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), oldname);
+
+	fr1->set_channel(oldname, newname);
+	//flush the change
+	fr1->flush_meta();
+	fr1->load_meta();
+	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
+	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), newname);
+	//change it back and let the destructor does the flushing
+	fr1->set_channel(newname, oldname);
+	fr1.reset();
+	//load it back and see the change has taken effect
+	fr1.reset(new H5CytoFrame(h5file));
+	BOOST_CHECK_EQUAL(fr1->get_channels()[2], oldname);
+	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), oldname);
+
+}
 
 BOOST_AUTO_TEST_CASE(CytoFrameView_copy)
 {
