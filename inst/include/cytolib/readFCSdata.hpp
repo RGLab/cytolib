@@ -29,6 +29,7 @@ struct FCS_READ_DATA_PARAM{
 	 TransformType transform;
 	 int num_threads; //number of cores to be used for parallel-read of data (channel / core)
 	 vector<int> which_lines; //select rows to be read in
+	 int seed;
 	 bool isTransformed;//record the outcome after parsing
 	 FCS_READ_DATA_PARAM(){
 		 scale = false;
@@ -39,6 +40,7 @@ struct FCS_READ_DATA_PARAM{
 		 transform =  TransformType::linearize;
 		 num_threads = 1;
 		 isTransformed = false;
+		 seed = 1;
 	 }
 
 

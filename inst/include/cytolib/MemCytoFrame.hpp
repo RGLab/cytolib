@@ -469,7 +469,7 @@ public:
 	  		nSelected = which_lines[0];
 	  		which_lines.resize(nSelected);
 	  		vector<int> total_vec(nrow);
-	  		std::default_random_engine generator;
+	  		std::default_random_engine generator(config.seed);
 	  		std::uniform_int_distribution<int> distribution(0, nrow - 1);
 	  		for(unsigned i = 0; i < nSelected; i++)
 	  		{
