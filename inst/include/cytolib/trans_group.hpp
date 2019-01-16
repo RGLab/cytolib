@@ -210,7 +210,20 @@ public:
 	{
 		trans_local res;
 		for(const auto & it : tp)
-			res.tp[it.first] = it.second->clone();
+		{
+			auto trans = it.second;
+			string chnl = it.first;
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			{
+				string type;
+				if(!trans)
+					throw(domain_error("Empty trans func: " + chnl));
+
+				trans->getType(type);
+				PRINT("copy transformation type = " + type +" : " + chnl+"\n");
+			}
+			res.tp[chnl] = trans->clone();
+		}
 		return res;
 	}
 };

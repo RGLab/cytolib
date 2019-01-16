@@ -263,8 +263,11 @@ public:
 
 							EVENT_DATA_TYPE * x = cytoframe.get_data_memptr(curChannel, ColType::channel);
 							if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-								PRINT("transforming "+curChannel+" with func:"+curTrans->getChannel()+"\n");
-
+							{
+								string type;
+								curTrans->getType(type);
+								PRINT("transforming "+curChannel+" with func:"+type+"\n");
+							}
 							curTrans->transforming(x,nEvents);
 
 							curTrans->transforming(&param_range.first, 1);

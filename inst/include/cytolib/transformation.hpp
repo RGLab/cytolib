@@ -115,6 +115,36 @@ public:
 	virtual string getChannel(){return channel;};
 	virtual void setChannel(string _channel){channel=_channel;};
 	virtual unsigned short getType(){return type;};
+	virtual unsigned short getType(string &ctype){
+		switch(type)
+		{
+			case  CALTBL:
+				ctype = "CALTBL";
+				break;
+			case  LOG:
+				ctype = "LOG";
+				break;
+			case  LIN:
+				ctype = "LIN";
+				break;
+			case  FLIN :
+				ctype = "FLIN";
+				break;
+			case  FASINH :
+				ctype = "FASINH";
+				break;
+			case  BIEXP :
+				ctype = "BIEXP";
+				break;
+			case  LOGICLE :
+				ctype = "LOGICLE";
+				break;
+			default:
+				throw(domain_error("unknown trans type id: " + to_string(type)));
+		}
+
+		return type;
+	};
 	virtual void setType(unsigned short _type){type=_type;};
 	virtual TransPtr clone() const{return TransPtr(new transformation(*this));};
 	transformation(const pb::transformation & trans_pb){
