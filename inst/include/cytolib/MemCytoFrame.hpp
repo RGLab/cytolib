@@ -469,10 +469,12 @@ public:
 	  		nSelected = which_lines[0];
 	  		which_lines.resize(nSelected);
 	  		vector<int> total_vec(nrow);
-	  		int n = 0;
-	  		std::generate(total_vec.begin(), total_vec.end(), [&n](){return n++;});//generate seq from 0 to nrow-1
-	  		std::random_shuffle(total_vec.begin(), total_vec.end());
-	  		std::copy_n(total_vec.begin(), nSelected, which_lines.begin());
+	  		std::default_random_engine generator;
+	  		std::uniform_int_distribution<int> distribution(0, nrow - 1);
+	  		for(unsigned i = 0; i < nSelected; i++)
+	  		{
+	  			which_lines[i] = distribution(generator);
+	  		}
 	  	}
 	  	if(nSelected>0){
 	  		if(nSelected >= nrow)
