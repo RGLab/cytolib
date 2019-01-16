@@ -1,7 +1,7 @@
 Package: cytolib
 Type: Package
 Title: C++ infrastructure for representing and interacting with the gated cytometry
-Version: 2.1.9
+Version: 2.1.10
 Date: 2017-08-07
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>

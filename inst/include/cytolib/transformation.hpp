@@ -733,7 +733,6 @@ public:
 	logicleTrans (double T, double W, double M, double A, bool _isGml2, int bins = 0, bool isInverse = false):transformation(false,LOGICLE)
 	{
 		calTbl.setInterpolated(true);
-
 	  	if (T <= 0)
 			throw domain_error("IllegalParameter: T is not positive");
 			//throw IllegalParameter("T is not positive");
@@ -765,18 +764,21 @@ public:
 		p.W = W;
 		p.A = A;
 		p.isInverse = isInverse;
+		init();
+	}
+	void init(){
 
 		// actual parameters
 		// formulas from biexponential paper
-		p.w = W / (M + A);
-		p.x2 = A / (M + A);
+		p.w = p.W / (p.M + p.A);
+		p.x2 = p.A / (p.M + p.A);
 		p.x1 = p.x2 + p.w;
 		p.x0 = p.x2 + 2 * p.w;
-		p.b = (M + A) * LN_10;
+		p.b = (p.M + p.A) * LN_10;
 		p.d = solve(p.b, p.w);
 		double c_a = exp(p.x0 * (p.b + p.d));
 		double mf_a = exp(p.b * p.x1) - c_a / exp(p.d * p.x1);
-		p.a = T / ((exp(p.b) - mf_a) - c_a / exp(p.d));
+		p.a = p.T / ((exp(p.b) - mf_a) - c_a / exp(p.d));
 		p.c = c_a * p.a;
 		p.f = -mf_a * p.a;
 
@@ -1085,7 +1087,8 @@ public:
 		lt_pb->set_bins(p.bins);
 		lt_pb->set_t(p.T);
 		lt_pb->set_isgml2(isGml2);
-		//no need to store isInverse flag assuming the inverse won't be used/stored directly by gs
+		lt_pb->set_isinverse(p.isInverse);
+
 	}
 	logicleTrans(const pb::transformation & trans_pb):transformation(trans_pb){
 		const pb::logicleTrans & lt_pb = trans_pb.lgt();
@@ -1095,6 +1098,9 @@ public:
 		p.A = lt_pb.a();
 		p.M = lt_pb.m();
 		isGml2 = lt_pb.isgml2();
+		p.isInverse = lt_pb.isinverse();
+
+		init();
 	}
 	TransPtr  getInverseTransformation(){
 		logicleTrans tt = *this;
