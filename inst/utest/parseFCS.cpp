@@ -8,20 +8,32 @@ using namespace cytolib;
 BOOST_FIXTURE_TEST_SUITE(parseFCS,parseFCSFixture)
 BOOST_AUTO_TEST_CASE(sample_1071)
 {
-	double start = gettime();//clock();
+//	double start = gettime();//clock();
 
 	string filename="../flowCore/misc/sample_1071.001";
 	FCS_READ_PARAM config;
 	config.data.num_threads = 4;
+	//subset
+	config.data.which_lines = {10};
+	MemCytoFrame cf1(filename.c_str(), config);
+	cf1.read_fcs();
+	BOOST_CHECK_EQUAL(cf1.n_rows(), 10);
+	config.data.which_lines = {10, 12};
+	MemCytoFrame cf2(filename.c_str(), config);
+	cf2.read_fcs();
+	BOOST_CHECK_EQUAL(cf2.n_rows(), 2);
+
+	config.data.which_lines = {};
 	MemCytoFrame cytofrm(filename.c_str(), config);
 	cytofrm.read_fcs();
-	double runtime = (gettime() - start);// / (double)(CLOCKS_PER_SEC / 1000);
-		cout << runtime << endl;
+
+	//	double runtime = (gettime() - start);// / (double)(CLOCKS_PER_SEC / 1000);
+//		cout << runtime << endl;
 	BOOST_CHECK_EQUAL(cytofrm.n_cols(), 8);
 	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 23981);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
 
-	string h5file = "/loc/no-backup/mike/shared/test.h5";
+	string h5file = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
 	cytofrm.write_h5(h5file);
 	H5CytoFrame h5fr(h5file);
 	BOOST_CHECK_EQUAL(h5fr.n_cols(), 8);

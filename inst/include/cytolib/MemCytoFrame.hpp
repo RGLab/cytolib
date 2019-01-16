@@ -463,6 +463,17 @@ public:
 
 	  	vector<int>which_lines = config.which_lines;
 	  	unsigned nSelected = which_lines.size();
+	  	//randomly sample the data if the given lines are of size 1
+	  	if(nSelected == 1)
+	  	{
+	  		nSelected = which_lines[0];
+	  		which_lines.resize(nSelected);
+	  		vector<int> total_vec(nrow);
+	  		int n = 0;
+	  		std::generate(total_vec.begin(), total_vec.end(), [&n](){return n++;});//generate seq from 0 to nrow-1
+	  		std::random_shuffle(total_vec.begin(), total_vec.end());
+	  		std::copy_n(total_vec.begin(), nSelected, which_lines.begin());
+	  	}
 	  	if(nSelected>0){
 	  		if(nSelected >= nrow)
 	  			throw(domain_error("total number of which.lines exceeds the total number of events: " + to_string(nrow)));
