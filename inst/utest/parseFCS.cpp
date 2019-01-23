@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(gigantic_file)
 
 	string filename="../flowCore/misc/gigantic_file.fcs";
 	FCS_READ_PARAM config;
-	vector<int> which_lines(1e3);
+	vector<long> which_lines(1e3);
 	for(auto i = 0; i < 1e3; i++)
 		which_lines[i] = i;
 	config.data.which_lines = which_lines;
@@ -176,6 +176,13 @@ BOOST_AUTO_TEST_CASE(gigantic_file)
 
 	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 1e3);
 	BOOST_CHECK_CLOSE(cytofrm.get_data()[1], 63418.3242, 1e-6);
+
+	config.data.seed = 2;
+	config.data.which_lines = {1000};
+	MemCytoFrame cytofrm1(filename.c_str(), config);
+	cytofrm1.read_fcs();
+	BOOST_CHECK_EQUAL(cytofrm1.n_rows(), 1e3);
+	BOOST_CHECK_CLOSE(cytofrm1.get_data()[1], 38579.7617, 1e-6);
 
 }
 

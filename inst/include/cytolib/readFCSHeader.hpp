@@ -25,7 +25,7 @@ enum class TransformType {none, linearize, scale,linearize_with_PnG_scaling};
 enum class endianType {big, small, mixed};
 struct FCS_Header{
 	float FCSversion;
-	int textstart, textend, datastart, dataend, anastart, anaend, additional;
+	long textstart, textend, datastart, dataend, anastart, anaend, additional;
 };
 
 //typedef unordered_map <string, string> KEY_WORDS;

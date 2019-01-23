@@ -448,7 +448,7 @@ public:
 
 	  in.seekg(header_.datastart);
 
-	  int nBytes = header_.dataend - header_.datastart + 1;
+	  auto nBytes = header_.dataend - header_.datastart + 1;
 
 
 	//	vector<BYTE>bytes(nBytes);
@@ -459,19 +459,18 @@ public:
 		//total bits for each row
 	  	size_t nRowSize = accumulate(params.begin(), params.end(), 0, [](size_t i, cytoParam p){return i + p.PnB;});
 
-	  	unsigned nrow = nBytes * 8/nRowSize;
+	  	auto nrow = nBytes * 8/nRowSize;
 
-	  	vector<int>which_lines = config.which_lines;
-	  	unsigned nSelected = which_lines.size();
+	  	auto which_lines = config.which_lines;
+	  	auto nSelected = which_lines.size();
 	  	//randomly sample the data if the given lines are of size 1
 	  	if(nSelected == 1)
 	  	{
 	  		nSelected = which_lines[0];
 	  		which_lines.resize(nSelected);
-	  		vector<int> total_vec(nrow);
 	  		std::default_random_engine generator(config.seed);
-	  		std::uniform_int_distribution<int> distribution(0, nrow - 1);
-	  		for(unsigned i = 0; i < nSelected; i++)
+	  		std::uniform_int_distribution<long> distribution(0, nrow - 1);
+	  		for(auto i = 0; i < nSelected; i++)
 	  		{
 	  			which_lines[i] = distribution(generator);
 	  		}
@@ -492,7 +491,7 @@ public:
 	  		auto nRowSizeBytes = nRowSize/8;
 	  		for(auto i : which_lines)
 	  		{
-	  			int pos =  header_.datastart + i * nRowSizeBytes;
+	  			auto pos =  header_.datastart + i * nRowSizeBytes;
 	  			if(pos > header_.dataend || pos < header_.datastart)
 	  				throw(domain_error("the index of which.lines exceeds the data boundary: " + to_string(i)));
 	  			in.seekg(pos);
@@ -505,8 +504,8 @@ public:
 	  		//load entire data section with one disk IO
 
 			in.read(bufPtr, nBytes); //load the bytes from file
-			int events_read = (in.gcount() * 8 / nRowSize);
-			int events_expected = boost::lexical_cast<int>(keys_["$TOT"]);
+			auto events_read = (in.gcount() * 8 / nRowSize);
+			auto events_expected = boost::lexical_cast<long>(keys_["$TOT"]);
 			if(events_read != events_expected)//can't use nBytes derived from FCS header as the check point since it may have extra bytes than needed
 			{
 				throw(domain_error("file " + filename_+ " seems to be corrupted. \n The actual number of cells in data section ("
@@ -516,7 +515,7 @@ public:
 	  	}
 	//	nEvents = nrow;
 		//how many element to return
-	  	size_t nElement = nrow * nCol;
+	  	auto nElement = nrow * nCol;
 
 	  	data_.resize(nrow, nCol);
 
