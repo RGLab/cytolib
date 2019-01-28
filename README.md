@@ -2,7 +2,7 @@
 
 `cytolib` provides the c++ headers for users to use and interact with the `GatingSet` (the gated cytometry data structure) at c++ level.
 
-###Installation
+### Installation
 The **cytolib** package is installed via `R CMD INSTALL ...`. 
 
 R packages wishing to use the libraries in `cytolib` only need to:
@@ -13,12 +13,12 @@ e.g.
 ```
 LinkingTo: cytolib
 ```
-###Usage
+### Usage
 Make sure to call `CYTOLIB_INIT()` in user c code
 
 See **flowWorkspace** package for the example of using `cytolib`.
 
-###Switching between the old and new tool chains
+### Switching between the old and new tool chains
 ```
 #new
 devtools::install_github(c("RGLab/RProtoBufLib", "RGLab/cytolib", "RGLab/flowWorkspace", "RGLab/openCyto","RGLab/CytoML"), ref = "cytoset")
