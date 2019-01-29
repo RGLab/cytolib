@@ -411,7 +411,6 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
 	{
 		fr_pb.set_is_h5(true);
-
 		if(!fs::equivalent(fs::path(filename_).parent_path(), fs::path(h5_filename).parent_path()))
 		{
 			switch(h5_opt)

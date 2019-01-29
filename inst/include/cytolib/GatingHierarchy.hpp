@@ -440,6 +440,7 @@ public:
 		if(!is_skip_data)
 		{
 			pb::CytoFrame * fr_pb = gh_pb.mutable_frame();
+			frame_.flush_meta();
 			frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
 		}
 
