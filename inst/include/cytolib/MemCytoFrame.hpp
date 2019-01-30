@@ -292,7 +292,9 @@ public:
 	 * @param config the parse arguments.
 	 * @param onlyTxt flag indicates whether to only parse text segment (which contains the keywords)
 	 */
-	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){}
+	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){
+		set_pheno_data("name", path_base_name(filename));
+	}
 
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
 	{
@@ -470,7 +472,7 @@ public:
 	  		which_lines.resize(nSelected);
 	  		std::default_random_engine generator(config.seed);
 	  		std::uniform_int_distribution<long> distribution(0, nrow - 1);
-	  		for(auto i = 0; i < nSelected; i++)
+	  		for(unsigned long i = 0; i < nSelected; i++)
 	  		{
 	  			which_lines[i] = distribution(generator);
 	  		}
@@ -491,7 +493,7 @@ public:
 	  		auto nRowSizeBytes = nRowSize/8;
 	  		for(auto i : which_lines)
 	  		{
-	  			auto pos =  header_.datastart + i * nRowSizeBytes;
+	  			long pos =  header_.datastart + i * nRowSizeBytes;
 	  			if(pos > header_.dataend || pos < header_.datastart)
 	  				throw(domain_error("the index of which.lines exceeds the data boundary: " + to_string(i)));
 	  			in.seekg(pos);
@@ -504,8 +506,8 @@ public:
 	  		//load entire data section with one disk IO
 
 			in.read(bufPtr, nBytes); //load the bytes from file
-			auto events_read = (in.gcount() * 8 / nRowSize);
-			auto events_expected = boost::lexical_cast<long>(keys_["$TOT"]);
+			unsigned long events_read = (in.gcount() * 8 / nRowSize);
+			unsigned long events_expected = boost::lexical_cast<unsigned long>(keys_["$TOT"]);
 			if(events_read != events_expected)//can't use nBytes derived from FCS header as the check point since it may have extra bytes than needed
 			{
 				throw(domain_error("file " + filename_+ " seems to be corrupted. \n The actual number of cells in data section ("

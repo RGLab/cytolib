@@ -281,7 +281,10 @@ public:
 	virtual void write_h5_pheno_data(H5File file) const
 	{
 		CompType key_type = get_h5_datatype_keys();
-		hsize_t dim_pd[] = {pheno_data_.size()};
+		hsize_t nSize = pheno_data_.size();
+		if(nSize==0)
+			throw("CytoFrame requires non-empty pdata to write to h5!");
+		hsize_t dim_pd[] = {nSize};
 		hsize_t dim_max[] = {H5S_UNLIMITED};
 		DataSpace dsp_pd(1, dim_pd, dim_max);
 		DSetCreatPropList plist;
@@ -296,7 +299,6 @@ public:
 		{
 			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
 		}
-
 
 		ds.write(&keyVec[0], key_type );
 
