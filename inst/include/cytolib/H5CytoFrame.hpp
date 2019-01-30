@@ -112,6 +112,7 @@ public:
 		hsize_t size[1] = {params.size()};
 		ds.extend(size);
 		ds.write(&params[0], param_type );
+		ds.flush(H5F_SCOPE_LOCAL);
 		is_dirty_params = false;
 	}
 
@@ -130,6 +131,8 @@ public:
 		hsize_t size[1] = {keyVec.size()};
 		ds.extend(size);
 		ds.write(&keyVec[0], key_type );
+		ds.flush(H5F_SCOPE_LOCAL);
+
 		is_dirty_keys = false;
 	}
 	void flush_pheno_data()
@@ -149,6 +152,8 @@ public:
 		ds.extend(size);
 
 		ds.write(&keyVec[0], key_type );
+		ds.flush(H5F_SCOPE_LOCAL);
+
 		is_dirty_pdata = false;
 	}
 
@@ -373,14 +378,7 @@ public:
 		int nKey = dim_key[0];
 
 		vector<key_t> keyVec(nKey);
-		try
-		{
-			ds_key.read(keyVec.data(), key_type);
-		}catch(const std::exception &e)
-		{
-			throw(domain_error("failed to read keywords dataset from h5!\n" + string(e.what())));
-		}
-//		keys.resize(nKey);
+		ds_key.read(keyVec.data(), key_type);
 		for(auto i = 0; i < nKey; i++)
 		{
 			keys_[keyVec[i].key] = keyVec[i].value;
@@ -515,6 +513,7 @@ public:
 		dataspace.getSimpleExtentDims(dims);
 
 		dataset.write(_data.mem, h5_datatype_data(DataTypeLocation::MEM));
+		dataset.flush(H5F_SCOPE_LOCAL);
 
 	}
 
