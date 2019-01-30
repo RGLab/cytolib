@@ -109,7 +109,9 @@ public:
 	{
 		CompType param_type = get_h5_datatype_params(DataTypeLocation::MEM);
 		DataSet ds = file.openDataSet("params");
-		ds.write(params.data(), param_type );
+		hsize_t size[1] = {params.size()};
+		ds.extend(size);
+		ds.write(&params[0], param_type );
 		is_dirty_params = false;
 	}
 
@@ -125,7 +127,8 @@ public:
 			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
 		}
 
-
+		hsize_t size[1] = {keyVec.size()};
+		ds.extend(size);
 		ds.write(&keyVec[0], key_type );
 		is_dirty_keys = false;
 	}
@@ -142,6 +145,8 @@ public:
 			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
 		}
 
+		hsize_t size[1] = {keyVec.size()};
+		ds.extend(size);
 
 		ds.write(&keyVec[0], key_type );
 		is_dirty_pdata = false;
@@ -368,7 +373,13 @@ public:
 		int nKey = dim_key[0];
 
 		vector<key_t> keyVec(nKey);
-		ds_key.read(keyVec.data(), key_type);
+		try
+		{
+			ds_key.read(keyVec.data(), key_type);
+		}catch(const std::exception &e)
+		{
+			throw(domain_error("failed to read keywords dataset from h5!\n" + string(e.what())));
+		}
 //		keys.resize(nKey);
 		for(auto i = 0; i < nKey; i++)
 		{
@@ -497,6 +508,11 @@ public:
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
 		check_write_permission();
+		hsize_t dims_data[2] = {_data.n_cols, _data.n_rows};
+		dataset.extend(dims_data);
+		//refresh data space and dims
+		dataspace = dataset.getSpace();
+		dataspace.getSimpleExtentDims(dims);
 
 		dataset.write(_data.mem, h5_datatype_data(DataTypeLocation::MEM));
 

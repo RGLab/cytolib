@@ -246,8 +246,11 @@ public:
 	virtual void write_h5_params(H5File file) const
 	{
 		hsize_t dim_param[] = {n_cols()};
-		DataSpace dsp_param(1, dim_param);
-		DataSet ds = file.createDataSet( "params", get_h5_datatype_params(DataTypeLocation::H5), dsp_param);
+		hsize_t dim_max[] = {H5S_UNLIMITED};
+		DataSpace dsp_param(1, dim_param, dim_max);
+		DSetCreatPropList plist;
+		plist.setChunk(1, dim_param);
+		DataSet ds = file.createDataSet( "params", get_h5_datatype_params(DataTypeLocation::H5), dsp_param, plist);
 
 		ds.write(&params[0], get_h5_datatype_params(DataTypeLocation::MEM));
 
@@ -258,8 +261,11 @@ public:
 	{
 		CompType key_type = get_h5_datatype_keys();
 		hsize_t dim_key[] = {keys_.size()};
-		DataSpace dsp_key(1, dim_key);
-		DataSet ds = file.createDataSet( "keywords", key_type, dsp_key);
+		hsize_t dim_max[] = {H5S_UNLIMITED};
+		DataSpace dsp_key(1, dim_key, dim_max);
+		DSetCreatPropList plist;
+		plist.setChunk(1, dim_key);
+		DataSet ds = file.createDataSet( "keywords", key_type, dsp_key, plist);
 
 		//convert to vector
 		vector<KEY_WORDS_SIMPLE> keyVec;
@@ -276,8 +282,12 @@ public:
 	{
 		CompType key_type = get_h5_datatype_keys();
 		hsize_t dim_pd[] = {pheno_data_.size()};
-		DataSpace dsp_pd(1, dim_pd);
-		DataSet ds = file.createDataSet( "pdata", key_type, dsp_pd);
+		hsize_t dim_max[] = {H5S_UNLIMITED};
+		DataSpace dsp_pd(1, dim_pd, dim_max);
+		DSetCreatPropList plist;
+		plist.setChunk(1, dim_pd);
+
+		DataSet ds = file.createDataSet( "pdata", key_type, dsp_pd, plist);
 
 		//convert to vector
 
@@ -317,7 +327,9 @@ public:
 		hsize_t	chunk_dims[2] = {1, nEvents};
 		plist.setChunk(2, chunk_dims);
 	//	plist.setFilter()
-		DataSpace dataspace( 2, dimsf);
+		hsize_t dim_max[] = {H5S_UNLIMITED, H5S_UNLIMITED};
+
+		DataSpace dataspace( 2, dimsf, dim_max);
 		DataSet dataset = file.createDataSet( DATASET_NAME, h5_datatype_data(DataTypeLocation::H5), dataspace, plist);
 		/*
 		* Write the data to the dataset using default memory space, file

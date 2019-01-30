@@ -20,6 +20,34 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
+BOOST_AUTO_TEST_CASE(serialize) {
+	GatingSet gs1 = gs.copy();
+	/*
+	 * make changes to meta data
+	 */
+	auto cf = gs1.begin()->second->get_cytoframe_view_ref();
+	string oldc = cf.get_channels()[0];
+	string newc = "new_channel";
+	cf.set_channel(oldc, newc);
+	string kn = cf.get_keywords().begin()->first;
+	string kv = "new_key";
+	cf.set_keyword(kn, kv);
+	string pdn = "pdn";
+	string pdv = "pdv";
+	cf.set_pheno_data(pdn, pdv);
+	//archive
+//	string tmp = "/tmp/gsEGnOlP";
+	string tmp = generate_unique_dir(fs::temp_directory_path(), "gs");
+	gs1.serialize_pb(tmp, H5Option::copy);
+	//load it back
+	GatingSet gs2(tmp);
+	auto cf2 = gs2.begin()->second->get_cytoframe_view_ref();
+
+	BOOST_CHECK_EQUAL(cf2.get_channels()[0], newc);
+	BOOST_CHECK_EQUAL(cf2.get_keyword(kn), kv);
+	BOOST_CHECK_EQUAL(cf2.get_pheno_data().find(pdn)->second, pdv);
+
+}
 BOOST_AUTO_TEST_CASE(get_cytoset) {
 	GatingSet cs = gs.get_cytoset();
 	BOOST_CHECK_EQUAL(cs.get_sample_uids().size(), gs.size());
