@@ -6,7 +6,8 @@ Date: 2017-08-07
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
 Description: This package provides the core data structure and API to represent and interact with the gated cytometry data.
-License: Artistic-2.0
+License: file LICENSE
+License_restricts_use: yes
 LazyLoad: yes
 Collate:
     'zzz.R'
