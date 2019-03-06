@@ -745,8 +745,8 @@ public:
 			/*
 			 * assume the reference node has already added during the parsing stage
 			 */
-			vector<string> nodePath=it->path;
-			nodeID=getRefNodeID(u,nodePath);
+
+			nodeID=getRefNodeID(u,it->path);
 
 			nodeProperties & curPop=getNodeProperty(nodeID);
 			//prevent self-referencing
@@ -822,9 +822,8 @@ public:
 			/*
 			 * assume the reference node has already added during the parsing stage
 			 */
-			vector<string> nodePath=it->path;
 
-			nodeID=getNodeID(nodePath);//search ID by path
+			nodeID=getNodeID(it->path);//search ID by path
 
 
 			nodeProperties & curPop=getNodeProperty(nodeID);
@@ -979,7 +978,7 @@ public:
 	  */
 	VertexID getNodeID(string gatePath){
 
-		StringVec res;
+		deque<string> res;
 		boost::split(res,gatePath,boost::is_any_of("/"));
 		//remove the empty string
 		res.erase(remove_if(res.begin(),res.end(), isEmpty), res.end());
@@ -997,7 +996,7 @@ public:
 	 * @param gatePath a string vector of full(or partial) gating path
 	 * @return node id
 	 */
-	VertexID getNodeID(vector<string> gatePath){
+	VertexID getNodeID(const deque<string> & gatePath){
 		VertexID_vec nodeIDs = queryByPath(0,gatePath);
 		unsigned nMatches = nodeIDs.size();
 		if(nMatches == 1)
@@ -1075,7 +1074,7 @@ public:
 
 	}
 
-	VertexID getRefNodeID(VertexID u,vector<string> refPath){
+	VertexID getRefNodeID(VertexID u, const deque<string> & refPath){
 
 		/*
 		 * to save searching time, try the siblings first(go up one level)
@@ -1202,7 +1201,7 @@ public:
 	 * @param gatePath input
 	 * @return node IDs that matches to the query path
 	 */
-	VertexID_vec queryByPath(VertexID ancestorID, vector<string> gatePath){
+	VertexID_vec queryByPath(VertexID ancestorID, const deque<string> & gatePath){
 		VertexID_vec res;
 		/*
 		 * search for the leaf node
@@ -1228,7 +1227,7 @@ public:
 
 			// start from the parent of the leaf node
 			VertexID curNodeID = curLeafID;
-			vector<string>::reverse_iterator it;
+			deque<string>::const_reverse_iterator it;
 			for(it = gatePath.rbegin()+1;it!=gatePath.rend();it++)
 			{
 				//get current parent from node path
@@ -1369,6 +1368,8 @@ public:
 				continue;
 
 			string nodeName=np.getName();
+			deque<string> nodePath;
+			nodePath.push_front(nodeName);
 			/*
 			 * append ancestors on its way of tracing back to the root node
 			 */
@@ -1378,20 +1379,25 @@ public:
 				//when full path is false, check if the current partial path is uniquely identifiable
 				if(!fullPath)
 				{
-					try{
-						getNodeID(nodeName);
-						break;//quit the path growing if not no error (i.e. it is unique)
-					}
-					catch(const domain_error & e){
-						// otherwise do nothing but continue to grow the path
-					}
+					VertexID_vec nodeIDs = queryByPath(0,nodePath);
+					unsigned nMatches = nodeIDs.size();
+					if(nMatches == 1)
+						break;//quit the path growing if unique
+					else if(nMatches == 0)
+						throw(domain_error(nodeName + " not found!" ));
+
+					// otherwise do nothing but continue to grow the path
 
 				}
 
 				nodeName="/"+nodeName;
 				u=getParent(u);
-					if(u>0)//don't append the root node
-						nodeName=getNodeProperty(u).getName()+nodeName;
+				if(u>0)//don't append the root node
+				{
+					string pname = getNodeProperty(u).getName();
+					nodePath.push_front(pname);
+					nodeName= pname + nodeName;
+				}
 
 
 
