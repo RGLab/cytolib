@@ -19,7 +19,7 @@ using namespace std;
 namespace cytolib
 {
 struct BOOL_GATE_OP{
-	vector<string> path;
+	deque<string> path;
 	char op;
 	bool isNot;
 	void convertToPb(pb::BOOL_GATE_OP & BOOL_GATE_OP_pb){
