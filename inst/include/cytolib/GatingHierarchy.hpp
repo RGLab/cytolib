@@ -1193,69 +1193,71 @@ public:
 
 	}
 
+	VertexID_vec pathMatch(VertexID_vec leafIDs, const deque<string> & gatePath){
+				VertexID_vec res;
+				/*
+				 * bottom-up searching each route from matched leaf nodes
+				 */
+				VertexID_vec::iterator it_leaf,it_matched;
+				it_matched = leafIDs.end();
 
+				for(it_leaf = leafIDs.begin(); it_leaf != leafIDs.end(); it_leaf++)
+				{
+					/*
+					 * bottom up matching to the given gating path
+					 *
+					 */
+
+					VertexID curLeafID = *it_leaf;
+
+					// start from the parent of the leaf node
+					VertexID curNodeID = curLeafID;
+					deque<string>::const_reverse_iterator it;
+					for(it = gatePath.rbegin()+1;it!=gatePath.rend();it++)
+					{
+						//get current parent from node path
+						string parentNameFromPath = *it;
+
+						/*
+						 * retrieve the actual parent node from the tree
+						 */
+						VertexID parentID = getParent(curNodeID);
+						string parentName = getNodeProperty(parentID).getName();
+						//compare it to the parent node from the path
+						if(parentName.compare(parentNameFromPath) != 0)
+						{
+							break; //not matched then exit current route
+						}else{
+							//move up to the next ancestor and continue the matching process
+							curNodeID = parentID;
+						}
+					}
+
+					//when it succeeds to the end of path
+					if(it == gatePath.rend())
+						res.push_back(curLeafID);
+
+				}
+
+
+				return res;
+
+	}
 	/*
-	 * retrieve the VertexIDs by the gating path.
+	 * retrieve the VertexIDs by the gating path.(bottom-up searching)
 	 * This routine allows multiple matches
 	 * @param ancestorID when gatePath is partial path, this node ID narrow the searching range.
 	 * @param gatePath input
 	 * @return node IDs that matches to the query path
 	 */
 	VertexID_vec queryByPath(VertexID ancestorID, const deque<string> & gatePath){
-		VertexID_vec res;
 		/*
 		 * search for the leaf node
 		 */
 		string leafName=gatePath.at(gatePath.size()-1);
 		VertexID_vec leafIDs=getDescendants(ancestorID,leafName);
+		return pathMatch(leafIDs, gatePath);
 
-
-		/*
-		 * bottom-up searching each route from matched leaf nodes
-		 */
-		VertexID_vec::iterator it_leaf,it_matched;
-		it_matched = leafIDs.end();
-
-		for(it_leaf = leafIDs.begin(); it_leaf != leafIDs.end(); it_leaf++)
-		{
-			/*
-			 * bottom up matching to the given gating path
-			 *
-			 */
-
-			VertexID curLeafID = *it_leaf;
-
-			// start from the parent of the leaf node
-			VertexID curNodeID = curLeafID;
-			deque<string>::const_reverse_iterator it;
-			for(it = gatePath.rbegin()+1;it!=gatePath.rend();it++)
-			{
-				//get current parent from node path
-				string parentNameFromPath = *it;
-
-				/*
-				 * retrieve the actual parent node from the tree
-				 */
-				VertexID parentID = getParent(curNodeID);
-				string parentName = getNodeProperty(parentID).getName();
-				//compare it to the parent node from the path
-				if(parentName.compare(parentNameFromPath) != 0)
-				{
-					break; //not matched then exit current route
-				}else{
-					//move up to the next ancestor and continue the matching process
-					curNodeID = parentID;
-				}
-			}
-
-			//when it succeeds to the end of path
-			if(it == gatePath.rend())
-				res.push_back(curLeafID);
-
-		}
-
-
-		return res;
 
 	}
 
@@ -1391,21 +1393,24 @@ public:
 	 */
 	string getNodePath(VertexID u,bool fullPath = true)
 	{
-
-		string sNodePath=getNodeProperty(u).getName();
+		//init node path with the leaf
+		string leafName=getNodeProperty(u).getName();
+		string sNodePath = leafName;
 		deque<string> nodePath;
 		nodePath.push_front(sNodePath);
-		/*
-		 * append ancestors on its way of tracing back to the root node
-		 */
 
+		//init searching routes
+		VertexID_vec leafIDs=getDescendants(0,leafName);
+
+		//start to trace back to ancestors
 		while(u > 0)
 		{
 			//when full path is false, check if the current partial path is uniquely identifiable
 			if(!fullPath)
 			{
-				VertexID_vec nodeIDs = queryByPath(0,nodePath);
-				unsigned nMatches = nodeIDs.size();
+				//update searching routes
+				leafIDs = pathMatch(leafIDs, nodePath);
+				unsigned nMatches = leafIDs.size();
 				if(nMatches == 1)
 					break;//quit the path growing if unique
 				else if(nMatches == 0)
