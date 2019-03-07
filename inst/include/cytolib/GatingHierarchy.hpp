@@ -1355,56 +1355,16 @@ public:
 	 * @param showHidden whether to include the hidden nodes
 	 * @return
 	 */
-	vector<string> getPopPaths(unsigned short order,bool fullPath,bool showHidden){
+	vector<string> getNodePaths(unsigned short order,bool fullPath,bool showHidden){
 
 		VertexID_vec vertices=getVertices(order);
 		vector<string> res;
 		for(VertexID_vec::iterator it=vertices.begin();it!=vertices.end();it++)
 		{
 			VertexID u=*it;
-			nodeProperties & np = getNodeProperty(u);
-
-			if(!showHidden&&np.getHiddenFlag())
+			if(!showHidden&&getNodeProperty(u).getHiddenFlag())
 				continue;
-
-			string nodeName=np.getName();
-			deque<string> nodePath;
-			nodePath.push_front(nodeName);
-			/*
-			 * append ancestors on its way of tracing back to the root node
-			 */
-
-			while(u > 0)
-			{
-				//when full path is false, check if the current partial path is uniquely identifiable
-				if(!fullPath)
-				{
-					VertexID_vec nodeIDs = queryByPath(0,nodePath);
-					unsigned nMatches = nodeIDs.size();
-					if(nMatches == 1)
-						break;//quit the path growing if unique
-					else if(nMatches == 0)
-						throw(domain_error(nodeName + " not found!" ));
-
-					// otherwise do nothing but continue to grow the path
-
-				}
-
-				nodeName="/"+nodeName;
-				u=getParent(u);
-				if(u>0)//don't append the root node
-				{
-					string pname = getNodeProperty(u).getName();
-					nodePath.push_front(pname);
-					nodeName= pname + nodeName;
-				}
-
-
-
-			}
-
-
-			res.push_back(nodeName);
+			res.push_back(getNodePath(u, fullPath));
 
 		}
 		return res;
@@ -1429,15 +1389,46 @@ public:
 	 * @param u
 	 * @return
 	 */
-	string getNodePath(VertexID u)
+	string getNodePath(VertexID u,bool fullPath = true)
 	{
-		string res;
 
-		while(u > 0){
-			res = "/" + getNodeProperty(u).getName() + res;
-			u = getParent(u);
+		string sNodePath=getNodeProperty(u).getName();
+		deque<string> nodePath;
+		nodePath.push_front(sNodePath);
+		/*
+		 * append ancestors on its way of tracing back to the root node
+		 */
+
+		while(u > 0)
+		{
+			//when full path is false, check if the current partial path is uniquely identifiable
+			if(!fullPath)
+			{
+				VertexID_vec nodeIDs = queryByPath(0,nodePath);
+				unsigned nMatches = nodeIDs.size();
+				if(nMatches == 1)
+					break;//quit the path growing if unique
+				else if(nMatches == 0)
+					throw(domain_error(sNodePath + " not found!" ));
+
+				// otherwise do nothing but continue to grow the path
+
+			}
+
+			sNodePath="/"+sNodePath;
+			u=getParent(u);
+			if(u>0)//don't append the root node
+			{
+				string pname = getNodeProperty(u).getName();
+				nodePath.push_front(pname);
+				sNodePath= pname + sNodePath;
+			}
+
+
+
 		}
-		return res;
+
+		return sNodePath;
 
 	}
 	/**
