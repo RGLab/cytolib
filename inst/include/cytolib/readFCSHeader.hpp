@@ -85,7 +85,7 @@ struct FCS_READ_HEADER_PARAM{
 		is_fix_slash_in_channel_name = false;
 		isEmptyKeyValue = false;
 		ignoreTextOffset = false;
-		nDataset = 1;
+		nDataset = 0;
 	};
 
 };
