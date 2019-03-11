@@ -717,7 +717,7 @@ struct sfun_info{
 };
 class logicleTrans:public transformation
 {
-	const double DEFAULT_DECADES = 4.5;
+//	const double DEFAULT_DECADES = 4.5;
 
 	const double LN_10 = log(10.);
 	const double EPSILON = std::numeric_limits<double>::epsilon();
