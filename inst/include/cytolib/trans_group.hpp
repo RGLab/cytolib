@@ -112,7 +112,7 @@ public:
 	void addTrans(string tName, TransPtr trans){tp[tName]=trans;};
 	trans_local(){};
 
-	virtual void convertToPb(pb::trans_local & lg_pb){
+	void convertToPb(pb::trans_local & lg_pb){
 
 		for(const auto & it : tp){
 			pb::trans_pair * tp = lg_pb.add_tp();
