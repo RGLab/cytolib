@@ -211,7 +211,7 @@ public:
 	}
 	CompType get_h5_datatype_params(DataTypeLocation storage_type) const
 	{
-		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
+		StrType str_type(H5::PredType::C_S1, H5T_VARIABLE);	//define variable-length string data type
 
 		/*
 		 * define params as array of compound type
@@ -235,7 +235,7 @@ public:
 	}
 	CompType get_h5_datatype_keys() const
 	{
-		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
+		StrType str_type(H5::PredType::C_S1, H5T_VARIABLE);	//define variable-length string data type
 
 		CompType key_type(sizeof(KEY_WORDS_SIMPLE));
 		key_type.insertMember("key", HOFFSET(KEY_WORDS_SIMPLE, key), str_type);

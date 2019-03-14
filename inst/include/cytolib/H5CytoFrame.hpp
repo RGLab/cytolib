@@ -307,7 +307,7 @@ public:
 		dsp_param.getSimpleExtentDims(dim_param);
 		int nParam = dim_param[0];
 
-		StrType str_type(0, H5T_VARIABLE);	//define variable-length string data type
+		StrType str_type(H5::PredType::C_S1, H5T_VARIABLE);	//define variable-length string data type
 
 		FloatType datatype = h5_datatype_data(DataTypeLocation::MEM);
 
