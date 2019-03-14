@@ -111,7 +111,9 @@ public:
 		DataSet ds = file.openDataSet("params");
 		hsize_t size[1] = {params.size()};
 		ds.extend(size);
-		ds.write(&params[0], param_type );
+		auto params_char = params_c_str();
+
+		ds.write(&params_char[0], param_type );
 		ds.flush(H5F_SCOPE_LOCAL);
 		is_dirty_params = false;
 	}
@@ -120,13 +122,7 @@ public:
 	{
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("keywords");
-
-		//convert to vector
-		vector<KEY_WORDS_SIMPLE> keyVec;
-		for(const auto & e : keys_)
-		{
-			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
-		}
+		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
 
 		hsize_t size[1] = {keyVec.size()};
 		ds.extend(size);
@@ -140,14 +136,7 @@ public:
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("pdata");
 
-		//convert to vector
-
-		vector<KEY_WORDS_SIMPLE> keyVec;
-		for(std::pair<std::string, string> e : pheno_data_)
-		{
-			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
-		}
-
+		auto keyVec = to_kw_vec<PDATA>(pheno_data_);
 		hsize_t size[1] = {keyVec.size()};
 		ds.extend(size);
 

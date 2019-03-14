@@ -100,7 +100,15 @@ struct cytoParam{
 	EVENT_DATA_TYPE PnE[2];
 	int PnB;
 };
-
+//for writing to h5 since writing vlen string causes segfault on mac
+struct cytoParam_cstr{
+	const char * channel;
+	const char *  marker;
+	EVENT_DATA_TYPE min, max, PnG;
+//	pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> PnE;//replace pair with simple array since it is not clear how to create compound type for pair
+	EVENT_DATA_TYPE PnE[2];
+	int PnB;
+};
 
 };
 

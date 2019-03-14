@@ -30,8 +30,9 @@ const H5std_string  DATASET_NAME( "data");
  * used for communicate with h5 since h5 doesn't support customized container data type
  */
 struct KEY_WORDS_SIMPLE{
-			string key, value;
-			KEY_WORDS_SIMPLE(const string & k, const string & v):key(k),value(v){};
+			const char * key;
+			const char * value;
+			KEY_WORDS_SIMPLE(const char * k, const char * v):key(k),value(v){};
 		};
 
 class CytoFrame;
@@ -221,14 +222,14 @@ public:
 		hsize_t dim_pne[] = {2};
 		ArrayType pne(datatype, 1, dim_pne);
 
-		CompType param_type(sizeof(cytoParam));
-		param_type.insertMember("channel", HOFFSET(cytoParam, channel), str_type);
-		param_type.insertMember("marker", HOFFSET(cytoParam, marker), str_type);
-		param_type.insertMember("min", HOFFSET(cytoParam, min), datatype);
-		param_type.insertMember("max", HOFFSET(cytoParam, max), datatype);
-		param_type.insertMember("PnG", HOFFSET(cytoParam, PnG), datatype);
-		param_type.insertMember("PnE", HOFFSET(cytoParam, PnE), pne);
-		param_type.insertMember("PnB", HOFFSET(cytoParam, PnB), PredType::NATIVE_INT8);
+		CompType param_type(sizeof(cytoParam_cstr));
+		param_type.insertMember("channel", HOFFSET(cytoParam_cstr, channel), str_type);
+		param_type.insertMember("marker", HOFFSET(cytoParam_cstr, marker), str_type);
+		param_type.insertMember("min", HOFFSET(cytoParam_cstr, min), datatype);
+		param_type.insertMember("max", HOFFSET(cytoParam_cstr, max), datatype);
+		param_type.insertMember("PnG", HOFFSET(cytoParam_cstr, PnG), datatype);
+		param_type.insertMember("PnE", HOFFSET(cytoParam_cstr, PnE), pne);
+		param_type.insertMember("PnB", HOFFSET(cytoParam_cstr, PnB), PredType::NATIVE_INT8);
 
 		return param_type;
 
@@ -251,12 +252,43 @@ public:
 		DSetCreatPropList plist;
 		plist.setChunk(1, dim_param);
 		DataSet ds = file.createDataSet( "params", get_h5_datatype_params(DataTypeLocation::H5), dsp_param, plist);
-
-		ds.write(&params[0], get_h5_datatype_params(DataTypeLocation::MEM));
-
-
+		auto params_char = params_c_str();
+		ds.write(&params_char[0], get_h5_datatype_params(DataTypeLocation::MEM));
 	}
-
+	/**
+	 * Convert string to cstr in params for writing to h5
+	 * @return
+	 */
+	vector<cytoParam_cstr> params_c_str() const{
+		auto nParams = params.size();
+		vector<cytoParam_cstr> res(nParams);
+		for(unsigned i = 0; i < nParams; i++)
+		{
+			res[i].channel = params[i].channel.c_str();
+			res[i].marker = params[i].marker.c_str();
+			res[i].min = params[i].min;
+			res[i].max = params[i].max;
+			res[i].PnG = params[i].PnG;
+			res[i].PnE[0] = params[i].PnE[0];
+			res[i].PnE[1] = params[i].PnE[1];
+			res[i].PnB = params[i].PnB;
+		}
+		return res;
+	}
+	/**
+	 * Convert string to cstr in keys/pdata for writing to h5
+	 * @return
+	 */
+	template<class T>
+	vector<KEY_WORDS_SIMPLE> to_kw_vec(const T & x) const{
+		//convert to vector
+		vector<KEY_WORDS_SIMPLE> keyVec;
+		for(const auto & e : x)
+		{
+			keyVec.push_back(KEY_WORDS_SIMPLE(e.first.c_str(), e.second.c_str()));
+		}
+		return keyVec;
+	}
 	virtual void write_h5_keys(H5File file) const
 	{
 		CompType key_type = get_h5_datatype_keys();
@@ -267,14 +299,7 @@ public:
 		plist.setChunk(1, dim_key);
 		DataSet ds = file.createDataSet( "keywords", key_type, dsp_key, plist);
 
-		//convert to vector
-		vector<KEY_WORDS_SIMPLE> keyVec;
-		for(const auto & e : keys_)
-		{
-			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
-		}
-
-
+		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
 		ds.write(&keyVec[0], key_type );
 
 	}
@@ -292,14 +317,7 @@ public:
 
 		DataSet ds = file.createDataSet( "pdata", key_type, dsp_pd, plist);
 
-		//convert to vector
-
-		vector<KEY_WORDS_SIMPLE> keyVec;
-		for(std::pair<std::string, string> e : pheno_data_)
-		{
-			keyVec.push_back(KEY_WORDS_SIMPLE(e.first, e.second));
-		}
-
+		auto keyVec = to_kw_vec<PDATA>(pheno_data_);
 		ds.write(&keyVec[0], key_type );
 
 	}
