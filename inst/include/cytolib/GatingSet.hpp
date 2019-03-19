@@ -139,7 +139,8 @@ public:
 		//init the output stream
 		string filename = (fs::path(path) / uid_).string() + ".pb";
 		ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
-		google::protobuf::io::OstreamOutputStream raw_output(&output);
+		string buf;
+		google::protobuf::io::StringOutputStream raw_output(&buf);
 
 		//empty message for gs
 		pb::GatingSet gs_pb;
@@ -180,6 +181,7 @@ public:
 
 				// Optional:  Delete all global objects allocated by libprotobuf.
 		google::protobuf::ShutdownProtobufLibrary();
+		output.write(&buf[0], buf.size());
 	}
 
 	/**
@@ -217,8 +219,14 @@ public:
 			throw(invalid_argument("File not found.." ));
 		} else{
 			 pb::GatingSet pbGS;
+			 //read entire file into buffer since message-lite doesn't support iostream
+			 input.seekg (0, input.end);
+			 int length = input.tellg();
+			 input.seekg (0, input.beg);
+			 vector<char> buf(length);
+			 input.read(buf.data(), length);
 
-			 google::protobuf::io::IstreamInputStream raw_input(&input);
+			 google::protobuf::io::ArrayInputStream raw_input(buf.data(), length);
 			 //read gs message
 			 bool success = readDelimitedFrom(raw_input, pbGS);
 
@@ -265,7 +273,13 @@ public:
 		} else{
 			 pb::GatingSet pbGS;
 
-			 google::protobuf::io::IstreamInputStream raw_input(&input);
+			 input.seekg (0, input.end);
+			 int length = input.tellg();
+			 input.seekg (0, input.beg);
+			 vector<char> buf(length);
+			 input.read(buf.data(), length);
+
+			 google::protobuf::io::ArrayInputStream raw_input(buf.data(), length);
 			 //read gs message
 			 bool success = readDelimitedFrom(raw_input, pbGS);
 
