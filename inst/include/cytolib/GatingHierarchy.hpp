@@ -298,6 +298,8 @@ public:
 		default:
 			{
 				vector<unsigned> pind = parentIndice.getIndices_u();
+				if(!fdata)
+					throw(domain_error("data is not loaded yet!"));
 				vector<unsigned> curIndices=g->gating(*fdata, pind);
 				node.setIndices(curIndices, parentIndice.getTotal());
 			}
@@ -681,6 +683,8 @@ public:
 		nodeProperties & node=getNodeProperty(u);
 		if(u==0)
 		{
+			if(!fdata)
+				throw(domain_error("data is not loaded yet!"));
 			node.setIndices(fdata->nRow());
 			node.computeStats();
 		}else
