@@ -67,7 +67,7 @@ const EVENT_DATA_TYPE pi = 3.1415926535897;
 #define ANDNOT 3
 #define ORNOT 4
 
-typedef vector<unsigned> INDICE_TYPE;
+
 
 
 class vertices_vector{
@@ -513,67 +513,19 @@ public:
 
 
 		vector<coordinate> vertices=param.getVertices();
-		unsigned nVertex=vertices.size();
+
 
 		string x=param.xName();
 		string y=param.yName();
 		EVENT_DATA_TYPE * xdata = fdata.subset(x);
 		EVENT_DATA_TYPE * ydata = fdata.subset(y);
 
-
-		unsigned counter;
-		EVENT_DATA_TYPE xinters;
-		EVENT_DATA_TYPE p1x, p2x, p1y, p2y;
-
 		int nEvents=parentInd.size();
 		INDICE_TYPE res;
 		res.reserve(nEvents);
-		for(auto i : parentInd)
-		{//iterate over points
-		p1x=vertices.at(0).x;
-		p1y=vertices.at(0).y;
-		counter=0;
-		for(unsigned j=1; j <= nVertex; j++)
-		{// iterate over vertices
-		  /*p1x,p1y and p2x,p2y are the endpoints of the current vertex*/
-		  if (j == nVertex)
-		  {//the last vertice must "loop around"
-			p2x = vertices.at(0).x;
-			p2y = vertices.at(0).y;
-		  }
-		  else
-		  {
-			p2x = vertices.at(j).x;
-			p2y = vertices.at(j).y;
-		  }
-		  /*if horizontal ray is in range of vertex find the x coordinate where
-			ray and vertex intersect*/
-		  if(ydata[i] >= min(p1y, p2y) && ydata[i] <= max(p1y, p2y) &&xdata[i] <= max(p1x, p2x) && p2y != p1y)
-		  {
-			  xinters = (ydata[i]-p1y)*(p2x-p1x)/(p2y-p1y)+p1x;
-			/*if intersection x coordinate == point x coordinate it lies on the
-			  boundary of the polygon, which means "in"*/
-			if(xinters==xdata[i])
-			{
-			  counter=1;
-			  break;
-			}
-			/*count how many vertices are passed by the ray*/
-			if (xinters > xdata[i])counter++;
-		  }
-		  p1x=p2x;
-		  p1y=p2y;
-		}
-		/*uneven number of vertices passed means "in"*/
-
-		 bool isIn =((counter % 2) != 0);
-		 if(isIn != neg)
-			res.push_back(i);
-		}
-
+		in_polygon(xdata, ydata, static_cast<vector<POINT>>(vertices), parentInd, neg, res);
 		return res;
 	}
-
 
 	/*
 	 * a wrapper that calls transforming(transformation * , transformation * )
