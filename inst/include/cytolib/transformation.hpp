@@ -25,15 +25,12 @@
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/regex.hpp>
 
-#include "global.hpp"
+#include "in_polygon.hpp"
 
 using namespace std;
 
-struct coordinate
+struct coordinate : POINT
 {
-//	friend class boost::serialization::access;
-
-	EVENT_DATA_TYPE x,y;
 	coordinate(EVENT_DATA_TYPE _x,EVENT_DATA_TYPE _y){x=_x;y=_y;};
 	coordinate(){};
 	void convertToPb(pb::coordinate & coor_pb){
