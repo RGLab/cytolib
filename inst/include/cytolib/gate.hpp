@@ -523,7 +523,11 @@ public:
 		int nEvents=parentInd.size();
 		INDICE_TYPE res;
 		res.reserve(nEvents);
-		in_polygon(xdata, ydata, static_cast<vector<POINT>>(vertices), parentInd, neg, res);
+		unsigned nVert = vertices.size();
+		vector<POINT> points(nVert);
+		for(unsigned i = 0; i < nVert; i++)
+			points[i] = vertices[i];
+		in_polygon(xdata, ydata, points, parentInd, neg, res);
 		return res;
 	}
 
