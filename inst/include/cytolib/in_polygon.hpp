@@ -12,10 +12,11 @@
 #include <algorithm>
 typedef vector<unsigned> INDICE_TYPE;
 using namespace std;
-
+namespace cytolib
+{
 struct POINT
 {
-//	friend class boost::serialization::access;
+//	this struct is the same as coordinate but without pb member functions so that flowCore doesn't need to depend on pb
 
 	EVENT_DATA_TYPE x,y;
 	POINT(EVENT_DATA_TYPE _x,EVENT_DATA_TYPE _y){x=_x;y=_y;};
@@ -93,6 +94,6 @@ inline void in_polygon(EVENT_DATA_TYPE * xdata, EVENT_DATA_TYPE * ydata, const v
 
 }
 
-
+}
 
 #endif /* INST_INCLUDE_CYTOLIB_IN_POLYGON_HPP_ */

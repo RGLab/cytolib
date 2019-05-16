@@ -29,7 +29,7 @@
 
 using namespace std;
 
-struct coordinate : public POINT
+struct coordinate : public cytolib::POINT
 {
 	coordinate(EVENT_DATA_TYPE _x,EVENT_DATA_TYPE _y):POINT(_x, _y){};//{x=_x;y=_y;};
 	coordinate(){};

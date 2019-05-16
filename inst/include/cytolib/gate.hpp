@@ -524,10 +524,10 @@ public:
 		INDICE_TYPE res;
 		res.reserve(nEvents);
 		unsigned nVert = vertices.size();
-		vector<POINT> points(nVert);
+		vector<cytolib::POINT> points(nVert);
 		for(unsigned i = 0; i < nVert; i++)
 			points[i] = vertices[i];
-		in_polygon(xdata, ydata, points, parentInd, neg, res);
+		cytolib::in_polygon(xdata, ydata, points, parentInd, neg, res);
 		return res;
 	}
 
