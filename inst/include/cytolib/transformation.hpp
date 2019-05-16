@@ -16,7 +16,7 @@
 #include <boost/algorithm/string/compare.hpp>
 
 
-#include "global.hpp"
+#include "in_polygon.hpp"
 
 using namespace std;
 
@@ -39,18 +39,15 @@ struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 
 typedef map<std::string, std::string, ciLessBoost> CHANNEL_MAP;
 
-struct coordinate
+struct coordinate : public cytolib::POINT
 {
-//	friend class boost::serialization::access;
-
-	EVENT_DATA_TYPE x,y;
-	coordinate(EVENT_DATA_TYPE _x,EVENT_DATA_TYPE _y){x=_x;y=_y;};
+	coordinate(EVENT_DATA_TYPE _x,EVENT_DATA_TYPE _y):POINT(_x, _y){};//{x=_x;y=_y;};
 	coordinate(){};
 	void convertToPb(pb::coordinate & coor_pb){
 		coor_pb.set_x(x);
 		coor_pb.set_y(y);
 	};
-	coordinate(const pb::coordinate & coor_pb):x(coor_pb.x()),y(coor_pb.y()){};
+	coordinate(const pb::coordinate & coor_pb):POINT(coor_pb.x(),coor_pb.y()){};
 };
 inline bool compare_x(coordinate i, coordinate j) { return i.x<j.x; }
 inline bool compare_y(coordinate i, coordinate j) { return i.y<j.y; }

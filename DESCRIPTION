@@ -14,8 +14,7 @@ Collate:
 Depends:
     R (>= 3.4)
 Suggests: knitr
-biocViews: FlowCytometry, DataImport, Preprocessing, DataRepresentation
-LinkingTo: BH(>= 1.62.0-1), RProtoBufLib(>= 2.1.6), Rhdf5lib(>= 1.1.5)
+biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing, DataRepresentation
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11
 RoxygenNote: 6.0.1
