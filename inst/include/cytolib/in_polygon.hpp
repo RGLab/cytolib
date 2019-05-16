@@ -29,7 +29,7 @@ inline void in_polygon(EVENT_DATA_TYPE * xdata, EVENT_DATA_TYPE * ydata, const v
 	EVENT_DATA_TYPE xinters;
 	 //find max py
 	double p_y_max = max_element(vertices.begin(), vertices.end(),[](const POINT & v1, const POINT & v2){return v1.y < v2.y;})->y;
-
+	//TODO: potentially we can speed up by caching pre-calculated p_bottom,top,left,right here to avoid repeated computation within the loop
 	for(auto i : parentInd)
 	{//iterate over points
 		vector<POINT>::const_iterator p1;
