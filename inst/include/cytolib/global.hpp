@@ -39,6 +39,7 @@ extern bool my_throw_on_error;//can be toggle off to get a partially parsed gati
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 using namespace H5;
+#include "datatype.hpp"
 
 namespace cytolib
 {
@@ -68,7 +69,6 @@ namespace cytolib
 	const int bsti = 1;  // Byte swap test integer
 	#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
 
-	typedef double EVENT_DATA_TYPE;
 	typedef arma::Mat<EVENT_DATA_TYPE> EVENT_DATA_VEC;
 
 	#define PRT true

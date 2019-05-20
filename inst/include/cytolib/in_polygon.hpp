@@ -8,10 +8,13 @@
 #ifndef INST_INCLUDE_CYTOLIB_IN_POLYGON_HPP_
 #define INST_INCLUDE_CYTOLIB_IN_POLYGON_HPP_
 
-#include "global.hpp"
+#include "datatype.hpp"
+#include <vector>
+
 #include <algorithm>
-typedef vector<unsigned> INDICE_TYPE;
 using namespace std;
+
+typedef vector<unsigned> INDICE_TYPE;
 namespace cytolib
 {
 struct POINT
