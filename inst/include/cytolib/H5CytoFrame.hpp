@@ -271,11 +271,12 @@ public:
 	 */
 	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY):CytoFrame(),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
-		readonly_ = flags == H5F_ACC_RDONLY;
 
 
 		file.openFile(filename_, flags);
 		load_meta();
+		readonly_ = flags == H5F_ACC_RDONLY;
+
 		//open dataset for event data
 
 		dataset = file.openDataSet(DATASET_NAME);
@@ -331,7 +332,7 @@ public:
 		param_type.insertMember("PnB", HOFFSET(cytoParam1, PnB), PredType::NATIVE_INT8);
 		ds_param.read(pvec.data(),param_type);
 		//cp back to param
-		params.resize(nParam);
+		vector<cytoParam> params(nParam);
 		for(auto i = 0; i < nParam; i++)
 		{
 			params[i].channel = pvec[i].channel;
@@ -345,7 +346,7 @@ public:
 			params[i].PnE[1] = pvec[i].PnE[1];
 			params[i].PnB = pvec[i].PnB;
 		}
-		build_hash();
+		set_params(params);
 		is_dirty_params = false;
 		/*
 		 * read keywords

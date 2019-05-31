@@ -196,6 +196,8 @@ public:
 	{
 		check_write_permission();
 		params = _params;
+		build_hash();//update idx table
+
 	}
 //	virtual void writeFCS(const string & filename);
 
@@ -434,8 +436,7 @@ public:
 			{
 					params_new[i] = params[col_idx[i]];
 			}
-			params = params_new;
-			build_hash();//update idx table
+			set_params(params_new);
 
 //			set_data(get_data(col_idx));
 			//update keywords PnX

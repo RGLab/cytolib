@@ -954,8 +954,8 @@ public:
 		 //parse important params from keys_
 		 string par = keys_["$PAR"];
 		 int nrpar = stoi(par);
-		params.resize(nrpar);
-		KEY_WORDS::iterator it;
+		 vector<cytoParam> params(nrpar);
+		 KEY_WORDS::iterator it;
 		for(int i = 1; i <= nrpar; i++)
 		{
 			string pid = to_string(i);
@@ -1009,7 +1009,7 @@ public:
 		}
 
 
-		build_hash();
+		set_params(params);
 
 
 	//	    origRange <- range
