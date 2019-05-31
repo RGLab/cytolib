@@ -435,6 +435,7 @@ public:
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... save flow data: "+sn+"... \n");
 				cfv.set_params(fr.get_params());
+				cfv.set_keywords(fr.get_keywords());
 				cfv.set_data(fr.get_data());
 			}
 			//attach to gh
