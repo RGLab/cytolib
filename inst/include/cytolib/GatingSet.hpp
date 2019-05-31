@@ -406,11 +406,9 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, unsigned int flags = H5F_ACC_RDWR):GatingSet(){
-
-		fs::path h5_dir = generate_h5_folder(fs::temp_directory_path());
-
-		for(const string & sn : cs.get_sample_uids())
+	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs):GatingSet(){
+		auto samples = cs.get_sample_uids();
+		for(const string & sn : samples)
 		{
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
@@ -418,7 +416,11 @@ public:
 			GatingHierarchyPtr gh = add_GatingHierarchy(gh_template.copy(false, false, ""), sn);
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... load flow data: "+sn+"... \n");
-			MemCytoFrame fr = MemCytoFrame(*(cs.get_cytoframe_view(sn).get_cytoframe_ptr()));
+			auto cfv = cs.get_cytoframe_view(sn);
+			string h5_filename = cfv.get_h5_file_path();
+			if(h5_filename=="")
+				throw(logic_error("in-memory version of cs is not supported!"));
+			MemCytoFrame fr = MemCytoFrame(*(cfv.get_cytoframe_ptr()));
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... compensate: "+sn+"... \n");
 			gh->compensate(fr);
@@ -430,10 +432,9 @@ public:
 			gh->gating(fr, 0, true, true);
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... save flow data: "+sn+"... \n");
-			string h5_filename = (h5_dir/sn).string() + ".h5";
 			fr.write_h5(h5_filename);
 			//attach to gh
-			gh->set_cytoframe_view(CytoFrameView(CytoFramePtr(new H5CytoFrame(h5_filename, flags))));
+			gh->set_cytoframe_view(cfv);
 		}
 
 	}
