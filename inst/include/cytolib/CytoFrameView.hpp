@@ -151,6 +151,16 @@ public:
 	const PDATA & get_pheno_data() const {return get_cytoframe_ptr()->get_pheno_data();}
 	void set_pheno_data(const string & name, const string & value) {get_cytoframe_ptr()->set_pheno_data(name, value);}
 	void set_pheno_data(const PDATA & _pd) {get_cytoframe_ptr()->set_pheno_data(_pd);}
+	const vector<cytoParam> & get_params() const
+	{
+		return get_cytoframe_ptr()->get_params();
+	}
+
+	void set_params(const vector<cytoParam> & _params)
+	{
+		get_cytoframe_ptr()->set_params(_params);
+	}
+
 	/*subsetting*/
 
 	void cols_(vector<string> colnames, ColType col_type)

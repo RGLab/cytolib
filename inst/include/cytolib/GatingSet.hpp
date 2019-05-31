@@ -434,7 +434,8 @@ public:
 				gh->gating(fr, 0, true, true);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... save flow data: "+sn+"... \n");
-				fr.write_h5(h5_filename);
+				cfv.set_params(fr.get_params());
+				cfv.set_data(fr.get_data());
 			}
 			//attach to gh
 			gh->set_cytoframe_view(cfv);
