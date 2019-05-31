@@ -406,7 +406,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs):GatingSet(){
+	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, bool execute = true):GatingSet(){
 		auto samples = cs.get_sample_uids();
 		for(const string & sn : samples)
 		{
@@ -414,25 +414,28 @@ public:
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
 			GatingHierarchyPtr gh = add_GatingHierarchy(gh_template.copy(false, false, ""), sn);
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... load flow data: "+sn+"... \n");
 			auto cfv = cs.get_cytoframe_view(sn);
 			string h5_filename = cfv.get_h5_file_path();
 			if(h5_filename=="")
 				throw(logic_error("in-memory version of cs is not supported!"));
-			MemCytoFrame fr = MemCytoFrame(*(cfv.get_cytoframe_ptr()));
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... compensate: "+sn+"... \n");
-			gh->compensate(fr);
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... transform_data: "+sn+"... \n");
-			gh->transform_data(fr);
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... gating: "+sn+"... \n");
-			gh->gating(fr, 0, true, true);
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... save flow data: "+sn+"... \n");
-			fr.write_h5(h5_filename);
+			if(execute)
+			{
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("\n... load flow data: "+sn+"... \n");
+				MemCytoFrame fr = MemCytoFrame(*(cfv.get_cytoframe_ptr()));
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("\n... compensate: "+sn+"... \n");
+				gh->compensate(fr);
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("\n... transform_data: "+sn+"... \n");
+				gh->transform_data(fr);
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("\n... gating: "+sn+"... \n");
+				gh->gating(fr, 0, true, true);
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("\n... save flow data: "+sn+"... \n");
+				fr.write_h5(h5_filename);
+			}
 			//attach to gh
 			gh->set_cytoframe_view(cfv);
 		}
