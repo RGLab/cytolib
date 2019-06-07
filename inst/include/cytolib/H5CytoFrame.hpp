@@ -346,7 +346,7 @@ public:
 			params[i].PnE[1] = pvec[i].PnE[1];
 			params[i].PnB = pvec[i].PnB;
 		}
-		set_params(params);
+		CytoFrame::set_params(params, true);
 		is_dirty_params = false;
 		/*
 		 * read keywords

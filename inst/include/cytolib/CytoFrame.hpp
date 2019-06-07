@@ -192,9 +192,10 @@ public:
 		return params;
 	}
 
-	virtual void set_params(const vector<cytoParam> & _params)
+	virtual void set_params(const vector<cytoParam> & _params, bool force = false)
 	{
-		check_write_permission();
+		if(!force)
+			check_write_permission();
 		params = _params;
 		build_hash();//update idx table
 
