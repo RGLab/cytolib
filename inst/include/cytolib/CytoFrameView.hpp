@@ -29,6 +29,9 @@ public:
 	/*forwarded apis
 	 *
 	 */
+	void scale_time_channel(string time_channel = "time"){
+		get_cytoframe_ptr()->scale_time_channel(time_channel);
+			}
 	void set_readonly(bool flag){
 		get_cytoframe_ptr()->set_readonly(flag);
 	}

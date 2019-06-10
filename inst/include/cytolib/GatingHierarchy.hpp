@@ -240,42 +240,27 @@ public:
 
 			string curChannel=*it1;
 			auto param_range = cytoframe.get_range(curChannel, ColType::channel, RangeType::instrument);
-			if(curChannel=="Time"||curChannel=="time"){
-				//special treatment for time channel
-				EVENT_DATA_TYPE timestep = cytoframe.get_time_step(curChannel);
-				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-					PRINT("multiplying "+curChannel+" by :"+ to_string(timestep) + "\n");
-				EVENT_DATA_TYPE * x = cytoframe.get_data_memptr(curChannel, ColType::channel);
-				for(int i = 0; i < nEvents; i++)
-					x[i] = x[i] * timestep;
-				param_range.first = param_range.first * timestep;
-				param_range.second = param_range.second * timestep;
+			TransPtr curTrans=trans.getTran(curChannel);
 
-			}
-			else
+			if(curTrans)
 			{
-				TransPtr curTrans=trans.getTran(curChannel);
+				if(curTrans->gateOnly())
+					continue;
 
-						if(curTrans)
-						{
-							if(curTrans->gateOnly())
-								continue;
+				EVENT_DATA_TYPE * x = cytoframe.get_data_memptr(curChannel, ColType::channel);
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				{
+					string type;
+					curTrans->getType(type);
+					PRINT("transforming "+curChannel+" with func:"+type+"\n");
+				}
+				curTrans->transforming(x,nEvents);
 
-							EVENT_DATA_TYPE * x = cytoframe.get_data_memptr(curChannel, ColType::channel);
-							if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-							{
-								string type;
-								curTrans->getType(type);
-								PRINT("transforming "+curChannel+" with func:"+type+"\n");
-							}
-							curTrans->transforming(x,nEvents);
+				curTrans->transforming(&param_range.first, 1);
 
-							curTrans->transforming(&param_range.first, 1);
-
-							curTrans->transforming(&param_range.second, 1);
-						}
-
+				curTrans->transforming(&param_range.second, 1);
 			}
+
 
 			cytoframe.set_range(curChannel, ColType::channel, param_range);
 

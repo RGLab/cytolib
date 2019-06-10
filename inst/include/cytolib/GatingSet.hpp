@@ -428,6 +428,7 @@ public:
 				gh->compensate(fr);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... transform_data: "+sn+"... \n");
+				fr.scale_time_channel();
 				gh->transform_data(fr);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... gating: "+sn+"... \n");

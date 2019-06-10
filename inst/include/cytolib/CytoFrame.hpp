@@ -37,7 +37,19 @@ struct KEY_WORDS_SIMPLE{
 
 class CytoFrame;
 typedef shared_ptr<CytoFrame> CytoFramePtr;
-
+struct KeyHash {
+ std::size_t operator()(const string& k) const
+ {
+     return std::hash<std::string>()(boost::to_lower_copy(k));
+ }
+};
+struct KeyEqual {
+ bool operator()(const string& u, const string& v) const
+ {
+     return boost::to_lower_copy(u) == boost::to_lower_copy(v);
+ }
+};
+typedef unordered_map<string, int, KeyHash, KeyEqual> PARAM_MAP;
 /**
  * The class representing a single FCS file
  */
@@ -46,8 +58,8 @@ protected:
 	PDATA pheno_data_;
 	KEY_WORDS keys_;//keyword pairs parsed from FCS Text section
 	vector<cytoParam> params;// parameters coerced from keywords and computed from data for quick query
-	unordered_map<string, int> channel_vs_idx;//hash map for query by channel
-	unordered_map<string, int> marker_vs_idx;//hash map for query by marker
+	PARAM_MAP channel_vs_idx;//hash map for query by channel
+	PARAM_MAP marker_vs_idx;//hash map for query by marker
 	bool readonly_;//whether allow the public API to modify it, currently only applied to H5 version
 
 	CytoFrame ():readonly_(false){};
@@ -183,6 +195,30 @@ public:
 //		A.submat(rind,indices).print("data comp");
 		set_data(dat);
 	}
+
+	virtual void scale_time_channel(string time_channel = "time"){
+		auto idx = get_col_idx(time_channel, ColType::channel);
+		if(idx > 0){
+			//special treatment for time channel
+			EVENT_DATA_TYPE timestep = get_time_step(time_channel);
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("multiplying "+time_channel+" by :"+ to_string(timestep) + "\n");
+			//TODO:partial IO
+			EVENT_DATA_VEC data = get_data();;//get_data(idx);
+			EVENT_DATA_TYPE * x = data.colptr(idx);
+			auto nEvents = n_rows();
+			for(int i = 0; i < nEvents; i++)
+				x[i] = x[i] * timestep;
+			set_data(data);
+			//TODO:update instrument range as well
+			auto param_range = get_range(time_channel, ColType::channel, RangeType::data);
+			param_range.first = param_range.first * timestep;
+			param_range.second = param_range.second * timestep;
+			set_range(time_channel, ColType::channel, param_range);
+		}
+
+	}
+
 	/**
 	 * getter from cytoParam vector
 	 * @return

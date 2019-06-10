@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(flags)
 	dat[100] = newval;
 
 	BOOST_CHECK_EXCEPTION(fr1->set_data(dat);, H5::DataSetIException,
-				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("H5Dwrite failed") != string::npos;});
+				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("read-only") != string::npos;});
 
 	BOOST_CHECK_CLOSE(fr1->get_data()[100], oldval, 1e-6);
 
@@ -166,6 +166,9 @@ BOOST_AUTO_TEST_CASE(set_channel)
 
 	MemCytoFrame fr1 = *fr.copy();
 	string oldname = channels[2];
+	//query by upper case
+	BOOST_CHECK_GT(fr1.get_col_idx(boost::to_lower_copy(oldname), ColType::channel), 0);
+
 	BOOST_CHECK_EXCEPTION(fr1.set_channel(oldname, channels[1]), domain_error,
 			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
 	string newname = "test";
@@ -204,6 +207,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	fr3 = H5CytoFrame(tmp);
 	BOOST_CHECK_GT(fr3.get_col_idx(newname, ColType::channel), 0);
 	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), newname);
+
 }
 BOOST_AUTO_TEST_CASE(shallow_copy)
 {
