@@ -1050,6 +1050,7 @@ public:
 	CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const
 	{
 		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
+		ptr->set_readonly(false);
 		ptr->realize_(row_idx, col_idx);
 
 		return CytoFramePtr(ptr.release());
