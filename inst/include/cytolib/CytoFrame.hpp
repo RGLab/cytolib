@@ -615,7 +615,8 @@ public:
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT(oldname + "-->"  + newname + "\n");
-			if(get_col_idx(newname, ColType::channel)>=0)
+			int id1 = get_col_idx(newname, ColType::channel);
+			if(id1>=0&&id1!=id)
 				throw(domain_error("colname already exists: " + newname));
 			params[id].channel=newname;
 			channel_vs_idx.erase(oldname);
@@ -640,7 +641,8 @@ public:
 			throw(domain_error("marker not found: " + oldname));
 		if(oldname!=newname)
 		{
-			if(get_col_idx(newname, ColType::marker)>=0)
+			int id1 = get_col_idx(newname, ColType::marker);
+			if(id1>=0&&id1!=id)
 				throw(domain_error("marker already exists: " + newname));
 			params[id].marker=newname;
 			marker_vs_idx.erase(oldname);
