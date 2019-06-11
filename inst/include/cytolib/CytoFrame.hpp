@@ -198,7 +198,7 @@ public:
 
 	virtual void scale_time_channel(string time_channel = "time"){
 		auto idx = get_col_idx(time_channel, ColType::channel);
-		if(idx > 0){
+		if(idx >= 0){
 			//special treatment for time channel
 			EVENT_DATA_TYPE timestep = get_time_step(time_channel);
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
