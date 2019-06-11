@@ -724,12 +724,14 @@ public:
 		lt_pb->set_decade(decade);
 		lt_pb->set_offset(offset);
 		lt_pb->set_t(T);
+		lt_pb->set_scale(scale);
 	}
 	logTrans(const pb::transformation & trans_pb):transformation(trans_pb){
 		const pb::logTrans & lt_pb = trans_pb.lt();
 		decade = lt_pb.decade();
 		offset = lt_pb.offset();
 		T = lt_pb.t();
+		scale = lt_pb.scale();
 	}
 
 	boost::shared_ptr<transformation>  getInverseTransformation();
