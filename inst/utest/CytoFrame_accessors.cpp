@@ -71,8 +71,10 @@ BOOST_AUTO_TEST_CASE(flags)
 	float newval = 100;
 	dat[100] = newval;
 
-	BOOST_CHECK_EXCEPTION(fr1->set_data(dat);, H5::DataSetIException,
-				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("read-only") != string::npos;});
+//	BOOST_CHECK_EXCEPTION(fr1->set_data(dat);, H5::DataSetIException,
+//				[](const H5::DataSetIException & ex) {return ex.getDetailMsg().find("read-only") != string::npos;});
+	BOOST_CHECK_EXCEPTION(fr1->set_data(dat), domain_error,
+			[](const exception & ex) {return string(ex.what()).find("read-only") != string::npos;});
 
 	BOOST_CHECK_CLOSE(fr1->get_data()[100], oldval, 1e-6);
 
@@ -202,11 +204,11 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	H5CytoFrame fr3(tmp);
 	BOOST_CHECK_EQUAL(fr3.get_col_idx(newname, ColType::channel), -1);
 	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), oldname);
-	//until cached meta data is flushed to h5 when the object is destroyed
+	//cached meta data is NoT flushed to h5 even when the object is destroyed
 	fr2.reset();
 	fr3 = H5CytoFrame(tmp);
-	BOOST_CHECK_GT(fr3.get_col_idx(newname, ColType::channel), 0);
-	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), newname);
+	BOOST_CHECK_GT(fr3.get_col_idx(oldname, ColType::channel), 0);
+	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), oldname);
 
 }
 BOOST_AUTO_TEST_CASE(shallow_copy)
@@ -288,13 +290,13 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 	fr1->load_meta();
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), newname);
-	//change it back and let the destructor does the flushing
+	//change it back and see if the destructor does the flushing
 	fr1->set_channel(newname, oldname);
 	fr1.reset();
-	//load it back and see the change has taken effect
+	//load it back and see the change has NOT taken effect
 	fr1.reset(new H5CytoFrame(h5file));
-	BOOST_CHECK_EQUAL(fr1->get_channels()[2], oldname);
-	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), oldname);
+	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
+	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), newname);
 
 }
 
