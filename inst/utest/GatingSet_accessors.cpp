@@ -81,9 +81,12 @@ BOOST_AUTO_TEST_CASE(copy) {
 	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
 }
 BOOST_AUTO_TEST_CASE(legacy_gs) {
-	GatingSet gs1 = GatingSet("../flowWorkspaceData/inst/extdata/legacy_gs/gs_manual/jzgmkCmwZR.pb",GatingSet());
+	auto cs = GatingSet();
+	auto sn = "CytoTrol_CytoTrol_1.fcs";
+	cs.add_cytoframe_view(sn, CytoFrameView(CytoFramePtr(new MemCytoFrame())));//add dummy frame
+	GatingSet gs1 = GatingSet("../flowWorkspaceData/inst/extdata/legacy_gs/gs_manual/jzgmkCmwZR.pb", cs);
 	vector<string> samples = gs1.get_sample_uids();
-	BOOST_CHECK_EQUAL(samples[0], "CytoTrol_CytoTrol_1.fcs");
+	BOOST_CHECK_EQUAL(samples[0], sn);
 
 	GatingHierarchyPtr gh = gs1.getGatingHierarchy(samples[0]);
 	VertexID_vec vid = gh->getVertices();
