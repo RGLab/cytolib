@@ -1,0 +1,21 @@
+Installation of c++ headers as standalone library
+======================================================
+
+   The Installation uses cmake.
+
+   1. `cd' to the directory 'inst' containing the `CMakeLists.txt', and type 
+      
+      'cmake .' 
+      
+      it will configure the package for your system. 
+
+     To install the library to custom directory, use '-DCMAKE_INSTALL_PREFIX' option
+     
+     e.g. 'cmake -DCMAKE_INSTALL_PREFIX=/usr/local' 
+     
+     it will install the library to  /usr/local/include 
+     
+
+  2. Type `make install' to install the package.
+
+ 
