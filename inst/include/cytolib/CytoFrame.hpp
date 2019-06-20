@@ -633,20 +633,21 @@ public:
 		}
 	}
 
-	virtual void set_marker(const string & oldname, const string & newname)
+	virtual void set_marker(const string & channelname, const string & markername)
 	{
 		check_write_permission();
-		int id = get_col_idx(oldname, ColType::marker);
+		int id = get_col_idx(channelname, ColType::channel);
 		if(id<0)
-			throw(domain_error("marker not found: " + oldname));
-		if(oldname!=newname)
+			throw(domain_error("channel not found: " + channelname));
+                string oldmarkername = params[id].marker;
+		if(oldmarkername!=markername)
 		{
-			int id1 = get_col_idx(newname, ColType::marker);
+			int id1 = get_col_idx(markername, ColType::marker);
 			if(id1>=0&&id1!=id)
-				throw(domain_error("marker already exists: " + newname));
-			params[id].marker=newname;
-			marker_vs_idx.erase(oldname);
-			marker_vs_idx[newname] = id;
+				throw(domain_error("marker already exists: " + markername));
+			params[id].marker=markername;
+			marker_vs_idx.erase(oldmarkername);
+			marker_vs_idx[markername] = id;
 		}
 	}
 

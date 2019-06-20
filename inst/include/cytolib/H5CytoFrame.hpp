@@ -228,9 +228,9 @@ public:
 		if(is_update_keywords)
 			is_dirty_keys = true;
 	}
-	void set_marker(const string & oldname, const string & newname)
+	void set_marker(const string & channelname, const string & markername)
 	{
-		CytoFrame::set_marker(oldname, newname);
+		CytoFrame::set_marker(channelname, markername);
 		is_dirty_params = true;
 	}
 	void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range, bool is_update_keywords = true){

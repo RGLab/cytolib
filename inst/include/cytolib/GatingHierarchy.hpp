@@ -123,7 +123,7 @@ public:
 	int n_cols() const{return get_cytoframe_view().n_cols();}
 	vector<string> get_markers() const{return get_cytoframe_view().get_markers();};
 	vector<string> get_channels() const{return get_cytoframe_view().get_channels();};
-	void set_marker(const string & _old, const string & _new){get_cytoframe_view_ref().set_marker(_old, _new);}
+	void set_marker(const string & _channel, const string & _marker){get_cytoframe_view_ref().set_marker(_channel, _marker);}
 	void set_channel(const string & _old, const string & _new){get_cytoframe_view_ref().set_channel(_old, _new);}
 	const PDATA & get_pheno_data() const {return get_cytoframe_view().get_pheno_data();}
 

@@ -579,9 +579,9 @@ public:
 //* forward to the first element's getChannels
 	vector<string> get_markers(){return get_first_gh()->get_markers();};
 
-	void set_marker(const string & _old, const string & _new){
+	void set_marker(const string & _channel, const string & _marker){
 		for(auto & p : ghs_)
-			p.second->set_marker(_old, _new);
+			p.second->set_marker(_channel, _marker);
 	};
 
 	int n_cols(){return get_first_gh()->n_cols();}

@@ -81,9 +81,9 @@ public:
 		return get_cytoframe_ptr()->get_marker(channel);
 	}
 
-	void set_marker(const string & oldname, const string & newname)
+	void set_marker(const string & channelname, const string & markername)
 	{
-		get_cytoframe_ptr()->set_marker(oldname, newname);
+		get_cytoframe_ptr()->set_marker(channelname, markername);
 	}
 	void compensate(const compensation & comp)
 	{
