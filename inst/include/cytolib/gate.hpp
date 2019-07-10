@@ -1169,7 +1169,7 @@ public:
 	boolGate():gate(){};
 	vector<BOOL_GATE_OP> boolOpSpec;//the gatePaths with the their logical operators
 public:
-	vector<BOOL_GATE_OP> getBoolSpec(){return boolOpSpec;};
+	vector<BOOL_GATE_OP> getBoolSpec() const{return boolOpSpec;};
 	unsigned short getType(){return BOOLGATE;}
 	boolGate * clone(){return new boolGate(*this);};
 	void convertToPb(pb::gate & gate_pb){
