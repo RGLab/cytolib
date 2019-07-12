@@ -234,7 +234,7 @@ public:
 
 	virtual ~gate(){};
 	virtual unsigned short getType()=0;
-	virtual vector<BOOL_GATE_OP> getBoolSpec(){throw(domain_error("undefined getBoolSpec function!"));};
+	virtual vector<BOOL_GATE_OP> getBoolSpec() const{throw(domain_error("undefined getBoolSpec function!"));};
 	virtual INDICE_TYPE gating(MemCytoFrame &, INDICE_TYPE &){throw(domain_error("undefined gating function!"));};
 	virtual void extend(MemCytoFrame &,float){throw(domain_error("undefined extend function!"));};
 	virtual void extend(float,float){throw(domain_error("undefined extend function!"));};
