@@ -5,4 +5,3 @@
 #include <cytolib/global.hpp>
 
 using namespace cytolib;
-CYTOLIB_INIT();

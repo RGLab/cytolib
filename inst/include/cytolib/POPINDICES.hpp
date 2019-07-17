@@ -13,35 +13,8 @@
 
 namespace cytolib
 {
-inline void packToBytes(const vector <bool> & x, vector<unsigned char> & bytes){
-	/*
-	 * pack bits into bytes
-	 */
-
-	for(unsigned i =0 ; i < x.size(); i++) {
-		unsigned byteIndex = i / 8;
-		unsigned bitIndex = i % 8;
-		if(x[i]) {
-			// set bit
-			unsigned char mask  = 1 << bitIndex;
-			bytes[byteIndex] = bytes[byteIndex] | mask;
-		}
-	}
-
-}
-inline void unpackFromBytes(vector <bool> & x, const vector<unsigned char>& x_bytes){
-
-	/*
-	 * unpack bytes into bits
-	 */
-	for(unsigned i =0 ; i < x.size(); i++) {
-		unsigned byteIndex = i / 8;
-		unsigned bitIndex = i % 8;
-
-		x[i] = x_bytes[byteIndex] & (1 << bitIndex);
-	}
-
-}
+void packToBytes(const vector <bool> & x, vector<unsigned char> & bytes);
+void unpackFromBytes(vector <bool> & x, const vector<unsigned char>& x_bytes);
 
 /**
  * \class POPINDICES
@@ -83,29 +56,12 @@ private:
 public:
 	BOOLINDICES():POPINDICES(){};
 
-	BOOLINDICES(vector <unsigned> _ind, unsigned _nEvent){
-		nEvents = _nEvent;
-		x.resize(nEvents);
-		for(auto i : _ind)
-			x[i] = true;
-	}
-	BOOLINDICES(vector <bool> _ind){
-		x=_ind;
-		nEvents=_ind.size();
-
-	}
+	BOOLINDICES(vector <unsigned> _ind, unsigned _nEvent);
+	BOOLINDICES(vector <bool> _ind);
 	vector<bool> getIndices(){
 		return x;
 	}
-	vector<unsigned> getIndices_u(){
-		vector<unsigned> res;
-
-		for(unsigned i = 0; i < x.size(); i++){
-			if(x[i])
-				res.push_back(i);
-		}
-		return res;
-	}
+	vector<unsigned> getIndices_u();
 
 
 	unsigned getCount(){
@@ -119,27 +75,8 @@ public:
 		BOOLINDICES * res=new BOOLINDICES(*this);
 		return res;
 	}
-	void convertToPb(pb::POPINDICES & ind_pb){
-		ind_pb.set_indtype(pb::BOOL);
-		unsigned nBits=x.size();
-		unsigned nBytes=ceil(float(nBits)/8);
-		vector<unsigned char> bytes(nBytes,0);
-		packToBytes(x, bytes);
-		string * byte_pb = ind_pb.mutable_bind();
-		for(unsigned i = 0; i < bytes.size(); i++){
-			unsigned char byte = bytes[i];
-			byte_pb->append(string(1, byte));
-		}
-		ind_pb.set_nevents(nEvents);
-	}
-	BOOLINDICES(const pb::POPINDICES & ind_pb){
-		nEvents = ind_pb.nevents();
-		//fetch byte stream from pb
-		vector<unsigned char> bytes(ind_pb.bind().begin(),ind_pb.bind().end());
-		//convert it to bit vector
-		x.resize(nEvents,false);
-		unpackFromBytes(x, bytes);
-	}
+	void convertToPb(pb::POPINDICES & ind_pb);
+	BOOLINDICES(const pb::POPINDICES & ind_pb);
 
 };
 
@@ -152,29 +89,11 @@ private:
 public:
 	INTINDICES():POPINDICES(){};
 
-	INTINDICES(vector <bool> _ind){
-
-		for(vector<bool>::iterator it=_ind.begin();it!=_ind.end();it++)
-		{
-			unsigned i=it-_ind.begin();
-			if(*it)
-				x.push_back(i);
-		}
-		nEvents=_ind.size();
-	}
+	INTINDICES(vector <bool> _ind);
 
 	INTINDICES(vector <unsigned> _ind, unsigned _nEvent):POPINDICES(_nEvent),x(_ind){};
 
-	vector<bool> getIndices(){
-
-		vector<bool> res(nEvents,false);
-
-		for(vector<unsigned>::iterator it=x.begin();it!=x.end();it++){
-			unsigned i=*it;
-			res[i]=true;
-		}
-		return res;
-	}
+	vector<bool> getIndices();
 
 	vector<unsigned> getIndices_u(){return x;};
 	unsigned getCount(){
@@ -188,21 +107,9 @@ public:
 		INTINDICES * res=new INTINDICES(*this);
 		return res;
 	}
-	void convertToPb(pb::POPINDICES & ind_pb){
-		ind_pb.set_indtype(pb::INT);
-		BOOST_FOREACH(vector<unsigned>::value_type & it, x){
-			ind_pb.add_iind(it);
-		}
-		ind_pb.set_nevents(nEvents);
-	}
+	void convertToPb(pb::POPINDICES & ind_pb);
 
-	INTINDICES(const pb::POPINDICES & ind_pb){
-		nEvents = ind_pb.nevents();
-		unsigned nSize = ind_pb.iind_size();
-		x = vector<unsigned>(nSize);
-		for(unsigned i = 0; i < nSize; i++)
-			x[i] = ind_pb.iind(i);
-	}
+	INTINDICES(const pb::POPINDICES & ind_pb);
 
 
 };
@@ -222,13 +129,7 @@ public:
 
 		return res;
 	}
-	vector<unsigned> getIndices_u(){
-
-		vector<unsigned> res(nEvents);
-		for(unsigned i = 0; i < nEvents; i++)
-			res[i]=i;
-		return res;
-	}
+	vector<unsigned> getIndices_u();
 
 
 	unsigned getCount(){
