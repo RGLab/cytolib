@@ -58,7 +58,7 @@ public:
 	vertices_vector(){};
 	vertices_vector(vector<coordinate> vertices);
 	//dummy api for backward compatibility
-	vertices_vector toVector(){return *this;};
+	vertices_vector toVector() const{return *this;};
 	void print();
 };
 
@@ -73,11 +73,11 @@ private:
 public:
 	paramRange(EVENT_DATA_TYPE _min,EVENT_DATA_TYPE _max,string _name){min=_min;max=_max;name=_name;};
 	paramRange(){};
-	vertices_vector toVector();
+	vertices_vector toVector() const;
 	void setName(string _n){name=_n;};
 	void update_channels(const CHANNEL_MAP & chnl_map);
 	string getName(){return name;}
-	vector<string> getNameArray();
+	vector<string> getNameArray() const;
 	EVENT_DATA_TYPE getMin(){return min;};
 	void setMin(EVENT_DATA_TYPE _v){min=_v;};
 	EVENT_DATA_TYPE getMax(){return max;};
@@ -93,12 +93,12 @@ private:
 	vector<string> params;//params[0] is x, params[1] is y axis
 	vector<coordinate> vertices;
 public:
-	vector<coordinate> getVertices(){return vertices;};
+	vector<coordinate> getVertices() const{return vertices;};
 	void setVertices(vector<coordinate> _v){vertices=_v;};
-	vector<string>  getNameArray(){return params;};
+	vector<string>  getNameArray() const{return params;};
 	void setName(vector<string> _params){params=_params;};
 	void update_channels(const CHANNEL_MAP & chnl_map);
-	vertices_vector toVector();
+	vertices_vector toVector() const;
 	string xName(){return params[0];};
 	string yName(){return params[1];};
 	paramPoly(){};
@@ -142,17 +142,17 @@ public:
 	virtual void convertToPb(pb::gate & gate_pb);
 
 	virtual ~gate(){};
-	virtual unsigned short getType()=0;
+	virtual unsigned short getType() const=0;
 	virtual vector<BOOL_GATE_OP> getBoolSpec() const{throw(domain_error("undefined getBoolSpec function!"));};
 	virtual INDICE_TYPE gating(MemCytoFrame &, INDICE_TYPE &){throw(domain_error("undefined gating function!"));};
 	virtual void extend(MemCytoFrame &,float){throw(domain_error("undefined extend function!"));};
 	virtual void extend(float,float){throw(domain_error("undefined extend function!"));};
 	virtual void gain(map<string,float> &){throw(domain_error("undefined gain function!"));};
-	virtual vector<string> getParamNames(){throw(domain_error("undefined getParam function!"));};
-	virtual vertices_vector getVertices(){throw(domain_error("undefined getVertices function!"));};
+	virtual vector<string> getParamNames() const{throw(domain_error("undefined getParam function!"));};
+	virtual vertices_vector getVertices() const{throw(domain_error("undefined getVertices function!"));};
 	virtual void transforming(trans_local &){throw(domain_error("undefined transforming function!"));};
 	virtual void update_channels(const CHANNEL_MAP & chnl_map){throw(domain_error("undefined update_channels function!"));};
-	virtual gate * clone()=0;
+	virtual gate * clone() const=0;
 	virtual bool isNegate(){return neg;};
 	virtual bool gained(){return isGained;};
 	virtual void setNegate(bool _neg){neg=_neg;};
@@ -168,19 +168,19 @@ public:
 	rangeGate():gate(){}
 	rangeGate(const pb::gate & gate_pb):gate(gate_pb),param(paramRange(gate_pb.rg().param())){}
 	void convertToPb(pb::gate & gate_pb);
-	unsigned short getType(){return RANGEGATE;}
+	unsigned short getType() const{return RANGEGATE;}
 	void transforming(trans_local & trans);
 	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd);
 
 	void extend(MemCytoFrame & fdata,float extend_val);
 	void extend(float extend_val, float extend_to);
 	void gain(map<string,float> & gains);
-	paramRange getParam(){return param;};
-	vector<string> getParamNames(){return param.getNameArray();};
+	paramRange getParam() const{return param;};
+	vector<string> getParamNames() const{return param.getNameArray();};
 	void setParam(paramRange _param){param=_param;};
 	void update_channels(const CHANNEL_MAP & chnl_map){param.update_channels(chnl_map);};
-	vertices_vector getVertices(){return param.toVector();};
-	rangeGate * clone(){return new rangeGate(*this);};
+	vertices_vector getVertices() const{return param.toVector();};
+	rangeGate * clone() const{return new rangeGate(*this);};
 };
 
 
@@ -199,7 +199,7 @@ protected:
 	paramPoly param;
 public:
 	polygonGate():gate(){};
-	virtual unsigned short getType(){return POLYGONGATE;}
+	virtual unsigned short getType() const{return POLYGONGATE;}
 	/*
 	 * when the original gate vertices are at the threshold
 	 * it is likely that the gates were truncated in flowJo xml
@@ -227,12 +227,12 @@ public:
 	 * the actual transforming logic for polygonGate, that is shared by polyonGate and ellipsoidGate(due to the special scale)
 	 */
 	virtual void transforming(TransPtr trans_x, TransPtr trans_y);
-	virtual vertices_vector getVertices(){return param.toVector();};
+	virtual vertices_vector getVertices() const{return param.toVector();};
 	void setParam(paramPoly _param){param=_param;};
 	void update_channels(const CHANNEL_MAP & chnl_map){param.update_channels(chnl_map);};
-	virtual paramPoly getParam(){return param;};
-	virtual vector<string> getParamNames(){return param.getNameArray();};
-	virtual polygonGate * clone(){return new polygonGate(*this);};
+	virtual paramPoly getParam() const{return param;};
+	virtual vector<string> getParamNames() const{return param.getNameArray();};
+	virtual polygonGate * clone() const{return new polygonGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
 	polygonGate(const pb::gate & gate_pb):gate(gate_pb),param(paramPoly(gate_pb.pg().param())){}
 
@@ -254,8 +254,8 @@ public:
 
 
 	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd);
-	unsigned short getType(){return RECTGATE;}
-	rectGate * clone(){return new rectGate(*this);};
+	unsigned short getType() const{return RECTGATE;}
+	rectGate * clone() const{return new rectGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
 	rectGate(const pb::gate & gate_pb):polygonGate(gate_pb){};;
 	rectGate():polygonGate(){};
@@ -279,7 +279,7 @@ public:
 	vector<coordinate> getCovarianceMat();
 	coordinate getMu();
 	EVENT_DATA_TYPE getDist();
-	virtual unsigned short getType(){return ELLIPSEGATE;}
+	virtual unsigned short getType() const{return ELLIPSEGATE;}
 	ellipseGate(coordinate _mu, vector<coordinate> _cov, EVENT_DATA_TYPE _dist);
 
 	ellipseGate(vector<coordinate> _antipodal, vector<string> _params);
@@ -296,7 +296,7 @@ public:
 	 * translated from flowCore::%in% method for ellipsoidGate
 	 */
 	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd);
-	ellipseGate * clone(){return new ellipseGate(*this);};
+	ellipseGate * clone() const{return new ellipseGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
 	ellipseGate(const pb::gate & gate_pb);
 
@@ -331,7 +331,7 @@ public:
 		toPolygon(100);
 	}
 
-	ellipsoidGate * clone(){return new ellipsoidGate(*this);};
+	ellipsoidGate * clone() const{return new ellipsoidGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
 	ellipsoidGate(const pb::gate & gate_pb);
 	/*
@@ -353,7 +353,7 @@ public:
 	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 		return polygonGate::gating(fdata, parentInd);
 	}
-	unsigned short getType(){return POLYGONGATE;}//expose it to R as polygonGate since the original antipodal points can't be used directly anyway
+	unsigned short getType() const{return POLYGONGATE;}//expose it to R as polygonGate since the original antipodal points can't be used directly anyway
 };
 
 /*
@@ -375,8 +375,8 @@ public:
 	vector<BOOL_GATE_OP> boolOpSpec;//the gatePaths with the their logical operators
 public:
 	vector<BOOL_GATE_OP> getBoolSpec() const{return boolOpSpec;};
-	unsigned short getType(){return BOOLGATE;}
-	boolGate * clone(){return new boolGate(*this);};
+	unsigned short getType() const{return BOOLGATE;}
+	boolGate * clone() const{return new boolGate(*this);};
 	void convertToPb(pb::gate & gate_pb);
 	boolGate(const pb::gate & gate_pb);
 
@@ -392,8 +392,8 @@ public:
  */
 class logicalGate:public boolGate {
 private:
-	unsigned short getType(){return LOGICALGATE;}
-	logicalGate * clone(){return new logicalGate(*this);};
+	unsigned short getType() const{return LOGICALGATE;}
+	logicalGate * clone() const{return new logicalGate(*this);};
 
 public:
 	void convertToPb(pb::gate & gate_pb);
@@ -405,8 +405,8 @@ public:
 class clusterGate:public boolGate {
 private:
 	string cluster_method_name_;
-	unsigned short getType(){return CLUSTERGATE; }
-	clusterGate * clone(){return new clusterGate(*this);};
+	unsigned short getType() const{return CLUSTERGATE; }
+	clusterGate * clone() const{return new clusterGate(*this);};
 
 public:
 	string get_cluster_method_name(){return cluster_method_name_;}
@@ -441,8 +441,8 @@ public:
 
 
 	void interpolate(trans_local & trans);
-	virtual unsigned short getType(){return CURLYQUADGATE;}
-	CurlyGuadGate * clone(){return new CurlyGuadGate(*this);};
+	virtual unsigned short getType() const{return CURLYQUADGATE;}
+	CurlyGuadGate * clone() const{return new CurlyGuadGate(*this);};
 
 };
 };

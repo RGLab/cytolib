@@ -44,7 +44,7 @@ namespace cytolib
 
 	}
 
-	vertices_vector paramRange::toVector(){
+	vertices_vector paramRange::toVector() const{
 
 		vertices_vector res;
 		res.resize(2);
@@ -59,7 +59,7 @@ namespace cytolib
 			if(itChnl!=chnl_map.end())
 				name = itChnl->second;
 	};
-	vector<string> paramRange::getNameArray(){
+	vector<string> paramRange::getNameArray() const{
 			vector<string> res;
 			res.push_back(name);
 			return res;
@@ -75,7 +75,7 @@ namespace cytolib
 					*it = itChnl->second;
 			}
 		};
-	vertices_vector paramPoly::toVector(){
+	vertices_vector paramPoly::toVector() const{
 
 		vertices_vector res;
 		unsigned nSize=vertices.size();
