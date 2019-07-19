@@ -1,4 +1,8 @@
 #include <cytolib/gate.hpp>
+#include <cytolib/global.hpp>
+
+#include <cytolib/ellipse2points.hpp>
+#include <boost/foreach.hpp>
 
 
 namespace cytolib

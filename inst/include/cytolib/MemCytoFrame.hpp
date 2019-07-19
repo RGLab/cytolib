@@ -9,8 +9,7 @@
 #define INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #include "CytoFrame.hpp"
 #include "readFCSdata.hpp"
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+
 namespace cytolib
 {
 /**
@@ -60,9 +59,7 @@ public:
 	 * @param config the parse arguments.
 	 * @param onlyTxt flag indicates whether to only parse text segment (which contains the keywords)
 	 */
-	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){
-		set_pheno_data("name", path_base_name(filename));
-	}
+	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config);
 
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const;
 	unsigned n_rows() const;

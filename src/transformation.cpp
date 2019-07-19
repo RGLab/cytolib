@@ -1,4 +1,5 @@
 #include <cytolib/transformation.hpp>
+#include <cytolib/global.hpp>
 
 namespace cytolib
 {

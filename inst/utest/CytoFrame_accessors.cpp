@@ -1,6 +1,11 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
+#include <boost/lexical_cast.hpp>
 #include <cytolib/GatingSet.hpp>
+#include <cytolib/H5CytoFrame.hpp>
+#include <cytolib/MemCytoFrame.hpp>
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 
 #include "fixture.hpp"
 using namespace cytolib;

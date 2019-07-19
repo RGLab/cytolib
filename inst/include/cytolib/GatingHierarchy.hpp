@@ -15,12 +15,7 @@
 #include "populationTree.hpp"
 #include <fstream>
 #include <algorithm>
-#include <boost/graph/graphviz.hpp>
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/topological_sort.hpp>
-#include <boost/graph/breadth_first_search.hpp>
 #include "MemCytoFrame.hpp"
-#include "H5CytoFrame.hpp"
 #include "CytoFrameView.hpp"
 using namespace std;
 
@@ -254,20 +249,6 @@ public:
 	 */
 	void drawGraph(string output);
 
-	class custom_bfs_visitor : public boost::default_bfs_visitor
-	{
-
-	public:
-		custom_bfs_visitor(VertexID_vec& v) : vlist(v) { }
-		VertexID_vec & vlist;
-	  template < typename Vertex, typename Graph >
-	  void discover_vertex(Vertex u, const Graph & g) const
-	  {
-		  vlist.push_back(u);
-	//	  v=u;
-	  }
-
-	};
 
 	/**
 	 * retrieve all the node IDs

@@ -3,6 +3,9 @@
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/H5CytoFrame.hpp>
 #include "fixture.hpp"
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#include <cytolib/global.hpp>
 using namespace cytolib;
 
 BOOST_FIXTURE_TEST_SUITE(parseFCS,parseFCSFixture)

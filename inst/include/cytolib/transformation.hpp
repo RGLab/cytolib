@@ -8,6 +8,7 @@
 #ifndef TRANSFORMATION_HPP_
 #define TRANSFORMATION_HPP_
 #include <map>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <stdexcept>

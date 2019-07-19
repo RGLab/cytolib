@@ -9,12 +9,7 @@
 #ifndef SPLINE_HPP_
 
 #define SPLINE_HPP_
-#include "global.hpp"
-#include <cmath>
-#include <stdexcept>
-#include <iostream>
 #include <vector>
-#include <cstring>
 using namespace std;
 
 namespace cytolib

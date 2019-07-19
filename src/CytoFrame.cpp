@@ -1,5 +1,6 @@
 #include <cytolib/CytoFrame.hpp>
-
+#include <boost/lexical_cast.hpp>
+#include <cytolib/global.hpp>
 
 
 namespace cytolib
@@ -137,7 +138,7 @@ namespace cytolib
 			//TODO:partial IO
 			EVENT_DATA_VEC data = get_data();;//get_data(idx);
 			EVENT_DATA_TYPE * x = data.colptr(idx);
-			auto nEvents = n_rows();
+			int nEvents = n_rows();
 			for(int i = 0; i < nEvents; i++)
 				x[i] = x[i] * timestep;
 			set_data(data);

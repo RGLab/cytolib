@@ -8,39 +8,21 @@
 #ifndef GLOBAL_HPP_
 #define GLOBAL_HPP_
 
-#define GATING_SET_LEVEL 1
-#define GATING_HIERARCHY_LEVEL 2
-#define POPULATION_LEVEL 3
-#define GATE_LEVEL 4
-
-
-#ifdef ROUT
-#include <R_ext/Print.h>
-#endif
-
 #include <iostream>
 #include <string>
 #include <memory>
 #include <ctype.h>
 #include <vector>
-
-#include <armadillo>
-using namespace arma;
-
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <chrono>
-#include <H5Cpp.h>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-using namespace std;
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-using namespace H5;
 #include "datatype.hpp"
+using namespace std;
 
 namespace cytolib
 {
+	#define GATING_SET_LEVEL 1
+	#define GATING_HIERARCHY_LEVEL 2
+	#define POPULATION_LEVEL 3
+	#define GATE_LEVEL 4
 
 	void PRINT(string a);
 	void PRINT(const char * a);
@@ -52,9 +34,9 @@ namespace cytolib
 	const int bsti = 1;  // Byte swap test integer
 	#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
 
-	typedef arma::Mat<EVENT_DATA_TYPE> EVENT_DATA_VEC;
 
 	#define PRT true
+	string fs_tmp_path();
 
 	string generate_unique_filename(const string & dir, const string & prefix, const string & suffix);
 

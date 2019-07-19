@@ -10,11 +10,10 @@
 #ifndef GATINGSET_HPP_
 #define GATINGSET_HPP_
 #include "GatingHierarchy.hpp"
-#include <cytolib/H5CytoFrame.hpp>
-#include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/CytoFrameView.hpp>
 #include <string>
 #include <cytolib/delimitedMessage.hpp>
+#include <cytolib/global.hpp>
 
 using namespace std;
 
@@ -89,7 +88,7 @@ public:
 	 * up to caller to free the memory
 	 */
 	GatingSet copy(bool is_copy_data = true, bool is_realize_data = true
-			, const string & new_h5_dir = fs::temp_directory_path().string());
+			, const string & new_h5_dir = fs_tmp_path());
 
 	/*Defunct
 	 * TODO:current version of this contructor is based on gating template ,simply copying
@@ -116,7 +115,8 @@ public:
 	 * @return a root-only GatingSet that carries the subsetted cytoframes
 	 */
 	GatingSet get_cytoset(string node_path);
-	fs::path generate_h5_folder(fs::path h5_dir);
+	string generate_h5_folder(string h5_dir);
+
 	/**
 	 * Retrieve the GatingHierarchy object from GatingSet by sample name.
 	 *
@@ -212,9 +212,10 @@ public:
 	 * @param is_add_root whether add root node. When false, gs is used as cytoset without gating tree
 	 */
 	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config= FCS_READ_PARAM()
-			, bool is_h5 = true, string h5_dir = fs::temp_directory_path());
+			, bool is_h5 = true, string h5_dir = fs_tmp_path());
 
-	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config = FCS_READ_PARAM(), bool is_h5 = true, string h5_dir = fs::temp_directory_path()):GatingSet()
+	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config = FCS_READ_PARAM()
+			, bool is_h5 = true, string h5_dir = fs_tmp_path()):GatingSet()
 	{
 		add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
 	}

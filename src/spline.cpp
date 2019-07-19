@@ -1,4 +1,9 @@
 #include <cytolib/spline.hpp>
+#include <cmath>
+#include <stdexcept>
+#include <iostream>
+#include <cstring>
+using namespace std;
 namespace cytolib
 {
 void natural_spline_C(int n, double *x, double *y, double *b, double *c, double *d)

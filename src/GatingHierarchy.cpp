@@ -1,4 +1,12 @@
 #include <cytolib/GatingHierarchy.hpp>
+#include <cytolib/H5CytoFrame.hpp>
+#include <cytolib/global.hpp>
+#include <boost/graph/graphviz.hpp>
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/topological_sort.hpp>
+#include <boost/graph/breadth_first_search.hpp>
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 
 namespace cytolib
 {
@@ -844,6 +852,20 @@ namespace cytolib
 
 	}
 
+	class custom_bfs_visitor : public boost::default_bfs_visitor
+		{
+
+		public:
+			custom_bfs_visitor(VertexID_vec& v) : vlist(v) { }
+			VertexID_vec & vlist;
+		  template < typename Vertex, typename Graph >
+		  void discover_vertex(Vertex u, const Graph & g) const
+		  {
+			  vlist.push_back(u);
+		//	  v=u;
+		  }
+
+		};
 
 	/**
 	 * retrieve all the node IDs

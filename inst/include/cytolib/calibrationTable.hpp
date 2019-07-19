@@ -14,8 +14,6 @@
 #include <stdexcept>
 #include "spline.hpp"
 using namespace std;
-#include <boost/config.hpp>
-#include <boost/foreach.hpp>
 #include <GatingSet.pb.h>
 
 namespace cytolib

@@ -1,4 +1,9 @@
 #include <cytolib/MemCytoFrame.hpp>
+#include <boost/lexical_cast.hpp>
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#include <cytolib/global.hpp>
+
 namespace cytolib
 {
 
@@ -242,7 +247,9 @@ namespace cytolib
 		swap(data_, frm.data_);
 		return *this;
 	}
-
+	MemCytoFrame::MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){
+			set_pheno_data("name", path_base_name(filename));
+		}
 	void MemCytoFrame::convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
 	{
 		fr_pb.set_is_h5(false);

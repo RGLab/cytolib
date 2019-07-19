@@ -1,5 +1,5 @@
-
 #include <cytolib/compensation.hpp>
+#include <boost/foreach.hpp>
 
 namespace cytolib
 {

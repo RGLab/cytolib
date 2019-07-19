@@ -1,4 +1,6 @@
 #include <cytolib/nodeProperties.hpp>
+#include <cytolib/global.hpp>
+#include <boost/foreach.hpp>
 
 namespace cytolib
 {

@@ -1,4 +1,5 @@
 #include <cytolib/trans_group.hpp>
+#include <cytolib/global.hpp>
 
 namespace cytolib
 {

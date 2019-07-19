@@ -1,5 +1,9 @@
-
 #include <cytolib/GatingSet.hpp>
+#include <cytolib/H5CytoFrame.hpp>
+#include <cytolib/MemCytoFrame.hpp>
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#include <cytolib/global.hpp>
 
 
 namespace cytolib
@@ -440,14 +444,13 @@ namespace cytolib
 		}
 		return gs;
 	}
-	fs::path GatingSet::generate_h5_folder(fs::path h5_dir)
+	string GatingSet::generate_h5_folder(string h5_dir)
 	{
-		h5_dir /= uid_;
-		const string sh5_dir = h5_dir.string();
+		h5_dir = fs::path(h5_dir) / uid_;
 		if(fs::exists(h5_dir))
-			throw(domain_error(sh5_dir + " already exists!"));
-		if(!create_directories(h5_dir))
-			throw(domain_error("Failed to create directory: " + sh5_dir));
+			throw(domain_error(h5_dir + " already exists!"));
+		if(!fs::create_directories(h5_dir))
+			throw(domain_error("Failed to create directory: " + h5_dir));
 		return h5_dir;
 	}
 	/**

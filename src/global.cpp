@@ -1,4 +1,14 @@
 #include <cytolib/global.hpp>
+#ifdef ROUT
+#include <R_ext/Print.h>
+#endif
+
+#include <boost/algorithm/string.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/lexical_cast.hpp>
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 
 namespace cytolib
 {
@@ -21,7 +31,10 @@ namespace cytolib
 	#endif
 
 	}
-
+	string fs_tmp_path()
+	{
+		return fs::temp_directory_path();
+	}
 	string generate_unique_filename(const string & dir, const string & prefix, const string & suffix)
 	{
 

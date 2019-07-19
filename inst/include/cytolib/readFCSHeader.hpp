@@ -10,17 +10,21 @@
 
 #include <fstream>
 #include <cstring>
-#include "global.hpp"
 #include <vector>
 #include <numeric>
 #include <unordered_map>
 #include <iostream>
 #include <algorithm>
 using namespace std;
+#include <armadillo>
+using namespace arma;
 
+#include "datatype.hpp"
 
 namespace cytolib
 {
+typedef arma::Mat<EVENT_DATA_TYPE> EVENT_DATA_VEC;
+
 enum class TransformType {none, linearize, scale,linearize_with_PnG_scaling};
 enum class endianType {big, small, mixed};
 struct FCS_Header{

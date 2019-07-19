@@ -9,8 +9,6 @@
 #define GATE_HPP_
 #include "MemCytoFrame.hpp"
 #include "trans_group.hpp"
-#include "compensation.hpp"
-#include "ellipse2points.hpp"
 
 
 using namespace std;

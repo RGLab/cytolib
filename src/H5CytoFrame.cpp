@@ -1,4 +1,7 @@
 #include <cytolib/H5CytoFrame.hpp>
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#include <cytolib/global.hpp>
 
 
 namespace cytolib

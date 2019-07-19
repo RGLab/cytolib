@@ -1,4 +1,5 @@
 #include <cytolib/POPINDICES.hpp>
+#include <boost/foreach.hpp>
 
 namespace cytolib
 {
