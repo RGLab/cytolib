@@ -938,16 +938,16 @@ namespace cytolib
 	}
 
 
-	void CurlyGuadGate::transforming(trans_local & trans){
+	void CurlyQuadGate::transforming(trans_local & trans){
 		if(interpolated)
 			polygonGate::transforming(trans);
 		else
-			throw(logic_error("CurlyGuadGate can't not be transformed before interpolation!"));
+			throw(logic_error("CurlyQuadGate can't not be transformed before interpolation!"));
 	};
 
 
 
-	INDICE_TYPE CurlyGuadGate::gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
+	INDICE_TYPE CurlyQuadGate::gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 		if(interpolated)
 		{
 			return polygonGate::gating(fdata, parentInd);
@@ -961,7 +961,7 @@ namespace cytolib
 	}
 
 
-	void CurlyGuadGate::interpolate(trans_local & trans){
+	void CurlyQuadGate::interpolate(trans_local & trans){
 
 		string x_chnl = param.xName();
 		string y_chnl = param.yName();
