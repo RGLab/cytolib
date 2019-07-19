@@ -426,11 +426,11 @@ enum QUAD{
 /*
  * Before interpolation, the intersection points are stored as the first element of param in polygonGate
  */
-class CurlyGuadGate:public polygonGate{
+class CurlyQuadGate:public polygonGate{
 	bool interpolated;
 	QUAD quadrant;
 public:
-	CurlyGuadGate(paramPoly _inter, QUAD _quad):polygonGate(),interpolated(false),quadrant(_quad){
+	CurlyQuadGate(paramPoly _inter, QUAD _quad):polygonGate(),interpolated(false),quadrant(_quad){
 		param = _inter;
 	};
 	void transforming(trans_local & trans);
@@ -442,7 +442,7 @@ public:
 
 	void interpolate(trans_local & trans);
 	virtual unsigned short getType() const{return CURLYQUADGATE;}
-	CurlyGuadGate * clone() const{return new CurlyGuadGate(*this);};
+	CurlyQuadGate * clone() const{return new CurlyQuadGate(*this);};
 
 };
 };
