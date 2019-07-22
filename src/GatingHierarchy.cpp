@@ -594,7 +594,7 @@ namespace cytolib
 					unsigned short gateType= g->getType();
 					if(gateType == CURLYQUADGATE)
 					{
-						CurlyGuadGate * curlyGate = dynamic_cast<CurlyGuadGate *>(g);
+						CurlyQuadGate * curlyGate = dynamic_cast<CurlyQuadGate *>(g);
 						curlyGate->interpolate(trans);//the interpolated polygon is in raw scale
 					}
 					if(gateType!=BOOLGATE)

@@ -48,7 +48,7 @@ namespace cytolib
 
 	}
 
-	vertices_vector paramRange::toVector(){
+	vertices_vector paramRange::toVector() const{
 
 		vertices_vector res;
 		res.resize(2);
@@ -63,7 +63,7 @@ namespace cytolib
 			if(itChnl!=chnl_map.end())
 				name = itChnl->second;
 	};
-	vector<string> paramRange::getNameArray(){
+	vector<string> paramRange::getNameArray() const{
 			vector<string> res;
 			res.push_back(name);
 			return res;
@@ -79,7 +79,7 @@ namespace cytolib
 					*it = itChnl->second;
 			}
 		};
-	vertices_vector paramPoly::toVector(){
+	vertices_vector paramPoly::toVector() const{
 
 		vertices_vector res;
 		unsigned nSize=vertices.size();
@@ -942,16 +942,16 @@ namespace cytolib
 	}
 
 
-	void CurlyGuadGate::transforming(trans_local & trans){
+	void CurlyQuadGate::transforming(trans_local & trans){
 		if(interpolated)
 			polygonGate::transforming(trans);
 		else
-			throw(logic_error("CurlyGuadGate can't not be transformed before interpolation!"));
+			throw(logic_error("CurlyQuadGate can't not be transformed before interpolation!"));
 	};
 
 
 
-	INDICE_TYPE CurlyGuadGate::gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
+	INDICE_TYPE CurlyQuadGate::gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 		if(interpolated)
 		{
 			return polygonGate::gating(fdata, parentInd);
@@ -965,7 +965,7 @@ namespace cytolib
 	}
 
 
-	void CurlyGuadGate::interpolate(trans_local & trans){
+	void CurlyQuadGate::interpolate(trans_local & trans){
 
 		string x_chnl = param.xName();
 		string y_chnl = param.yName();
