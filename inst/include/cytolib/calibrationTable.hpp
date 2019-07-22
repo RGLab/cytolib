@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include "spline.hpp"
 using namespace std;
-#include <GatingSet.pb.h>
+#include <cytolib/GatingSet.pb.h>
 
 namespace cytolib
 {
