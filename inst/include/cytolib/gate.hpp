@@ -277,6 +277,7 @@ public:
 	vector<coordinate> getCovarianceMat() const;
 	coordinate getMu() const;
 	EVENT_DATA_TYPE getDist() const;
+	vector<coordinate> getAntipodalVerts() const;
 	virtual unsigned short getType() const{return ELLIPSEGATE;}
 	ellipseGate(coordinate _mu, vector<coordinate> _cov, EVENT_DATA_TYPE _dist);
 

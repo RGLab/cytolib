@@ -483,6 +483,9 @@ namespace cytolib
 		if(!Transformed())
 			throw(domain_error("EllipseGate has not been transformed so dist is unavailable!"));
 		return dist;};
+	vector<coordinate> ellipseGate::getAntipodalVerts() const{
+		return antipodal_vertices;
+	}
 	ellipseGate::ellipseGate(coordinate _mu, vector<coordinate> _cov, EVENT_DATA_TYPE _dist):mu(_mu),cov(_cov), dist(_dist){
 		isTransformed = true;
 		isGained = true;
