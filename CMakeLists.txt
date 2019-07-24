@@ -19,6 +19,7 @@ project (cytolib)
     include_directories(${BLAS_INCLUDE_DIRS})
 
     find_package(Boost REQUIRED)
+    set(LIBS ${LIBS} libboost_program_options.a)
     include_directories(${Boost_INCLUDE_DIRS})
  
     find_package(ZLIB REQUIRED)
