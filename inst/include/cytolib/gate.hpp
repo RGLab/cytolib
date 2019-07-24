@@ -269,6 +269,7 @@ public:
 class ellipseGate:public polygonGate {
 protected:
 	vector<coordinate> antipodal_vertices; //four antipodal points of ellipse (to be deprecated)
+	vector<coordinate> foci;
 	coordinate mu;// center point
 	vector<coordinate> cov;//covariance matrix
 	EVENT_DATA_TYPE dist; //size of ellipse
@@ -278,6 +279,7 @@ public:
 	coordinate getMu() const;
 	EVENT_DATA_TYPE getDist() const;
 	vector<coordinate> getAntipodalVerts() const;
+	vector<coordinate> getFoci() const;
 	virtual unsigned short getType() const{return ELLIPSEGATE;}
 	ellipseGate(coordinate _mu, vector<coordinate> _cov, EVENT_DATA_TYPE _dist);
 
@@ -291,6 +293,10 @@ public:
 	 * antipodal points must be transformed first.
 	 */
 	void computeCov();
+	/*
+	 * use antipodal points to compute foci
+	 */
+	void computeFoci();
 	/*
 	 * translated from flowCore::%in% method for ellipsoidGate
 	 */
