@@ -471,15 +471,15 @@ namespace cytolib
 		polygonGate::convertToPb(gate_pb);
 			gate_pb.set_type(pb::RECT_GATE);
 	}
-	vector<coordinate> ellipseGate::getCovarianceMat(){
+	vector<coordinate> ellipseGate::getCovarianceMat() const{
 		if(!Transformed())
 			throw(domain_error("EllipseGate has not been transformed so covariance matrix is unavailable!"));
 		return cov;};
-	coordinate ellipseGate::getMu(){
+	coordinate ellipseGate::getMu() const{
 		if(!Transformed())
 				throw(domain_error("EllipseGate has not been transformed so mu is unavailable!"));
 		return mu;};
-	EVENT_DATA_TYPE ellipseGate::getDist(){
+	EVENT_DATA_TYPE ellipseGate::getDist() const{
 		if(!Transformed())
 			throw(domain_error("EllipseGate has not been transformed so dist is unavailable!"));
 		return dist;};

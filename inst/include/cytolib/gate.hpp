@@ -151,10 +151,10 @@ public:
 	virtual void transforming(trans_local &){throw(domain_error("undefined transforming function!"));};
 	virtual void update_channels(const CHANNEL_MAP & chnl_map){throw(domain_error("undefined update_channels function!"));};
 	virtual gate * clone() const=0;
-	virtual bool isNegate(){return neg;};
-	virtual bool gained(){return isGained;};
+	virtual bool isNegate() const{return neg;};
+	virtual bool gained() const{return isGained;};
 	virtual void setNegate(bool _neg){neg=_neg;};
-	virtual bool Transformed(){return isTransformed;};
+	virtual bool Transformed() const{return isTransformed;};
 	virtual void setTransformed(bool _isTransformed){isTransformed=_isTransformed;};
 };
 
@@ -274,9 +274,9 @@ protected:
 	EVENT_DATA_TYPE dist; //size of ellipse
 public:
 	ellipseGate(){dist = 1;};
-	vector<coordinate> getCovarianceMat();
-	coordinate getMu();
-	EVENT_DATA_TYPE getDist();
+	vector<coordinate> getCovarianceMat() const;
+	coordinate getMu() const;
+	EVENT_DATA_TYPE getDist() const;
 	virtual unsigned short getType() const{return ELLIPSEGATE;}
 	ellipseGate(coordinate _mu, vector<coordinate> _cov, EVENT_DATA_TYPE _dist);
 
