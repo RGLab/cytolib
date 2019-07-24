@@ -19,6 +19,7 @@ project (cytolib)
     include_directories(${BLAS_INCLUDE_DIRS})
 
     find_package(Boost REQUIRED)
+    set(LIBS ${LIBS} libboost_program_options.a)
     include_directories(${Boost_INCLUDE_DIRS})
  
     find_package(ZLIB REQUIRED)
@@ -48,16 +49,3 @@ project (cytolib)
     add_subdirectory(src)
     add_subdirectory(inst)#install header
 #    add_subdirectory(test)
-	set(cytolibfile libcytolib.a)
-	add_custom_target(cytolib ALL
-   		COMMAND ar  -M <<EOM
-						    CREATE ${cytolibfile}
-						    ADDLIB $<TARGET_FILE:cytoliblite>
-						    ADDLIB ${PB_LIBS}
-						    ADDLIB ${H5_LIBS}
-						    SAVE
-						    END
-						EOM    )
-
-   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cytolibfile} DESTINATION lib)    
-   
