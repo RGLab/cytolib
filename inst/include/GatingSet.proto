@@ -25,6 +25,7 @@ message ellipseGate{
  	repeated coordinate cov = 2;//covariance matrix
  	repeated coordinate antipodal_vertices = 3;
  	optional float dist = 4;
+ 	repeated coordinate foci = 5;
 }
 message BOOL_GATE_OP{
 	repeated string path = 1;

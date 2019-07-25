@@ -2187,6 +2187,7 @@ const int ellipseGate::kMuFieldNumber;
 const int ellipseGate::kCovFieldNumber;
 const int ellipseGate::kAntipodalVerticesFieldNumber;
 const int ellipseGate::kDistFieldNumber;
+const int ellipseGate::kFociFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ellipseGate::ellipseGate()
@@ -2199,7 +2200,8 @@ ellipseGate::ellipseGate(const ellipseGate& from)
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
       cov_(from.cov_),
-      antipodal_vertices_(from.antipodal_vertices_) {
+      antipodal_vertices_(from.antipodal_vertices_),
+      foci_(from.foci_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   if (from.has_mu()) {
     mu_ = new ::pb::coordinate(*from.mu_);
@@ -2244,6 +2246,7 @@ void ellipseGate::Clear() {
 
   cov_.Clear();
   antipodal_vertices_.Clear();
+  foci_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
     GOOGLE_DCHECK(mu_ != nullptr);
@@ -2317,6 +2320,22 @@ const char* ellipseGate::_InternalParse(const char* begin, const char* end, void
         if (static_cast<::google::protobuf::uint8>(tag) != 37) goto handle_unusual;
         msg->set_dist(::google::protobuf::io::UnalignedLoad<float>(ptr));
         ptr += sizeof(float);
+        break;
+      }
+      // repeated .pb.coordinate foci = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::pb::coordinate::_InternalParse;
+          object = msg->add_foci();
+          if (size > end - ptr) goto len_delim_till_end;
+          ptr += size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+              {parser_till_end, object}, ptr - size, ptr));
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
         break;
       }
       default: {
@@ -2401,6 +2420,17 @@ bool ellipseGate::MergePartialFromCodedStream(
         break;
       }
 
+      // repeated .pb.coordinate foci = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_foci()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2458,6 +2488,15 @@ void ellipseGate::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFloat(4, this->dist(), output);
   }
 
+  // repeated .pb.coordinate foci = 5;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->foci_size()); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      5,
+      this->foci(static_cast<int>(i)),
+      output);
+  }
+
   output->WriteRaw(_internal_metadata_.unknown_fields().data(),
                    static_cast<int>(_internal_metadata_.unknown_fields().size()));
   // @@protoc_insertion_point(serialize_end:pb.ellipseGate)
@@ -2501,6 +2540,17 @@ size_t ellipseGate::ByteSizeLong() const {
     }
   }
 
+  // repeated .pb.coordinate foci = 5;
+  {
+    unsigned int count = static_cast<unsigned int>(this->foci_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          this->foci(static_cast<int>(i)));
+    }
+  }
+
   // optional float dist = 4;
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000002u) {
@@ -2526,6 +2576,7 @@ void ellipseGate::MergeFrom(const ellipseGate& from) {
 
   cov_.MergeFrom(from.cov_);
   antipodal_vertices_.MergeFrom(from.antipodal_vertices_);
+  foci_.MergeFrom(from.foci_);
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
@@ -2549,6 +2600,7 @@ bool ellipseGate::IsInitialized() const {
   if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
   if (!::google::protobuf::internal::AllAreInitialized(this->cov())) return false;
   if (!::google::protobuf::internal::AllAreInitialized(this->antipodal_vertices())) return false;
+  if (!::google::protobuf::internal::AllAreInitialized(this->foci())) return false;
   if (has_mu()) {
     if (!this->mu_->IsInitialized()) return false;
   }
@@ -2565,6 +2617,7 @@ void ellipseGate::InternalSwap(ellipseGate* other) {
   swap(_has_bits_[0], other->_has_bits_[0]);
   CastToBase(&cov_)->InternalSwap(CastToBase(&other->cov_));
   CastToBase(&antipodal_vertices_)->InternalSwap(CastToBase(&other->antipodal_vertices_));
+  CastToBase(&foci_)->InternalSwap(CastToBase(&other->foci_));
   swap(mu_, other->mu_);
   swap(dist_, other->dist_);
 }
