@@ -1,6 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-#target_include_directories(cytolib include/)
-file(GLOB HEADERS "include/cytolib/*")
 
-install (FILES ${HEADERS} DESTINATION include/cytolib)
+install (DIRECTORY "include/cytolib" DESTINATION include/cytolib)
 
