@@ -7,5 +7,7 @@
 	add_custom_target(pblibs DEPENDS ${pb_lib_file})
 	set_source_files_properties( ${pb_lib_file} PROPERTIES GENERATED TRUE ) 
 	
-   	set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/pb_build/include PARENT_SCOPE)
+    set(pb_include ${CMAKE_CURRENT_BINARY_DIR}/pb_build/include)
+    set(INCLUDE_DIR ${INCLUDE_DIR} ${pb_include} PARENT_SCOPE)
+    install (DIRECTORY "${pb_include}/google" DESTINATION include/cytolib)
 	set ( PB_LIBS ${CMAKE_CURRENT_BINARY_DIR}/pb_build/lib/libprotobuf-lite.a PARENT_SCOPE)
