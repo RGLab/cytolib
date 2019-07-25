@@ -486,9 +486,6 @@ namespace cytolib
 	vector<coordinate> ellipseGate::getAntipodalVerts() const{
 		return antipodal_vertices;
 	}
-	vector<coordinate> ellipseGate::getFoci() const{
-		return foci;
-	}
 	ellipseGate::ellipseGate(coordinate _mu, vector<coordinate> _cov, EVENT_DATA_TYPE _dist):mu(_mu),cov(_cov), dist(_dist){
 		isTransformed = true;
 		isGained = true;
@@ -662,78 +659,6 @@ namespace cytolib
 		//set distance (in this calculation should always be 1)
 		dist = 1;
 	}
-
-	/*
-	 * Use antipodal vertices to compute foci. Ideally, these would
-	 * be read in along with the antipodal vertices, but in legacy
-	 * FlowJo workspaces, only the antipodal vertices were provided.
-	 */
-	void ellipseGate::computeFoci(){
-		// This starts the same as computeCov
-		vector<coordinate> v=antipodal_vertices;
-		unsigned short nSize = v.size();
-		if (nSize != 4)
-			throw(domain_error("invalid number of antipodal points"));
-
-		/*
-		 * get center and set mu
-		 */
-		mu.x=0;
-		mu.y=0;
-		for(vector<coordinate>::iterator it=v.begin();it!=v.end();it++)
-		{
-			mu.x+=it->x;
-			mu.y+=it->y;
-		}
-		mu.x=mu.x/nSize;
-		mu.y=mu.y/nSize;
-
-		//center the antipods
-		for(vector<coordinate>::iterator it=v.begin();it!=v.end();it++)
-		{
-			it->x = it->x - mu.x;
-			it->y = it->y - mu.y;
-		}
-
-		/*
-		 * find the four positions of four antipodals
-		 */
-
-		//far right point
-		vector<coordinate>::iterator R_it=max_element(v.begin(),v.end(),[](coordinate i, coordinate j) { return i.x<j.x; });
-		coordinate R = *R_it;
-
-		//far left point
-		vector<coordinate>::iterator L_it=min_element(v.begin(),v.end(),[](coordinate i, coordinate j) { return i.x<j.x; });
-		coordinate L = *L_it;
-
-		// calculate the a length
-		EVENT_DATA_TYPE a = hypot(L.x-R.x,L.y-R.y)/2;
-
-		//use the rest of two points for computing b
-		vector<coordinate> Q;
-		for(vector<coordinate>::iterator it = v.begin();it!= v.end();it++){
-			if(it != R_it && it != L_it)
-				Q.push_back(*it);
-		}
-		coordinate V1 = Q[0];
-		coordinate V2 = Q[1];
-		EVENT_DATA_TYPE b = hypot(V1.x-V2.x,V1.y-V2.y)/2;
-
-		EVENT_DATA_TYPE a2 = a * a ;
-		EVENT_DATA_TYPE b2 = b * b ;
-
-		// Now, instead of covariance matrix, we just get foci
-		EVENT_DATA_TYPE c = sqrt(a2-b2);
-		EVENT_DATA_TYPE focal_scale = c/a;
-		if (!foci.empty()){
-			foci.clear();
-		}
-		//R and L are already translated to the origin, so no need for (R.x-mu.x)*scale
-		foci.push_back(coordinate(mu.x+R.x*focal_scale, mu.y+R.y*focal_scale));
-		foci.push_back(coordinate(mu.x+L.x*focal_scale, mu.y+L.y*focal_scale));
-	}
-
 
 	/*
 	 * translated from flowCore::%in% method for ellipsoidGate
