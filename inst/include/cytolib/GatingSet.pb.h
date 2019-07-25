@@ -997,18 +997,6 @@ class ellipseGate final :
   const ::google::protobuf::RepeatedPtrField< ::pb::coordinate >&
       antipodal_vertices() const;
 
-  // repeated .pb.coordinate foci = 5;
-  int foci_size() const;
-  void clear_foci();
-  static const int kFociFieldNumber = 5;
-  ::pb::coordinate* mutable_foci(int index);
-  ::google::protobuf::RepeatedPtrField< ::pb::coordinate >*
-      mutable_foci();
-  const ::pb::coordinate& foci(int index) const;
-  ::pb::coordinate* add_foci();
-  const ::google::protobuf::RepeatedPtrField< ::pb::coordinate >&
-      foci() const;
-
   // required .pb.coordinate mu = 1;
   bool has_mu() const;
   void clear_mu();
@@ -1034,7 +1022,6 @@ class ellipseGate final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::RepeatedPtrField< ::pb::coordinate > cov_;
   ::google::protobuf::RepeatedPtrField< ::pb::coordinate > antipodal_vertices_;
-  ::google::protobuf::RepeatedPtrField< ::pb::coordinate > foci_;
   ::pb::coordinate* mu_;
   float dist_;
   friend struct ::TableStruct_GatingSet_2eproto;
@@ -5422,36 +5409,6 @@ inline void ellipseGate::set_dist(float value) {
   _has_bits_[0] |= 0x00000002u;
   dist_ = value;
   // @@protoc_insertion_point(field_set:pb.ellipseGate.dist)
-}
-
-// repeated .pb.coordinate foci = 5;
-inline int ellipseGate::foci_size() const {
-  return foci_.size();
-}
-inline void ellipseGate::clear_foci() {
-  foci_.Clear();
-}
-inline ::pb::coordinate* ellipseGate::mutable_foci(int index) {
-  // @@protoc_insertion_point(field_mutable:pb.ellipseGate.foci)
-  return foci_.Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField< ::pb::coordinate >*
-ellipseGate::mutable_foci() {
-  // @@protoc_insertion_point(field_mutable_list:pb.ellipseGate.foci)
-  return &foci_;
-}
-inline const ::pb::coordinate& ellipseGate::foci(int index) const {
-  // @@protoc_insertion_point(field_get:pb.ellipseGate.foci)
-  return foci_.Get(index);
-}
-inline ::pb::coordinate* ellipseGate::add_foci() {
-  // @@protoc_insertion_point(field_add:pb.ellipseGate.foci)
-  return foci_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::pb::coordinate >&
-ellipseGate::foci() const {
-  // @@protoc_insertion_point(field_list:pb.ellipseGate.foci)
-  return foci_;
 }
 
 // -------------------------------------------------------------------
