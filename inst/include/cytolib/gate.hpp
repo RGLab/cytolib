@@ -292,6 +292,10 @@ public:
 	 */
 	void computeCov();
 	/*
+	 * convert covariance matrix and mean to antipodal vertices
+	 */
+	void computeAntipodalVerts();
+	/*
 	 * translated from flowCore::%in% method for ellipsoidGate
 	 */
 	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd);

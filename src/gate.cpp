@@ -653,11 +653,43 @@ namespace cytolib
 
 
 		//set cov
+		cov.clear();
 		cov.push_back(p1);
 		cov.push_back(p2);
 
 		//set distance (in this calculation should always be 1)
 		dist = 1;
+	}
+
+	void ellipseGate::computeAntipodalVerts(){
+		antipodal_vertices.clear();
+		/*
+		 * Calculate the antipodal vertices by eigendecomposition
+		 * of the covariance matrix
+		 */
+		Mat<EVENT_DATA_TYPE> covmat = {{cov[0].x, cov[0].y} , {cov[1].x,cov[1].y} };
+		Col<EVENT_DATA_TYPE> evals;
+		Mat<EVENT_DATA_TYPE> evecs;
+		// Covariance matrix should be enforced symmetric by cytolib/flowCore
+		// but otherwise could use eig_gen
+		eig_sym(evals, evecs, covmat);
+
+		// It sorts the evals, evecs in ascending mag order by default
+		EVENT_DATA_TYPE a2 = dist*evals(1);
+		EVENT_DATA_TYPE a = sqrt(a2); // major semi-axis length
+		EVENT_DATA_TYPE b2 = dist*evals(0);
+		EVENT_DATA_TYPE b = sqrt(b2); // minor semi-axis length
+		EVENT_DATA_TYPE c = sqrt(a2-b2); // semi-focal length
+
+		Col<EVENT_DATA_TYPE> a_vec(a*evecs.col(1));
+		Col<EVENT_DATA_TYPE> b_vec(b*evecs.col(0));
+		Col<EVENT_DATA_TYPE> c_vec(c*evecs.col(1));
+		// Add the 4 antipodal vertices in the order FlowJo expects:
+		// vertices on same axis are adjacent in vector
+		antipodal_vertices.push_back(coordinate(mu.x+a_vec(0), mu.y+a_vec(1)));
+		antipodal_vertices.push_back(coordinate(mu.x-a_vec(0), mu.y-a_vec(1)));
+		antipodal_vertices.push_back(coordinate(mu.x+b_vec(0), mu.y+b_vec(1)));
+		antipodal_vertices.push_back(coordinate(mu.x-b_vec(0), mu.y-b_vec(1)));
 	}
 
 	/*
