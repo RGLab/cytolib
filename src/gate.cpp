@@ -865,7 +865,7 @@ namespace cytolib
 	ellipsoidGate::ellipsoidGate(const pb::gate & gate_pb):ellipseGate(gate_pb){
 		//deal with legacy archive that did not interpolate ellipsoidGate
 		if(param.getVertices().size() == 0)
-			toPolygon(50);
+			toPolygon(100);
 	}
 	/*
 	 *
