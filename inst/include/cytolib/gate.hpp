@@ -431,6 +431,7 @@ enum QUAD{
  */
 class CurlyQuadGate:public polygonGate{
 	bool interpolated;
+protected:
 	QUAD quadrant;
 public:
 	CurlyQuadGate(paramPoly _inter, QUAD _quad):polygonGate(),interpolated(false),quadrant(_quad){
