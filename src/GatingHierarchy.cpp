@@ -30,7 +30,7 @@ namespace cytolib
 			nodeProperties & node=getNodeProperty(u);
 			if(u!=0)
 			{
-				gate *g=node.getGate();
+				gatePtr g=node.getGate();
 				if(g==NULL)
 					throw(domain_error("no gate available for this node"));
 				if(g_loglevel>=POPULATION_LEVEL)
@@ -173,7 +173,7 @@ namespace cytolib
 		if(g_loglevel>=POPULATION_LEVEL)
 			PRINT("gating on:"+getNodePath(u)+"\n");
 
-		gate *g=node.getGate();
+		gatePtr g=node.getGate();
 
 		if(g==NULL)
 			throw(domain_error("no gate available for this node"));
@@ -241,7 +241,7 @@ namespace cytolib
 				nodeProperties & node=getNodeProperty(u);
 				if(u!=0)
 				{
-					gate *g=node.getGate();
+					gatePtr g=node.getGate();
 					if(g==NULL)
 						throw(domain_error("no gate available for this node"));
 					if(g_loglevel>=POPULATION_LEVEL)
@@ -404,7 +404,7 @@ namespace cytolib
 	 * assuming gate split the parent population into two subpops, one of which is to keep
 	 * depends on isNegate flag of the gate
 	 */
-	VertexID GatingHierarchy::addGate(gate* g,VertexID parentID,string popName)
+	VertexID GatingHierarchy::addGate(gatePtr g,VertexID parentID,string popName)
 	{
 
 
@@ -533,7 +533,7 @@ namespace cytolib
 				nodeProperties & node=getNodeProperty(u);
 				if(u!=0)
 				{
-					gate *g=node.getGate();
+					gatePtr g=node.getGate();
 					if(g==NULL)
 						throw(domain_error("no gate available for this node"));
 					if(g_loglevel>=POPULATION_LEVEL)
@@ -559,7 +559,7 @@ namespace cytolib
 				nodeProperties & node=getNodeProperty(u);
 				if(u!=0)
 				{
-					gate *g=node.getGate();
+					gatePtr g=node.getGate();
 					if(g==NULL)
 						throw(domain_error("no gate available for this node"));
 					if(g_loglevel>=POPULATION_LEVEL)
@@ -586,7 +586,7 @@ namespace cytolib
 				nodeProperties & node=getNodeProperty(u);
 				if(u!=0)
 				{
-					gate *g=node.getGate();
+					gatePtr g=node.getGate();
 					if(g==NULL)
 						throw(domain_error("no gate available for this node"));
 					if(g_loglevel>=POPULATION_LEVEL)
@@ -594,8 +594,8 @@ namespace cytolib
 					unsigned short gateType= g->getType();
 					if(gateType == CURLYQUADGATE)
 					{
-						CurlyQuadGate * curlyGate = dynamic_cast<CurlyQuadGate *>(g);
-						curlyGate->interpolate(trans);//the interpolated polygon is in raw scale
+						CurlyQuadGate& curlyGate = dynamic_cast<CurlyQuadGate&>(*g);
+						curlyGate.interpolate(trans);//the interpolated polygon is in raw scale
 					}
 					if(gateType!=BOOLGATE)
 						g->transforming(trans);
@@ -691,7 +691,7 @@ namespace cytolib
 	vector<bool> GatingHierarchy::boolGating(MemCytoFrame & cytoframe, VertexID u, bool computeTerminalBool){
 
 		nodeProperties & node=getNodeProperty(u);
-		gate * g=node.getGate();
+		gatePtr  g=node.getGate();
 
 		//init the indices
 	//	unsigned nEvents=fdata.getEventsCount();

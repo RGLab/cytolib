@@ -40,7 +40,7 @@ typedef unique_ptr<POPINDICES> popIndPtr;/*! the pointer to the event indices*/
 class nodeProperties{
 private:
 	string thisName;
-	gate * thisGate; /**< pointer to the abstract gate object */
+	gatePtr thisGate; /**< pointer to the abstract gate object */
 	popIndPtr indices;/**< ptr to the POPINDICES */
 	POPSTATS fjStats,fcStats;
 	bool hidden;
@@ -68,10 +68,6 @@ public:
 	nodeProperties(const nodeProperties& np);
 	nodeProperties & operator=(nodeProperties np);
 
-	/*
-	 * gate is dynamically created,so they are freed here in destroy method
-	 */
-	~nodeProperties();
 
 	/**
 	 * retrieve the pop stats that was pre-calculated and stored in the node.
@@ -93,7 +89,7 @@ public:
 	 * getter for the private member of gate
 	 * @return the pointer to an abstract base \link<gate> object
 	 */
-	gate * getGate();
+	gatePtr getGate();
 	/**
 	 * getter for the private member of population name
 	 */
@@ -115,7 +111,7 @@ public:
 	/**
 	 * setter for the private member of gate
 	 */
-	void setGate(gate *gate){
+	void setGate(gatePtr gate){
 		thisGate=gate;
 	}
 

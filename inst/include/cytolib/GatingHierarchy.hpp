@@ -174,7 +174,7 @@ public:
 	 * assuming gate split the parent population into two subpops, one of which is to keep
 	 * depends on isNegate flag of the gate
 	 */
-	VertexID addGate(gate* g,VertexID parentID,string popName);
+	VertexID addGate(gatePtr g,VertexID parentID,string popName);
 	/*
 	 * remove the node along with associated population properities including indices and gates
 	 */

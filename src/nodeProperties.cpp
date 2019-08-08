@@ -48,25 +48,25 @@ namespace cytolib
 			switch(gate_pb.type())
 			{
 			case pb::RANGE_GATE:
-				thisGate = new rangeGate(gate_pb);
+				thisGate = gatePtr(new rangeGate(gate_pb));
 				break;
 			case pb::BOOL_GATE:
-				thisGate = new boolGate(gate_pb);
+				thisGate = gatePtr(new boolGate(gate_pb));
 				break;
 			case pb::POLYGON_GATE:
-				thisGate = new polygonGate(gate_pb);
+				thisGate = gatePtr(new polygonGate(gate_pb));
 				break;
 			case pb::RECT_GATE:
-				thisGate = new rectGate(gate_pb);
+				thisGate = gatePtr(new rectGate(gate_pb));
 				break;
 			case pb::ELLIPSE_GATE:
-				thisGate = new ellipseGate(gate_pb);
+				thisGate = gatePtr(new ellipseGate(gate_pb));
 				break;
 			case pb::ELLIPSOID_GATE:
-				thisGate = new ellipsoidGate(gate_pb);
+				thisGate = gatePtr(new ellipsoidGate(gate_pb));
 				break;
 			case pb::LOGICAL_GATE:
-				thisGate = new logicalGate(gate_pb);
+				thisGate = gatePtr(new logicalGate(gate_pb));
 				break;
 			default:
 				throw(domain_error("unknown type of gate archive!"));
@@ -153,20 +153,7 @@ namespace cytolib
 
 	}
 
-	/*
-	 * gate is dynamically created,so they are freed here in destroy method
-	 */
-	nodeProperties::~nodeProperties(){
 
-	//	PRINT("entring the destructor of nodeProperties\n");
-
-		if(thisGate!=NULL)
-		{
-			if(g_loglevel>=GATE_LEVEL)
-				PRINT("free gate:"+this->thisName+"\n");
-			delete thisGate;
-		}
-	}
 
 	/**
 	 * setter method for the private member of pop stats
@@ -184,7 +171,7 @@ namespace cytolib
 	 * getter for the private member of gate
 	 * @return the pointer to an abstract base \link<gate> object
 	 */
-	gate * nodeProperties::getGate(){
+	gatePtr nodeProperties::getGate(){
 		if(thisGate==NULL)
 			throw(logic_error("gate is not parsed!"));
 		return(thisGate);
