@@ -675,9 +675,9 @@ namespace cytolib
 		eig_sym(evals, evecs, covmat);
 
 		// It sorts the evals, evecs in ascending mag order by default
-		EVENT_DATA_TYPE a2 = dist*evals(1);
+		EVENT_DATA_TYPE a2 = dist*dist*evals(1);
 		EVENT_DATA_TYPE a = sqrt(a2); // major semi-axis length
-		EVENT_DATA_TYPE b2 = dist*evals(0);
+		EVENT_DATA_TYPE b2 = dist*dist*evals(0);
 		EVENT_DATA_TYPE b = sqrt(b2); // minor semi-axis length
 		EVENT_DATA_TYPE c = sqrt(a2-b2); // semi-focal length
 
