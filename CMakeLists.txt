@@ -26,8 +26,9 @@ project (cytolib)
     include_directories(${ZLIB_INCLUDE_DIRS})
     # TO BE CREATED
 #    include(thirdparty/tbb.cmake)
-#  	set(LIBS ${LIBS} libdl.so)
-  
+    if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
+	  	set(LIBS ${LIBS} libdl.so)
+  	endif()
 #	set(CYTOLIB_INCLUDE_DIR "" CACHE FILEPATH "Path to cytolib includes")
 #
 #	if(NOT EXISTS ${CYTOLIB_INCLUDE_DIR}/cytolib/global.hpp)
