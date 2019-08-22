@@ -44,7 +44,12 @@ project (cytolib)
 #	message(${THIRDPARTY_INCLUDE_DIR})	
 	set(CMAKE_CXX_STANDARD 14)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
-	set(LIBS ${LIBS} stdc++fs)
+	if ( ${CMAKE_CXX_COMPILER} STREQUAL "g++" )
+	  	set(FSLIB stdc++fs)
+	else()
+		set(FSLIB c++fs)
+  	endif()
+	set(LIBS ${LIBS} ${FSLIB})
 
     add_subdirectory(src)
     add_subdirectory(inst)#install header
