@@ -675,10 +675,10 @@ inline boost::shared_ptr<transformation>  fasinhTrans::getInverseTransformation(
  */
 class logTrans:public transformation{
 public:
-		EVENT_DATA_TYPE offset;
-		EVENT_DATA_TYPE decade;
+		EVENT_DATA_TYPE offset;//i.e. min in flowjo
+		EVENT_DATA_TYPE decade; //i.e. log(max) - log(min) in flowjo
 		unsigned scale;
-		unsigned T; //top value; derived from keyword $PnR for each channel
+		unsigned T; //(deprecated)top value; derived from keyword $PnR for each channel
 public:
 	logTrans():transformation(false,LOG),offset(0),decade(1), scale(1),T(262144){
 		calTbl.setInterpolated(true);
@@ -690,21 +690,6 @@ public:
 	}
 
 
-	/*
-	 *
-	 *now we switch back to zero imputation instead of min value since
-	 *when convert to R version of transformation function, the data is
-	 *no available anymore, thus no way to specify this minvalue
-	 *
-	 */
-	EVENT_DATA_TYPE flog(EVENT_DATA_TYPE x,EVENT_DATA_TYPE T,EVENT_DATA_TYPE _min) {
-
-		EVENT_DATA_TYPE M=decade;
-		return x>0?(log10(x/T)/M+offset):_min;
-	//	return x>0?(log10((x+offset)/T)/M):_min;
-
-	}
-
 	void transforming(EVENT_DATA_TYPE * input, int nSize){
 
 
@@ -712,8 +697,9 @@ public:
 			EVENT_DATA_TYPE thisMin=0;//input.min();
 
 			for(int i=0;i<nSize;i++){
-				input[i]=flog(input[i],T,thisMin) * scale;
-			}
+				auto & x = input[i];
+
+ 				x = x>0?((log10(x)-log10(offset))/decade)* scale:0;			}
 
 	}
 	logTrans * clone(){return new logTrans(*this);};
@@ -739,6 +725,7 @@ public:
 	void setTransformedScale(int _scale){scale = _scale;};
 	int getTransformedScale(){return scale;};
 	int getRawScale(){return T;};
+
 };
 
 class logInverseTrans:public logTrans{
@@ -751,7 +738,7 @@ public:
 	//		EVENT_DATA_TYPE thisMin=0;//input.min();
 
 			for(int i=0;i<nSize;i++){
-				input[i]= pow(10, (input[i]/scale - 1) * decade) * T;
+				input[i]= pow(10, (input[i]* decade/scale + log10(offset)));
 			}
 
 
