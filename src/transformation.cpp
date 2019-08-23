@@ -420,24 +420,19 @@ namespace cytolib
 	 *now we switch back to zero imputation instead of min value since
 	 *when convert to R version of transformation function, the data is
 	 *no available anymore, thus no way to specify this minvalue
-	 *
+	 *EDIT:flowjo log formula
+	 * scale* (log(x) - log(min))/(log(max) - log(min))
+	 * min is recorded as offset
+	 * log(max) - log(min) is recorded as decade
+	 * scale is 256 when store ellipsoid gate
 	 */
-	EVENT_DATA_TYPE logTrans::flog(EVENT_DATA_TYPE x,EVENT_DATA_TYPE T,EVENT_DATA_TYPE _min) {
-
-		EVENT_DATA_TYPE M=decade;
-		return x>0?(log10(x/T)/M+offset):_min;
-	//	return x>0?(log10((x+offset)/T)/M):_min;
-
-	}
 
 	void logTrans::transforming(EVENT_DATA_TYPE * input, int nSize){
 
-
-	//		EVENT_DATA_TYPE thisMax=input.max();//max val must be globally determined during xml parsing
-			EVENT_DATA_TYPE thisMin=0;//input.min();
-
 			for(int i=0;i<nSize;i++){
-				input[i]=flog(input[i],T,thisMin) * scale;
+				auto & x = input[i];
+
+				x = x>0?((log10(x)-log10(offset))/decade)* scale:0;
 			}
 
 	}
@@ -465,16 +460,9 @@ namespace cytolib
 	logInverseTrans::logInverseTrans(EVENT_DATA_TYPE _offset,EVENT_DATA_TYPE _decade, unsigned _scale, unsigned _T):logTrans(_offset, _decade, _scale, _T){};
 	void logInverseTrans::transforming(EVENT_DATA_TYPE * input, int nSize){
 
-
-	//		EVENT_DATA_TYPE thisMax=input.max();
-	//		EVENT_DATA_TYPE thisMin=0;//input.min();
-
 			for(int i=0;i<nSize;i++){
-				input[i]= pow(10, (input[i]/scale - 1) * decade) * T;
+				input[i]= pow(10, (input[i]* decade/scale + log10(offset)));
 			}
-
-
-	//		input=log10(input);
 
 	}
 

@@ -175,23 +175,15 @@ public:
  */
 class logTrans:public transformation{
 public:
-		EVENT_DATA_TYPE offset;
-		EVENT_DATA_TYPE decade;
+		EVENT_DATA_TYPE offset;//i.e. min in flowjo
+		EVENT_DATA_TYPE decade; //i.e. log(max) - log(min) in flowjo
 		unsigned scale;
-		unsigned T; //top value; derived from keyword $PnR for each channel
+		unsigned T; //(deprecated)top value; derived from keyword $PnR for each channel
 public:
 	logTrans();
 
 	logTrans(EVENT_DATA_TYPE _offset,EVENT_DATA_TYPE _decade, unsigned _scale, unsigned _T);
 
-	/*
-	 *
-	 *now we switch back to zero imputation instead of min value since
-	 *when convert to R version of transformation function, the data is
-	 *no available anymore, thus no way to specify this minvalue
-	 *
-	 */
-	EVENT_DATA_TYPE flog(EVENT_DATA_TYPE x,EVENT_DATA_TYPE T,EVENT_DATA_TYPE _min);
 	void transforming(EVENT_DATA_TYPE * input, int nSize);
 	TransPtr clone() const;
 	void convertToPb(pb::transformation & trans_pb);
