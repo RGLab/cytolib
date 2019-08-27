@@ -810,6 +810,25 @@ namespace cytolib
 
 	}
 
+	void ellipseGate::interpolatePolygon(unsigned nVertices = 50){
+		Mat<EVENT_DATA_TYPE> covmat = {{cov[0].x, cov[0].y} , {cov[1].x,cov[1].y} };
+		Mat<EVENT_DATA_TYPE> chol_lower = chol(covmat, "lower");
+		Row<EVENT_DATA_TYPE> theta = linspace<Row<EVENT_DATA_TYPE>>(0.0, 2.0*datum::pi, nVertices);
+		Row<EVENT_DATA_TYPE> xvals = dist*cos(theta);
+		Row<EVENT_DATA_TYPE> yvals = dist*sin(theta);
+		Mat<EVENT_DATA_TYPE> result = join_cols(xvals, yvals);
+		result = chol_lower * result;
+		vector<coordinate> vertices=param.getVertices();
+		vertices.clear();
+		vertices.resize(nVertices);
+		for(unsigned short i=0;i<nVertices;i++)
+		{
+			vertices[i].x = result(0, i) + mu.x;
+			vertices[i].y = result(1, i) + mu.y;
+		}
+		param.setVertices(vertices);
+	}
+
 	void ellipseGate::transforming(trans_local & trans){
 		if(!Transformed())
 		{

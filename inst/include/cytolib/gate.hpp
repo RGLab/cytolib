@@ -310,6 +310,13 @@ public:
 	 */
 	void toPolygon(unsigned nVertices);
 
+	/*
+	 * Alternative to toPolygon using same logic as flowCore
+	 * ellipsoidGate->polygonGate coercion method using Cholesky
+	 * decomposition
+	 */
+	void interpolatePolygon(unsigned nVertices);
+
 	void transforming(trans_local & trans);
 };
 
