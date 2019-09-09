@@ -1,7 +1,8 @@
 #include <cytolib/ellipse2points.hpp>
-#include <exception>
+#include <stdexcept>
 #include <algorithm>
 #include <cmath>
+using namespace std;
 namespace cytolib
 {
 
@@ -10,7 +11,7 @@ namespace cytolib
 
 // get center
 	if(x.size()!=y.size())
-	throw("invalid antipodal coordinates!");
+	throw runtime_error("invalid antipodal coordinates!");
 
 	int n = x.size();
 	float mu_x = 0, mu_y = 0;

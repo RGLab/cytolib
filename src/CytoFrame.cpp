@@ -258,7 +258,7 @@ namespace cytolib
 		CompType key_type = get_h5_datatype_keys();
 		hsize_t nSize = pheno_data_.size();
 		if(nSize==0)
-			throw("CytoFrame requires non-empty pdata to write to h5!");
+			throw runtime_error("CytoFrame requires non-empty pdata to write to h5!");
 		hsize_t dim_pd[] = {nSize};
 		hsize_t dim_max[] = {H5S_UNLIMITED};
 		DataSpace dsp_pd(1, dim_pd, dim_max);
@@ -568,7 +568,7 @@ namespace cytolib
 	 * @param
 	 * @return
 	 */
-	EVENT_DATA_TYPE CytoFrame::get_time_step(const string time_channel)
+	EVENT_DATA_TYPE CytoFrame::get_time_step(const string time_channel) const
 	{
 
 	  //check if $TIMESTEP is available
