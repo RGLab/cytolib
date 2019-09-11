@@ -57,8 +57,15 @@ namespace cytolib
 
 	struct TM_ext
 	{
-		tm time;
+		tm _time;
 		EVENT_DATA_TYPE fractional_secs;
+		TM_ext():fractional_secs(0){
+			time_t rawtime;
+			time(&rawtime);
+			struct tm * timeinfo = localtime (&rawtime);//The returned value points to an internal object
+			//init time member to avoid random values for day,month,year
+			_time = *timeinfo;
+		}
 	};
 	/**
 	 * Parse the time string with fractional seconds

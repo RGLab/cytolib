@@ -123,7 +123,7 @@ namespace cytolib
 		//split the H:M:S.ms by .
 		boost::split(time_vec, s_time, boost::is_any_of("."));
 		//using std lib to parse the first half
-		strptime(time_vec[0].c_str(), "%H:%M:%S", &(res.time));
+		strptime(time_vec[0].c_str(), "%H:%M:%S", &(res._time));
 		 //parse the second half as fractional seconds
 		if(time_vec.size()==2)
 		{

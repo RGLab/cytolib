@@ -34,6 +34,13 @@ struct CFFixture{
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 
+BOOST_AUTO_TEST_CASE(get_time_step)
+{
+	auto fr1 = MemCytoFrame("../flowWorkspace/output/s5a01.fcs", config);
+	fr1.read_fcs();
+	BOOST_CHECK_CLOSE(fr1.get_time_step("Time"), 0.0557, 0.01);
+
+}
 BOOST_AUTO_TEST_CASE(h5_vs_mem)
 {
 	//check if h5 version is consistent with mem

@@ -586,8 +586,9 @@ namespace cytolib
 		  {
 			  TM_ext btime = parse_time_with_fractional_seconds(it_btime->second);
 			  TM_ext etime = parse_time_with_fractional_seconds(it_etime->second);
-
-			  ts = difftime(mktime(&btime.time),mktime(&btime.time));
+			  auto t1 = mktime(&btime._time);
+			  auto t2 = mktime(&etime._time);
+			  ts = difftime(t2, t1);
 			  ts = ts + etime.fractional_secs/100 - btime.fractional_secs/100;
 
 			  const auto time_range = get_range(time_channel, ColType::channel, RangeType::data);
