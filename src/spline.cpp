@@ -239,22 +239,26 @@ void spline_eval(int method, double* u,int nSize,
     i = 0;
     for(l = 0; l < nu; l++) {
 	ul = v[l];
-	if(ul < x[i] || (i < n_1 && x[i+1] < ul)) {
-	    /* reset i  such that  x[i] <= ul <= x[i+1] : */
-	    i = 0;
-	    j = n;
-	    do {
-		k = (i+j)/2;
-		if(ul < x[k]) j = k;
-		else i = k;
-	    }
-	    while(j > i+1);
-	}
-	dx = ul - x[i];
-	/* for natural splines extrapolate linearly left */
-	tmp = (method == 2 && ul < x[0]) ? 0.0 : d[i];
+	if(isfinite(ul))
+	{
+		if(ul < x[i] || (i < n_1 && x[i+1] < ul)) {
 
-	v[l] = y[i] + dx*(b[i] + dx*(c[i] + dx*tmp));
+			/* reset i  such that  x[i] <= ul <= x[i+1] : */
+			i = 0;
+			j = n;
+			do {
+			k = (i+j)/2;
+			if(ul < x[k]) j = k;
+			else i = k;
+			}
+			while(j > i+1);
+		}
+		dx = ul - x[i];
+		/* for natural splines extrapolate linearly left */
+		tmp = (method == 2 && ul < x[0]) ? 0.0 : d[i];
+
+		v[l] = y[i] + dx*(b[i] + dx*(c[i] + dx*tmp));
+	}
     }
 //    memcpy(u, v, sizeof(double)*nSize);
 //    delete v;
