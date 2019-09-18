@@ -392,7 +392,8 @@ namespace cytolib
  */
 	fsinhTrans::fsinhTrans():fasinhTrans(){}
 
-	fsinhTrans::fsinhTrans(EVENT_DATA_TYPE _length, EVENT_DATA_TYPE _maxRange, EVENT_DATA_TYPE _T, EVENT_DATA_TYPE _A, EVENT_DATA_TYPE _M):fasinhTrans(_length,_maxRange, _T, _A, _M){}
+	fsinhTrans::fsinhTrans(EVENT_DATA_TYPE _maxRange, EVENT_DATA_TYPE _length, EVENT_DATA_TYPE _T
+			, EVENT_DATA_TYPE _A, EVENT_DATA_TYPE _M):fasinhTrans(_maxRange, _length, _T, _A, _M){}
 
 	void  fsinhTrans::transforming(EVENT_DATA_TYPE * input, int nSize){
 		for(int i=0;i<nSize;i++)
@@ -402,7 +403,7 @@ namespace cytolib
 	TransPtr fsinhTrans::getInverseTransformation(){throw(domain_error("inverse function not defined!"));};
 
 	TransPtr  fasinhTrans::getInverseTransformation(){
-		return TransPtr(new fsinhTrans(length, maxRange, T, A , M));
+		return TransPtr(new fsinhTrans(maxRange, length, T, A , M));
 	}
 
 	logTrans::logTrans():transformation(false,LOG),offset(0),decade(1), scale(1),T(262144){

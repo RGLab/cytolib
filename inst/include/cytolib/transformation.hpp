@@ -163,7 +163,7 @@ public:
 
 	fsinhTrans();
 
-	fsinhTrans(EVENT_DATA_TYPE _length, EVENT_DATA_TYPE _maxRange, EVENT_DATA_TYPE _T, EVENT_DATA_TYPE _A, EVENT_DATA_TYPE _M);
+	fsinhTrans(EVENT_DATA_TYPE _maxRange, EVENT_DATA_TYPE _length, EVENT_DATA_TYPE _T, EVENT_DATA_TYPE _A, EVENT_DATA_TYPE _M);
 
 	void  transforming(EVENT_DATA_TYPE * input, int nSize);
 	TransPtr getInverseTransformation();
