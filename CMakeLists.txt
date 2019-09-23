@@ -3,7 +3,10 @@ project (cytolib)
 # required for unit testing using CMake's ctest command
 #    include(CTest)
 #    enable_testing()
- 
+	set(CYTOLIB_VERSION_MAJOR 2)
+	set(CYTOLIB_VERSION_MINOR 2)
+	set(CYTOLIB_VERSION_PATCH 17)
+	set(CYTOLIB_VERSION ${CYTOLIB_VERSION_MAJOR}.${CYTOLIB_VERSION_MINOR}.${CYTOLIB_VERSION_PATCH} )
  # required modules for our task
     include(CheckIncludeFile)
     include(CheckIncludeFileCXX)
