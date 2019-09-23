@@ -327,7 +327,7 @@ namespace cytolib
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data, const string & new_h5_dir){
+	GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data, const string & new_h5_dir) const{
 		GatingSet gs;
 		fs::path h5_dir;
 		if(is_copy_data)
@@ -444,7 +444,7 @@ namespace cytolib
 		}
 		return gs;
 	}
-	string GatingSet::generate_h5_folder(string h5_dir)
+	string GatingSet::generate_h5_folder(string h5_dir) const
 	{
 		h5_dir = fs::path(h5_dir) / uid_;
 		if(fs::exists(h5_dir))
