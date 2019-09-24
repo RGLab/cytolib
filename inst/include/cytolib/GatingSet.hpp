@@ -88,7 +88,7 @@ public:
 	 * up to caller to free the memory
 	 */
 	GatingSet copy(bool is_copy_data = true, bool is_realize_data = true
-			, const string & new_h5_dir = fs_tmp_path());
+			, const string & new_h5_dir = fs_tmp_path()) const;
 
 	/*Defunct
 	 * TODO:current version of this contructor is based on gating template ,simply copying
@@ -115,7 +115,7 @@ public:
 	 * @return a root-only GatingSet that carries the subsetted cytoframes
 	 */
 	GatingSet get_cytoset(string node_path);
-	string generate_h5_folder(string h5_dir);
+	string generate_h5_folder(string h5_dir) const;
 
 	/**
 	 * Retrieve the GatingHierarchy object from GatingSet by sample name.
@@ -140,7 +140,7 @@ public:
 	 /**
 	  * forward to the first element's getChannels
 	  */
-	vector<string> get_channels(){return get_first_gh()->get_channels();};
+	vector<string> get_channels() const{return get_first_gh()->get_channels();};
 	/**
 	 * modify the channels for each individual fh
 	 * @param _old
