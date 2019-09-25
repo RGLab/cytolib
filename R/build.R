@@ -15,18 +15,18 @@ CxxFlags <- function() {
 # to sourceCpp via the inlineCxxPlugin (defined below) and to packages 
 # via a line in Makevars[.win] like this:
 #
-#   PKG_LIBS += $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" -e "cytolib::LdFlags()")
+#   PKG_LIBS += $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" -e "cytolib::cytolib_LdFlags()")
 #' @export
 #' @importFrom RProtoBufLib LdFlags
 #' @importFrom RcppParallel RcppParallelLibs
 #' @noRd
-LdFlags <- function(...) {
+cytolib_LdFlags <- function(...) {
    cat(cytolibLdFlags(...))
 }
 
 # alias for backward compatibility
 cytolibLibs <- function() {
-   LdFlags()
+   cytolib_LdFlags()
 }
 
 
