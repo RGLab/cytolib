@@ -75,7 +75,7 @@ public:
 	 * @param path
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
 	 */
-	GatingSet(string path, bool is_skip_data = false, unsigned int h5_flags = H5F_ACC_RDONLY);
+	GatingSet(string path, bool is_skip_data = false, bool readonly = true);
 	/**
 	 * constructor from the legacy archives (de-serialization)
 	 * @param filename
@@ -221,7 +221,7 @@ public:
 	}
 
 	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path
-			, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, unsigned int flags = H5F_ACC_RDWR);
+			, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, bool readonly = false);
 	/**
 	 * Update sample id
 	 * @param _old

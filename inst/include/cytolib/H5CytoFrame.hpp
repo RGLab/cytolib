@@ -129,12 +129,12 @@ public:
 	 * @param h5_filename
 	 */
 	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename
-			, unsigned int flags = H5F_ACC_RDWR);
+			, bool readonly = false);
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, unsigned int flags = H5F_ACC_RDONLY);
+	H5CytoFrame(const string & h5_filename, bool readonly = true);
 	/**
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */

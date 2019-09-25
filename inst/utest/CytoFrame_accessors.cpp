@@ -94,15 +94,6 @@ BOOST_AUTO_TEST_CASE(flags)
 	/**
 	 * try another open with different flag
 	 */
-
-	BOOST_CHECK_EXCEPTION(H5CytoFrame fr3(h5file, H5F_ACC_RDWR);, H5::FileIException,
-					[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fopen failed") != string::npos;});
-
-
-	//load it as readonly and make meta dirty
-//	fr1.reset(new H5CytoFrame(h5file));
-//	fr1->set_channel(oldname, newname);
-//			BOOST_CHECK_;
 	//destroy it to expect succeed
 	fr1.reset();
 	//turn on error report
@@ -110,7 +101,7 @@ BOOST_AUTO_TEST_CASE(flags)
 	//clear previous errors from stacks resulted from write attempts
 //	H5::Exception::clearErrorStack();
 	//try open again
-	H5CytoFrame fr3(h5file, H5F_ACC_RDWR);
+	H5CytoFrame fr3(h5file, false);
 	fr3.set_data(dat);
 	BOOST_CHECK_CLOSE(fr3.get_data()[100], newval, 1e-6);//fr1 is updated
 

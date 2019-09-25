@@ -133,7 +133,7 @@ namespace cytolib
 	 * @param path
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
 	 */
-	GatingSet::GatingSet(string path, bool is_skip_data, unsigned int h5_flags)
+	GatingSet::GatingSet(string path, bool is_skip_data, bool readonly)
 	{
 		fs::path pb_file;
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -196,7 +196,7 @@ namespace cytolib
 				pb::CytoFrame fr = *gh_pb.mutable_frame();
 				string h5_filename = fs::path(path) / (sn + ".h5");
 
-				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, h5_flags)), sn);
+				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
 			}
 
 		}
@@ -589,7 +589,7 @@ namespace cytolib
 	}
 
 	void GatingSet::add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path
-			, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, unsigned int flags)
+			, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, bool readonly)
 	{
 
 		fs::path h5_path;
@@ -608,7 +608,7 @@ namespace cytolib
 			{
 				string h5_filename = (h5_path/it.first).string() + ".h5";
 				fr_ptr->write_h5(h5_filename);
-				fr_ptr.reset(new H5CytoFrame(h5_filename, flags));
+				fr_ptr.reset(new H5CytoFrame(h5_filename, readonly));
 			}
 
 			add_cytoframe_view(it.first, CytoFrameView(fr_ptr));

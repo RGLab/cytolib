@@ -301,7 +301,7 @@ namespace cytolib
 
 	}
 
-	GatingHierarchy::GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data, unsigned int flags){
+	GatingHierarchy::GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data, bool readonly){
 		const pb::populationTree & tree_pb =  pb_gh.tree();
 		int nNodes = tree_pb.node_size();
 
@@ -335,7 +335,7 @@ namespace cytolib
 
 			if(fs::exists(h5_filename))
 			{
-			 ptr.reset(new H5CytoFrame(h5_filename, flags));
+			 ptr.reset(new H5CytoFrame(h5_filename, readonly));
 			 pb::CytoFrame fr = *pb_gh.mutable_frame();
 			 if(!fr.is_h5())
 				 ptr.reset(new MemCytoFrame(*ptr));

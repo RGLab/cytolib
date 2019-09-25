@@ -153,7 +153,7 @@ public:
 	 */
 	void convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, H5Option h5_opt, bool is_skip_data = false);
 	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data
-			, unsigned int flags = H5F_ACC_RDONLY);
+			, bool readonly = true);
 	//load legacy pb
 	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, TransPtr> & trans_tbl);
 	/**

@@ -161,24 +161,24 @@ namespace cytolib
 	 * @param h5_filename
 	 */
 	H5CytoFrame::H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config
-			, const string & h5_filename, unsigned int flags):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+			, const string & h5_filename, bool readonly):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
 		fr.write_h5(h5_filename);
-		*this = H5CytoFrame(h5_filename, flags);
+		*this = H5CytoFrame(h5_filename, readonly);
 	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame::H5CytoFrame(const string & h5_filename, unsigned int flags):CytoFrame(),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	H5CytoFrame::H5CytoFrame(const string & h5_filename, bool readonly):CytoFrame(readonly),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 
 
-		file.openFile(filename_, flags);
+		file.openFile(filename_, H5F_ACC_RDWR);//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
 		load_meta();
-		readonly_ = flags == H5F_ACC_RDONLY;
+
 
 		//open dataset for event data
 
@@ -362,7 +362,7 @@ namespace cytolib
 			fs::remove(new_filename);
 		}
 		fs::copy_file(filename_, new_filename);
-		CytoFramePtr ptr(new H5CytoFrame(new_filename, H5F_ACC_RDWR));
+		CytoFramePtr ptr(new H5CytoFrame(new_filename, false));
 		//copy cached meta
 		ptr->set_params(get_params());
 		ptr->set_keywords(get_keywords());
@@ -383,7 +383,7 @@ namespace cytolib
 		//otherwise, realize it to memory and write back to new file
 		MemCytoFrame fr(*this);
 		fr.copy_realized(row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new H5CytoFrame(new_filename, H5F_ACC_RDWR));
+		return CytoFramePtr(new H5CytoFrame(new_filename, false));
 	}
 
 	/**

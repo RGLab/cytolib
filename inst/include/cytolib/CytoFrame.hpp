@@ -67,6 +67,7 @@ protected:
 	bool readonly_;//whether allow the public API to modify it, currently only applied to H5 version
 
 	CytoFrame ():readonly_(false){};
+	CytoFrame (bool readonly):readonly_(readonly){};
 	virtual bool is_hashed() const
 	{
 		return channel_vs_idx.size()==n_cols();
