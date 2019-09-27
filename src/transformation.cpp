@@ -71,6 +71,9 @@ namespace cytolib
 			case  LOGICLE :
 				ctype = "LOGICLE";
 				break;
+		  case  LOGGML2 :
+		    ctype = "LOGGML2";
+		    break;
 			default:
 				throw(domain_error("unknown trans type id: " + to_string(type)));
 		}
@@ -470,6 +473,70 @@ namespace cytolib
 
  TransPtr  logTrans::getInverseTransformation(){
 		return TransPtr(new logInverseTrans(offset, decade,scale, T));
+	}
+
+	logGML2Trans::logGML2Trans():transformation(false,LOGGML2),T(262144),M(1){
+		calTbl.setInterpolated(true);
+	}
+
+
+	logGML2Trans::logGML2Trans(EVENT_DATA_TYPE _T,EVENT_DATA_TYPE _M):transformation(false,LOGGML2),T(_T),M(_M){
+		calTbl.setInterpolated(true);
+	}
+
+	void logGML2Trans::transforming(EVENT_DATA_TYPE * input, int nSize){
+		EVENT_DATA_TYPE min = 0.0;
+		// Find smallest positive value
+		for(int i=0; i< nSize; i++)
+		{
+			EVENT_DATA_TYPE x = input[i];
+			min = (x > 0.0 && ( x < min || !min ))?x:min;
+		}
+		if(!min){
+		  // For nSize == 1, just move up to the lower limit of the transform (0.0)
+		  // this allows transformation of negative lower bound of transform range
+		  if(nSize > 1)
+		    throw(domain_error("All data values are negative. Cannot impute minimum value for GML2 log transform."));
+		}
+			
+		for(int i=0;i<nSize;i++){
+			auto & x = input[i];
+			// Non GML2-standard imputation logic
+			// Bring any negative values up to the smallest
+			// positive value
+			x = x>0.0?((log10(x)-log10(T))/M)+1:min;
+		}
+	}
+
+	TransPtr logGML2Trans::clone() const{return TransPtr(new logGML2Trans(*this));};
+	void logGML2Trans::convertToPb(pb::transformation & trans_pb){
+		transformation::convertToPb(trans_pb);
+		trans_pb.set_trans_type(pb::PB_LOGGML2);
+		pb::logGML2Trans * lgml2t_pb = trans_pb.mutable_lgml2t();
+		lgml2t_pb->set_t(T);
+		lgml2t_pb->set_m(M);
+	}
+	logGML2Trans::logGML2Trans(const pb::transformation & trans_pb):transformation(trans_pb){
+		const pb::logGML2Trans & lgml2t_pb = trans_pb.lgml2t();
+		T = lgml2t_pb.t();
+		M = lgml2t_pb.m();
+	}
+
+//	void logTrans::setTransformedScale(int _scale){scale = _scale;};
+	int logGML2Trans::getTransformedScale(){return 1;};
+	int logGML2Trans::getRawScale(){return T;};
+	logGML2InverseTrans::logGML2InverseTrans(EVENT_DATA_TYPE _T,EVENT_DATA_TYPE _M):logGML2Trans(_T, _M){};
+	void logGML2InverseTrans::transforming(EVENT_DATA_TYPE * input, int nSize){
+
+			for(int i=0;i<nSize;i++){
+				// T*10^(M(x-1))
+				input[i]= pow(10, (input[i]*M - M + log10(T)));
+			}
+
+	}
+
+	TransPtr logGML2Trans::getInverseTransformation(){
+		return TransPtr(new logGML2InverseTrans(T,M));
 	}
 
  linTrans::linTrans():transformation(true,LIN){

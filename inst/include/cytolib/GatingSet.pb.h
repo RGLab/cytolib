@@ -41,7 +41,7 @@ struct TableStruct_GatingSet_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[31]
+  static const ::google::protobuf::internal::ParseTable schema[32]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -102,6 +102,9 @@ extern flinTransDefaultTypeInternal _flinTrans_default_instance_;
 class gate;
 class gateDefaultTypeInternal;
 extern gateDefaultTypeInternal _gate_default_instance_;
+class logGML2Trans;
+class logGML2TransDefaultTypeInternal;
+extern logGML2TransDefaultTypeInternal _logGML2Trans_default_instance_;
 class logTrans;
 class logTransDefaultTypeInternal;
 extern logTransDefaultTypeInternal _logTrans_default_instance_;
@@ -162,6 +165,7 @@ template<> ::pb::ellipseGate* Arena::CreateMaybeMessage<::pb::ellipseGate>(Arena
 template<> ::pb::fasinhTrans* Arena::CreateMaybeMessage<::pb::fasinhTrans>(Arena*);
 template<> ::pb::flinTrans* Arena::CreateMaybeMessage<::pb::flinTrans>(Arena*);
 template<> ::pb::gate* Arena::CreateMaybeMessage<::pb::gate>(Arena*);
+template<> ::pb::logGML2Trans* Arena::CreateMaybeMessage<::pb::logGML2Trans>(Arena*);
 template<> ::pb::logTrans* Arena::CreateMaybeMessage<::pb::logTrans>(Arena*);
 template<> ::pb::logicleTrans* Arena::CreateMaybeMessage<::pb::logicleTrans>(Arena*);
 template<> ::pb::nodeProperties* Arena::CreateMaybeMessage<::pb::nodeProperties>(Arena*);
@@ -211,11 +215,12 @@ enum TRANS_TYPE {
   PB_FLIN = 3,
   PB_FASIGNH = 4,
   PB_BIEXP = 5,
-  PB_LOGICLE = 6
+  PB_LOGICLE = 6,
+  PB_LOGGML2 = 7
 };
 bool TRANS_TYPE_IsValid(int value);
 const TRANS_TYPE TRANS_TYPE_MIN = PB_CALTBL;
-const TRANS_TYPE TRANS_TYPE_MAX = PB_LOGICLE;
+const TRANS_TYPE TRANS_TYPE_MAX = PB_LOGGML2;
 const int TRANS_TYPE_ARRAYSIZE = TRANS_TYPE_MAX + 1;
 
 // ===================================================================
@@ -2648,6 +2653,131 @@ class logTrans final :
 };
 // -------------------------------------------------------------------
 
+class logGML2Trans final :
+    public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:pb.logGML2Trans) */ {
+ public:
+  logGML2Trans();
+  virtual ~logGML2Trans();
+
+  logGML2Trans(const logGML2Trans& from);
+
+  inline logGML2Trans& operator=(const logGML2Trans& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  logGML2Trans(logGML2Trans&& from) noexcept
+    : logGML2Trans() {
+    *this = ::std::move(from);
+  }
+
+  inline logGML2Trans& operator=(logGML2Trans&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  inline const ::std::string& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+  inline ::std::string* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const logGML2Trans& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const logGML2Trans* internal_default_instance() {
+    return reinterpret_cast<const logGML2Trans*>(
+               &_logGML2Trans_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    17;
+
+  void Swap(logGML2Trans* other);
+  friend void swap(logGML2Trans& a, logGML2Trans& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline logGML2Trans* New() const final {
+    return CreateMaybeMessage<logGML2Trans>(nullptr);
+  }
+
+  logGML2Trans* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<logGML2Trans>(arena);
+  }
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
+    final;
+  void CopyFrom(const logGML2Trans& from);
+  void MergeFrom(const logGML2Trans& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  void DiscardUnknownFields();
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(logGML2Trans* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::std::string GetTypeName() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional float T = 1;
+  bool has_t() const;
+  void clear_t();
+  static const int kTFieldNumber = 1;
+  float t() const;
+  void set_t(float value);
+
+  // optional float M = 2;
+  bool has_m() const;
+  void clear_m();
+  static const int kMFieldNumber = 2;
+  float m() const;
+  void set_m(float value);
+
+  // @@protoc_insertion_point(class_scope:pb.logGML2Trans)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  float t_;
+  float m_;
+  friend struct ::TableStruct_GatingSet_2eproto;
+};
+// -------------------------------------------------------------------
+
 class logicleTrans final :
     public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:pb.logicleTrans) */ {
  public:
@@ -2690,7 +2820,7 @@ class logicleTrans final :
                &_logicleTrans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   void Swap(logicleTrans* other);
   friend void swap(logicleTrans& a, logicleTrans& b) {
@@ -2855,7 +2985,7 @@ class transformation final :
                &_transformation_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   void Swap(transformation* other);
   friend void swap(transformation& a, transformation& b) {
@@ -3004,6 +3134,15 @@ class transformation final :
   ::pb::logicleTrans* mutable_lgt();
   void set_allocated_lgt(::pb::logicleTrans* lgt);
 
+  // optional .pb.logGML2Trans lgml2t = 14;
+  bool has_lgml2t() const;
+  void clear_lgml2t();
+  static const int kLgml2TFieldNumber = 14;
+  const ::pb::logGML2Trans& lgml2t() const;
+  ::pb::logGML2Trans* release_lgml2t();
+  ::pb::logGML2Trans* mutable_lgml2t();
+  void set_allocated_lgml2t(::pb::logGML2Trans* lgml2t);
+
   // optional .pb.TRANS_TYPE trans_type = 3;
   bool has_trans_type() const;
   void clear_trans_type();
@@ -3048,6 +3187,7 @@ class transformation final :
   ::pb::scaleTrans* st_;
   ::pb::fasinhTrans* ft_;
   ::pb::logicleTrans* lgt_;
+  ::pb::logGML2Trans* lgml2t_;
   int trans_type_;
   bool isgateonly_;
   bool iscomputed_;
@@ -3098,7 +3238,7 @@ class trans_pair final :
                &_trans_pair_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   void Swap(trans_pair* other);
   friend void swap(trans_pair& a, trans_pair& b) {
@@ -3241,7 +3381,7 @@ class trans_local final :
                &_trans_local_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    21;
 
   void Swap(trans_local* other);
   friend void swap(trans_local& a, trans_local& b) {
@@ -3393,7 +3533,7 @@ class POPINDICES final :
                &_POPINDICES_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    22;
 
   void Swap(POPINDICES* other);
   friend void swap(POPINDICES& a, POPINDICES& b) {
@@ -3551,7 +3691,7 @@ class nodeProperties final :
                &_nodeProperties_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    23;
 
   void Swap(nodeProperties* other);
   friend void swap(nodeProperties& a, nodeProperties& b) {
@@ -3733,7 +3873,7 @@ class treeNodes final :
                &_treeNodes_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    24;
 
   void Swap(treeNodes* other);
   friend void swap(treeNodes& a, treeNodes& b) {
@@ -3860,7 +4000,7 @@ class populationTree final :
                &_populationTree_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    25;
 
   void Swap(populationTree* other);
   friend void swap(populationTree& a, populationTree& b) {
@@ -3982,7 +4122,7 @@ class COMP final :
                &_COMP_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    26;
 
   void Swap(COMP* other);
   friend void swap(COMP& a, COMP& b) {
@@ -4207,7 +4347,7 @@ class PARAM final :
                &_PARAM_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    26;
+    27;
 
   void Swap(PARAM* other);
   friend void swap(PARAM& a, PARAM& b) {
@@ -4364,7 +4504,7 @@ class GatingHierarchy final :
                &_GatingHierarchy_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    27;
+    28;
 
   void Swap(GatingHierarchy* other);
   friend void swap(GatingHierarchy& a, GatingHierarchy& b) {
@@ -4534,7 +4674,7 @@ class CytoFrame final :
                &_CytoFrame_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    28;
+    29;
 
   void Swap(CytoFrame* other);
   friend void swap(CytoFrame& a, CytoFrame& b) {
@@ -4651,7 +4791,7 @@ class TRANS_TBL final :
                &_TRANS_TBL_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    29;
+    30;
 
   void Swap(TRANS_TBL* other);
   friend void swap(TRANS_TBL& a, TRANS_TBL& b) {
@@ -4778,7 +4918,7 @@ class GatingSet final :
                &_GatingSet_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    30;
+    31;
 
   void Swap(GatingSet* other);
   friend void swap(GatingSet& a, GatingSet& b) {
@@ -6600,6 +6740,46 @@ inline void logTrans::set_scale(float value) {
 
 // -------------------------------------------------------------------
 
+// logGML2Trans
+
+// optional float T = 1;
+inline bool logGML2Trans::has_t() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void logGML2Trans::clear_t() {
+  t_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline float logGML2Trans::t() const {
+  // @@protoc_insertion_point(field_get:pb.logGML2Trans.T)
+  return t_;
+}
+inline void logGML2Trans::set_t(float value) {
+  _has_bits_[0] |= 0x00000001u;
+  t_ = value;
+  // @@protoc_insertion_point(field_set:pb.logGML2Trans.T)
+}
+
+// optional float M = 2;
+inline bool logGML2Trans::has_m() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void logGML2Trans::clear_m() {
+  m_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline float logGML2Trans::m() const {
+  // @@protoc_insertion_point(field_get:pb.logGML2Trans.M)
+  return m_;
+}
+inline void logGML2Trans::set_m(float value) {
+  _has_bits_[0] |= 0x00000002u;
+  m_ = value;
+  // @@protoc_insertion_point(field_set:pb.logGML2Trans.M)
+}
+
+// -------------------------------------------------------------------
+
 // logicleTrans
 
 // optional float T = 1;
@@ -6783,18 +6963,18 @@ inline void transformation::set_allocated_caltbl(::pb::calibrationTable* caltbl)
 
 // optional bool isGateOnly = 2;
 inline bool transformation::has_isgateonly() const {
-  return (_has_bits_[0] & 0x00000400u) != 0;
+  return (_has_bits_[0] & 0x00000800u) != 0;
 }
 inline void transformation::clear_isgateonly() {
   isgateonly_ = false;
-  _has_bits_[0] &= ~0x00000400u;
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline bool transformation::isgateonly() const {
   // @@protoc_insertion_point(field_get:pb.transformation.isGateOnly)
   return isgateonly_;
 }
 inline void transformation::set_isgateonly(bool value) {
-  _has_bits_[0] |= 0x00000400u;
+  _has_bits_[0] |= 0x00000800u;
   isgateonly_ = value;
   // @@protoc_insertion_point(field_set:pb.transformation.isGateOnly)
 }
@@ -6921,47 +7101,47 @@ inline void transformation::set_allocated_channel(::std::string* channel) {
 
 // optional bool isComputed = 6;
 inline bool transformation::has_iscomputed() const {
-  return (_has_bits_[0] & 0x00000800u) != 0;
+  return (_has_bits_[0] & 0x00001000u) != 0;
 }
 inline void transformation::clear_iscomputed() {
   iscomputed_ = false;
-  _has_bits_[0] &= ~0x00000800u;
+  _has_bits_[0] &= ~0x00001000u;
 }
 inline bool transformation::iscomputed() const {
   // @@protoc_insertion_point(field_get:pb.transformation.isComputed)
   return iscomputed_;
 }
 inline void transformation::set_iscomputed(bool value) {
-  _has_bits_[0] |= 0x00000800u;
+  _has_bits_[0] |= 0x00001000u;
   iscomputed_ = value;
   // @@protoc_insertion_point(field_set:pb.transformation.isComputed)
 }
 
 // optional uint32 type = 12;
 inline bool transformation::has_type() const {
-  return (_has_bits_[0] & 0x00001000u) != 0;
+  return (_has_bits_[0] & 0x00002000u) != 0;
 }
 inline void transformation::clear_type() {
   type_ = 0u;
-  _has_bits_[0] &= ~0x00001000u;
+  _has_bits_[0] &= ~0x00002000u;
 }
 inline ::google::protobuf::uint32 transformation::type() const {
   // @@protoc_insertion_point(field_get:pb.transformation.type)
   return type_;
 }
 inline void transformation::set_type(::google::protobuf::uint32 value) {
-  _has_bits_[0] |= 0x00001000u;
+  _has_bits_[0] |= 0x00002000u;
   type_ = value;
   // @@protoc_insertion_point(field_set:pb.transformation.type)
 }
 
 // optional .pb.TRANS_TYPE trans_type = 3;
 inline bool transformation::has_trans_type() const {
-  return (_has_bits_[0] & 0x00000200u) != 0;
+  return (_has_bits_[0] & 0x00000400u) != 0;
 }
 inline void transformation::clear_trans_type() {
   trans_type_ = 0;
-  _has_bits_[0] &= ~0x00000200u;
+  _has_bits_[0] &= ~0x00000400u;
 }
 inline ::pb::TRANS_TYPE transformation::trans_type() const {
   // @@protoc_insertion_point(field_get:pb.transformation.trans_type)
@@ -6969,7 +7149,7 @@ inline ::pb::TRANS_TYPE transformation::trans_type() const {
 }
 inline void transformation::set_trans_type(::pb::TRANS_TYPE value) {
   assert(::pb::TRANS_TYPE_IsValid(value));
-  _has_bits_[0] |= 0x00000200u;
+  _has_bits_[0] |= 0x00000400u;
   trans_type_ = value;
   // @@protoc_insertion_point(field_set:pb.transformation.trans_type)
 }
@@ -7266,6 +7446,55 @@ inline void transformation::set_allocated_lgt(::pb::logicleTrans* lgt) {
   }
   lgt_ = lgt;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.lgt)
+}
+
+// optional .pb.logGML2Trans lgml2t = 14;
+inline bool transformation::has_lgml2t() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+inline void transformation::clear_lgml2t() {
+  if (lgml2t_ != nullptr) lgml2t_->Clear();
+  _has_bits_[0] &= ~0x00000200u;
+}
+inline const ::pb::logGML2Trans& transformation::lgml2t() const {
+  const ::pb::logGML2Trans* p = lgml2t_;
+  // @@protoc_insertion_point(field_get:pb.transformation.lgml2t)
+  return p != nullptr ? *p : *reinterpret_cast<const ::pb::logGML2Trans*>(
+      &::pb::_logGML2Trans_default_instance_);
+}
+inline ::pb::logGML2Trans* transformation::release_lgml2t() {
+  // @@protoc_insertion_point(field_release:pb.transformation.lgml2t)
+  _has_bits_[0] &= ~0x00000200u;
+  ::pb::logGML2Trans* temp = lgml2t_;
+  lgml2t_ = nullptr;
+  return temp;
+}
+inline ::pb::logGML2Trans* transformation::mutable_lgml2t() {
+  _has_bits_[0] |= 0x00000200u;
+  if (lgml2t_ == nullptr) {
+    auto* p = CreateMaybeMessage<::pb::logGML2Trans>(GetArenaNoVirtual());
+    lgml2t_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:pb.transformation.lgml2t)
+  return lgml2t_;
+}
+inline void transformation::set_allocated_lgml2t(::pb::logGML2Trans* lgml2t) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete lgml2t_;
+  }
+  if (lgml2t) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      lgml2t = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, lgml2t, submessage_arena);
+    }
+    _has_bits_[0] |= 0x00000200u;
+  } else {
+    _has_bits_[0] &= ~0x00000200u;
+  }
+  lgml2t_ = lgml2t;
+  // @@protoc_insertion_point(field_set_allocated:pb.transformation.lgml2t)
 }
 
 // -------------------------------------------------------------------
@@ -9111,6 +9340,8 @@ inline void GatingSet::set_allocated_guid(::std::string* guid) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

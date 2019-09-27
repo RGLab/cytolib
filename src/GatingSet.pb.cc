@@ -25,6 +25,7 @@ extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_coordinate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_fasinhTrans_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_flinTrans_GatingSet_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_logGML2Trans_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_logTrans_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_logicleTrans_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_paramRange_GatingSet_2eproto;
@@ -41,7 +42,7 @@ extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_treeNodes_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_nodeProperties_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<5> scc_info_gate_GatingSet_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<7> scc_info_transformation_GatingSet_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_transformation_GatingSet_2eproto;
 namespace pb {
 class paramRangeDefaultTypeInternal {
  public:
@@ -111,6 +112,10 @@ class logTransDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<logTrans> _instance;
 } _logTrans_default_instance_;
+class logGML2TransDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<logGML2Trans> _instance;
+} _logGML2Trans_default_instance_;
 class logicleTransDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<logicleTrans> _instance;
@@ -416,6 +421,20 @@ static void InitDefaultslogTrans_GatingSet_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_logTrans_GatingSet_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultslogTrans_GatingSet_2eproto}, {}};
 
+static void InitDefaultslogGML2Trans_GatingSet_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::pb::_logGML2Trans_default_instance_;
+    new (ptr) ::pb::logGML2Trans();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::pb::logGML2Trans::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_logGML2Trans_GatingSet_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultslogGML2Trans_GatingSet_2eproto}, {}};
+
 static void InitDefaultslogicleTrans_GatingSet_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -441,15 +460,16 @@ static void InitDefaultstransformation_GatingSet_2eproto() {
   ::pb::transformation::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<7> scc_info_transformation_GatingSet_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 7, InitDefaultstransformation_GatingSet_2eproto}, {
+::google::protobuf::internal::SCCInfo<8> scc_info_transformation_GatingSet_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 8, InitDefaultstransformation_GatingSet_2eproto}, {
       &scc_info_calibrationTable_GatingSet_2eproto.base,
       &scc_info_biexpTrans_GatingSet_2eproto.base,
       &scc_info_logTrans_GatingSet_2eproto.base,
       &scc_info_flinTrans_GatingSet_2eproto.base,
       &scc_info_scaleTrans_GatingSet_2eproto.base,
       &scc_info_fasinhTrans_GatingSet_2eproto.base,
-      &scc_info_logicleTrans_GatingSet_2eproto.base,}};
+      &scc_info_logicleTrans_GatingSet_2eproto.base,
+      &scc_info_logGML2Trans_GatingSet_2eproto.base,}};
 
 static void InitDefaultstrans_pair_GatingSet_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -671,6 +691,7 @@ bool TRANS_TYPE_IsValid(int value) {
     case 4:
     case 5:
     case 6:
+    case 7:
       return true;
     default:
       return false;
@@ -6829,6 +6850,289 @@ void logTrans::InternalSwap(logTrans* other) {
 
 // ===================================================================
 
+void logGML2Trans::InitAsDefaultInstance() {
+}
+class logGML2Trans::HasBitSetters {
+ public:
+  static void set_has_t(logGML2Trans* msg) {
+    msg->_has_bits_[0] |= 0x00000001u;
+  }
+  static void set_has_m(logGML2Trans* msg) {
+    msg->_has_bits_[0] |= 0x00000002u;
+  }
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int logGML2Trans::kTFieldNumber;
+const int logGML2Trans::kMFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+logGML2Trans::logGML2Trans()
+  : ::google::protobuf::MessageLite(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:pb.logGML2Trans)
+}
+logGML2Trans::logGML2Trans(const logGML2Trans& from)
+  : ::google::protobuf::MessageLite(),
+      _internal_metadata_(nullptr),
+      _has_bits_(from._has_bits_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::memcpy(&t_, &from.t_,
+    static_cast<size_t>(reinterpret_cast<char*>(&m_) -
+    reinterpret_cast<char*>(&t_)) + sizeof(m_));
+  // @@protoc_insertion_point(copy_constructor:pb.logGML2Trans)
+}
+
+void logGML2Trans::SharedCtor() {
+  ::memset(&t_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&m_) -
+      reinterpret_cast<char*>(&t_)) + sizeof(m_));
+}
+
+logGML2Trans::~logGML2Trans() {
+  // @@protoc_insertion_point(destructor:pb.logGML2Trans)
+  SharedDtor();
+}
+
+void logGML2Trans::SharedDtor() {
+}
+
+void logGML2Trans::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const logGML2Trans& logGML2Trans::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_logGML2Trans_GatingSet_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void logGML2Trans::Clear() {
+// @@protoc_insertion_point(message_clear_start:pb.logGML2Trans)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    ::memset(&t_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&m_) -
+        reinterpret_cast<char*>(&t_)) + sizeof(m_));
+  }
+  _has_bits_.Clear();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* logGML2Trans::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<logGML2Trans*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // optional float T = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 13) goto handle_unusual;
+        msg->set_t(::google::protobuf::io::UnalignedLoad<float>(ptr));
+        ptr += sizeof(float);
+        break;
+      }
+      // optional float M = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 21) goto handle_unusual;
+        msg->set_m(::google::protobuf::io::UnalignedLoad<float>(ptr));
+        ptr += sizeof(float);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool logGML2Trans::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::LiteUnknownFieldSetter unknown_fields_setter(
+      &_internal_metadata_);
+  ::google::protobuf::io::StringOutputStream unknown_fields_output(
+      unknown_fields_setter.buffer());
+  ::google::protobuf::io::CodedOutputStream unknown_fields_stream(
+      &unknown_fields_output, false);
+  // @@protoc_insertion_point(parse_start:pb.logGML2Trans)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional float T = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (13 & 0xFF)) {
+          HasBitSetters::set_has_t(this);
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &t_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // optional float M = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (21 & 0xFF)) {
+          HasBitSetters::set_has_m(this);
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &m_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(
+            input, tag, &unknown_fields_stream));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:pb.logGML2Trans)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:pb.logGML2Trans)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void logGML2Trans::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:pb.logGML2Trans)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // optional float T = 1;
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(1, this->t(), output);
+  }
+
+  // optional float M = 2;
+  if (cached_has_bits & 0x00000002u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(2, this->m(), output);
+  }
+
+  output->WriteRaw(_internal_metadata_.unknown_fields().data(),
+                   static_cast<int>(_internal_metadata_.unknown_fields().size()));
+  // @@protoc_insertion_point(serialize_end:pb.logGML2Trans)
+}
+
+size_t logGML2Trans::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:pb.logGML2Trans)
+  size_t total_size = 0;
+
+  total_size += _internal_metadata_.unknown_fields().size();
+
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    // optional float T = 1;
+    if (cached_has_bits & 0x00000001u) {
+      total_size += 1 + 4;
+    }
+
+    // optional float M = 2;
+    if (cached_has_bits & 0x00000002u) {
+      total_size += 1 + 4;
+    }
+
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void logGML2Trans::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const logGML2Trans*>(&from));
+}
+
+void logGML2Trans::MergeFrom(const logGML2Trans& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:pb.logGML2Trans)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      t_ = from.t_;
+    }
+    if (cached_has_bits & 0x00000002u) {
+      m_ = from.m_;
+    }
+    _has_bits_[0] |= cached_has_bits;
+  }
+}
+
+void logGML2Trans::CopyFrom(const logGML2Trans& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:pb.logGML2Trans)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool logGML2Trans::IsInitialized() const {
+  return true;
+}
+
+void logGML2Trans::Swap(logGML2Trans* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void logGML2Trans::InternalSwap(logGML2Trans* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_has_bits_[0], other->_has_bits_[0]);
+  swap(t_, other->t_);
+  swap(m_, other->m_);
+}
+
+::std::string logGML2Trans::GetTypeName() const {
+  return "pb.logGML2Trans";
+}
+
+
+// ===================================================================
+
 void logicleTrans::InitAsDefaultInstance() {
 }
 class logicleTrans::HasBitSetters {
@@ -7317,6 +7621,8 @@ void transformation::InitAsDefaultInstance() {
       ::pb::fasinhTrans::internal_default_instance());
   ::pb::_transformation_default_instance_._instance.get_mutable()->lgt_ = const_cast< ::pb::logicleTrans*>(
       ::pb::logicleTrans::internal_default_instance());
+  ::pb::_transformation_default_instance_._instance.get_mutable()->lgml2t_ = const_cast< ::pb::logGML2Trans*>(
+      ::pb::logGML2Trans::internal_default_instance());
 }
 class transformation::HasBitSetters {
  public:
@@ -7325,7 +7631,7 @@ class transformation::HasBitSetters {
     msg->_has_bits_[0] |= 0x00000004u;
   }
   static void set_has_isgateonly(transformation* msg) {
-    msg->_has_bits_[0] |= 0x00000400u;
+    msg->_has_bits_[0] |= 0x00000800u;
   }
   static void set_has_name(transformation* msg) {
     msg->_has_bits_[0] |= 0x00000001u;
@@ -7334,13 +7640,13 @@ class transformation::HasBitSetters {
     msg->_has_bits_[0] |= 0x00000002u;
   }
   static void set_has_iscomputed(transformation* msg) {
-    msg->_has_bits_[0] |= 0x00000800u;
-  }
-  static void set_has_type(transformation* msg) {
     msg->_has_bits_[0] |= 0x00001000u;
   }
+  static void set_has_type(transformation* msg) {
+    msg->_has_bits_[0] |= 0x00002000u;
+  }
   static void set_has_trans_type(transformation* msg) {
-    msg->_has_bits_[0] |= 0x00000200u;
+    msg->_has_bits_[0] |= 0x00000400u;
   }
   static const ::pb::biexpTrans& bt(const transformation* msg);
   static void set_has_bt(transformation* msg) {
@@ -7365,6 +7671,10 @@ class transformation::HasBitSetters {
   static const ::pb::logicleTrans& lgt(const transformation* msg);
   static void set_has_lgt(transformation* msg) {
     msg->_has_bits_[0] |= 0x00000100u;
+  }
+  static const ::pb::logGML2Trans& lgml2t(const transformation* msg);
+  static void set_has_lgml2t(transformation* msg) {
+    msg->_has_bits_[0] |= 0x00000200u;
   }
 };
 
@@ -7396,6 +7706,10 @@ const ::pb::logicleTrans&
 transformation::HasBitSetters::lgt(const transformation* msg) {
   return *msg->lgt_;
 }
+const ::pb::logGML2Trans&
+transformation::HasBitSetters::lgml2t(const transformation* msg) {
+  return *msg->lgml2t_;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int transformation::kCalTblFieldNumber;
 const int transformation::kIsGateOnlyFieldNumber;
@@ -7410,6 +7724,7 @@ const int transformation::kFltFieldNumber;
 const int transformation::kStFieldNumber;
 const int transformation::kFtFieldNumber;
 const int transformation::kLgtFieldNumber;
+const int transformation::kLgml2TFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 transformation::transformation()
@@ -7465,6 +7780,11 @@ transformation::transformation(const transformation& from)
   } else {
     lgt_ = nullptr;
   }
+  if (from.has_lgml2t()) {
+    lgml2t_ = new ::pb::logGML2Trans(*from.lgml2t_);
+  } else {
+    lgml2t_ = nullptr;
+  }
   ::memcpy(&trans_type_, &from.trans_type_,
     static_cast<size_t>(reinterpret_cast<char*>(&type_) -
     reinterpret_cast<char*>(&trans_type_)) + sizeof(type_));
@@ -7496,6 +7816,7 @@ void transformation::SharedDtor() {
   if (this != internal_default_instance()) delete st_;
   if (this != internal_default_instance()) delete ft_;
   if (this != internal_default_instance()) delete lgt_;
+  if (this != internal_default_instance()) delete lgml2t_;
 }
 
 void transformation::SetCachedSize(int size) const {
@@ -7546,11 +7867,17 @@ void transformation::Clear() {
       ft_->Clear();
     }
   }
-  if (cached_has_bits & 0x00000100u) {
-    GOOGLE_DCHECK(lgt_ != nullptr);
-    lgt_->Clear();
+  if (cached_has_bits & 0x00000300u) {
+    if (cached_has_bits & 0x00000100u) {
+      GOOGLE_DCHECK(lgt_ != nullptr);
+      lgt_->Clear();
+    }
+    if (cached_has_bits & 0x00000200u) {
+      GOOGLE_DCHECK(lgml2t_ != nullptr);
+      lgml2t_->Clear();
+    }
   }
-  if (cached_has_bits & 0x00001e00u) {
+  if (cached_has_bits & 0x00003c00u) {
     ::memset(&trans_type_, 0, static_cast<size_t>(
         reinterpret_cast<char*>(&type_) -
         reinterpret_cast<char*>(&trans_type_)) + sizeof(type_));
@@ -7720,6 +8047,19 @@ const char* transformation::_InternalParse(const char* begin, const char* end, v
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::pb::logicleTrans::_InternalParse;
         object = msg->mutable_lgt();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // optional .pb.logGML2Trans lgml2t = 14;
+      case 14: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 114) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::pb::logGML2Trans::_InternalParse;
+        object = msg->mutable_lgml2t();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -7924,6 +8264,17 @@ bool transformation::MergePartialFromCodedStream(
         break;
       }
 
+      // optional .pb.logGML2Trans lgml2t = 14;
+      case 14: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (114 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_lgml2t()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -7959,12 +8310,12 @@ void transformation::SerializeWithCachedSizes(
   }
 
   // optional bool isGateOnly = 2;
-  if (cached_has_bits & 0x00000400u) {
+  if (cached_has_bits & 0x00000800u) {
     ::google::protobuf::internal::WireFormatLite::WriteBool(2, this->isgateonly(), output);
   }
 
   // optional .pb.TRANS_TYPE trans_type = 3;
-  if (cached_has_bits & 0x00000200u) {
+  if (cached_has_bits & 0x00000400u) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       3, this->trans_type(), output);
   }
@@ -7982,7 +8333,7 @@ void transformation::SerializeWithCachedSizes(
   }
 
   // optional bool isComputed = 6;
-  if (cached_has_bits & 0x00000800u) {
+  if (cached_has_bits & 0x00001000u) {
     ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->iscomputed(), output);
   }
 
@@ -8017,7 +8368,7 @@ void transformation::SerializeWithCachedSizes(
   }
 
   // optional uint32 type = 12;
-  if (cached_has_bits & 0x00001000u) {
+  if (cached_has_bits & 0x00002000u) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(12, this->type(), output);
   }
 
@@ -8025,6 +8376,12 @@ void transformation::SerializeWithCachedSizes(
   if (cached_has_bits & 0x00000100u) {
     ::google::protobuf::internal::WireFormatLite::WriteMessage(
       13, HasBitSetters::lgt(this), output);
+  }
+
+  // optional .pb.logGML2Trans lgml2t = 14;
+  if (cached_has_bits & 0x00000200u) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      14, HasBitSetters::lgml2t(this), output);
   }
 
   output->WriteRaw(_internal_metadata_.unknown_fields().data(),
@@ -8101,7 +8458,7 @@ size_t transformation::ByteSizeLong() const {
     }
 
   }
-  if (cached_has_bits & 0x00001f00u) {
+  if (cached_has_bits & 0x00003f00u) {
     // optional .pb.logicleTrans lgt = 13;
     if (cached_has_bits & 0x00000100u) {
       total_size += 1 +
@@ -8109,24 +8466,31 @@ size_t transformation::ByteSizeLong() const {
           *lgt_);
     }
 
-    // optional .pb.TRANS_TYPE trans_type = 3;
+    // optional .pb.logGML2Trans lgml2t = 14;
     if (cached_has_bits & 0x00000200u) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *lgml2t_);
+    }
+
+    // optional .pb.TRANS_TYPE trans_type = 3;
+    if (cached_has_bits & 0x00000400u) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->trans_type());
     }
 
     // optional bool isGateOnly = 2;
-    if (cached_has_bits & 0x00000400u) {
-      total_size += 1 + 1;
-    }
-
-    // optional bool isComputed = 6;
     if (cached_has_bits & 0x00000800u) {
       total_size += 1 + 1;
     }
 
-    // optional uint32 type = 12;
+    // optional bool isComputed = 6;
     if (cached_has_bits & 0x00001000u) {
+      total_size += 1 + 1;
+    }
+
+    // optional uint32 type = 12;
+    if (cached_has_bits & 0x00002000u) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->type());
@@ -8179,20 +8543,23 @@ void transformation::MergeFrom(const transformation& from) {
       mutable_ft()->::pb::fasinhTrans::MergeFrom(from.ft());
     }
   }
-  if (cached_has_bits & 0x00001f00u) {
+  if (cached_has_bits & 0x00003f00u) {
     if (cached_has_bits & 0x00000100u) {
       mutable_lgt()->::pb::logicleTrans::MergeFrom(from.lgt());
     }
     if (cached_has_bits & 0x00000200u) {
-      trans_type_ = from.trans_type_;
+      mutable_lgml2t()->::pb::logGML2Trans::MergeFrom(from.lgml2t());
     }
     if (cached_has_bits & 0x00000400u) {
-      isgateonly_ = from.isgateonly_;
+      trans_type_ = from.trans_type_;
     }
     if (cached_has_bits & 0x00000800u) {
-      iscomputed_ = from.iscomputed_;
+      isgateonly_ = from.isgateonly_;
     }
     if (cached_has_bits & 0x00001000u) {
+      iscomputed_ = from.iscomputed_;
+    }
+    if (cached_has_bits & 0x00002000u) {
       type_ = from.type_;
     }
     _has_bits_[0] |= cached_has_bits;
@@ -8229,6 +8596,7 @@ void transformation::InternalSwap(transformation* other) {
   swap(st_, other->st_);
   swap(ft_, other->ft_);
   swap(lgt_, other->lgt_);
+  swap(lgml2t_, other->lgml2t_);
   swap(trans_type_, other->trans_type_);
   swap(isgateonly_, other->isgateonly_);
   swap(iscomputed_, other->iscomputed_);
@@ -13242,6 +13610,9 @@ template<> PROTOBUF_NOINLINE ::pb::flinTrans* Arena::CreateMaybeMessage< ::pb::f
 }
 template<> PROTOBUF_NOINLINE ::pb::logTrans* Arena::CreateMaybeMessage< ::pb::logTrans >(Arena* arena) {
   return Arena::CreateInternal< ::pb::logTrans >(arena);
+}
+template<> PROTOBUF_NOINLINE ::pb::logGML2Trans* Arena::CreateMaybeMessage< ::pb::logGML2Trans >(Arena* arena) {
+  return Arena::CreateInternal< ::pb::logGML2Trans >(arena);
 }
 template<> PROTOBUF_NOINLINE ::pb::logicleTrans* Arena::CreateMaybeMessage< ::pb::logicleTrans >(Arena* arena) {
   return Arena::CreateInternal< ::pb::logicleTrans >(arena);

@@ -30,6 +30,7 @@ namespace cytolib
 #define FASINH 4
 #define BIEXP 5
 #define LOGICLE 6
+#define LOGGML2 7
 /* case insensitive compare predicate*/
 struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 {
@@ -201,6 +202,40 @@ public:
 	logInverseTrans(EVENT_DATA_TYPE _offset,EVENT_DATA_TYPE _decade, unsigned _scale, unsigned _T);
 	void transforming(EVENT_DATA_TYPE * input, int nSize);
 };
+
+/*
+ * Separate class created to faithfully represent GML 2.0 specification
+ * for "parametrized logarithmic transformation -- flog" (Section 6.2.1)
+ *
+ * Names of data members intentionally mirror the specification
+ */
+class logGML2Trans:public transformation{
+public:
+		EVENT_DATA_TYPE T; // top of scale value
+		EVENT_DATA_TYPE M; // number of logarithmic decades
+public:
+	logGML2Trans();
+
+	logGML2Trans(EVENT_DATA_TYPE _T,EVENT_DATA_TYPE _M);
+
+	void transforming(EVENT_DATA_TYPE * input, int nSize);
+	TransPtr clone() const;
+	void convertToPb(pb::transformation & trans_pb);
+	logGML2Trans(const pb::transformation & trans_pb);
+
+	TransPtr  getInverseTransformation();
+
+//	void setTransformedScale(int _scale);
+	int getTransformedScale();
+	int getRawScale();
+};
+
+class logGML2InverseTrans:public logGML2Trans{
+public:
+	logGML2InverseTrans(EVENT_DATA_TYPE _T,EVENT_DATA_TYPE _M);
+	void transforming(EVENT_DATA_TYPE * input, int nSize);
+};
+
 
 
 class linTrans:public transformation{

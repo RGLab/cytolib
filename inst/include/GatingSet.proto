@@ -94,6 +94,7 @@ enum TRANS_TYPE {
 		PB_FASIGNH = 4;
 		PB_BIEXP = 5;
 		PB_LOGICLE = 6;
+		PB_LOGGML2 = 7;
 	}
 message biexpTrans{
 	optional uint32 channelRange = 1;
@@ -122,6 +123,10 @@ message logTrans{
 	optional float T = 3;
 	optional float scale = 4;
 	}
+message logGML2Trans{
+	optional float T = 1;
+	optional float M = 2;
+}
 message logicleTrans{
 	optional float T = 1;
 	optional float W= 2;
@@ -146,6 +151,7 @@ message transformation{
 	optional scaleTrans st = 10;
 	optional fasinhTrans ft = 11;
 	optional logicleTrans lgt = 13;
+	optional logGML2Trans lgml2t = 14;
 }
 
 message trans_pair{
