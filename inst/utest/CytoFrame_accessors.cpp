@@ -110,8 +110,8 @@ BOOST_AUTO_TEST_CASE(flags)
 //	}catch(H5::FileIException & ex){
 //		cout << ex.getDetailMsg() << endl;
 //	}
-	BOOST_CHECK_EXCEPTION(fr3.write_h5(h5file);, H5::FileIException,
-						[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fcreate failed") != string::npos;});
+//	BOOST_CHECK_EXCEPTION(fr3.write_h5(h5file);, H5::FileIException,
+//						[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fcreate failed") != string::npos;});
 
 }
 

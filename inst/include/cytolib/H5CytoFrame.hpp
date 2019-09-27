@@ -20,15 +20,6 @@ namespace cytolib
 class H5CytoFrame:public CytoFrame{
 protected:
 	string filename_;
-	/*TODO: We may not want to maintain these handlers, instead treat each IO as atomic operations
-	 * Because it is not easy to accomplish the resource sharing among multiple H5CytoFrame objects solely depending on H5's mechanisms.
-	 * e.g. a second openFile call with H5F_ACC_RDONLY will NOT overwrite the previous H5F_ACC_RDWR , thus cause the unexpected data tampering
-	 * these H5 handlers remain open during the life cycle of H5CytoFrame
-	 * for faster accessing the data
-	 */
-	H5File file;
-	DataSet dataset;
-	DataSpace dataspace;
 	hsize_t dims[2];              // dataset dimensions
 	//flags indicating if cached meta data needs to be flushed to h5
 	bool is_dirty_params;
@@ -36,31 +27,7 @@ protected:
 	bool is_dirty_pdata;
 	EVENT_DATA_VEC read_data(uvec col_idx) const;
 public:
-	~H5CytoFrame(){
-		/*
-		 * catch the exception to prevent the destructor from throwing, which could crash the application
-		 */
-//		string msg = "Warning: failed to flush the meta data to h5!Changes to meta are unsaved.";
-//
-//		try{
-//			flush_meta();
-//		}catch(const H5::DataSetIException &e){
-//			PRINT(e.getDetailMsg() + "\n");
-//			PRINT(msg);
-//		}catch(...){
-//			PRINT(msg);
-//		}
-
-	};
-	/*
-	 * for simplicity, we don't want to handle the object that has all the h5 handler closed
-	 * because it will require lots of validity checks before each disk IO operations
-	 */
-//	void close_h5(){
-//		dataspace.close();
-//		dataset.close();
-//		file.close();
-//	}
+	const unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta();
 	void flush_params();
 

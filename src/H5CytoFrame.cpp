@@ -8,6 +8,10 @@ namespace cytolib
 {
 	EVENT_DATA_VEC H5CytoFrame::read_data(uvec col_idx) const
 	{
+		H5File file(filename_, default_flags);
+		auto dataset = file.openDataSet(DATASET_NAME);
+		auto dataspace = dataset.getSpace();
+
 		unsigned nrow = n_rows();
 		unsigned ncol = col_idx.size();
 		/*
@@ -61,6 +65,8 @@ namespace cytolib
 	}
 	void H5CytoFrame::flush_params()
 	{
+		H5File file(filename_, default_flags);
+
 		CompType param_type = get_h5_datatype_params(DataTypeLocation::MEM);
 		DataSet ds = file.openDataSet("params");
 		hsize_t size[1] = {params.size()};
@@ -74,6 +80,7 @@ namespace cytolib
 
 	void H5CytoFrame::flush_keys()
 	{
+		H5File file(filename_, default_flags);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("keywords");
 		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
@@ -87,6 +94,7 @@ namespace cytolib
 	}
 	void H5CytoFrame::flush_pheno_data()
 	{
+		H5File file(filename_, default_flags);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("pdata");
 
@@ -103,9 +111,6 @@ namespace cytolib
 	H5CytoFrame::H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
 	{
 		filename_ = frm.filename_;
-		file = frm.file;//safe to copy due to refcount during copy constructor provided by h5
-		dataset = frm.dataset;//safe to copy due to refcount during copy constructor provided by h5
-		dataspace = frm.dataspace;//safe to copy due to explicit copy through its assignment operator provided by h5
 		is_dirty_params = frm.is_dirty_params;
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
@@ -120,9 +125,6 @@ namespace cytolib
 //		swap(channel_vs_idx, frm.channel_vs_idx);
 //		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(filename_, frm.filename_);
-		swap(file, frm.file);
-		swap(dataset, frm.dataset);
-		swap(dataspace, frm.dataspace);
 		swap(dims, frm.dims);
 
 		swap(is_dirty_params, frm.is_dirty_params);
@@ -133,9 +135,6 @@ namespace cytolib
 	{
 		CytoFrame::operator=(frm);
 		filename_ = frm.filename_;
-		file = frm.file;
-		dataset = frm.dataset;
-		dataspace = frm.dataspace;
 		is_dirty_params = frm.is_dirty_params;
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
@@ -146,9 +145,6 @@ namespace cytolib
 	{
 		CytoFrame::operator=(frm);
 		swap(filename_, frm.filename_);
-		swap(file, frm.file);
-		swap(dataset, frm.dataset);
-		swap(dataspace, frm.dataspace);
 		swap(dims, frm.dims);
 		swap(is_dirty_params, frm.is_dirty_params);
 		swap(is_dirty_keys, frm.is_dirty_keys);
@@ -174,16 +170,15 @@ namespace cytolib
 	 */
 	H5CytoFrame::H5CytoFrame(const string & h5_filename, bool readonly):CytoFrame(readonly),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
-
-
-		file.openFile(filename_, H5F_ACC_RDWR);//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
+		//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
+		H5File file(filename_, default_flags);
 		load_meta();
 
 
 		//open dataset for event data
 
-		dataset = file.openDataSet(DATASET_NAME);
-		dataspace = dataset.getSpace();
+		auto dataset = file.openDataSet(DATASET_NAME);
+		auto dataspace = dataset.getSpace();
 		dataspace.getSimpleExtentDims(dims);
 
 	}
@@ -191,7 +186,7 @@ namespace cytolib
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */
 	void H5CytoFrame::load_meta(){
-
+		H5File file(filename_, default_flags);
 		DataSet ds_param = file.openDataSet("params");
 	//	DataType param_type = ds_param.getDataType();
 
@@ -392,11 +387,14 @@ namespace cytolib
 	 */
 	void H5CytoFrame::set_data(const EVENT_DATA_VEC & _data)
 	{
+		H5File file(filename_, default_flags);
 		check_write_permission();
 		hsize_t dims_data[2] = {_data.n_cols, _data.n_rows};
+		auto dataset = file.openDataSet(DATASET_NAME);
+
 		dataset.extend(dims_data);
 		//refresh data space and dims
-		dataspace = dataset.getSpace();
+		auto dataspace = dataset.getSpace();
 		dataspace.getSimpleExtentDims(dims);
 
 		dataset.write(_data.mem, h5_datatype_data(DataTypeLocation::MEM));
