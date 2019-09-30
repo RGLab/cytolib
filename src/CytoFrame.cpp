@@ -1,6 +1,8 @@
 #include <cytolib/CytoFrame.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cytolib/global.hpp>
+#include <unordered_map>
+#include <queue>
 
 
 namespace cytolib
@@ -80,13 +82,43 @@ namespace cytolib
 			vector<string> valVec;
 			boost::split(valVec, val, boost::is_any_of(","));
 			int n = boost::lexical_cast<int>(valVec[0]);
+			unordered_map<string, queue<int>> chnls;
 			if(n > 0)
 			{
 				comp.spillOver.resize(n*n);
 				comp.marker.resize(n);
+				bool isDuplicate = false;
 				for(int i = 0; i < n; i++)//param name
 				{
 					comp.marker[i] = valVec[i+1];
+
+					// Keep track of where this marker has appeared
+					auto found = chnls.find(comp.marker[i]);
+					if( found == chnls.end()){
+						chnls[comp.marker[i]] = queue<int>();
+						chnls[comp.marker[i]].push(i);
+					}else{
+						isDuplicate = true;
+						found->second.push(i);
+					}
+				}
+				
+				// Disambiguate duplicates by appending -<N>
+				if(isDuplicate){
+					PRINT("channel_alias: Duplicate channel names in spillover matrix!\n"
+		                    "               Integer suffixes added to disambiguate channels.\n"
+		                    "               It is recommended to verify correct mapping of spillover matrix columns.\n");
+					for ( auto chnl : chnls ){
+						if( chnl.second.size() > 1 ){
+							int dup_idx;
+							int suffix = 1;
+							while( !chnl.second.empty()){
+								dup_idx = chnl.second.front();
+								chnl.second.pop();
+								comp.marker[dup_idx] = comp.marker[dup_idx] + "-" + to_string(suffix++);
+							}
+						}
+					}
 				}
 				for(unsigned i = n + 1; i < valVec.size(); i++)//param name
 				{

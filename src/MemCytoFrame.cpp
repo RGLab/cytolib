@@ -1,6 +1,8 @@
 #include <cytolib/MemCytoFrame.hpp>
 #include <boost/lexical_cast.hpp>
 #include <experimental/filesystem>
+#include <unordered_map>
+#include <queue>
 namespace fs = std::experimental::filesystem;
 #include <cytolib/global.hpp>
 
@@ -910,6 +912,8 @@ namespace cytolib
 		 int nrpar = stoi(par);
 		 vector<cytoParam> params(nrpar);
 		 KEY_WORDS::iterator it;
+		unordered_map<string, queue<int>> chnls;
+		bool isDuplicate = false;
 		for(int i = 1; i <= nrpar; i++)
 		{
 			string pid = to_string(i);
@@ -956,11 +960,40 @@ namespace cytolib
 			if(config.is_fix_slash_in_channel_name)
 				boost::replace_all(params[i-1].channel, "/", "_");
 
+			// Keep track of where this PnN value has appeared
+			auto found = chnls.find(params[i-1].channel);
+			if( found == chnls.end()){
+				chnls[params[i-1].channel] = queue<int>();
+				chnls[params[i-1].channel].push(i-1);
+			}else{
+				isDuplicate = true;
+				found->second.push(i-1);
+			}
+
 			it = keys_.find("$P" + pid + "S");
 			if(it!=keys_.end())
 				params[i-1].marker = keys_["$P" + pid + "S"];
 
 		}
+		
+		// Disambiguate duplicates by appending -<N>
+		if(isDuplicate){
+			PRINT("channel_alias: Multiple channels from one FCS are matched to the same alias!\n"
+                    "               Integer suffixes added to disambiguate channels.\n"
+                    "               It is also recommended to verify correct mapping of spillover matrix columns.\n");
+			for ( auto chnl : chnls ){
+				if( chnl.second.size() > 1){
+					int dup_idx;
+					int suffix = 1;
+					while( !chnl.second.empty()){
+						dup_idx = chnl.second.front();
+						chnl.second.pop();
+						params[dup_idx].channel = params[dup_idx].channel + "-" + to_string(suffix++);
+					}
+				}
+			}
+		}
+
 
 
 		set_params(params);
