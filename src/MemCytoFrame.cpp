@@ -979,8 +979,8 @@ namespace cytolib
 		// Disambiguate duplicates by appending -<N>
 		if(isDuplicate){
 			PRINT("channel_alias: Multiple channels from one FCS are matched to the same alias!\n"
-                    "               Integer suffixes added to disambiguate channels.\n"
-                    "               It is also recommended to verify correct mapping of spillover matrix columns.\n");
+            "Integer suffixes added to disambiguate channels.\n"
+            "It is also recommended to verify correct mapping of spillover matrix columns.\n");
 			for ( auto chnl : chnls ){
 				if( chnl.second.size() > 1){
 					int dup_idx;

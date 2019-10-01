@@ -106,8 +106,8 @@ namespace cytolib
 				// Disambiguate duplicates by appending -<N>
 				if(isDuplicate){
 					PRINT("channel_alias: Duplicate channel names in spillover matrix!\n"
-		                    "               Integer suffixes added to disambiguate channels.\n"
-		                    "               It is recommended to verify correct mapping of spillover matrix columns.\n");
+		            "Integer suffixes added to disambiguate channels.\n"
+		            "It is recommended to verify correct mapping of spillover matrix columns.\n");
 					for ( auto chnl : chnls ){
 						if( chnl.second.size() > 1 ){
 							int dup_idx;
