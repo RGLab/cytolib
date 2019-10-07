@@ -11,9 +11,9 @@
 	set(h5_include ${CMAKE_CURRENT_BINARY_DIR}/h5_build/include)
     set(INCLUDE_DIR ${INCLUDE_DIR} ${h5_include} PARENT_SCOPE)
 	file(GLOB HEADERS "${h5_include}/*")
-	install (FILES ${HEADERS} DESTINATION lib/cytolib/include)
-	install (FILES ${H5_SZ_LIBS} DESTINATION lib/cytolib/lib)
-	install (FILES ${H5_C_LIBS} DESTINATION lib/cytolib/lib)
-	install (FILES ${H5_C_LIBS} DESTINATION lib/cytolib/lib)
+	install (FILES ${HEADERS} DESTINATION cytolib/include)
+	install (FILES ${H5_SZ_LIBS} DESTINATION cytolib/lib)
+	install (FILES ${H5_C_LIBS} DESTINATION cytolib/lib)
+	install (FILES ${H5_C_LIBS} DESTINATION cytolib/lib)
 	
 		

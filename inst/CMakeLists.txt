@@ -1,3 +1,3 @@
 
-install (DIRECTORY "include/cytolib" DESTINATION lib/cytolib/include)
+install (DIRECTORY "include/cytolib" DESTINATION cytolib/include)
 

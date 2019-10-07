@@ -10,6 +10,5 @@
     set(pb_include ${CMAKE_CURRENT_BINARY_DIR}/pb_build/include)
     set(INCLUDE_DIR ${INCLUDE_DIR} ${pb_include} PARENT_SCOPE)
     
-    install (DIRECTORY "${pb_include}/google" DESTINATION lib/cytolib/include)
-    install (FILES ${CMAKE_CURRENT_BINARY_DIR}/pb_build/lib/libprotobuf-lite.a DESTINATION lib/cytolib/lib)
-#	set ( PB_LIBS ${CMAKE_CURRENT_BINARY_DIR}/pb_build/lib/libprotobuf-lite.a PARENT_SCOPE)
+    install (DIRECTORY "${pb_include}/google" DESTINATION cytolib/include)
+    install (FILES ${CMAKE_CURRENT_BINARY_DIR}/pb_build/lib/libprotobuf-lite.a DESTINATION cytolib/lib)
