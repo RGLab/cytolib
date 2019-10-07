@@ -14,6 +14,6 @@
 	install (FILES ${HEADERS} DESTINATION cytolib/include)
 	install (FILES ${H5_SZ_LIBS} DESTINATION cytolib/lib)
 	install (FILES ${H5_C_LIBS} DESTINATION cytolib/lib)
-	install (FILES ${H5_C_LIBS} DESTINATION cytolib/lib)
+	install (FILES ${H5_CXX_LIBS} DESTINATION cytolib/lib)
 	
 		
