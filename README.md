@@ -19,9 +19,8 @@ See **CytoML** package for the example of using `cytolib`.
 
 **System requirement**
 1. cmake
-2. g++ (>=4.9)
+2. g++ (>=4.9) or clang++(>= 7.0.1)
 3. libblas, liblapack, ZLIB, boost c++ library
-4. cytolib c++ library (see https://github.com/RGLab/cytolib/blob/trunk/inst/INSTALL.txt)
 
 **Installation**
 
@@ -36,6 +35,9 @@ $ cd build
 
 # run cmake to configure the package for your system
 $ cmake ..
+
+# to select different compiler other than the default
+# e.g. `cmake -DCMAKE_CXX_COMPILER=clang++` 
 
 #To install the library to custom directory, use `-DCMAKE_INSTALL_PREFIX` option
 # e.g. `cmake -DCMAKE_INSTALL_PREFIX=/usr/local` 
