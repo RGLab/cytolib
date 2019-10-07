@@ -57,7 +57,7 @@ cytolibLdFlags <- function() {
 cytolibLibPath <- function(suffix = "") {
    sysname <- Sys.info()['sysname']
    cytolibSupported <- list(
-      "Darwin" = paste("cytolib", suffix, ".dylib", sep = ""), 
+      "Darwin" = paste("cytolib", suffix, ".so", sep = ""), 
       "Linux" = paste("cytolib", suffix, ".so", sep = ""), 
       "Windows" = paste("cytolib", suffix, ".dll", sep = ""),
       "SunOS" = paste("cytolib", suffix, ".so", sep = "")
