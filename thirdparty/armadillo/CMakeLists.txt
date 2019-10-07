@@ -1,4 +1,4 @@
 	set(INCLUDE_DIR ${INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
-    install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/armadillo_bits DESTINATION include/cytolib)
-    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/armadillo DESTINATION include/cytolib)
+    install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/armadillo_bits DESTINATION lib/cytolib/include)
+    install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/armadillo DESTINATION lib/cytolib/include)
 

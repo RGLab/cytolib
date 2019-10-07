@@ -1,6 +1,0 @@
-CREATE ${cytolib_bundle_file}
-ADDLIB ${CYTOLIB}
-ADDLIB ${PB_LIBS}
-ADDLIB ${H5_LIBS_BUNDLE}
-SAVE
-END
