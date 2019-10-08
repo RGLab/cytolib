@@ -16,8 +16,11 @@ project (cytolib)
     
     file(COPY DESCRIPTION DESTINATION .)
     
-    execute_process(COMMAND ${PROJECT_SOURCE_DIR}/get_version.sh OUTPUT_VARIABLE CYTOLIB_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-#    message(STATUS ${CYTOLIB_VERSION}/d)
+    execute_process(COMMAND sed -n -e "s/^Version:[ '\\t']\\{1,\\}\\([^ '\\t']\\{1,\\}\\)[ '\\t']*$/\\1/p" DESCRIPTION 
+					    OUTPUT_VARIABLE CYTOLIB_VERSION 
+					    RESULT_VARIABLE res
+					    OUTPUT_STRIP_TRAILING_WHITESPACE)
+#    message(STATUS ${CYTOLIB_VERSION}/out/${res}/res)
     configure_file (
 	  "${PROJECT_SOURCE_DIR}/cytolibConfig.h.in"
 	  "${PROJECT_BINARY_DIR}/cytolibConfig.h"
