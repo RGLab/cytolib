@@ -1,1 +1,1 @@
-sed -n -r '/^Version: /{s/^Version:[ \t]+([^ \t]+)[ \t]*$/\1/;p}' DESCRIPTION
+sed -n -e 's/^Version:[ '\t']\{1,\}\([^ '\t']\{1,\}\)[ '\t']*$/\1/p' DESCRIPTION
