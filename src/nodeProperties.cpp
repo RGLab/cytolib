@@ -71,6 +71,9 @@ namespace cytolib
 			case pb::CLUSTER_GATE:
 				thisGate = gatePtr(new clusterGate(gate_pb));
 				break;
+			case pb::QUAD_GATE:
+				thisGate = gatePtr(new quadGate(gate_pb));
+				break;
 			default:
 				throw(domain_error("unknown type of gate archive!"));
 			}

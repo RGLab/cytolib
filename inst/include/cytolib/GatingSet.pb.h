@@ -41,7 +41,7 @@ struct TableStruct_GatingSet_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[32]
+  static const ::google::protobuf::internal::ParseTable schema[33]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -126,6 +126,9 @@ extern polygonGateDefaultTypeInternal _polygonGate_default_instance_;
 class populationTree;
 class populationTreeDefaultTypeInternal;
 extern populationTreeDefaultTypeInternal _populationTree_default_instance_;
+class quadGate;
+class quadGateDefaultTypeInternal;
+extern quadGateDefaultTypeInternal _quadGate_default_instance_;
 class rangeGate;
 class rangeGateDefaultTypeInternal;
 extern rangeGateDefaultTypeInternal _rangeGate_default_instance_;
@@ -173,6 +176,7 @@ template<> ::pb::paramPoly* Arena::CreateMaybeMessage<::pb::paramPoly>(Arena*);
 template<> ::pb::paramRange* Arena::CreateMaybeMessage<::pb::paramRange>(Arena*);
 template<> ::pb::polygonGate* Arena::CreateMaybeMessage<::pb::polygonGate>(Arena*);
 template<> ::pb::populationTree* Arena::CreateMaybeMessage<::pb::populationTree>(Arena*);
+template<> ::pb::quadGate* Arena::CreateMaybeMessage<::pb::quadGate>(Arena*);
 template<> ::pb::rangeGate* Arena::CreateMaybeMessage<::pb::rangeGate>(Arena*);
 template<> ::pb::scaleTrans* Arena::CreateMaybeMessage<::pb::scaleTrans>(Arena*);
 template<> ::pb::trans_local* Arena::CreateMaybeMessage<::pb::trans_local>(Arena*);
@@ -183,6 +187,17 @@ template<> ::pb::treeNodes* Arena::CreateMaybeMessage<::pb::treeNodes>(Arena*);
 }  // namespace google
 namespace pb {
 
+enum QUAD {
+  Q1 = 1,
+  Q2 = 2,
+  Q3 = 3,
+  Q4 = 4
+};
+bool QUAD_IsValid(int value);
+const QUAD QUAD_MIN = Q1;
+const QUAD QUAD_MAX = Q4;
+const int QUAD_ARRAYSIZE = QUAD_MAX + 1;
+
 enum GATE_TYPE {
   POLYGON_GATE = 1,
   RANGE_GATE = 2,
@@ -191,11 +206,12 @@ enum GATE_TYPE {
   RECT_GATE = 5,
   LOGICAL_GATE = 6,
   ELLIPSOID_GATE = 7,
-  CLUSTER_GATE = 8
+  CLUSTER_GATE = 8,
+  QUAD_GATE = 9
 };
 bool GATE_TYPE_IsValid(int value);
 const GATE_TYPE GATE_TYPE_MIN = POLYGON_GATE;
-const GATE_TYPE GATE_TYPE_MAX = CLUSTER_GATE;
+const GATE_TYPE GATE_TYPE_MAX = QUAD_GATE;
 const int GATE_TYPE_ARRAYSIZE = GATE_TYPE_MAX + 1;
 
 enum ind_type {
@@ -740,6 +756,15 @@ class polygonGate final :
   ::pb::paramPoly* mutable_param();
   void set_allocated_param(::pb::paramPoly* param);
 
+  // optional .pb.quadGate qg = 2;
+  bool has_qg() const;
+  void clear_qg();
+  static const int kQgFieldNumber = 2;
+  const ::pb::quadGate& qg() const;
+  ::pb::quadGate* release_qg();
+  ::pb::quadGate* mutable_qg();
+  void set_allocated_qg(::pb::quadGate* qg);
+
   // @@protoc_insertion_point(class_scope:pb.polygonGate)
  private:
   class HasBitSetters;
@@ -748,6 +773,7 @@ class polygonGate final :
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::pb::paramPoly* param_;
+  ::pb::quadGate* qg_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1431,6 +1457,142 @@ class clusterGate final :
 };
 // -------------------------------------------------------------------
 
+class quadGate final :
+    public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:pb.quadGate) */ {
+ public:
+  quadGate();
+  virtual ~quadGate();
+
+  quadGate(const quadGate& from);
+
+  inline quadGate& operator=(const quadGate& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  quadGate(quadGate&& from) noexcept
+    : quadGate() {
+    *this = ::std::move(from);
+  }
+
+  inline quadGate& operator=(quadGate&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  inline const ::std::string& unknown_fields() const {
+    return _internal_metadata_.unknown_fields();
+  }
+  inline ::std::string* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields();
+  }
+
+  static const quadGate& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const quadGate* internal_default_instance() {
+    return reinterpret_cast<const quadGate*>(
+               &_quadGate_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  void Swap(quadGate* other);
+  friend void swap(quadGate& a, quadGate& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline quadGate* New() const final {
+    return CreateMaybeMessage<quadGate>(nullptr);
+  }
+
+  quadGate* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<quadGate>(arena);
+  }
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
+    final;
+  void CopyFrom(const quadGate& from);
+  void MergeFrom(const quadGate& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  void DiscardUnknownFields();
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(quadGate* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::std::string GetTypeName() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string uid = 1;
+  bool has_uid() const;
+  void clear_uid();
+  static const int kUidFieldNumber = 1;
+  const ::std::string& uid() const;
+  void set_uid(const ::std::string& value);
+  #if LANG_CXX11
+  void set_uid(::std::string&& value);
+  #endif
+  void set_uid(const char* value);
+  void set_uid(const char* value, size_t size);
+  ::std::string* mutable_uid();
+  ::std::string* release_uid();
+  void set_allocated_uid(::std::string* uid);
+
+  // required .pb.QUAD quadrant = 3;
+  bool has_quadrant() const;
+  void clear_quadrant();
+  static const int kQuadrantFieldNumber = 3;
+  ::pb::QUAD quadrant() const;
+  void set_quadrant(::pb::QUAD value);
+
+  // @@protoc_insertion_point(class_scope:pb.quadGate)
+ private:
+  class HasBitSetters;
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
+  ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  ::google::protobuf::internal::HasBits<1> _has_bits_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::internal::ArenaStringPtr uid_;
+  int quadrant_;
+  friend struct ::TableStruct_GatingSet_2eproto;
+};
+// -------------------------------------------------------------------
+
 class gate final :
     public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:pb.gate) */ {
  public:
@@ -1473,7 +1635,7 @@ class gate final :
                &_gate_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(gate* other);
   friend void swap(gate& a, gate& b) {
@@ -1667,7 +1829,7 @@ class POPSTATS final :
                &_POPSTATS_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(POPSTATS* other);
   friend void swap(POPSTATS& a, POPSTATS& b) {
@@ -1803,7 +1965,7 @@ class calibrationTable final :
                &_calibrationTable_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(calibrationTable* other);
   friend void swap(calibrationTable& a, calibrationTable& b) {
@@ -2014,7 +2176,7 @@ class biexpTrans final :
                &_biexpTrans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(biexpTrans* other);
   friend void swap(biexpTrans& a, biexpTrans& b) {
@@ -2163,7 +2325,7 @@ class fasinhTrans final :
                &_fasinhTrans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(fasinhTrans* other);
   friend void swap(fasinhTrans& a, fasinhTrans& b) {
@@ -2312,7 +2474,7 @@ class scaleTrans final :
                &_scaleTrans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(scaleTrans* other);
   friend void swap(scaleTrans& a, scaleTrans& b) {
@@ -2429,7 +2591,7 @@ class flinTrans final :
                &_flinTrans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(flinTrans* other);
   friend void swap(flinTrans& a, flinTrans& b) {
@@ -2554,7 +2716,7 @@ class logTrans final :
                &_logTrans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   void Swap(logTrans* other);
   friend void swap(logTrans& a, logTrans& b) {
@@ -2695,7 +2857,7 @@ class logGML2Trans final :
                &_logGML2Trans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   void Swap(logGML2Trans* other);
   friend void swap(logGML2Trans& a, logGML2Trans& b) {
@@ -2820,7 +2982,7 @@ class logicleTrans final :
                &_logicleTrans_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   void Swap(logicleTrans* other);
   friend void swap(logicleTrans& a, logicleTrans& b) {
@@ -2985,7 +3147,7 @@ class transformation final :
                &_transformation_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   void Swap(transformation* other);
   friend void swap(transformation& a, transformation& b) {
@@ -3238,7 +3400,7 @@ class trans_pair final :
                &_trans_pair_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    21;
 
   void Swap(trans_pair* other);
   friend void swap(trans_pair& a, trans_pair& b) {
@@ -3381,7 +3543,7 @@ class trans_local final :
                &_trans_local_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    22;
 
   void Swap(trans_local* other);
   friend void swap(trans_local& a, trans_local& b) {
@@ -3533,7 +3695,7 @@ class POPINDICES final :
                &_POPINDICES_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    23;
 
   void Swap(POPINDICES* other);
   friend void swap(POPINDICES& a, POPINDICES& b) {
@@ -3691,7 +3853,7 @@ class nodeProperties final :
                &_nodeProperties_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    24;
 
   void Swap(nodeProperties* other);
   friend void swap(nodeProperties& a, nodeProperties& b) {
@@ -3873,7 +4035,7 @@ class treeNodes final :
                &_treeNodes_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    25;
 
   void Swap(treeNodes* other);
   friend void swap(treeNodes& a, treeNodes& b) {
@@ -4000,7 +4162,7 @@ class populationTree final :
                &_populationTree_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    26;
 
   void Swap(populationTree* other);
   friend void swap(populationTree& a, populationTree& b) {
@@ -4122,7 +4284,7 @@ class COMP final :
                &_COMP_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    26;
+    27;
 
   void Swap(COMP* other);
   friend void swap(COMP& a, COMP& b) {
@@ -4347,7 +4509,7 @@ class PARAM final :
                &_PARAM_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    27;
+    28;
 
   void Swap(PARAM* other);
   friend void swap(PARAM& a, PARAM& b) {
@@ -4504,7 +4666,7 @@ class GatingHierarchy final :
                &_GatingHierarchy_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    28;
+    29;
 
   void Swap(GatingHierarchy* other);
   friend void swap(GatingHierarchy& a, GatingHierarchy& b) {
@@ -4674,7 +4836,7 @@ class CytoFrame final :
                &_CytoFrame_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    29;
+    30;
 
   void Swap(CytoFrame* other);
   friend void swap(CytoFrame& a, CytoFrame& b) {
@@ -4791,7 +4953,7 @@ class TRANS_TBL final :
                &_TRANS_TBL_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    30;
+    31;
 
   void Swap(TRANS_TBL* other);
   friend void swap(TRANS_TBL& a, TRANS_TBL& b) {
@@ -4918,7 +5080,7 @@ class GatingSet final :
                &_GatingSet_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    31;
+    32;
 
   void Swap(GatingSet* other);
   friend void swap(GatingSet& a, GatingSet& b) {
@@ -5380,6 +5542,55 @@ inline void polygonGate::set_allocated_param(::pb::paramPoly* param) {
   // @@protoc_insertion_point(field_set_allocated:pb.polygonGate.param)
 }
 
+// optional .pb.quadGate qg = 2;
+inline bool polygonGate::has_qg() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void polygonGate::clear_qg() {
+  if (qg_ != nullptr) qg_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline const ::pb::quadGate& polygonGate::qg() const {
+  const ::pb::quadGate* p = qg_;
+  // @@protoc_insertion_point(field_get:pb.polygonGate.qg)
+  return p != nullptr ? *p : *reinterpret_cast<const ::pb::quadGate*>(
+      &::pb::_quadGate_default_instance_);
+}
+inline ::pb::quadGate* polygonGate::release_qg() {
+  // @@protoc_insertion_point(field_release:pb.polygonGate.qg)
+  _has_bits_[0] &= ~0x00000002u;
+  ::pb::quadGate* temp = qg_;
+  qg_ = nullptr;
+  return temp;
+}
+inline ::pb::quadGate* polygonGate::mutable_qg() {
+  _has_bits_[0] |= 0x00000002u;
+  if (qg_ == nullptr) {
+    auto* p = CreateMaybeMessage<::pb::quadGate>(GetArenaNoVirtual());
+    qg_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:pb.polygonGate.qg)
+  return qg_;
+}
+inline void polygonGate::set_allocated_qg(::pb::quadGate* qg) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete qg_;
+  }
+  if (qg) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      qg = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, qg, submessage_arena);
+    }
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  qg_ = qg;
+  // @@protoc_insertion_point(field_set_allocated:pb.polygonGate.qg)
+}
+
 // -------------------------------------------------------------------
 
 // coordinate
@@ -5756,6 +5967,89 @@ inline void clusterGate::set_allocated_cluster_method(::std::string* cluster_met
   }
   cluster_method_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), cluster_method);
   // @@protoc_insertion_point(field_set_allocated:pb.clusterGate.cluster_method)
+}
+
+// -------------------------------------------------------------------
+
+// quadGate
+
+// required string uid = 1;
+inline bool quadGate::has_uid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void quadGate::clear_uid() {
+  uid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const ::std::string& quadGate::uid() const {
+  // @@protoc_insertion_point(field_get:pb.quadGate.uid)
+  return uid_.GetNoArena();
+}
+inline void quadGate::set_uid(const ::std::string& value) {
+  _has_bits_[0] |= 0x00000001u;
+  uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:pb.quadGate.uid)
+}
+#if LANG_CXX11
+inline void quadGate::set_uid(::std::string&& value) {
+  _has_bits_[0] |= 0x00000001u;
+  uid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:pb.quadGate.uid)
+}
+#endif
+inline void quadGate::set_uid(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000001u;
+  uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:pb.quadGate.uid)
+}
+inline void quadGate::set_uid(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000001u;
+  uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:pb.quadGate.uid)
+}
+inline ::std::string* quadGate::mutable_uid() {
+  _has_bits_[0] |= 0x00000001u;
+  // @@protoc_insertion_point(field_mutable:pb.quadGate.uid)
+  return uid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* quadGate::release_uid() {
+  // @@protoc_insertion_point(field_release:pb.quadGate.uid)
+  if (!has_uid()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return uid_.ReleaseNonDefaultNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void quadGate::set_allocated_uid(::std::string* uid) {
+  if (uid != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  uid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), uid);
+  // @@protoc_insertion_point(field_set_allocated:pb.quadGate.uid)
+}
+
+// required .pb.QUAD quadrant = 3;
+inline bool quadGate::has_quadrant() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void quadGate::clear_quadrant() {
+  quadrant_ = 1;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline ::pb::QUAD quadGate::quadrant() const {
+  // @@protoc_insertion_point(field_get:pb.quadGate.quadrant)
+  return static_cast< ::pb::QUAD >(quadrant_);
+}
+inline void quadGate::set_quadrant(::pb::QUAD value) {
+  assert(::pb::QUAD_IsValid(value));
+  _has_bits_[0] |= 0x00000002u;
+  quadrant_ = value;
+  // @@protoc_insertion_point(field_set:pb.quadGate.quadrant)
 }
 
 // -------------------------------------------------------------------
@@ -9402,6 +9696,8 @@ inline void GatingSet::set_allocated_guid(::std::string* guid) {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -9410,6 +9706,7 @@ inline void GatingSet::set_allocated_guid(::std::string* guid) {
 namespace google {
 namespace protobuf {
 
+template <> struct is_proto_enum< ::pb::QUAD> : ::std::true_type {};
 template <> struct is_proto_enum< ::pb::GATE_TYPE> : ::std::true_type {};
 template <> struct is_proto_enum< ::pb::ind_type> : ::std::true_type {};
 template <> struct is_proto_enum< ::pb::TRANS_TYPE> : ::std::true_type {};

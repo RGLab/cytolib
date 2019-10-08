@@ -2,7 +2,6 @@
 // source: GatingSet.proto
 
 #include <cytolib/GatingSet.pb.h>
-
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
@@ -29,17 +28,18 @@ extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_logTrans_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_logicleTrans_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_paramRange_GatingSet_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_quadGate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_scaleTrans_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_TRANS_TBL_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_boolGate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ellipseGate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_paramPoly_GatingSet_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_polygonGate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_populationTree_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_rangeGate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_trans_local_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_trans_pair_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_treeNodes_GatingSet_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_polygonGate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_nodeProperties_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<5> scc_info_gate_GatingSet_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_transformation_GatingSet_2eproto;
@@ -80,6 +80,10 @@ class clusterGateDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<clusterGate> _instance;
 } _clusterGate_default_instance_;
+class quadGateDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<quadGate> _instance;
+} _quadGate_default_instance_;
 class gateDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<gate> _instance;
@@ -228,9 +232,10 @@ static void InitDefaultspolygonGate_GatingSet_2eproto() {
   ::pb::polygonGate::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_polygonGate_GatingSet_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultspolygonGate_GatingSet_2eproto}, {
-      &scc_info_paramPoly_GatingSet_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_polygonGate_GatingSet_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultspolygonGate_GatingSet_2eproto}, {
+      &scc_info_paramPoly_GatingSet_2eproto.base,
+      &scc_info_quadGate_GatingSet_2eproto.base,}};
 
 static void InitDefaultscoordinate_GatingSet_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -303,6 +308,20 @@ static void InitDefaultsclusterGate_GatingSet_2eproto() {
 
 ::google::protobuf::internal::SCCInfo<0> scc_info_clusterGate_GatingSet_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsclusterGate_GatingSet_2eproto}, {}};
+
+static void InitDefaultsquadGate_GatingSet_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::pb::_quadGate_default_instance_;
+    new (ptr) ::pb::quadGate();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::pb::quadGate::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_quadGate_GatingSet_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsquadGate_GatingSet_2eproto}, {}};
 
 static void InitDefaultsgate_GatingSet_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -655,6 +674,18 @@ static void InitDefaultsGatingSet_GatingSet_2eproto() {
       &scc_info_trans_local_GatingSet_2eproto.base,}};
 
 namespace pb {
+bool QUAD_IsValid(int value) {
+  switch (value) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
 bool GATE_TYPE_IsValid(int value) {
   switch (value) {
     case 1:
@@ -665,6 +696,7 @@ bool GATE_TYPE_IsValid(int value) {
     case 6:
     case 7:
     case 8:
+    case 9:
       return true;
     default:
       return false;
@@ -1630,6 +1662,8 @@ void paramPoly::InternalSwap(paramPoly* other) {
 void polygonGate::InitAsDefaultInstance() {
   ::pb::_polygonGate_default_instance_._instance.get_mutable()->param_ = const_cast< ::pb::paramPoly*>(
       ::pb::paramPoly::internal_default_instance());
+  ::pb::_polygonGate_default_instance_._instance.get_mutable()->qg_ = const_cast< ::pb::quadGate*>(
+      ::pb::quadGate::internal_default_instance());
 }
 class polygonGate::HasBitSetters {
  public:
@@ -1637,14 +1671,23 @@ class polygonGate::HasBitSetters {
   static void set_has_param(polygonGate* msg) {
     msg->_has_bits_[0] |= 0x00000001u;
   }
+  static const ::pb::quadGate& qg(const polygonGate* msg);
+  static void set_has_qg(polygonGate* msg) {
+    msg->_has_bits_[0] |= 0x00000002u;
+  }
 };
 
 const ::pb::paramPoly&
 polygonGate::HasBitSetters::param(const polygonGate* msg) {
   return *msg->param_;
 }
+const ::pb::quadGate&
+polygonGate::HasBitSetters::qg(const polygonGate* msg) {
+  return *msg->qg_;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int polygonGate::kParamFieldNumber;
+const int polygonGate::kQgFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 polygonGate::polygonGate()
@@ -1662,13 +1705,20 @@ polygonGate::polygonGate(const polygonGate& from)
   } else {
     param_ = nullptr;
   }
+  if (from.has_qg()) {
+    qg_ = new ::pb::quadGate(*from.qg_);
+  } else {
+    qg_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:pb.polygonGate)
 }
 
 void polygonGate::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_polygonGate_GatingSet_2eproto.base);
-  param_ = nullptr;
+  ::memset(&param_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&qg_) -
+      reinterpret_cast<char*>(&param_)) + sizeof(qg_));
 }
 
 polygonGate::~polygonGate() {
@@ -1678,6 +1728,7 @@ polygonGate::~polygonGate() {
 
 void polygonGate::SharedDtor() {
   if (this != internal_default_instance()) delete param_;
+  if (this != internal_default_instance()) delete qg_;
 }
 
 void polygonGate::SetCachedSize(int size) const {
@@ -1696,9 +1747,15 @@ void polygonGate::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    GOOGLE_DCHECK(param_ != nullptr);
-    param_->Clear();
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      GOOGLE_DCHECK(param_ != nullptr);
+      param_->Clear();
+    }
+    if (cached_has_bits & 0x00000002u) {
+      GOOGLE_DCHECK(qg_ != nullptr);
+      qg_->Clear();
+    }
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -1724,6 +1781,19 @@ const char* polygonGate::_InternalParse(const char* begin, const char* end, void
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::pb::paramPoly::_InternalParse;
         object = msg->mutable_param();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // optional .pb.quadGate qg = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::pb::quadGate::_InternalParse;
+        object = msg->mutable_qg();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -1777,6 +1847,17 @@ bool polygonGate::MergePartialFromCodedStream(
         break;
       }
 
+      // optional .pb.quadGate qg = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_qg()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1811,6 +1892,12 @@ void polygonGate::SerializeWithCachedSizes(
       1, HasBitSetters::param(this), output);
   }
 
+  // optional .pb.quadGate qg = 2;
+  if (cached_has_bits & 0x00000002u) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      2, HasBitSetters::qg(this), output);
+  }
+
   output->WriteRaw(_internal_metadata_.unknown_fields().data(),
                    static_cast<int>(_internal_metadata_.unknown_fields().size()));
   // @@protoc_insertion_point(serialize_end:pb.polygonGate)
@@ -1832,6 +1919,14 @@ size_t polygonGate::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  // optional .pb.quadGate qg = 2;
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000002u) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *qg_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1849,8 +1944,14 @@ void polygonGate::MergeFrom(const polygonGate& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.has_param()) {
-    mutable_param()->::pb::paramPoly::MergeFrom(from.param());
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      mutable_param()->::pb::paramPoly::MergeFrom(from.param());
+    }
+    if (cached_has_bits & 0x00000002u) {
+      mutable_qg()->::pb::quadGate::MergeFrom(from.qg());
+    }
   }
 }
 
@@ -1866,6 +1967,9 @@ bool polygonGate::IsInitialized() const {
   if (has_param()) {
     if (!this->param_->IsInitialized()) return false;
   }
+  if (has_qg()) {
+    if (!this->qg_->IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -1878,6 +1982,7 @@ void polygonGate::InternalSwap(polygonGate* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   swap(param_, other->param_);
+  swap(qg_, other->qg_);
 }
 
 ::std::string polygonGate::GetTypeName() const {
@@ -3451,6 +3556,343 @@ void clusterGate::InternalSwap(clusterGate* other) {
 
 ::std::string clusterGate::GetTypeName() const {
   return "pb.clusterGate";
+}
+
+
+// ===================================================================
+
+void quadGate::InitAsDefaultInstance() {
+}
+class quadGate::HasBitSetters {
+ public:
+  static void set_has_uid(quadGate* msg) {
+    msg->_has_bits_[0] |= 0x00000001u;
+  }
+  static void set_has_quadrant(quadGate* msg) {
+    msg->_has_bits_[0] |= 0x00000002u;
+  }
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int quadGate::kUidFieldNumber;
+const int quadGate::kQuadrantFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+quadGate::quadGate()
+  : ::google::protobuf::MessageLite(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:pb.quadGate)
+}
+quadGate::quadGate(const quadGate& from)
+  : ::google::protobuf::MessageLite(),
+      _internal_metadata_(nullptr),
+      _has_bits_(from._has_bits_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  uid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.has_uid()) {
+    uid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uid_);
+  }
+  quadrant_ = from.quadrant_;
+  // @@protoc_insertion_point(copy_constructor:pb.quadGate)
+}
+
+void quadGate::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_quadGate_GatingSet_2eproto.base);
+  uid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  quadrant_ = 1;
+}
+
+quadGate::~quadGate() {
+  // @@protoc_insertion_point(destructor:pb.quadGate)
+  SharedDtor();
+}
+
+void quadGate::SharedDtor() {
+  uid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void quadGate::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const quadGate& quadGate::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_quadGate_GatingSet_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void quadGate::Clear() {
+// @@protoc_insertion_point(message_clear_start:pb.quadGate)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      uid_.ClearNonDefaultToEmptyNoArena();
+    }
+    quadrant_ = 1;
+  }
+  _has_bits_.Clear();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* quadGate::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<quadGate*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // required string uid = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        object = msg->mutable_uid();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParser;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheck(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // required .pb.QUAD quadrant = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        if (!::pb::QUAD_IsValid(val)) {
+          ::google::protobuf::internal::WriteVarint(3, val, msg->mutable_unknown_fields());
+          break;
+        }
+        msg->set_quadrant(static_cast<::pb::QUAD>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool quadGate::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::LiteUnknownFieldSetter unknown_fields_setter(
+      &_internal_metadata_);
+  ::google::protobuf::io::StringOutputStream unknown_fields_output(
+      unknown_fields_setter.buffer());
+  ::google::protobuf::io::CodedOutputStream unknown_fields_stream(
+      &unknown_fields_output, false);
+  // @@protoc_insertion_point(parse_start:pb.quadGate)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required string uid = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_uid()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required .pb.QUAD quadrant = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::pb::QUAD_IsValid(value)) {
+            set_quadrant(static_cast< ::pb::QUAD >(value));
+          } else {
+            unknown_fields_stream.WriteVarint32(24u);
+            unknown_fields_stream.WriteVarint32(
+                static_cast<::google::protobuf::uint32>(value));
+          }
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(
+            input, tag, &unknown_fields_stream));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:pb.quadGate)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:pb.quadGate)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void quadGate::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:pb.quadGate)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // required string uid = 1;
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->uid(), output);
+  }
+
+  // required .pb.QUAD quadrant = 3;
+  if (cached_has_bits & 0x00000002u) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      3, this->quadrant(), output);
+  }
+
+  output->WriteRaw(_internal_metadata_.unknown_fields().data(),
+                   static_cast<int>(_internal_metadata_.unknown_fields().size()));
+  // @@protoc_insertion_point(serialize_end:pb.quadGate)
+}
+
+size_t quadGate::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:pb.quadGate)
+  size_t total_size = 0;
+
+  if (has_uid()) {
+    // required string uid = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->uid());
+  }
+
+  if (has_quadrant()) {
+    // required .pb.QUAD quadrant = 3;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->quadrant());
+  }
+
+  return total_size;
+}
+size_t quadGate::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:pb.quadGate)
+  size_t total_size = 0;
+
+  total_size += _internal_metadata_.unknown_fields().size();
+
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+    // required string uid = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->uid());
+
+    // required .pb.QUAD quadrant = 3;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->quadrant());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void quadGate::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const quadGate*>(&from));
+}
+
+void quadGate::MergeFrom(const quadGate& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:pb.quadGate)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      _has_bits_[0] |= 0x00000001u;
+      uid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.uid_);
+    }
+    if (cached_has_bits & 0x00000002u) {
+      quadrant_ = from.quadrant_;
+    }
+    _has_bits_[0] |= cached_has_bits;
+  }
+}
+
+void quadGate::CopyFrom(const quadGate& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:pb.quadGate)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool quadGate::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  return true;
+}
+
+void quadGate::Swap(quadGate* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void quadGate::InternalSwap(quadGate* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_has_bits_[0], other->_has_bits_[0]);
+  uid_.Swap(&other->uid_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(quadrant_, other->quadrant_);
+}
+
+::std::string quadGate::GetTypeName() const {
+  return "pb.quadGate";
 }
 
 
@@ -13586,6 +14028,9 @@ template<> PROTOBUF_NOINLINE ::pb::boolGate* Arena::CreateMaybeMessage< ::pb::bo
 }
 template<> PROTOBUF_NOINLINE ::pb::clusterGate* Arena::CreateMaybeMessage< ::pb::clusterGate >(Arena* arena) {
   return Arena::CreateInternal< ::pb::clusterGate >(arena);
+}
+template<> PROTOBUF_NOINLINE ::pb::quadGate* Arena::CreateMaybeMessage< ::pb::quadGate >(Arena* arena) {
+  return Arena::CreateInternal< ::pb::quadGate >(arena);
 }
 template<> PROTOBUF_NOINLINE ::pb::gate* Arena::CreateMaybeMessage< ::pb::gate >(Arena* arena) {
   return Arena::CreateInternal< ::pb::gate >(arena);

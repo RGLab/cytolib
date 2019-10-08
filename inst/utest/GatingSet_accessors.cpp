@@ -22,6 +22,46 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
+BOOST_AUTO_TEST_CASE(quadgate) {
+
+	GatingSet gs1({"../flowWorkspace/output/s5a01.fcs"}, FCS_READ_PARAM());
+	auto gh = gs1.begin()->second;
+	//test regular rectgate
+	shared_ptr<rectGate> g(new rectGate());
+	paramPoly p;
+	p.setName({"FSC-H", "SSC-H"});
+	p.setVertices({coordinate(300,0), coordinate(500,400)});
+	g->setParam(p);
+	auto id = gh->addGate(g, 0, "test");
+	auto cf = MemCytoFrame(*(gh->get_cytoframe_view().get_cytoframe_ptr()));
+	gh->gating(cf, 0, true, true);
+	BOOST_CHECK_EQUAL(gh->getNodeProperty(gh->getNodeID("test")).getCounts(), 649);
+	//quadgate
+//	gh->removeNode(id);
+	p.setVertices({coordinate(500,600)});
+	gh->addGate(gatePtr(new quadGate(p, "123", Q1)), id, "A");
+	gh->addGate(gatePtr(new quadGate(p, "123", Q2)), id, "B");
+	gh->addGate(gatePtr(new quadGate(p, "123", Q3)), id, "C");
+	gh->addGate(gatePtr(new quadGate(p, "123", Q4)), id, "D");
+	gh->gating(cf, 0, true, true);
+	BOOST_CHECK_EQUAL(gh->getNodeProperty(gh->getNodeID("test")).getCounts()
+					, gh->getNodeProperty(gh->getNodeID("A")).getCounts()+
+					gh->getNodeProperty(gh->getNodeID("B")).getCounts()+
+					gh->getNodeProperty(gh->getNodeID("C")).getCounts()+
+					gh->getNodeProperty(gh->getNodeID("D")).getCounts());
+	//test pb
+	string tmp = generate_unique_dir(fs::temp_directory_path(), "gs");
+	gs1.serialize_pb(tmp, H5Option::copy);
+	gs1 = GatingSet(tmp);
+	gh = gs1.begin()->second;
+	gh->gating(cf, 0, true, true);
+	BOOST_CHECK_EQUAL(gh->getNodeProperty(gh->getNodeID("test")).getCounts()
+					, gh->getNodeProperty(gh->getNodeID("A")).getCounts()+
+					gh->getNodeProperty(gh->getNodeID("B")).getCounts()+
+					gh->getNodeProperty(gh->getNodeID("C")).getCounts()+
+					gh->getNodeProperty(gh->getNodeID("D")).getCounts());
+
+}
 BOOST_AUTO_TEST_CASE(serialize) {
 	GatingSet gs1 = gs.copy();
 	/*

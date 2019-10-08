@@ -425,46 +425,6 @@ namespace cytolib
 		param.convertToPb(*pr_pb);
 	}
 
-	INDICE_TYPE rectGate::gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
-
-		vector<coordinate> vertices=param.getVertices();
-		unsigned nVertex=vertices.size();
-		if(nVertex!=2)
-			throw(domain_error("invalid number of vertices for rectgate!"));
-		string x=param.xName();
-		string y=param.yName();
-		EVENT_DATA_TYPE * xdata = fdata.get_data_memptr(x, ColType::channel);
-		EVENT_DATA_TYPE * ydata =fdata.get_data_memptr(y, ColType::channel);
-
-		int nEvents=parentInd.size();
-		INDICE_TYPE res;
-		res.reserve(nEvents);
-
-		/*
-		 * actual gating
-		 */
-		for(auto i : parentInd)
-		{
-			bool inX,inY;
-			EVENT_DATA_TYPE xMin=vertices[0].x;
-			EVENT_DATA_TYPE yMin=vertices[0].y;
-
-			EVENT_DATA_TYPE xMax=vertices[1].x;
-			EVENT_DATA_TYPE yMax=vertices[1].y;
-
-			if(xMin>xMax||yMin>yMax)
-				throw(domain_error("invalid vertices for rectgate!"));
-
-			inX=xdata[i]<=xMax&&xdata[i]>=xMin;
-			inY=ydata[i]<=yMax&&ydata[i]>=yMin;
-			bool isIn = inX&&inY;
-			if(isIn != neg)
-			res.push_back(i);
-		}
-
-		return res;
-
-	}
 
 	void rectGate::convertToPb(pb::gate & gate_pb)
 	{

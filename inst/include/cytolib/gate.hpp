@@ -38,6 +38,7 @@ const EVENT_DATA_TYPE pi = 3.1415926535897;
 #define LOGICALGATE 6
 #define CURLYQUADGATE 7
 #define CLUSTERGATE 8
+#define QUADGATE 9
 
 #define AND 1
 #define OR 2
@@ -236,6 +237,15 @@ public:
 	polygonGate(const pb::gate & gate_pb):gate(gate_pb),param(paramPoly(gate_pb.pg().param())){}
 
 };
+
+enum QUAD{
+	Q1 = 1,//-+
+	Q2 = 2,//++
+	Q3 = 3,//+-
+	Q4 = 4//--
+
+};
+
 /*
  * rectgate is a special polygon requires simpler gating routine
  * it doesn't overload getType member function, which means it is exposed to R
@@ -248,16 +258,95 @@ public:
  * It is a special polygonGate and has the simpler(faster) gating calculation.
  */
 class rectGate:public polygonGate {
+	bool is_quad;
+	QUAD quadrant;//it is only valid when is_quad is true
 public:
+	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd)
+	{
+			vector<coordinate> vertices=param.getVertices();
+			unsigned nVertex=vertices.size();
+			if(nVertex!=2)
+				throw(domain_error("invalid number of vertices for rectgate!"));
+			string x=param.xName();
+			string y=param.yName();
+			EVENT_DATA_TYPE * xdata = fdata.get_data_memptr(x, ColType::channel);
+			EVENT_DATA_TYPE * ydata =fdata.get_data_memptr(y, ColType::channel);
+
+			int nEvents=parentInd.size();
+			INDICE_TYPE res;
+			res.reserve(nEvents);
+
+			/*
+			 * actual gating
+			 */
+			for(auto i : parentInd)
+			{
+				bool inX,inY;
+				EVENT_DATA_TYPE xMin=vertices[0].x;
+				EVENT_DATA_TYPE yMin=vertices[0].y;
+
+				EVENT_DATA_TYPE xMax=vertices[1].x;
+				EVENT_DATA_TYPE yMax=vertices[1].y;
+
+				if(xMin>xMax||yMin>yMax)
+					throw(domain_error("invalid vertices for rectgate!"));
+
+				if(is_quad)
+				{
+					//avoid the edge cells counted multiple times
+					switch(quadrant)
+					{
+						case Q1:
+						{
+							inX=xdata[i]<=xMax&&xdata[i]>=xMin;
+							inY=ydata[i]<=yMax&&ydata[i]>yMin;
+							break;
+						}
+						case Q2:
+						{
+							inX=xdata[i]<=xMax&&xdata[i]>xMin;
+							inY=ydata[i]<=yMax&&ydata[i]>=yMin;
+							break;
+						}
+						case Q3:
+						{
+							inX=xdata[i]<=xMax&&xdata[i]>=xMin;
+							inY=ydata[i]<yMax&&ydata[i]>=yMin;
+							break;
+						}
+						case Q4:
+						{
+							inX=xdata[i]<xMax&&xdata[i]>=xMin;
+							inY=ydata[i]<=yMax&&ydata[i]>=yMin;
+							break;
+						}
+					}
+				}
+				else
+				{
+					inX=xdata[i]<=xMax&&xdata[i]>=xMin;
+					inY=ydata[i]<=yMax&&ydata[i]>=yMin;
+				}
 
 
+				bool isIn = inX&&inY;
+				if(isIn != neg)
+				res.push_back(i);
+			}
 
-	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd);
+			return res;
+
+		}
 	unsigned short getType() const{return RECTGATE;}
 	gatePtr clone() const{return gatePtr(new rectGate(*this));};
 	void convertToPb(pb::gate & gate_pb);
-	rectGate(const pb::gate & gate_pb):polygonGate(gate_pb){};;
-	rectGate():polygonGate(){};
+	rectGate(const pb::gate & gate_pb):polygonGate(gate_pb), is_quad(false), quadrant(Q1){};;
+	rectGate():polygonGate(), is_quad(false), quadrant(Q1){};
+	void set_quadrant(QUAD _quadrant)
+	{
+		is_quad = true;
+		quadrant = _quadrant;
+	}
 };
 
 /**
@@ -427,13 +516,6 @@ public:
 	clusterGate(string cluster_method_name):boolGate(),cluster_method_name_(cluster_method_name){};
 };
 
-enum QUAD{
-	Q1,//-+
-	Q2,//++
-	Q3,//+-
-	Q4//--
-
-};
 /*
  * Before interpolation, the intersection points are stored as the first element of param in polygonGate
  */
@@ -455,6 +537,87 @@ public:
 	void interpolate(trans_local & trans);
 	virtual unsigned short getType() const{return CURLYQUADGATE;}
 	gatePtr clone() const{return gatePtr(new CurlyQuadGate(*this));};
+
+};
+
+class quadGate : public polygonGate{
+	string uid_;//used to uniquely tag the quadrant gate so that they can be reassembled/grouped
+	QUAD quadrant;
+public:
+	quadGate(paramPoly _intersect, string uid, QUAD _quadrant):polygonGate(), uid_(uid), quadrant(_quadrant)
+	{
+		param = _intersect;
+
+	};
+	coordinate get_intersection() const{return param.getVertices()[0];};
+	QUAD get_quadrant() const{return quadrant;};
+	void transforming(trans_local & trans){
+		polygonGate::transforming(trans);
+	}
+	rectGate to_rectgate()
+	{
+		rectGate g;
+		paramPoly params;
+		vector<coordinate> verts(2);
+		auto p = get_intersection();
+		switch(quadrant)
+		{
+			case Q1:
+			{
+				verts[0] = {-numeric_limits<double>::infinity(), p.y};//bottom left
+				verts[1] = {p.x, numeric_limits<double>::infinity()};//top right
+				break;
+			}
+			case Q2:
+			{
+				verts[0] = {p.x, p.y};//bottom left
+				verts[1] = {numeric_limits<double>::infinity(), numeric_limits<double>::infinity()};//top right
+				break;
+			}
+			case Q3:
+			{
+				verts[0] = {p.x, -numeric_limits<double>::infinity()};//bottom left
+				verts[1] = {numeric_limits<double>::infinity(), p.y};//top right
+				break;
+			}
+			case Q4:
+			{
+				verts[0] = {-numeric_limits<double>::infinity(), -numeric_limits<double>::infinity()};//bottom left
+				verts[1] = {p.x, p.y};//top right
+				break;
+			}
+		}
+		params.setName(param.getNameArray());
+		params.setVertices(verts);
+		g.setParam(params);
+		g.set_quadrant(quadrant);
+		return g;
+	}
+	INDICE_TYPE gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd)
+	{
+		//construct rect gate on the fly and do the quadrant-specific gating
+		return to_rectgate().gating(fdata, parentInd);
+	}
+	virtual unsigned short getType() const{return QUADGATE;}
+	gatePtr clone() const{return gatePtr(new quadGate(*this));};
+	string get_uid(){return uid_;}
+	void convertToPb(pb::gate & gate_pb){
+		polygonGate::convertToPb(gate_pb);
+		//cp nested gate
+		pb::polygonGate * p_pb = gate_pb.mutable_pg();//already created by previous call, just get its pointer
+		pb::quadGate * q_pb = p_pb->mutable_qg();
+		gate_pb.set_type(pb::QUAD_GATE);
+		q_pb->set_uid(uid_);
+		q_pb->set_quadrant(static_cast<pb::QUAD>(quadrant));
+	}
+	quadGate(const pb::gate & gate_pb):polygonGate(gate_pb)
+	{
+
+		auto qg = gate_pb.pg().qg();
+		uid_ = qg.uid();
+		quadrant = static_cast<cytolib::QUAD>(qg.quadrant());
+
+	};
 
 };
 };

@@ -14,6 +14,8 @@ message paramPoly{
 }
 message polygonGate{
 	required paramPoly param = 1;
+	optional quadGate qg = 2;
+
 }
 message coordinate{
 	required float x = 1;
@@ -39,6 +41,17 @@ message boolGate{
 message clusterGate{
     required string cluster_method = 1;
 }
+enum QUAD{
+	Q1 = 1;//-+
+	Q2 = 2;//++
+	Q3 = 3;//+-
+	Q4 = 4;//--
+
+};
+message quadGate{
+    required string uid = 1;
+    required QUAD quadrant = 3;
+}
 enum GATE_TYPE{
 	 POLYGON_GATE = 1;
 	 RANGE_GATE = 2;
@@ -48,7 +61,7 @@ enum GATE_TYPE{
 	 LOGICAL_GATE = 6;
 	 ELLIPSOID_GATE = 7;
 	 CLUSTER_GATE = 8;
-
+	 QUAD_GATE = 9;
 	}
 message gate{
 	required bool neg =1;
@@ -61,7 +74,6 @@ message gate{
 	optional ellipseGate eg = 7;
 	optional boolGate bg = 8;
     optional clusterGate cg = 9;
-
 
 }
 
