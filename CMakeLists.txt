@@ -30,7 +30,7 @@ project (cytolib)
 	# so that we will find cytolibmlConfig.h
 	include_directories("${PROJECT_BINARY_DIR}")
  
-	install(FILES ${PROJECT_BINARY_DIR}/cytolibConfig.h DESTINATION cytolib/include/cytolib)
+	install(FILES ${PROJECT_BINARY_DIR}/cytolibConfig.h DESTINATION cytolib/include)
   # we add the sub-directories that we want CMake to scan
     add_subdirectory(thirdparty)
 
