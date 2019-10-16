@@ -10,8 +10,9 @@
 	set_source_files_properties( ${H5_CXX_LIBS} PROPERTIES GENERATED TRUE )
 	set(h5_include ${CMAKE_CURRENT_BINARY_DIR}/h5_build/include)
     set(INCLUDE_DIR ${INCLUDE_DIR} ${h5_include} PARENT_SCOPE)
-	file(GLOB HEADERS "${h5_include}/*")
-	install (FILES ${HEADERS} DESTINATION cytolib/include)
+#	file(GLOB HEADERS "${h5_include}/*")
+	#install (FILES ${HEADERS} DESTINATION cytolib/include) #this won't work since the content of ${HEADERS} are generated at this point
+    install (DIRECTORY "${h5_include}" DESTINATION cytolib FILES_MATCHING PATTERN "*.h")
 	install (FILES ${H5_SZ_LIBS} DESTINATION cytolib/lib)
 	install (FILES ${H5_C_LIBS} DESTINATION cytolib/lib)
 	install (FILES ${H5_CXX_LIBS} DESTINATION cytolib/lib)
