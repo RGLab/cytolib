@@ -1,4 +1,5 @@
 #include <cytolib/MemCytoFrame.hpp>
+#include <cytolib/cytolibConfig.h>
 #include <boost/lexical_cast.hpp>
 #include <experimental/filesystem>
 #include <unordered_map>
@@ -270,6 +271,7 @@ namespace cytolib
 	{
 		open_fcs_file();
 		read_fcs_header(in_, config_.header);
+		keys_["$CYTOLIB_VERSION"] = CYTOLIB_VERSION;
 		read_fcs_data(in_, config_.data);
 		in_.close();
 	}
