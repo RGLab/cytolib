@@ -533,9 +533,12 @@ namespace cytolib
                 string oldmarkername = params[id].marker;
 		if(oldmarkername!=markername)
 		{
-			int id1 = get_col_idx(markername, ColType::marker);
-			if(id1>=0&&id1!=id)
-				throw(domain_error("marker already exists: " + markername));
+			if(markername.size() > 0)
+			{
+				int id1 = get_col_idx(markername, ColType::marker);
+				if(id1>=0&&id1!=id)
+					throw(domain_error("marker already exists: " + markername));
+			}
 			params[id].marker=markername;
 			marker_vs_idx.erase(oldmarkername);
 			marker_vs_idx[markername] = id;
