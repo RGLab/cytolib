@@ -1,5 +1,5 @@
 	set(pb_lib_file pb_build/lib/libprotobuf-lite.a)
-	file(COPY protobuf-3.7.0.tar.gz DESTINATION .)
+	file(COPY protobuf-3.7.0.tar.xz DESTINATION .)
 	file(COPY install.sh DESTINATION .)
 	add_custom_command(OUTPUT ${pb_lib_file}
 						COMMAND bash install.sh

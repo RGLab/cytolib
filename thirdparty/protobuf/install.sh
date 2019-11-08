@@ -1,6 +1,6 @@
 #untar the lib
 BASEPBNAME="protobuf-3.7.0"
-PBTGZNAME=${BASEPBNAME}.tar.gz
+PBTGZNAME=${BASEPBNAME}.tar.xz
 if test -d ./${BASEPBNAME}; then 
 	echo 'found ' $BASEPBNAME ' header sources and tar archive;using what is there.'
 else
