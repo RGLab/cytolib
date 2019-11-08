@@ -1,4 +1,6 @@
-/*
+/* Copyright 2019 Fred Hutchinson Cancer Research Center
+ * See the included LICENSE file for details on the license that is granted to the
+ * user of this software.
  * H5CytoFrame.hpp
  *
  *  Created on: Sep 18, 2017

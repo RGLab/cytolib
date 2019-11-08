@@ -1,4 +1,6 @@
-/*
+/* Copyright 2019 Fred Hutchinson Cancer Research Center
+ * See the included LICENSE file for details on the license that is granted to the
+ * user of this software.
  * global.hpp
  *
  *  Created on: Mar 31, 2014

@@ -1,4 +1,5 @@
-
+# Copyright 2019 Fred Hutchinson Cancer Research Center
+# See the included LICENSE file for details on the licence that is granted to the user of this software.
 dllInfo <- NULL
 
 .onLoad <- function(libname, pkgname) {

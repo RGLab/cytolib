@@ -1,4 +1,5 @@
-
+# Copyright 2019 Fred Hutchinson Cancer Research Center
+# See the included LICENSE file for details on the licence that is granted to the user of this software.
 CXX_STD = CXX11
 
 PKG_CPPFLAGS =-DROUT -DRCPP_PARALLEL_USE_TBB=1 -fpermissive
