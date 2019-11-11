@@ -41,7 +41,7 @@ message boolGate{
 message clusterGate{
     required string cluster_method = 1;
 }
-enum QUAD{
+enum QUADRANT{
 	Q1 = 1;//-+
 	Q2 = 2;//++
 	Q3 = 3;//+-
@@ -50,7 +50,7 @@ enum QUAD{
 };
 message quadGate{
     required string uid = 1;
-    required QUAD quadrant = 3;
+    required QUADRANT quadrant = 3;
 }
 enum GATE_TYPE{
 	 POLYGON_GATE = 1;
