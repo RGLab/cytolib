@@ -2,29 +2,12 @@
 # See the included LICENSE file for details on the licence that is granted to the user of this software.
 CXX_STD = CXX11
 
-PKG_CPPFLAGS =-DROUT -DRCPP_PARALLEL_USE_TBB=1 -fpermissive
 
-PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags();cat(' ');RcppParallel::RcppParallelLibs()"` -lws2_32
+PKG_CPPFLAGS =-DROUT -I../inst/include -DRCPP_PARALLEL_USE_TBB=1 -fpermissive -Wno-deprecated-declarations -DBOOST_NO_AUTO_PTR -Wno-unknown-pragmas -Wno-comment 
 
-USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
-PKGLIB = ${USERDIR}/libflowWorkspace.a
+fslib = stdc++fs
+	
+RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
+    "${R_HOME}/bin/R" --vanilla --slave)
 
-
-all:  $(SHLIB)
- 
-$(SHLIB): $(PKGLIB)
-
-
-#expose static lib for other package to link to 
-$(PKGLIB): $(OBJECTS)
-	mkdir -p "${USERDIR}"
-	$(AR) rs "${PKGLIB}" $(OBJECTS)
-
-
-.PHONY: 	all clean 
-
-clean:
-		rm -f $(OBJECTS) $(SHLIB)
- 
-
-
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` -l$(fslib) -lws2_32  
