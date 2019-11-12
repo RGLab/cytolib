@@ -610,7 +610,7 @@ public:
 		pb::quadGate * q_pb = p_pb->mutable_qg();
 		gate_pb.set_type(pb::QUAD_GATE);
 		q_pb->set_uid(uid_);
-		q_pb->set_quadrant(static_cast<pb::QUAD>(quadrant));
+		q_pb->set_quadrant(static_cast<pb::QUADRANT>(quadrant));
 	}
 	quadGate(const pb::gate & gate_pb):polygonGate(gate_pb)
 	{
