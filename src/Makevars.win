@@ -1,13 +1,44 @@
 # Copyright 2019 Fred Hutchinson Cancer Research Center
 # See the included LICENSE file for details on the licence that is granted to the user of this software.
 CXX_STD = CXX11
+# Just a snippet to stop executing under other make(1) commands
+# that won't understand these lines
+ifneq (,)
+This makefile requires GNU Make.
+endif
+
+
+boost_sys_src=${wildcard boost/libs/system/src/*.cpp}
+boost_sys_objs=${boost_sys_src:.cpp=.o}
+boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
+boost_fs_objs=${boost_fs_src:.cpp=.o}
+
+BOOSTFSLIB = libboost_fs.a
+USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
+USERLIB = ${USERDIR}/${BOOSTFSLIB}
 
 
 PKG_CPPFLAGS =-DROUT -I../inst/include -DRCPP_PARALLEL_USE_TBB=1 -fpermissive -Wno-deprecated-declarations -DBOOST_NO_AUTO_PTR -Wno-unknown-pragmas -Wno-comment 
 
-fslib = stdc++fs
 	
 RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
     "${R_HOME}/bin/R" --vanilla --slave)
 
-PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` -l$(fslib) -lws2_32  
+PKG_LIBS = ${USERLIB} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` -lws2_32  
+
+.PHONY: all clean 
+
+all: $(SHLIB) 
+
+$(SHLIB): $(USERLIB)
+
+$(USERLIB): ${boost_fs_objs}
+	mkdir -p "${USERDIR}"
+	$(AR) rs "${USERLIB}" ${boost_fs_objs} ${boost_sys_objs}
+
+$(boost_fs_objs): ${boost_sys_objs}
+
+
+clean:
+	rm -f $(OBJECTS) $(SHLIB)
+ 

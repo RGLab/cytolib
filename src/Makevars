@@ -7,23 +7,39 @@
 ifneq (,)
 This makefile requires GNU Make.
 endif
+
+
+boost_sys_src=${wildcard boost/libs/system/src/*.cpp}
+boost_sys_objs=${boost_sys_src:.cpp=.o}
+boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
+boost_fs_objs=${boost_fs_src:.cpp=.o}
+
+BOOSTFSLIB = libboost_fs.a
+USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
+USERLIB = ${USERDIR}/${BOOSTFSLIB}
+
 	
 CXX_STD = CXX11
 PKG_CPPFLAGS =-DROUT -I../inst/include -Wno-deprecated-declarations -DBOOST_NO_AUTO_PTR -Wno-unknown-pragmas -Wno-comment 
 
-#somehow the implicit $CC isn't available/accurate, so we have to re-fetch it
-compilerinfo = ${shell R CMD config CXX}
-compiler = $(findstring clang++, $(compilerinfo))
-#$(info "$(compiler)")
-ifneq (,$(compiler))
-	fslib = c++fs
-else
-	fslib = stdc++fs
-endif
-	
 RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
     "${R_HOME}/bin/R" --vanilla --slave)
 
-PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` -l$(fslib)  
+PKG_LIBS = ${USERLIB} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
 
+.PHONY: all clean 
+
+all: $(SHLIB) 
+
+$(SHLIB): $(USERLIB)
+
+$(USERLIB): ${boost_fs_objs}
+	mkdir -p "${USERDIR}"
+	$(AR) rs "${USERLIB}" ${boost_fs_objs} ${boost_sys_objs}
+
+$(boost_fs_objs): ${boost_sys_objs}
+
+
+clean:
+	rm -f $(OBJECTS) $(SHLIB)
  
