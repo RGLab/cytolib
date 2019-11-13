@@ -9,8 +9,8 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 namespace cytolib
 {
@@ -35,7 +35,7 @@ namespace cytolib
 	}
 	string fs_tmp_path()
 	{
-		return fs::temp_directory_path();
+		return fs::temp_directory_path().c_str();
 	}
 	string generate_unique_filename(const string & dir, const string & prefix, const string & suffix)
 	{

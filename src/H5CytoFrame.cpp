@@ -2,8 +2,9 @@
 // See the included LICENSE file for details on the licence that is granted to the user of this software.
 #include <cytolib/H5CytoFrame.hpp>
 #include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
 #include <cytolib/global.hpp>
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 
 namespace cytolib
@@ -355,7 +356,7 @@ namespace cytolib
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
-			new_filename = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
+			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 			fs::remove(new_filename);
 		}
 		fs::copy_file(filename_, new_filename);
@@ -372,7 +373,7 @@ namespace cytolib
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
-			new_filename = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
+			new_filename = generate_unique_filename(fs::temp_directory_path().c_str(), "", ".h5");
 			fs::remove(new_filename);
 		}		//if view is empty, then simply invoke copy
 		if(row_idx.size() == 0 && col_idx.size() == 0)
