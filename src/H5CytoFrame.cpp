@@ -1,7 +1,6 @@
 // Copyright 2019 Fred Hutchinson Cancer Research Center
 // See the included LICENSE file for details on the licence that is granted to the user of this software.
 #include <cytolib/H5CytoFrame.hpp>
-#include <experimental/filesystem>
 #include <cytolib/global.hpp>
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
