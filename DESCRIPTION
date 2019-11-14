@@ -20,3 +20,4 @@ biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing, DataReprese
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11
 RoxygenNote: 6.1.1
+Biarch: TRUE
