@@ -35,29 +35,24 @@ namespace cytolib
 	}
 	string fs_tmp_path()
 	{
-		return fs::temp_directory_path().c_str();
+		return fs::temp_directory_path().string();
 	}
 	string generate_unique_filename(const string & dir, const string & prefix, const string & suffix)
 	{
 
-		string tmp = dir + "/" + prefix + "XXXXXX" + suffix;
-		int fid = mkstemps(&tmp[0], suffix.size());
-		if(fid == -1)
+		string tmp = dir + "/" + prefix + generate_uid() + suffix;
+//		int fid = mkstemps(&tmp[0], suffix.size());
+		if(fs::exists(fs::path(tmp)))
 			throw(domain_error("Can't create the unique file: " + tmp));
 
-		close(fid);
+//		close(fid);
 		return tmp;
 	}
 
 	string generate_unique_dir(const string & dir, const string & prefix)
 	{
 
-		string tmp = dir + "/" + prefix + "XXXXXX";
-		char * res = mkdtemp(&tmp[0]);
-		if(!res)
-			throw(domain_error("Can't create the unique dir: " + tmp));
-
-		return tmp;
+		return generate_unique_filename(dir, prefix, "");
 	}
 	/**
 	 * Generate time stamp as string
