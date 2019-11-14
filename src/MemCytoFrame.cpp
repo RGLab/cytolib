@@ -768,7 +768,7 @@ namespace cytolib
 			keys_["ORIGINALGUID"] = oldguid;
 		}
 
-		keys_["GUID"] = fs::path(filename_).filename().c_str();
+		keys_["GUID"] = fs::path(filename_).filename().string();
 
 	}
 
