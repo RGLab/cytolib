@@ -9,8 +9,8 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 namespace cytolib
 {
@@ -35,29 +35,24 @@ namespace cytolib
 	}
 	string fs_tmp_path()
 	{
-		return fs::temp_directory_path();
+		return fs::temp_directory_path().string();
 	}
 	string generate_unique_filename(const string & dir, const string & prefix, const string & suffix)
 	{
 
-		string tmp = dir + "/" + prefix + "XXXXXX" + suffix;
-		int fid = mkstemps(&tmp[0], suffix.size());
-		if(fid == -1)
+		string tmp = dir + "/" + prefix + generate_uid() + suffix;
+//		int fid = mkstemps(&tmp[0], suffix.size());
+		if(fs::exists(fs::path(tmp)))
 			throw(domain_error("Can't create the unique file: " + tmp));
 
-		close(fid);
+//		close(fid);
 		return tmp;
 	}
 
 	string generate_unique_dir(const string & dir, const string & prefix)
 	{
 
-		string tmp = dir + "/" + prefix + "XXXXXX";
-		char * res = mkdtemp(&tmp[0]);
-		if(!res)
-			throw(domain_error("Can't create the unique dir: " + tmp));
-
-		return tmp;
+		return generate_unique_filename(dir, prefix, "");
 	}
 	/**
 	 * Generate time stamp as string
@@ -113,6 +108,25 @@ namespace cytolib
 //		return full_path.substr(i_last_slash);
 		return fs::path(full_path).filename().string();
 	}
+
+	/**
+	 * parse HH:MM:SS time string
+	 * std::strptime is not portable
+	 * see https://github.com/RGLab/cytolib/issues/19
+	 * @param s
+	 * @return
+	 */
+	tm str_to_tm(string s){
+		vector<string> time_vec;
+		boost::split(time_vec, s, boost::is_any_of(":"));
+		if(time_vec.size() != 3)
+			throw(domain_error("expect time string in 'HH:MM:SS' format!"));
+		tm t;
+		t.tm_hour = boost::lexical_cast<int>(time_vec[0]);
+		t.tm_min = boost::lexical_cast<int>(time_vec[1]);
+		t.tm_sec = boost::lexical_cast<int>(time_vec[2]);
+		return t;
+	}
 /**
 	 * Parse the time string with fractional seconds
 	 * std lib doesn't handle and boost::posix_time is not header-only
@@ -125,7 +139,7 @@ namespace cytolib
 		//split the H:M:S.ms by .
 		boost::split(time_vec, s_time, boost::is_any_of("."));
 		//using std lib to parse the first half
-		strptime(time_vec[0].c_str(), "%H:%M:%S", &(res._time));
+		res._time = str_to_tm(time_vec[0]);
 		 //parse the second half as fractional seconds
 		if(time_vec.size()==2)
 		{

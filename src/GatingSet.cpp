@@ -3,9 +3,8 @@
 #include <cytolib/GatingSet.hpp>
 #include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#include <cytolib/global.hpp>
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 
 namespace cytolib
@@ -43,8 +42,8 @@ namespace cytolib
 					unordered_set<string> h5_samples;
 					for(auto & e : fs::directory_iterator(path))
 					{
-						fs::path p = e.path();
-						string ext = p.extension();
+						fs::path p = e;
+						string ext = p.extension().string();
 						if(ext == ".pb")
 						{
 							if(pb_file.empty())
@@ -54,11 +53,11 @@ namespace cytolib
 						}
 						else if(ext == ".h5")
 						{
-							string sample_uid = p.stem();
+							string sample_uid = p.stem().string();
 							if(find(sample_uid) == end())
 							  throw(domain_error(errmsg + "h5 file not matched to any sample in GatingSet: " + p.string()));
 							else
-								h5_samples.insert(p.stem());
+								h5_samples.insert(p.stem().string());
 						}
 						else
 						  throw(domain_error(errmsg + "File not recognized: " + p.string()));
@@ -141,8 +140,8 @@ namespace cytolib
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
 		for(auto & e : fs::directory_iterator(path))
 		{
-			fs::path p = e.path();
-			string ext = p.extension();
+			fs::path p = e;
+			string ext = p.extension().string();
 			if(ext == ".pb")
 			{
 				if(pb_file.empty())
@@ -160,7 +159,7 @@ namespace cytolib
 
 
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
-		ifstream input(pb_file.c_str(), ios::in | ios::binary);
+		ifstream input(pb_file.string(), ios::in | ios::binary);
 		if (!input) {
 			throw(invalid_argument("File not found.." ));
 		} else{
@@ -196,7 +195,7 @@ namespace cytolib
 				}
 
 				pb::CytoFrame fr = *gh_pb.mutable_frame();
-				string h5_filename = fs::path(path) / (sn + ".h5");
+				string h5_filename = (fs::path(path) / (sn + ".h5")).string();
 
 				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
 			}
@@ -333,14 +332,14 @@ namespace cytolib
 		GatingSet gs;
 		fs::path h5_dir;
 		if(is_copy_data)
-			h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir));
+			h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir).string());
 		for(const string & sn : get_sample_uids())
 		{
 			GatingHierarchyPtr gh = getGatingHierarchy(sn);
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+sn+"... \n");
-			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, h5_dir/sn), sn);
+			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, (h5_dir/sn).string()), sn);
 
 		}
 
@@ -448,7 +447,7 @@ namespace cytolib
 	}
 	string GatingSet::generate_h5_folder(string h5_dir) const
 	{
-		h5_dir = fs::path(h5_dir) / uid_;
+		h5_dir = (fs::path(h5_dir) / uid_).string();
 		if(fs::exists(h5_dir))
 			throw(domain_error(h5_dir + " already exists!"));
 		if(!fs::create_directories(h5_dir))

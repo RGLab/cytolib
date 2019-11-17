@@ -38,6 +38,11 @@ BOOST_AUTO_TEST_CASE(get_time_step)
 {
 	auto fr1 = MemCytoFrame("../flowWorkspace/output/s5a01.fcs", config);
 	fr1.read_fcs();
+	string ts = fr1.get_keyword("$BTIM");
+	TM_ext btime = parse_time_with_fractional_seconds(ts);
+	BOOST_CHECK_EQUAL(btime._time.tm_hour, 9);
+	BOOST_CHECK_EQUAL(btime._time.tm_min, 51);
+	BOOST_CHECK_EQUAL(btime._time.tm_sec, 34);
 	BOOST_CHECK_CLOSE(fr1.get_time_step("Time"), 0.0557, 0.01);
 
 }

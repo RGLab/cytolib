@@ -1,7 +1,7 @@
 Package: cytolib
 Type: Package
 Title: C++ infrastructure for representing and interacting with the gated cytometry
-Version: 1.9.2
+Version: 1.9.3
 Date: 2017-08-07
 Author: Mike Jiang
 Maintainer: Mike Jiang <wjiang2@fhcrc.org>
@@ -20,3 +20,4 @@ biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing, DataReprese
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11
 RoxygenNote: 6.1.1
+Biarch: TRUE

@@ -3,11 +3,11 @@
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/cytolibConfig.h>
 #include <boost/lexical_cast.hpp>
-#include <experimental/filesystem>
 #include <unordered_map>
 #include <queue>
-namespace fs = std::experimental::filesystem;
 #include <cytolib/global.hpp>
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 namespace cytolib
 {
@@ -768,7 +768,7 @@ namespace cytolib
 			keys_["ORIGINALGUID"] = oldguid;
 		}
 
-		keys_["GUID"] = fs::path(filename_).filename();
+		keys_["GUID"] = fs::path(filename_).filename().string();
 
 	}
 

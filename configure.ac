@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-
+# This autoconf based configure is replaced by more portable R package 'configure' 
 AC_PREREQ([2.65])
 AC_INIT([cytolib], [2.0], [wjiang2@fhcrc.org])
 AC_CONFIG_SRCDIR([cytolibConfig.h.in])
