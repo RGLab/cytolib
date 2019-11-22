@@ -23,14 +23,11 @@ project (cytolib)
 #    message(STATUS ${CYTOLIB_VERSION}/out/${res}/res)
     configure_file (
 	  "${PROJECT_SOURCE_DIR}/cytolibConfig.h.in"
-	  "${PROJECT_BINARY_DIR}/cytolibConfig.h"
+	  "${PROJECT_SOURCE_DIR}/inst/include/cytolib/cytolibConfig.h"
 	  )
 	 
-	# add the binary tree to the search path for include files
-	# so that we will find cytolibmlConfig.h
-	include_directories("${PROJECT_BINARY_DIR}")
- 
-	install(FILES ${PROJECT_BINARY_DIR}/cytolibConfig.h DESTINATION cytolib/include)
+
+	
   # we add the sub-directories that we want CMake to scan
     add_subdirectory(thirdparty)
 
