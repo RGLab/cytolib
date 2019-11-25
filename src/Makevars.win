@@ -23,13 +23,25 @@ PKG_LIBS =  ${boost_fs_objs} ${boost_sys_objs} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLI
 
 .PHONY: all clean 
 
-all: $(SHLIB) 
+USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
+PKGLIB = ${USERDIR}/libcytolib.a
 
-$(SHLIB): ${boost_fs_objs}
+
+all: $(PKGLIB)
+
+
+#expose static lib for other package to link to 
+$(PKGLIB): $(OBJECTS)
+	mkdir -p "${USERDIR}"
+	$(AR) rs "${PKGLIB}" $(OBJECTS) $(boost_fs_objs) ${boost_sys_objs}
+	
+
+
+$(OBJECTS): ${boost_fs_objs}
 
 $(boost_fs_objs): ${boost_sys_objs}
 
 
 clean:
-	rm -f $(OBJECTS) $(SHLIB) ${boost_fs_objs} ${boost_sys_objs}
+	rm -f $(OBJECTS) ${boost_fs_objs} ${boost_sys_objs}
  

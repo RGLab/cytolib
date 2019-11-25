@@ -6,7 +6,7 @@ dllInfo <- NULL
    
    # load cytolib and cytolibmalloc on supported platforms   
    cytolib <- cytolibLibPath()
-   if (!is.null(cytolib)) {
+   if (!is.null(cytolib)&& Sys.info()['sysname'] != "Windows") {
       if (!file.exists(cytolib)) {
          warning(paste("cytolib library", cytolib, "not found."))
       } else {
