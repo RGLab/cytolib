@@ -27,7 +27,9 @@ USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
 PKGLIB = ${USERDIR}/libcytolib.a
 
 
-all: $(PKGLIB)
+all: $(SHLIB) 
+
+$(SHLIB): $(PKGLIB)
 
 
 #expose static lib for other package to link to 
