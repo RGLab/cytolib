@@ -4,17 +4,17 @@
 namespace cytolib
 {
 
-void in_polygon(EVENT_DATA_TYPE * xdata, EVENT_DATA_TYPE * ydata, const vector<POINT> & vertices, INDICE_TYPE & parentInd, bool is_negated, INDICE_TYPE &res)
+void in_polygon(EVENT_DATA_TYPE * xdata, EVENT_DATA_TYPE * ydata, const vector<cytolib::CYTO_POINT> & vertices, INDICE_TYPE & parentInd, bool is_negated, INDICE_TYPE &res)
 {
 	unsigned counter;
 	EVENT_DATA_TYPE xinters;
 	 //find max py
-	double p_y_max = max_element(vertices.begin(), vertices.end(),[](const POINT & v1, const POINT & v2){return v1.y < v2.y;})->y;
+	double p_y_max = max_element(vertices.begin(), vertices.end(),[](const cytolib::CYTO_POINT & v1, const cytolib::CYTO_POINT & v2){return v1.y < v2.y;})->y;
 	//TODO: potentially we can speed up by caching pre-calculated p_bottom,top,left,right here to avoid repeated computation within the loop
 	for(auto i : parentInd)
 	{//iterate over points
-		vector<POINT>::const_iterator p1;
-		vector<POINT>::const_iterator p2;
+		vector<cytolib::CYTO_POINT>::const_iterator p1;
+		vector<cytolib::CYTO_POINT>::const_iterator p2;
 		counter=0;
 		for(p1  = vertices.begin(), p2 = p1 + 1; p1 < vertices.end(); p1++,p2++)
 		{// iterate over vertices
@@ -26,13 +26,13 @@ void in_polygon(EVENT_DATA_TYPE * xdata, EVENT_DATA_TYPE * ydata, const vector<P
 
 		  /*if horizontal ray is in y range of vertex find the x coordinate where
 			ray and vertex intersect*/
-			const POINT *  p_bottom = &(*p1);
-			const POINT *  p_top = &(*p2);
+			const cytolib::CYTO_POINT *  p_bottom = &(*p1);
+			const cytolib::CYTO_POINT *  p_top = &(*p2);
 			if(p_bottom->y > p_top->y)
 				swap(p_bottom, p_top);
 
-			const POINT *  p_left = p_bottom;
-			const POINT *  p_right = p_top;
+			const cytolib::CYTO_POINT *  p_left = p_bottom;
+			const cytolib::CYTO_POINT *  p_right = p_top;
 			if(p_left->x > p_right->x)
 				swap(p_left, p_right);
 

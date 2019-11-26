@@ -43,15 +43,15 @@ struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 
 typedef map<std::string, std::string, ciLessBoost> CHANNEL_MAP;
 
-struct coordinate : public cytolib::POINT
+struct coordinate : public cytolib::CYTO_POINT
 {
-	coordinate(EVENT_DATA_TYPE _x,EVENT_DATA_TYPE _y):POINT(_x, _y){};//{x=_x;y=_y;};
+	coordinate(EVENT_DATA_TYPE _x,EVENT_DATA_TYPE _y):CYTO_POINT(_x, _y){};//{x=_x;y=_y;};
 	coordinate(){};
 	void convertToPb(pb::coordinate & coor_pb){
 		coor_pb.set_x(x);
 		coor_pb.set_y(y);
 	};
-	coordinate(const pb::coordinate & coor_pb):POINT(coor_pb.x(),coor_pb.y()){};
+	coordinate(const pb::coordinate & coor_pb):CYTO_POINT(coor_pb.x(),coor_pb.y()){};
 };
 
 class transformation;
