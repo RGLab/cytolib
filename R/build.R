@@ -43,9 +43,7 @@ cytolibCxxFlags <- function() {
 cytolibLdFlags <- function() {
    # on Windows and Solaris we need to explicitly link against cytolib.dll
    if ((Sys.info()['sysname'] %in% c("Windows", "SunOS")) && !isSparc()) {
-	  cytolib <- cytolibLibPath()
-	  cytoliblib <- "cytolib"
-      res <- paste("-L", asBuildPath(dirname(cytolib)), " -l", cytoliblib, sep = "")
+	  res <- cytolibLibPath()
    } else {
      res <- ""
    }
@@ -60,14 +58,18 @@ cytolibLibPath <- function(suffix = "") {
    cytolibSupported <- list(
       "Darwin" = paste("cytolib", suffix, ".so", sep = ""), 
       "Linux" = paste("cytolib", suffix, ".so", sep = ""), 
-      "Windows" = paste("cytolib", suffix, ".dll", sep = ""),
+      "Windows" = paste("libcytolib", suffix, ".a", sep = ""),
       "SunOS" = paste("cytolib", suffix, ".so", sep = "")
    )
    # browser()
    if ((sysname %in% names(cytolibSupported)) && !isSparc()) {
-      libDir <- "libs/"
+      
       if (sysname == "Windows")
+	  {
+		  libDir <- "lib/"
          libDir <- paste(libDir, .Platform$r_arch, "/", sep="")
+	 }else
+		 libDir <- "libs/"
       system.file(paste(libDir, cytolibSupported[[sysname]], sep = ""), 
                   package = "cytolib")
    } else {

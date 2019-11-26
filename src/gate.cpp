@@ -348,7 +348,7 @@ namespace cytolib
 		INDICE_TYPE res;
 		res.reserve(nEvents);
 		unsigned nVert = vertices.size();
-		vector<cytolib::POINT> points(nVert);
+		vector<cytolib::CYTO_POINT> points(nVert);
 		for(unsigned i = 0; i < nVert; i++)
 			points[i] = vertices[i];
 		cytolib::in_polygon(xdata, ydata, points, parentInd, neg, res);

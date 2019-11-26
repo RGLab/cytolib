@@ -2,3 +2,4 @@
 # Use 'remove_file()' to remove files generated during configuration.
 
 
+remove_file("inst/include/cytolib/cytolibConfig.h")
