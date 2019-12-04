@@ -43,7 +43,7 @@ cytolibCxxFlags <- function() {
 cytolibLdFlags <- function() {
    # on Windows and Solaris we need to explicitly link against cytolib.dll
    if ((Sys.info()['sysname'] %in% c("Windows", "SunOS")) && !isSparc()) {
-	  res <- cytolibLibPath()
+	  res <- asBuildPath(cytolibLibPath())
    } else {
      res <- ""
    }
