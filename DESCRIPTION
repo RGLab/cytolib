@@ -19,5 +19,5 @@ LinkingTo: Rcpp, BH(>= 1.62.0-1), RProtoBufLib(>= 1.9.4),Rhdf5lib, RcppArmadillo
 biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing, DataRepresentation
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Biarch: TRUE
