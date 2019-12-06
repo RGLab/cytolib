@@ -133,8 +133,9 @@ namespace cytolib
 	 * constructor from the archives (de-serialization)
 	 * @param path
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
+	 * @param select_sample_idx samples to load
 	 */
-	GatingSet::GatingSet(string path, bool is_skip_data, bool readonly)
+	GatingSet::GatingSet(string path, bool is_skip_data, bool readonly, vector<string> select_samples)
 	{
 		fs::path pb_file;
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -181,11 +182,31 @@ namespace cytolib
 
 			uid_ = pbGS.guid();
 
+			auto nSelect = select_samples.size();
+			auto nTotal = pbGS.samplename_size();
+			unordered_map<string,bool> sn_hash;
 
+			//prescan select and update hash
+			if(nSelect>0)
+			{
+				for(int i = 0; i < nTotal; i++){
+					string sn = pbGS.samplename(i);
+					sn_hash[sn] = false;
+				}
+				for(unsigned i = 0; i < nSelect; i++)
+				{
+					auto sel = select_samples[i];
+					auto it = sn_hash.find(sel);
+					if(it == sn_hash.end())
+						throw(domain_error("sample selection is out of boundary: " + sel));
+					it->second = true;
+
+				}
+			}
 			//read gating hierarchy messages
-			for(int i = 0; i < pbGS.samplename_size(); i++){
+			for(int i = 0; i < nTotal; i++){
 				string sn = pbGS.samplename(i);
-
+//				all_samples[i] =sn;
 				//gh message is stored as the same order as sample name vector in gs
 				pb::GatingHierarchy gh_pb;
 				bool success = readDelimitedFrom(raw_input, gh_pb);
@@ -193,13 +214,23 @@ namespace cytolib
 				if (!success) {
 					throw(domain_error("Failed to parse GatingHierarchy."));
 				}
+				//conditional add gh (thus avoid to load h5)
+				if(nSelect==0||sn_hash.find(sn)->second)
+				{
+					pb::CytoFrame fr = *gh_pb.mutable_frame();
+					string h5_filename = (fs::path(path) / (sn + ".h5")).string();
 
-				pb::CytoFrame fr = *gh_pb.mutable_frame();
-				string h5_filename = (fs::path(path) / (sn + ".h5")).string();
-
-				add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
+					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
+				}
 			}
 
+
+			//reorder view based on select
+			if(nSelect>0)
+			{
+				uid_ = generate_uid();
+				sample_names_ = select_samples;
+			}
 		}
 
 	}
