@@ -12,17 +12,16 @@ CxxFlags <- function() {
 }
 
 
-# Output the LD flags for building against cytolib. These flags are propagated
-# to sourceCpp via the inlineCxxPlugin (defined below) and to packages 
-# via a line in Makevars[.win] like this:
-#
-#   PKG_LIBS += $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" -e "cytolib::cytolib_LdFlags()")
+#' Output the LD flags for building against cytolib. These flags are propagated
+#' to sourceCpp via the inlineCxxPlugin (defined below) and to packages 
+#' via a line in Makevars[.win] like this:
+#'
+#'   PKG_LIBS += $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" -e "cytolib::cytolib_LdFlags()")
 #' @export
 #' @importFrom RProtoBufLib LdFlags
 #' @importFrom RcppParallel RcppParallelLibs
-#' @noRd
-cytolib_LdFlags <- function(...) {
-   cat(cytolibLdFlags(...))
+cytolib_LdFlags <- function() {
+   cat(cytolibLdFlags())
 }
 
 # alias for backward compatibility
@@ -43,7 +42,7 @@ cytolibCxxFlags <- function() {
 cytolibLdFlags <- function() {
    # on Windows and Solaris we need to explicitly link against cytolib.dll
    if ((Sys.info()['sysname'] %in% c("Windows", "SunOS")) && !isSparc()) {
-	  res <- cytolibLibPath()
+	  res <- asBuildPath(cytolibLibPath())
    } else {
      res <- ""
    }

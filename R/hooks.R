@@ -26,7 +26,6 @@ dllInfo <- NULL
    # library.dynam.unload("cytolib", libpath)
    
    # unload dll if we loaded it
-  for(dll in dllInfo)
-   if (!is.null(dll))
-      dyn.unload(dll[["path"]])
+   if (!is.null(dllInfo))
+      dyn.unload(dllInfo[["path"]])
 }
