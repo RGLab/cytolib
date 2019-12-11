@@ -12,8 +12,10 @@ namespace cytolib
 	vector<string> CytoFrameView::get_channels() const{
 		vector<string> orig = get_cytoframe_ptr()->get_channels();
 		unsigned n = col_idx_.size();
-		if(n == 0)
+		if(!is_col_indexed_)
 			return orig;
+		else if(n == 0)
+			return vector<string>();
 		else
 		{
 			vector<string> res(n);
@@ -25,8 +27,10 @@ namespace cytolib
 	vector<string> CytoFrameView::get_markers() const{
 		vector<string> orig = get_cytoframe_ptr()->get_markers();
 		unsigned n = col_idx_.size();
-		if(n == 0)
+		if(!is_col_indexed_)
 			return orig;
+		else if(n == 0)
+			return vector<string>();
 		else
 		{
 			vector<string> res(n);
