@@ -184,7 +184,7 @@ namespace cytolib
 	{
 		EVENT_DATA_VEC data;
 		if(is_empty()){
-			data = EVENT_DATA_VEC();
+			data = EVENT_DATA_VEC(n_rows(), n_cols());
 		}else{
 			if(is_col_indexed())
 				data = get_cytoframe_ptr()->get_data(col_idx_);
