@@ -179,7 +179,15 @@ public:
 	 */
 	CytoFrameView copy_realized(const string & h5_filename = "") const
 	{
-		return get_cytoframe_ptr()->copy_realized(is_row_indexed_, is_col_indexed_, row_idx_, col_idx_, h5_filename);	
+		if(is_row_indexed_ && is_col_indexed_){
+			return get_cytoframe_ptr()->copy(row_idx_, col_idx_, h5_filename);
+		}else if(is_row_indexed_){
+			return get_cytoframe_ptr()->copy(row_idx_, true, h5_filename);
+		}else if(is_col_indexed_){
+			return get_cytoframe_ptr()->copy(col_idx_, false, h5_filename);
+		}else{
+			return get_cytoframe_ptr()->copy(h5_filename);
+		}
 	}
 	void set_data(const EVENT_DATA_VEC & data_in);
 	EVENT_DATA_VEC get_data() const;

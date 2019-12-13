@@ -1017,25 +1017,37 @@ namespace cytolib
 	 * @param h5_filename
 	 * @return
 	 */
-	void MemCytoFrame::realize_(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx)
+	void MemCytoFrame::realize_(uvec row_idx, uvec col_idx)
 	{
-
-		if(is_row_indexed)
-			data_ = data_.rows(row_idx);
-
-		if(is_col_indexed)
-		{
-			data_ =data_.cols(col_idx);
-			subset_parameters(col_idx);
-		}
-
+		data_ = data_.rows(row_idx);
+		data_ = data_.cols(col_idx);
+		subset_parameters(col_idx);
 	}
 
-	CytoFramePtr MemCytoFrame::copy_realized(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx, const string & h5_filename) const
+	void MemCytoFrame::realize_(uvec idx, bool is_row_indexed)
+	{
+		if(is_row_indexed)
+			data_ = data_.rows(idx);
+		else{
+			data_ = data_.cols(idx);
+			subset_parameters(idx);
+		}
+	}
+
+	CytoFramePtr MemCytoFrame::copy(uvec idx, bool is_row_indexed, const string & h5_filename) const
 	{
 		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
 		ptr->set_readonly(false);
-		ptr->realize_(is_row_indexed, is_col_indexed, row_idx, col_idx);
+		ptr->realize_(idx, is_row_indexed);
+		
+		return CytoFramePtr(ptr.release());
+	}
+
+	CytoFramePtr MemCytoFrame::copy(uvec row_idx, uvec col_idx, const string & h5_filename) const
+	{
+		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
+		ptr->set_readonly(false);
+		ptr->realize_(row_idx, col_idx);
 
 		return CytoFramePtr(ptr.release());
 	}

@@ -89,8 +89,11 @@ public:
 	CytoFramePtr copy(const string & h5_filename = "") const
 	{
 		CytoFramePtr res(new MemCytoFrame(*this));
+		res->set_readonly(false);
 		return res;
 	}
+	CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "") const;
+	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const;
 
 	/**
 	 * realize in place
@@ -99,9 +102,8 @@ public:
 	 * @param h5_filename
 	 * @return
 	 */
-	void realize_(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx);
-
-	CytoFramePtr copy_realized(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx, const string & h5_filename = "") const;
+	void realize_(uvec row_idx, uvec col_idx);
+	void realize_(uvec idx, bool is_row_indexed);
 
 	/**
  * Caller will receive a copy of data

@@ -366,7 +366,7 @@ namespace cytolib
 		ptr->set_pheno_data(get_pheno_data());
 		return ptr;
 	}
-	CytoFramePtr H5CytoFrame::copy_realized(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx, const string & h5_filename) const
+	CytoFramePtr H5CytoFrame::copy(uvec row_idx, uvec col_idx, const string & h5_filename) const
 	{
 
 		string new_filename = h5_filename;
@@ -375,12 +375,22 @@ namespace cytolib
 			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 			fs::remove(new_filename);
 		}
-		//if view is entire cytoframe, then simply invoke copy
-		if(!is_row_indexed && !is_col_indexed)
-			return copy(new_filename);
-		//otherwise, realize it to memory and write back to new file
 		MemCytoFrame fr(*this);
-		fr.copy_realized(is_row_indexed, is_col_indexed, row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
+		fr.copy(row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
+		return CytoFramePtr(new H5CytoFrame(new_filename, false));
+	}
+
+	CytoFramePtr H5CytoFrame::copy(uvec idx, bool is_row_indexed, const string & h5_filename) const
+	{
+		
+		string new_filename = h5_filename;
+		if(new_filename == "")
+		{
+			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
+			fs::remove(new_filename);
+		}
+		MemCytoFrame fr(*this);
+		fr.copy(idx, is_row_indexed)->write_h5(new_filename);//this flushes the meta data as well
 		return CytoFramePtr(new H5CytoFrame(new_filename, false));
 	}
 
