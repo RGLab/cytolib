@@ -179,12 +179,7 @@ public:
 	 */
 	CytoFrameView copy_realized(const string & h5_filename = "") const
 	{
-		if(is_empty()){
-			// Force copy_realized to hit case yielding simple copy by making sure BOTH uvecs are empty
-			return get_cytoframe_ptr()->copy_realized(arma::uvec(), arma::uvec(), h5_filename);
-		}else{
-			return get_cytoframe_ptr()->copy_realized(row_idx_, col_idx_, h5_filename);	
-		}
+		return get_cytoframe_ptr()->copy_realized(is_row_indexed_, is_col_indexed_, row_idx_, col_idx_, h5_filename);	
 	}
 	void set_data(const EVENT_DATA_VEC & data_in);
 	EVENT_DATA_VEC get_data() const;

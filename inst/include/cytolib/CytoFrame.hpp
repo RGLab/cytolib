@@ -275,7 +275,7 @@ public:
 	virtual void load_meta(){};
 
 
-	virtual CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
+	virtual CytoFramePtr copy_realized(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const ;

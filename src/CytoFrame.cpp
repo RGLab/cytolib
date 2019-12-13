@@ -247,7 +247,12 @@ namespace cytolib
 		hsize_t dim_max[] = {H5S_UNLIMITED};
 		DataSpace dsp_param(1, dim_param, dim_max);
 		DSetCreatPropList plist;
-		plist.setChunk(1, dim_param);
+		if(dim_param[0] > 0){
+			plist.setChunk(1, dim_param);	
+		}else{
+			hsize_t chunk_dim[] ={1};
+			plist.setChunk(1, chunk_dim);
+		}
 		DataSet ds = file.createDataSet( "params", get_h5_datatype_params(DataTypeLocation::H5), dsp_param, plist);
 		auto params_char = params_c_str();
 		ds.write(&params_char[0], get_h5_datatype_params(DataTypeLocation::MEM));
@@ -280,7 +285,11 @@ namespace cytolib
 		hsize_t dim_max[] = {H5S_UNLIMITED};
 		DataSpace dsp_key(1, dim_key, dim_max);
 		DSetCreatPropList plist;
-		plist.setChunk(1, dim_key);
+		if(dim_key[0] > 0){
+			plist.setChunk(1, dim_key);
+		}else{
+			hsize_t chunk_dim[] ={1};
+		}
 		DataSet ds = file.createDataSet( "keywords", key_type, dsp_key, plist);
 
 		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
@@ -297,7 +306,12 @@ namespace cytolib
 		hsize_t dim_max[] = {H5S_UNLIMITED};
 		DataSpace dsp_pd(1, dim_pd, dim_max);
 		DSetCreatPropList plist;
-		plist.setChunk(1, dim_pd);
+		if(dim_pd[0] > 1){
+			plist.setChunk(1, dim_pd);
+		}else{
+			hsize_t chunk_dim[] = {1};
+			plist.setChunk(1, chunk_dim);
+		}
 
 		DataSet ds = file.createDataSet( "pdata", key_type, dsp_pd, plist);
 
@@ -328,7 +342,7 @@ namespace cytolib
 		unsigned nEvents = n_rows();
 		hsize_t dimsf[2] = {n_cols(), nEvents};              // dataset dimensions
 		DSetCreatPropList plist;
-		hsize_t	chunk_dims[2] = {1, nEvents};
+		hsize_t	chunk_dims[2] = {1, (nEvents > 0 ? nEvents : 1)};
 		plist.setChunk(2, chunk_dims);
 	//	plist.setFilter()
 		hsize_t dim_max[] = {H5S_UNLIMITED, H5S_UNLIMITED};

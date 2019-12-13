@@ -99,9 +99,9 @@ public:
 	 * @param h5_filename
 	 * @return
 	 */
-	void realize_(uvec row_idx, uvec col_idx);
+	void realize_(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx);
 
-	CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const;
+	CytoFramePtr copy_realized(bool is_row_indexed, bool is_col_indexed, uvec row_idx, uvec col_idx, const string & h5_filename = "") const;
 
 	/**
  * Caller will receive a copy of data
