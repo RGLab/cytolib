@@ -16,12 +16,15 @@ class CytoFrameView{
 	CytoFramePtr ptr_;
 	arma::uvec row_idx_;
 	arma::uvec col_idx_;
+	bool is_row_indexed_ = false;
+	bool is_col_indexed_ = false;
 public:
 	CytoFrameView(){};
 	CytoFrameView(CytoFramePtr ptr):ptr_(ptr){};
 	CytoFramePtr get_cytoframe_ptr() const;
-	bool is_row_indexed() const{return row_idx_.size()>0;};
-	bool is_col_indexed() const{return col_idx_.size()>0;};
+	bool is_row_indexed() const{return is_row_indexed_;};
+	bool is_col_indexed() const{return is_col_indexed_;};
+	bool is_empty() const{return (is_row_indexed_ && row_idx_.is_empty()) || (is_col_indexed_ && col_idx_.is_empty());};
 
 	/*forwarded apis
 	 *
@@ -168,7 +171,7 @@ public:
 	void reset_view(){
 		row_idx_.clear();
 		col_idx_.clear();
-
+		is_row_indexed_ = is_col_indexed_ = false;
 	}
 	/**
 	 * Realize the delayed subsetting (i.e. cols() and rows()) operations to the underlying data
@@ -176,7 +179,15 @@ public:
 	 */
 	CytoFrameView copy_realized(const string & h5_filename = "") const
 	{
-		return get_cytoframe_ptr()->copy_realized(row_idx_, col_idx_, h5_filename);;
+		if(is_row_indexed_ && is_col_indexed_){
+			return get_cytoframe_ptr()->copy(row_idx_, col_idx_, h5_filename);
+		}else if(is_row_indexed_){
+			return get_cytoframe_ptr()->copy(row_idx_, true, h5_filename);
+		}else if(is_col_indexed_){
+			return get_cytoframe_ptr()->copy(col_idx_, false, h5_filename);
+		}else{
+			return get_cytoframe_ptr()->copy(h5_filename);
+		}
 	}
 	void set_data(const EVENT_DATA_VEC & data_in);
 	EVENT_DATA_VEC get_data() const;

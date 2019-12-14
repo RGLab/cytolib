@@ -270,12 +270,13 @@ public:
 	EVENT_DATA_TYPE get_time_step(const string time_channel) const;
 
 	virtual CytoFramePtr copy(const string & h5_filename = "") const=0;
+	virtual CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "") const=0;
+	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
+	
+	
 	virtual string get_h5_file_path() const=0;
 	virtual void flush_meta(){};
 	virtual void load_meta(){};
-
-
-	virtual CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
 
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const ;

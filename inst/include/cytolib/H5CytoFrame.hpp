@@ -134,7 +134,8 @@ public:
 	}
 
 	CytoFramePtr copy(const string & h5_filename = "") const;
-	CytoFramePtr copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename = "") const;
+	CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "") const;
+	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const;
 
 	/**
 	 * copy setter

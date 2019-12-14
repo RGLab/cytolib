@@ -1019,19 +1019,31 @@ namespace cytolib
 	 */
 	void MemCytoFrame::realize_(uvec row_idx, uvec col_idx)
 	{
-
-		if(row_idx.size()>0)
-			data_ = data_.rows(row_idx);
-
-		if(col_idx.size()>0)
-		{
-			data_ =data_.cols(col_idx);
-			subset_parameters(col_idx);
-		}
-
+		data_ = data_.rows(row_idx);
+		data_ = data_.cols(col_idx);
+		subset_parameters(col_idx);
 	}
 
-	CytoFramePtr MemCytoFrame::copy_realized(uvec row_idx, uvec col_idx, const string & h5_filename) const
+	void MemCytoFrame::realize_(uvec idx, bool is_row_indexed)
+	{
+		if(is_row_indexed)
+			data_ = data_.rows(idx);
+		else{
+			data_ = data_.cols(idx);
+			subset_parameters(idx);
+		}
+	}
+
+	CytoFramePtr MemCytoFrame::copy(uvec idx, bool is_row_indexed, const string & h5_filename) const
+	{
+		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
+		ptr->set_readonly(false);
+		ptr->realize_(idx, is_row_indexed);
+		
+		return CytoFramePtr(ptr.release());
+	}
+
+	CytoFramePtr MemCytoFrame::copy(uvec row_idx, uvec col_idx, const string & h5_filename) const
 	{
 		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
 		ptr->set_readonly(false);
