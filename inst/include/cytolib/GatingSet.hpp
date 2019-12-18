@@ -77,7 +77,7 @@ public:
 	 * @param path
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
 	 */
-	GatingSet(string path, bool is_skip_data = false, bool readonly = true, vector<string> select_samples = {});
+	GatingSet(string path, bool is_skip_data = false, bool readonly = true, vector<string> select_samples = {}, bool print_lib_ver = false);
 	/**
 	 * constructor from the legacy archives (de-serialization)
 	 * @param filename
