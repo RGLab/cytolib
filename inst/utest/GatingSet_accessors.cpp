@@ -10,7 +10,7 @@ struct GSFixture {
 	GSFixture() {
 
 		path = "../flowWorkspace/output/NHLBI/gs/gs";
-		gs = GatingSet(path);
+		gs = GatingSet(path,false,false,{},true);
 
 	};
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(serialize) {
 	string tmp = generate_unique_dir(fs::temp_directory_path(), "gs");
 	gs1.serialize_pb(tmp, H5Option::copy);
 	//load it back
-	GatingSet gs2(tmp);
+	GatingSet gs2(tmp,false,false,{},true);
 	auto cf2 = gs2.begin()->second->get_cytoframe_view_ref();
 
 	BOOST_CHECK_EQUAL(cf2.get_channels()[0], newc);

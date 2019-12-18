@@ -6058,6 +6058,9 @@ class GatingSet :
     kTransTblFieldNumber = 2,
     kGTransFieldNumber = 5,
     kGuidFieldNumber = 6,
+    kCytolibVerionFieldNumber = 7,
+    kPbVerionFieldNumber = 8,
+    kH5VerionFieldNumber = 9,
     kGlobalBiExpTransFieldNumber = 3,
     kGlobalLinTransFieldNumber = 4,
   };
@@ -6141,6 +6144,66 @@ class GatingSet :
   std::string* _internal_mutable_guid();
   public:
 
+  // optional string cytolib_verion = 7;
+  bool has_cytolib_verion() const;
+  private:
+  bool _internal_has_cytolib_verion() const;
+  public:
+  void clear_cytolib_verion();
+  const std::string& cytolib_verion() const;
+  void set_cytolib_verion(const std::string& value);
+  void set_cytolib_verion(std::string&& value);
+  void set_cytolib_verion(const char* value);
+  void set_cytolib_verion(const char* value, size_t size);
+  std::string* mutable_cytolib_verion();
+  std::string* release_cytolib_verion();
+  void set_allocated_cytolib_verion(std::string* cytolib_verion);
+  private:
+  const std::string& _internal_cytolib_verion() const;
+  void _internal_set_cytolib_verion(const std::string& value);
+  std::string* _internal_mutable_cytolib_verion();
+  public:
+
+  // optional string pb_verion = 8;
+  bool has_pb_verion() const;
+  private:
+  bool _internal_has_pb_verion() const;
+  public:
+  void clear_pb_verion();
+  const std::string& pb_verion() const;
+  void set_pb_verion(const std::string& value);
+  void set_pb_verion(std::string&& value);
+  void set_pb_verion(const char* value);
+  void set_pb_verion(const char* value, size_t size);
+  std::string* mutable_pb_verion();
+  std::string* release_pb_verion();
+  void set_allocated_pb_verion(std::string* pb_verion);
+  private:
+  const std::string& _internal_pb_verion() const;
+  void _internal_set_pb_verion(const std::string& value);
+  std::string* _internal_mutable_pb_verion();
+  public:
+
+  // optional string h5_verion = 9;
+  bool has_h5_verion() const;
+  private:
+  bool _internal_has_h5_verion() const;
+  public:
+  void clear_h5_verion();
+  const std::string& h5_verion() const;
+  void set_h5_verion(const std::string& value);
+  void set_h5_verion(std::string&& value);
+  void set_h5_verion(const char* value);
+  void set_h5_verion(const char* value, size_t size);
+  std::string* mutable_h5_verion();
+  std::string* release_h5_verion();
+  void set_allocated_h5_verion(std::string* h5_verion);
+  private:
+  const std::string& _internal_h5_verion() const;
+  void _internal_set_h5_verion(const std::string& value);
+  std::string* _internal_mutable_h5_verion();
+  public:
+
   // optional uint64 globalBiExpTrans = 3;
   bool has_globalbiexptrans() const;
   private:
@@ -6178,6 +6241,9 @@ class GatingSet :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::TRANS_TBL > trans_tbl_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::trans_local > gtrans_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr guid_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cytolib_verion_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr pb_verion_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr h5_verion_;
   ::PROTOBUF_NAMESPACE_ID::uint64 globalbiexptrans_;
   ::PROTOBUF_NAMESPACE_ID::uint64 globallintrans_;
   friend struct ::TableStruct_GatingSet_2eproto;
@@ -11752,7 +11818,7 @@ GatingSet::mutable_samplename() {
 
 // optional uint64 globalBiExpTrans = 3;
 inline bool GatingSet::_internal_has_globalbiexptrans() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
   return value;
 }
 inline bool GatingSet::has_globalbiexptrans() const {
@@ -11760,7 +11826,7 @@ inline bool GatingSet::has_globalbiexptrans() const {
 }
 inline void GatingSet::clear_globalbiexptrans() {
   globalbiexptrans_ = PROTOBUF_ULONGLONG(0);
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::_internal_globalbiexptrans() const {
   return globalbiexptrans_;
@@ -11770,7 +11836,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::globalbiexptrans() const {
   return _internal_globalbiexptrans();
 }
 inline void GatingSet::_internal_set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000010u;
   globalbiexptrans_ = value;
 }
 inline void GatingSet::set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
@@ -11780,7 +11846,7 @@ inline void GatingSet::set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 valu
 
 // optional uint64 globalLinTrans = 4;
 inline bool GatingSet::_internal_has_globallintrans() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
   return value;
 }
 inline bool GatingSet::has_globallintrans() const {
@@ -11788,7 +11854,7 @@ inline bool GatingSet::has_globallintrans() const {
 }
 inline void GatingSet::clear_globallintrans() {
   globallintrans_ = PROTOBUF_ULONGLONG(0);
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::_internal_globallintrans() const {
   return globallintrans_;
@@ -11798,7 +11864,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::globallintrans() const {
   return _internal_globallintrans();
 }
 inline void GatingSet::_internal_set_globallintrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000020u;
   globallintrans_ = value;
 }
 inline void GatingSet::set_globallintrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
@@ -11914,6 +11980,219 @@ inline void GatingSet::set_allocated_guid(std::string* guid) {
   }
   guid_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), guid);
   // @@protoc_insertion_point(field_set_allocated:pb.GatingSet.guid)
+}
+
+// optional string cytolib_verion = 7;
+inline bool GatingSet::_internal_has_cytolib_verion() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool GatingSet::has_cytolib_verion() const {
+  return _internal_has_cytolib_verion();
+}
+inline void GatingSet::clear_cytolib_verion() {
+  cytolib_verion_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline const std::string& GatingSet::cytolib_verion() const {
+  // @@protoc_insertion_point(field_get:pb.GatingSet.cytolib_verion)
+  return _internal_cytolib_verion();
+}
+inline void GatingSet::set_cytolib_verion(const std::string& value) {
+  _internal_set_cytolib_verion(value);
+  // @@protoc_insertion_point(field_set:pb.GatingSet.cytolib_verion)
+}
+inline std::string* GatingSet::mutable_cytolib_verion() {
+  // @@protoc_insertion_point(field_mutable:pb.GatingSet.cytolib_verion)
+  return _internal_mutable_cytolib_verion();
+}
+inline const std::string& GatingSet::_internal_cytolib_verion() const {
+  return cytolib_verion_.GetNoArena();
+}
+inline void GatingSet::_internal_set_cytolib_verion(const std::string& value) {
+  _has_bits_[0] |= 0x00000002u;
+  cytolib_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void GatingSet::set_cytolib_verion(std::string&& value) {
+  _has_bits_[0] |= 0x00000002u;
+  cytolib_verion_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.cytolib_verion)
+}
+inline void GatingSet::set_cytolib_verion(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000002u;
+  cytolib_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:pb.GatingSet.cytolib_verion)
+}
+inline void GatingSet::set_cytolib_verion(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000002u;
+  cytolib_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.cytolib_verion)
+}
+inline std::string* GatingSet::_internal_mutable_cytolib_verion() {
+  _has_bits_[0] |= 0x00000002u;
+  return cytolib_verion_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* GatingSet::release_cytolib_verion() {
+  // @@protoc_insertion_point(field_release:pb.GatingSet.cytolib_verion)
+  if (!has_cytolib_verion()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return cytolib_verion_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void GatingSet::set_allocated_cytolib_verion(std::string* cytolib_verion) {
+  if (cytolib_verion != nullptr) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  cytolib_verion_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), cytolib_verion);
+  // @@protoc_insertion_point(field_set_allocated:pb.GatingSet.cytolib_verion)
+}
+
+// optional string pb_verion = 8;
+inline bool GatingSet::_internal_has_pb_verion() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool GatingSet::has_pb_verion() const {
+  return _internal_has_pb_verion();
+}
+inline void GatingSet::clear_pb_verion() {
+  pb_verion_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline const std::string& GatingSet::pb_verion() const {
+  // @@protoc_insertion_point(field_get:pb.GatingSet.pb_verion)
+  return _internal_pb_verion();
+}
+inline void GatingSet::set_pb_verion(const std::string& value) {
+  _internal_set_pb_verion(value);
+  // @@protoc_insertion_point(field_set:pb.GatingSet.pb_verion)
+}
+inline std::string* GatingSet::mutable_pb_verion() {
+  // @@protoc_insertion_point(field_mutable:pb.GatingSet.pb_verion)
+  return _internal_mutable_pb_verion();
+}
+inline const std::string& GatingSet::_internal_pb_verion() const {
+  return pb_verion_.GetNoArena();
+}
+inline void GatingSet::_internal_set_pb_verion(const std::string& value) {
+  _has_bits_[0] |= 0x00000004u;
+  pb_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void GatingSet::set_pb_verion(std::string&& value) {
+  _has_bits_[0] |= 0x00000004u;
+  pb_verion_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.pb_verion)
+}
+inline void GatingSet::set_pb_verion(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000004u;
+  pb_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:pb.GatingSet.pb_verion)
+}
+inline void GatingSet::set_pb_verion(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000004u;
+  pb_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.pb_verion)
+}
+inline std::string* GatingSet::_internal_mutable_pb_verion() {
+  _has_bits_[0] |= 0x00000004u;
+  return pb_verion_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* GatingSet::release_pb_verion() {
+  // @@protoc_insertion_point(field_release:pb.GatingSet.pb_verion)
+  if (!has_pb_verion()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000004u;
+  return pb_verion_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void GatingSet::set_allocated_pb_verion(std::string* pb_verion) {
+  if (pb_verion != nullptr) {
+    _has_bits_[0] |= 0x00000004u;
+  } else {
+    _has_bits_[0] &= ~0x00000004u;
+  }
+  pb_verion_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), pb_verion);
+  // @@protoc_insertion_point(field_set_allocated:pb.GatingSet.pb_verion)
+}
+
+// optional string h5_verion = 9;
+inline bool GatingSet::_internal_has_h5_verion() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool GatingSet::has_h5_verion() const {
+  return _internal_has_h5_verion();
+}
+inline void GatingSet::clear_h5_verion() {
+  h5_verion_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline const std::string& GatingSet::h5_verion() const {
+  // @@protoc_insertion_point(field_get:pb.GatingSet.h5_verion)
+  return _internal_h5_verion();
+}
+inline void GatingSet::set_h5_verion(const std::string& value) {
+  _internal_set_h5_verion(value);
+  // @@protoc_insertion_point(field_set:pb.GatingSet.h5_verion)
+}
+inline std::string* GatingSet::mutable_h5_verion() {
+  // @@protoc_insertion_point(field_mutable:pb.GatingSet.h5_verion)
+  return _internal_mutable_h5_verion();
+}
+inline const std::string& GatingSet::_internal_h5_verion() const {
+  return h5_verion_.GetNoArena();
+}
+inline void GatingSet::_internal_set_h5_verion(const std::string& value) {
+  _has_bits_[0] |= 0x00000008u;
+  h5_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void GatingSet::set_h5_verion(std::string&& value) {
+  _has_bits_[0] |= 0x00000008u;
+  h5_verion_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.h5_verion)
+}
+inline void GatingSet::set_h5_verion(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000008u;
+  h5_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:pb.GatingSet.h5_verion)
+}
+inline void GatingSet::set_h5_verion(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000008u;
+  h5_verion_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.h5_verion)
+}
+inline std::string* GatingSet::_internal_mutable_h5_verion() {
+  _has_bits_[0] |= 0x00000008u;
+  return h5_verion_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* GatingSet::release_h5_verion() {
+  // @@protoc_insertion_point(field_release:pb.GatingSet.h5_verion)
+  if (!has_h5_verion()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000008u;
+  return h5_verion_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void GatingSet::set_allocated_h5_verion(std::string* h5_verion) {
+  if (h5_verion != nullptr) {
+    _has_bits_[0] |= 0x00000008u;
+  } else {
+    _has_bits_[0] &= ~0x00000008u;
+  }
+  h5_verion_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), h5_verion);
+  // @@protoc_insertion_point(field_set_allocated:pb.GatingSet.h5_verion)
 }
 
 #ifdef __GNUC__

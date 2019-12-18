@@ -3,6 +3,7 @@
 #include <cytolib/GatingSet.hpp>
 #include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
+#include <cytolib/cytolibConfig.h>
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
@@ -90,6 +91,13 @@ namespace cytolib
 		//empty message for gs
 		pb::GatingSet gs_pb;
 
+		//ver
+		gs_pb.set_cytolib_verion(CYTOLIB_VERSION);
+		gs_pb.set_pb_verion(std::to_string(GOOGLE_PROTOBUF_VERSION));
+		unsigned h5major,h5minor,h5rel;
+		H5::H5Library::getLibVersion(h5major,h5minor,h5rel);
+		string h5ver = std::to_string(h5major) + "." + std::to_string(h5minor) + "." +std::to_string(h5rel);
+		gs_pb.set_h5_verion(h5ver);
 		//uid
 		gs_pb.set_guid(uid_);
 
@@ -135,7 +143,7 @@ namespace cytolib
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
 	 * @param select_sample_idx samples to load
 	 */
-	GatingSet::GatingSet(string path, bool is_skip_data, bool readonly, vector<string> select_samples)
+	GatingSet::GatingSet(string path, bool is_skip_data, bool readonly, vector<string> select_samples, bool print_lib_ver)
 	{
 		fs::path pb_file;
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -179,7 +187,29 @@ namespace cytolib
 			if (!success) {
 				throw(domain_error("Failed to parse GatingSet."));
 			}
+			if(print_lib_ver)
+			{
+				PRINT("The GatingSet was archived by:\n");
+				PRINT("cytolib: ");
+				string cv = pbGS.cytolib_verion();
+				if(cv=="")
+					cv = "unknown";
+				PRINT(cv);
+				PRINT("\n");
+				PRINT("protobuf: ");
+				string pv = pbGS.pb_verion();
+				if(pv=="")
+					pv = "unknown";
+				PRINT(pv);
+				PRINT("\n");
+				PRINT("HDF5: ");
+				string hv = pbGS.h5_verion();
+				if(hv=="")
+					hv = "unknown";
+				PRINT(hv);
+				PRINT("\n");
 
+			}
 			uid_ = pbGS.guid();
 
 			auto nSelect = select_samples.size();

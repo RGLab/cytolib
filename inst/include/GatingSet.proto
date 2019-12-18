@@ -248,6 +248,9 @@ message GatingSet {
 	optional uint64 globalLinTrans = 4;//address of globalLinTrans, the actual object stored in trans_tbl
 	repeated trans_local gTrans = 5;
 	optional string guid = 6;
+	optional string cytolib_verion = 7;
+	optional string pb_verion = 8;
+	optional string h5_verion = 9;
 //	repeated gh_tbl ghs = 7;//gh is separately stored due to the size limit of pb message
 }
 
