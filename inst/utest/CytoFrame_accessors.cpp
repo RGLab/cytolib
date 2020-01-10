@@ -35,13 +35,17 @@ struct CFFixture{
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 BOOST_AUTO_TEST_CASE(profile_get_data)
 {
-	auto fr1 = unique_ptr<MemCytoFrame>(new MemCytoFrame("../flowWorkspace/wsTestSuite/profile_get_data.fcs", config));
-	fr1->read_fcs();
-	auto cfv = CytoFrameView(CytoFramePtr(fr1.release()));
+	auto fr1 = MemCytoFrame("../flowWorkspace/wsTestSuite/profile_get_data.fcs", config);
+	fr1.read_fcs();
 	double start = gettime();
-	auto dat = cfv.get_data();
+	auto dat = fr1.get_data();
 	double runtime = (gettime() - start);
-		cout << runtime << endl;
+	cout << "get a copy: " << runtime << endl;
+
+	start = gettime();
+	auto &dat_ref = fr1.get_data_ref();
+	runtime = (gettime() - start);
+	cout << "get a reference: " << runtime << endl;
 }
 BOOST_AUTO_TEST_CASE(get_time_step)
 {

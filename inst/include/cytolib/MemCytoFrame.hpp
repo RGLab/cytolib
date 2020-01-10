@@ -114,7 +114,10 @@ public:
 	{
 		return data_;
 	}
-
+	EVENT_DATA_VEC & get_data_ref()
+	{
+		return data_;
+	}
 
 	EVENT_DATA_VEC get_data(uvec col_idx) const;
 	/**
