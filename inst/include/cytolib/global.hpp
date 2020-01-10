@@ -76,6 +76,12 @@ namespace cytolib
 	 * @return
 	 */
 	TM_ext parse_time_with_fractional_seconds(const string s_time);
+
+	#ifdef _OPENMP
+#define gettime() omp_get_wtime()
+#else
+#define gettime() clock()/(double)(CLOCKS_PER_SEC / 1000)
+#endif
 };
 
 #endif /* GLOBAL_HPP_ */

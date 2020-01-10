@@ -151,11 +151,7 @@ public:
 
 };
 
-#ifdef _OPENMP
-#define gettime() omp_get_wtime()
-#else
-#define gettime() clock()/(double)(CLOCKS_PER_SEC / 1000)
-#endif
+
 };
 
 
