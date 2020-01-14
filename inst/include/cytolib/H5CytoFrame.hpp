@@ -22,6 +22,8 @@ namespace cytolib
 class H5CytoFrame:public CytoFrame{
 protected:
 	string filename_;
+	H5File h5file;
+	bool core_driver;
 	hsize_t dims[2];              // dataset dimensions
 	//flags indicating if cached meta data needs to be flushed to h5
 	bool is_dirty_params;
@@ -98,12 +100,12 @@ public:
 	 * @param h5_filename
 	 */
 	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename
-			, bool readonly = false);
+			, bool readonly = false, bool is_mem = false );
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, bool readonly = true);
+	H5CytoFrame(const string & h5_filename, bool readonly = true, bool is_mem = false );
 	/**
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */

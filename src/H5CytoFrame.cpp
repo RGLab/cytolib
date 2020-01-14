@@ -10,7 +10,7 @@ namespace cytolib
 {
 	EVENT_DATA_VEC H5CytoFrame::read_data(uvec col_idx) const
 	{
-		H5File file(filename_, default_flags);
+		H5File file = core_driver ? h5file : H5File(filename_, default_flags);
 		auto dataset = file.openDataSet(DATASET_NAME);
 		auto dataspace = dataset.getSpace();
 
@@ -67,7 +67,7 @@ namespace cytolib
 	}
 	void H5CytoFrame::flush_params()
 	{
-		H5File file(filename_, default_flags);
+		H5File file = core_driver ? h5file : H5File(filename_, default_flags);
 
 		CompType param_type = get_h5_datatype_params(DataTypeLocation::MEM);
 		DataSet ds = file.openDataSet("params");
@@ -82,7 +82,7 @@ namespace cytolib
 
 	void H5CytoFrame::flush_keys()
 	{
-		H5File file(filename_, default_flags);
+		H5File file = core_driver ? h5file : H5File(filename_, default_flags);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("keywords");
 		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
@@ -96,7 +96,7 @@ namespace cytolib
 	}
 	void H5CytoFrame::flush_pheno_data()
 	{
-		H5File file(filename_, default_flags);
+		H5File file = core_driver ? h5file : H5File(filename_, default_flags);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("pdata");
 
@@ -113,6 +113,8 @@ namespace cytolib
 	H5CytoFrame::H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
 	{
 		filename_ = frm.filename_;
+		h5file = frm.h5file;
+		core_driver = frm.core_driver;
 		is_dirty_params = frm.is_dirty_params;
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
@@ -128,6 +130,8 @@ namespace cytolib
 //		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(filename_, frm.filename_);
 		swap(dims, frm.dims);
+		swap(h5file, frm.h5file);
+		swap(core_driver, frm.core_driver);
 
 		swap(is_dirty_params, frm.is_dirty_params);
 		swap(is_dirty_keys, frm.is_dirty_keys);
@@ -159,23 +163,31 @@ namespace cytolib
 	 * @param h5_filename
 	 */
 	H5CytoFrame::H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config
-			, const string & h5_filename, bool readonly):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+			, const string & h5_filename, bool readonly, bool is_mem ):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), core_driver(is_mem)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
 		fr.write_h5(h5_filename);
-		*this = H5CytoFrame(h5_filename, readonly);
+		*this = H5CytoFrame(h5_filename, readonly, is_mem);
 	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame::H5CytoFrame(const string & h5_filename, bool readonly):CytoFrame(readonly),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	H5CytoFrame::H5CytoFrame(const string & h5_filename, bool readonly, bool is_mem):CytoFrame(readonly),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), core_driver(is_mem)
 	{
 		//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
-		H5File file(filename_, default_flags);
+		H5File file;
+		FileAccPropList fapl = FileAccPropList();
+		FileCreatPropList fcpl = FileCreatPropList();
+		if( is_mem ){
+			size_t increment = 64000;
+			// For testing, leave backup at false;
+			fapl.setCore(increment, false);
+			h5file = file;
+		}
+		file = H5File(filename_, default_flags, fcpl, fapl);
 		load_meta();
-
 
 		//open dataset for event data
 
@@ -188,7 +200,7 @@ namespace cytolib
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */
 	void H5CytoFrame::load_meta(){
-		H5File file(filename_, default_flags);
+		H5File file = core_driver ? h5file : H5File(filename_, default_flags);
 		DataSet ds_param = file.openDataSet("params");
 	//	DataType param_type = ds_param.getDataType();
 
@@ -359,7 +371,7 @@ namespace cytolib
 			fs::remove(new_filename);
 		}
 		fs::copy_file(filename_, new_filename);
-		CytoFramePtr ptr(new H5CytoFrame(new_filename, false));
+		CytoFramePtr ptr(new H5CytoFrame(new_filename, false, false));
 		//copy cached meta
 		ptr->set_params(get_params());
 		ptr->set_keywords(get_keywords());
@@ -377,7 +389,7 @@ namespace cytolib
 		}
 		MemCytoFrame fr(*this);
 		fr.copy(row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new H5CytoFrame(new_filename, false));
+		return CytoFramePtr(new H5CytoFrame(new_filename, false, false));
 	}
 
 	CytoFramePtr H5CytoFrame::copy(uvec idx, bool is_row_indexed, const string & h5_filename) const
@@ -391,7 +403,7 @@ namespace cytolib
 		}
 		MemCytoFrame fr(*this);
 		fr.copy(idx, is_row_indexed)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new H5CytoFrame(new_filename, false));
+		return CytoFramePtr(new H5CytoFrame(new_filename, false, false));
 	}
 
 	/**
@@ -400,7 +412,7 @@ namespace cytolib
 	 */
 	void H5CytoFrame::set_data(const EVENT_DATA_VEC & _data)
 	{
-		H5File file(filename_, default_flags);
+		H5File file = core_driver ? h5file : H5File(filename_, default_flags);
 		check_write_permission();
 		hsize_t dims_data[2] = {_data.n_cols, _data.n_rows};
 		auto dataset = file.openDataSet(DATASET_NAME);
