@@ -323,8 +323,11 @@ namespace cytolib
 					fs::rename(filename_, h5_filename);
 					break;
 				case H5Option::link:
+				{
+					throw(logic_error("'link' option for H5CytoFrame is no longer supported!"));
 					fs::create_hard_link(filename_, h5_filename);
 					break;
+				}
 				case H5Option::symlink:
 					fs::create_symlink(filename_, h5_filename);
 					break;

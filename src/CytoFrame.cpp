@@ -151,7 +151,7 @@ namespace cytolib
 		{
 			int id = get_col_idx(comp.marker[i], ColType::channel);
 			if(id < 0)
-				throw(domain_error("compensation parameter '" + comp.marker[i] + " not found in cytoframe parameters!"));
+				throw(domain_error("compensation parameter '" + comp.marker[i] + "' not found in cytoframe parameters!"));
 
 			indices[i] = id;
 		}
