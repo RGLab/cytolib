@@ -126,7 +126,6 @@ public:
 	 */
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
-		check_write_permission();
 		data_ = _data;
 	}
 	/**
@@ -135,7 +134,6 @@ public:
 	 */
 	void set_data(EVENT_DATA_VEC && _data)
 	{
-		check_write_permission();
 		swap(data_, _data);
 	}
 	/**

@@ -75,7 +75,8 @@ BOOST_AUTO_TEST_CASE(flags)
 	//update meta data
 	string oldname = fr1->get_channels()[2];
 	string newname = "test";
-	BOOST_CHECK_EXCEPTION(fr1->set_channel(oldname, newname), domain_error,
+	fr1->set_channel(oldname, newname);
+	BOOST_CHECK_EXCEPTION(fr1->flush_params(), domain_error,
 				[](const domain_error & ex) {return string(ex.what()).find("read-only") != string::npos;});
 
 	//save error handler

@@ -66,10 +66,8 @@ protected:
 	vector<cytoParam> params;// parameters coerced from keywords and computed from data for quick query
 	PARAM_MAP channel_vs_idx;//hash map for query by channel
 	PARAM_MAP marker_vs_idx;//hash map for query by marker
-	bool readonly_;//whether allow the public API to modify it, currently only applied to H5 version
 
-	CytoFrame ():readonly_(false){};
-	CytoFrame (bool readonly):readonly_(readonly){};
+	CytoFrame (){};
 	virtual bool is_hashed() const
 	{
 		return channel_vs_idx.size()==n_cols();
@@ -80,7 +78,6 @@ protected:
 	 *
 	 */
 	virtual void build_hash();
-	void check_write_permission();
 public:
 	virtual ~CytoFrame(){};
 //	virtual void close_h5() =0;
@@ -96,8 +93,7 @@ public:
 	compensation get_compensation(const string & key = "SPILL");
 	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const = 0;
 
-	void set_readonly(bool flag){
-		readonly_ = flag;
+	virtual void set_readonly(bool flag){
 	}
 
 	virtual void compensate(const compensation & comp);
@@ -111,8 +107,12 @@ public:
 	{
 		return params;
 	}
+	virtual void set_params(const vector<cytoParam> & _params, bool force = false)
+	{
+		params = _params;
+		build_hash();//update idx table
 
-	virtual void set_params(const vector<cytoParam> & _params, bool force = false);
+	}
 //	virtual void writeFCS(const string & filename);
 
 	FloatType h5_datatype_data(DataTypeLocation storage_type) const;
@@ -168,7 +168,6 @@ public:
 		return keys_;
 	}
 	 virtual void set_keywords(const KEY_WORDS & keys){
-			check_write_permission();
 			keys_ = keys;
 		}
 	/**
@@ -186,7 +185,6 @@ public:
 	 */
 	virtual void set_keyword(const string & key, const string & value)
 	{
-		check_write_permission();
 		keys_[key] = value;
 	}
 
@@ -281,16 +279,13 @@ public:
 	const PDATA & get_pheno_data() const {return pheno_data_;}
 	string get_pheno_data(const string & name) const ;
 	virtual void set_pheno_data(const string & name, const string & value){
-		check_write_permission();
 		pheno_data_[name] = value;
 	}
 	virtual void set_pheno_data(const PDATA & _pd)
 	{
-		check_write_permission();
 		pheno_data_ = _pd;
 	}
 	virtual void del_pheno_data(const string & name){
-		check_write_permission();
 		pheno_data_.erase(name);}
 };
 };

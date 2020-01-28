@@ -24,11 +24,6 @@ namespace cytolib
 			marker_vs_idx[params[i].marker] = i;
 		}
 	}
-	void CytoFrame::check_write_permission(){
-		if(readonly_)
-			throw(domain_error("Can't modify the read-only CytoFrame object!"));
-
-	}
 //	void close_h5() =0;
 	CytoFrame::CytoFrame(const CytoFrame & frm)
 	{
@@ -38,7 +33,6 @@ namespace cytolib
 		params = frm.params;
 		channel_vs_idx = frm.channel_vs_idx;
 		marker_vs_idx = frm.marker_vs_idx;
-		readonly_ = frm.readonly_;
 	}
 
 	CytoFrame & CytoFrame::operator=(const CytoFrame & frm)
@@ -48,7 +42,6 @@ namespace cytolib
 		params = frm.params;
 		channel_vs_idx = frm.channel_vs_idx;
 		marker_vs_idx = frm.marker_vs_idx;
-		readonly_ = frm.readonly_;
 		return *this;
 
 	}
@@ -60,7 +53,6 @@ namespace cytolib
 		swap(params, frm.params);
 		swap(channel_vs_idx, frm.channel_vs_idx);
 		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(readonly_, frm.readonly_);
 		return *this;
 	}
 
@@ -71,7 +63,6 @@ namespace cytolib
 		swap(keys_, frm.keys_);
 		swap(params, frm.params);
 		swap(channel_vs_idx, frm.channel_vs_idx);
-		swap(readonly_, frm.readonly_);
 	}
 
 	compensation CytoFrame::get_compensation(const string & key)
@@ -186,14 +177,7 @@ namespace cytolib
 	}
 
 
-	void CytoFrame::set_params(const vector<cytoParam> & _params, bool force)
-	{
-		if(!force)
-			check_write_permission();
-		params = _params;
-		build_hash();//update idx table
 
-	}
 //	void writeFCS(const string & filename);
 
 	FloatType CytoFrame::h5_datatype_data(DataTypeLocation storage_type) const
@@ -408,7 +392,6 @@ namespace cytolib
 
 	void CytoFrame::set_channels(const CHANNEL_MAP & chnl_map)
 	{
-		check_write_permission();
 		for(auto & it : chnl_map)
 		{
 			try//catch the unmatched col error so that it can proceed the rest
@@ -513,7 +496,6 @@ namespace cytolib
 	}
 	void CytoFrame::set_channel(const string & oldname, const string &newname, bool is_update_keywords)
 	{
-		check_write_permission();
 		int id = get_col_idx(oldname, ColType::channel);
 		if(id<0)
 			throw(domain_error("colname not found: " + oldname));
@@ -542,7 +524,6 @@ namespace cytolib
 
 	void CytoFrame::set_marker(const string & channelname, const string & markername)
 	{
-		check_write_permission();
 		int id = get_col_idx(channelname, ColType::channel);
 		if(id<0)
 			throw(domain_error("channel not found: " + channelname));
@@ -569,7 +550,6 @@ namespace cytolib
 	 */
 	void CytoFrame::set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range
 			, bool is_update_keywords){
-		check_write_permission();
 		int idx = get_col_idx(colname, ctype);
 		if(idx<0)
 			throw(domain_error("colname not found: " + colname));

@@ -67,6 +67,7 @@ namespace cytolib
 	}
 	void H5CytoFrame::flush_params()
 	{
+		check_write_permission();
 		H5File file(filename_, default_flags);
 
 		CompType param_type = get_h5_datatype_params(DataTypeLocation::MEM);
@@ -82,6 +83,7 @@ namespace cytolib
 
 	void H5CytoFrame::flush_keys()
 	{
+		check_write_permission();
 		H5File file(filename_, default_flags);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("keywords");
@@ -96,6 +98,7 @@ namespace cytolib
 	}
 	void H5CytoFrame::flush_pheno_data()
 	{
+		check_write_permission();
 		H5File file(filename_, default_flags);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("pdata");
@@ -110,49 +113,7 @@ namespace cytolib
 		is_dirty_pdata = false;
 	}
 
-	H5CytoFrame::H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
-	{
-		filename_ = frm.filename_;
-		is_dirty_params = frm.is_dirty_params;
-		is_dirty_keys = frm.is_dirty_keys;
-		is_dirty_pdata = frm.is_dirty_pdata;
-		memcpy(dims, frm.dims, sizeof(dims));
 
-	}
-	H5CytoFrame::H5CytoFrame(H5CytoFrame && frm):CytoFrame(frm)
-	{
-//		swap(pheno_data_, frm.pheno_data_);
-//		swap(keys_, frm.keys_);
-//		swap(params, frm.params);
-//		swap(channel_vs_idx, frm.channel_vs_idx);
-//		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(filename_, frm.filename_);
-		swap(dims, frm.dims);
-
-		swap(is_dirty_params, frm.is_dirty_params);
-		swap(is_dirty_keys, frm.is_dirty_keys);
-		swap(is_dirty_pdata, frm.is_dirty_pdata);
-	}
-	H5CytoFrame & H5CytoFrame::operator=(const H5CytoFrame & frm)
-	{
-		CytoFrame::operator=(frm);
-		filename_ = frm.filename_;
-		is_dirty_params = frm.is_dirty_params;
-		is_dirty_keys = frm.is_dirty_keys;
-		is_dirty_pdata = frm.is_dirty_pdata;
-		memcpy(dims, frm.dims, sizeof(dims));
-		return *this;
-	}
-	H5CytoFrame & H5CytoFrame::operator=(H5CytoFrame && frm)
-	{
-		CytoFrame::operator=(frm);
-		swap(filename_, frm.filename_);
-		swap(dims, frm.dims);
-		swap(is_dirty_params, frm.is_dirty_params);
-		swap(is_dirty_keys, frm.is_dirty_keys);
-		swap(is_dirty_pdata, frm.is_dirty_pdata);
-		return *this;
-	}
 	/**
 	 * constructor from FCS
 	 * @param fcs_filename
@@ -170,7 +131,7 @@ namespace cytolib
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame::H5CytoFrame(const string & h5_filename, bool readonly):CytoFrame(readonly),filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	H5CytoFrame::H5CytoFrame(const string & h5_filename, bool readonly):CytoFrame(),filename_(h5_filename), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
 		H5File file(filename_, default_flags);
