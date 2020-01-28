@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(fr1.get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
 
-	fr1 = *fr.copy({}, {});
+	fr1 = *fr.copy({}, true);
 	newname = "test1";
 	fr1.set_channel(oldname, newname);
 	key = fr1.get_keyword("$P3N");
