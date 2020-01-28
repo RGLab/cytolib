@@ -35,6 +35,9 @@ public:
 	void set_readonly(bool flag){
 		get_cytoframe_ptr()->set_readonly(flag);
 	}
+	bool get_readonly(){
+			return get_cytoframe_ptr()->get_readonly();
+		}
 	virtual void flush_meta(){
 		get_cytoframe_ptr()->flush_meta();
 	};

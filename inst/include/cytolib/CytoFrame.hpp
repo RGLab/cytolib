@@ -95,7 +95,9 @@ public:
 
 	virtual void set_readonly(bool flag){
 	}
-
+	virtual bool get_readonly(){
+		return false;
+		}
 	virtual void compensate(const compensation & comp);
 
 	virtual void scale_time_channel(string time_channel = "time");
@@ -107,7 +109,7 @@ public:
 	{
 		return params;
 	}
-	virtual void set_params(const vector<cytoParam> & _params, bool force = false)
+	virtual void set_params(const vector<cytoParam> & _params)
 	{
 		params = _params;
 		build_hash();//update idx table

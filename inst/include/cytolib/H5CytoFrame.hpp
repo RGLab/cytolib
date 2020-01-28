@@ -39,6 +39,9 @@ public:
 	void set_readonly(bool flag){
 		readonly_ = flag;
 	}
+	bool get_readonly(){
+		return readonly_ ;
+	}
 	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
 	{
 		filename_ = frm.filename_;
@@ -91,10 +94,8 @@ public:
 				return dims[1];
 		}
 
-	void set_params(const vector<cytoParam> & _params, bool force)
+	void set_params(const vector<cytoParam> & _params)
 	{
-		if(!force)
-			check_write_permission();
 		CytoFrame::set_params(_params);
 		is_dirty_params = true;
 

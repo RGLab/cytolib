@@ -207,7 +207,7 @@ namespace cytolib
 			params[i].PnE[1] = pvec[i].PnE[1];
 			params[i].PnB = pvec[i].PnB;
 		}
-		CytoFrame::set_params(params, true);
+		CytoFrame::set_params(params);
 		is_dirty_params = false;
 		/*
 		 * read keywords
