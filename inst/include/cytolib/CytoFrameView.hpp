@@ -50,7 +50,17 @@ public:
 	vector<string> get_channels() const;
 	vector<string> get_markers() const;
 	void set_channels(const CHANNEL_MAP & chnl_map){get_cytoframe_ptr()->set_channels(chnl_map);}
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);};
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{
+		if(is_row_indexed_ || is_col_indexed_)
+		{
+			if(h5_opt != H5Option::copy)
+				throw(domain_error("Only 'copy' H5Option is supported for the indexed CytoFrameView object!"));
+			copy_realized(h5_filename);
+			h5_opt = H5Option::skip;
+		}
+
+		get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
+	};
 	void set_channel(const string & oldname, const string &newname)
 	{
 		get_cytoframe_ptr()->set_channel(oldname, newname);
