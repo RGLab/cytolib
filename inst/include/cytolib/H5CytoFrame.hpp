@@ -23,6 +23,7 @@ class H5CytoFrame:public CytoFrame{
 protected:
 	string filename_;
 	hsize_t dims[2];              // dataset dimensions
+	bool readonly_;//whether allow the public API to modify it, can't rely on h5 flag mechanism since its behavior is uncerntain for multiple opennings
 	//flags indicating if cached meta data needs to be flushed to h5
 	bool is_dirty_params;
 	bool is_dirty_keys;
@@ -35,11 +36,60 @@ public:
 
 	void flush_keys();
 	void flush_pheno_data();
+	void set_readonly(bool flag){
+		readonly_ = flag;
+	}
+	bool get_readonly(){
+		return readonly_ ;
+	}
+	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
+	{
+		filename_ = frm.filename_;
+		is_dirty_params = frm.is_dirty_params;
+		is_dirty_keys = frm.is_dirty_keys;
+		is_dirty_pdata = frm.is_dirty_pdata;
+		readonly_ = frm.readonly_;
+		memcpy(dims, frm.dims, sizeof(dims));
 
-	H5CytoFrame(const H5CytoFrame & frm);
-	H5CytoFrame(H5CytoFrame && frm);
-	H5CytoFrame & operator=(const H5CytoFrame & frm);
-	H5CytoFrame & operator=(H5CytoFrame && frm);
+	}
+	H5CytoFrame(H5CytoFrame && frm):CytoFrame(frm)
+	{
+//		swap(pheno_data_, frm.pheno_data_);
+//		swap(keys_, frm.keys_);
+//		swap(params, frm.params);
+//		swap(channel_vs_idx, frm.channel_vs_idx);
+//		swap(marker_vs_idx, frm.marker_vs_idx);
+		swap(filename_, frm.filename_);
+		swap(dims, frm.dims);
+
+		swap(readonly_, frm.readonly_);
+		swap(is_dirty_params, frm.is_dirty_params);
+		swap(is_dirty_keys, frm.is_dirty_keys);
+		swap(is_dirty_pdata, frm.is_dirty_pdata);
+	}
+	H5CytoFrame & operator=(const H5CytoFrame & frm)
+	{
+		CytoFrame::operator=(frm);
+		filename_ = frm.filename_;
+		is_dirty_params = frm.is_dirty_params;
+		is_dirty_keys = frm.is_dirty_keys;
+		is_dirty_pdata = frm.is_dirty_pdata;
+		readonly_ = frm.readonly_;
+		memcpy(dims, frm.dims, sizeof(dims));
+		return *this;
+	}
+	H5CytoFrame & operator=(H5CytoFrame && frm)
+	{
+		CytoFrame::operator=(frm);
+		swap(filename_, frm.filename_);
+		swap(dims, frm.dims);
+		swap(is_dirty_params, frm.is_dirty_params);
+		swap(is_dirty_keys, frm.is_dirty_keys);
+		swap(is_dirty_pdata, frm.is_dirty_pdata);
+		swap(readonly_, frm.readonly_);
+		return *this;
+	}
+
 	unsigned n_rows() const{
 				return dims[1];
 		}
@@ -111,6 +161,11 @@ public:
 
 	string get_h5_file_path() const{
 		return filename_;
+	}
+	void check_write_permission(){
+		if(readonly_)
+			throw(domain_error("Can't write to the read-only H5CytoFrame object!"));
+
 	}
 
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const;

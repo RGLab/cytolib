@@ -114,7 +114,10 @@ public:
 	{
 		return data_;
 	}
-
+	EVENT_DATA_VEC & get_data_ref()
+	{
+		return data_;
+	}
 
 	EVENT_DATA_VEC get_data(uvec col_idx) const;
 	/**
@@ -123,7 +126,6 @@ public:
 	 */
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
-		check_write_permission();
 		data_ = _data;
 	}
 	/**
@@ -132,7 +134,6 @@ public:
 	 */
 	void set_data(EVENT_DATA_VEC && _data)
 	{
-		check_write_permission();
 		swap(data_, _data);
 	}
 	/**
@@ -151,11 +152,7 @@ public:
 
 };
 
-#ifdef _OPENMP
-#define gettime() omp_get_wtime()
-#else
-#define gettime() clock()/(double)(CLOCKS_PER_SEC / 1000)
-#endif
+
 };
 
 

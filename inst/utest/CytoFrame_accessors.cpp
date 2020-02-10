@@ -33,7 +33,20 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+BOOST_AUTO_TEST_CASE(profile_get_data)
+{
+	auto fr1 = MemCytoFrame("../flowWorkspace/wsTestSuite/profile_get_data.fcs", config);
+	fr1.read_fcs();
+	double start = gettime();
+	auto dat = fr1.get_data();
+	double runtime = (gettime() - start);
+	cout << "get a copy: " << runtime << endl;
 
+	start = gettime();
+	auto &dat_ref = fr1.get_data_ref();
+	runtime = (gettime() - start);
+	cout << "get a reference: " << runtime << endl;
+}
 BOOST_AUTO_TEST_CASE(get_time_step)
 {
 	auto fr1 = MemCytoFrame("../flowWorkspace/output/s5a01.fcs", config);
@@ -62,7 +75,8 @@ BOOST_AUTO_TEST_CASE(flags)
 	//update meta data
 	string oldname = fr1->get_channels()[2];
 	string newname = "test";
-	BOOST_CHECK_EXCEPTION(fr1->set_channel(oldname, newname), domain_error,
+	fr1->set_channel(oldname, newname);
+	BOOST_CHECK_EXCEPTION(fr1->flush_params(), domain_error,
 				[](const domain_error & ex) {return string(ex.what()).find("read-only") != string::npos;});
 
 	//save error handler
@@ -187,7 +201,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(fr1.get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
 
-	fr1 = *fr.copy({}, {});
+	fr1 = *fr.copy({}, true);
 	newname = "test1";
 	fr1.set_channel(oldname, newname);
 	key = fr1.get_keyword("$P3N");

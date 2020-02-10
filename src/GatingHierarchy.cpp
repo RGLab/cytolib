@@ -296,7 +296,11 @@ namespace cytolib
 		if(!is_skip_data)
 		{
 			pb::CytoFrame * fr_pb = gh_pb.mutable_frame();
+			bool flag = frame_.get_readonly();//get lock status
+			frame_.set_readonly(false);//temporary unlock it
 			frame_.flush_meta();
+			frame_.set_readonly(flag);//restore the lock
+
 			frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
 		}
 
