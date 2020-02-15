@@ -1,10 +1,6 @@
 // Copyright 2019 Fred Hutchinson Cancer Research Center
 // See the included LICENSE file for details on the licence that is granted to the user of this software.
 #include <cytolib/H5CytoFrame.hpp>
-#include <cytolib/global.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-
 
 namespace cytolib
 {
@@ -316,6 +312,7 @@ namespace cytolib
 
 	CytoFramePtr H5CytoFrame::copy(const string & h5_filename) const
 	{
+		copy_overwrite_check(h5_filename);
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
@@ -333,6 +330,7 @@ namespace cytolib
 	CytoFramePtr H5CytoFrame::copy(uvec row_idx, uvec col_idx, const string & h5_filename) const
 	{
 
+		copy_overwrite_check(h5_filename);
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
@@ -347,6 +345,7 @@ namespace cytolib
 	CytoFramePtr H5CytoFrame::copy(uvec idx, bool is_row_indexed, const string & h5_filename) const
 	{
 		
+		copy_overwrite_check(h5_filename);
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{

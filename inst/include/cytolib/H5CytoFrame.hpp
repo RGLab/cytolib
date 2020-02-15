@@ -10,7 +10,9 @@
 #ifndef INST_INCLUDE_CYTOLIB_H5CYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_H5CYTOFRAME_HPP_
 #include <cytolib/MemCytoFrame.hpp>
-
+#include <cytolib/global.hpp>
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 namespace cytolib
 {
@@ -186,6 +188,15 @@ public:
 	EVENT_DATA_VEC get_data(uvec col_idx) const
 	{
 		return read_data(col_idx);
+	}
+	/*
+	 * protect the h5 from being overwritten accidentally
+	 * which will make the original cf object invalid
+	 */
+	void copy_overwrite_check(const string & dest) const
+	{
+		if(fs::equivalent(fs::path(filename_), fs::path(dest)))
+			throw(domain_error("Copying H5CytoFrame to itself is not supported! "+ dest));
 	}
 
 	CytoFramePtr copy(const string & h5_filename = "") const;

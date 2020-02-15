@@ -4,8 +4,6 @@
 #include <cytolib/GatingSet.hpp>
 #include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
 
 #include "fixture.hpp"
 using namespace cytolib;
@@ -17,7 +15,7 @@ struct CFFixture{
 		fr = MemCytoFrame(file_path, config);
 		fr.read_fcs();
 		//create h5 version
-		string tmp = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
+		string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 //		cout << tmp << endl;
 		fr.write_h5(tmp);
 		fr_h5.reset(new H5CytoFrame(tmp));
@@ -215,7 +213,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(fr2->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
 
-	string tmp = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
+	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 	fr2 = fr_h5->copy({1,2,3}, {1,2}, tmp);//channel order may change
 	fr2->set_channel(oldname, newname);
 	key = fr2->get_keyword("$P3N");
@@ -267,7 +265,7 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 {
 	//deep cp
 	CytoFramePtr fr1 = fr_h5->copy();
-
+//	fr1->copy(fr1->get_h5_file_path());
 	//update meta data
 	string oldname = fr1->get_channels()[2];
 	string newname = "test";
