@@ -260,40 +260,6 @@ namespace cytolib
 
 	}
 
-	void H5CytoFrame::convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
-	{
-		fr_pb.set_is_h5(true);
-		if(h5_opt != H5Option::skip)
-		{
-			auto dest = fs::path(h5_filename).parent_path();
-			if(!fs::exists(dest))
-				throw(logic_error(dest.string() + "doesn't exist!"));
-
-			if(!fs::equivalent(fs::path(filename_).parent_path(), dest))
-			{
-				switch(h5_opt)
-				{
-				case H5Option::copy:
-					fs::copy(filename_, h5_filename);
-					break;
-				case H5Option::move:
-					fs::rename(filename_, h5_filename);
-					break;
-				case H5Option::link:
-				{
-					throw(logic_error("'link' option for H5CytoFrame is no longer supported!"));
-					fs::create_hard_link(filename_, h5_filename);
-					break;
-				}
-				case H5Option::symlink:
-					fs::create_symlink(filename_, h5_filename);
-					break;
-				default:
-					throw(logic_error("invalid h5_opt!"));
-				}
-			}
-		}
-	}
 
 	/**
 	 * Read data from disk.
@@ -310,52 +276,6 @@ namespace cytolib
 		return read_data(col_idx);
 	}
 
-	CytoFramePtr H5CytoFrame::copy(const string & h5_filename) const
-	{
-		copy_overwrite_check(h5_filename);
-		string new_filename = h5_filename;
-		if(new_filename == "")
-		{
-			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-			fs::remove(new_filename);
-		}
-		fs::copy_file(filename_, new_filename);
-		CytoFramePtr ptr(new H5CytoFrame(new_filename, false));
-		//copy cached meta
-		ptr->set_params(get_params());
-		ptr->set_keywords(get_keywords());
-		ptr->set_pheno_data(get_pheno_data());
-		return ptr;
-	}
-	CytoFramePtr H5CytoFrame::copy(uvec row_idx, uvec col_idx, const string & h5_filename) const
-	{
-
-		copy_overwrite_check(h5_filename);
-		string new_filename = h5_filename;
-		if(new_filename == "")
-		{
-			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-			fs::remove(new_filename);
-		}
-		MemCytoFrame fr(*this);
-		fr.copy(row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new H5CytoFrame(new_filename, false));
-	}
-
-	CytoFramePtr H5CytoFrame::copy(uvec idx, bool is_row_indexed, const string & h5_filename) const
-	{
-		
-		copy_overwrite_check(h5_filename);
-		string new_filename = h5_filename;
-		if(new_filename == "")
-		{
-			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-			fs::remove(new_filename);
-		}
-		MemCytoFrame fr(*this);
-		fr.copy(idx, is_row_indexed)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new H5CytoFrame(new_filename, false));
-	}
 
 	/**
 	 * copy setter
