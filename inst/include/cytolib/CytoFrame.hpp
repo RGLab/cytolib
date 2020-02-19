@@ -269,9 +269,9 @@ public:
 	 */
 	EVENT_DATA_TYPE get_time_step(const string time_channel) const;
 
-	virtual CytoFramePtr copy(const string & h5_filename = "") const=0;
-	virtual CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "") const=0;
-	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "") const=0;
+	virtual CytoFramePtr copy(const string & h5_filename = "", bool overwrite = false) const=0;
+	virtual CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "", bool overwrite = false) const=0;
+	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "", bool overwrite = false) const=0;
 	
 	
 	virtual string get_h5_file_path() const=0;

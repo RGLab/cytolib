@@ -53,13 +53,29 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
-			if(h5_opt != H5Option::copy)
-				throw(domain_error("Only 'copy' H5Option is supported for the indexed CytoFrameView object!"));
-			copy_realized(h5_filename);
-			h5_opt = H5Option::skip;
-		}
+			if(h5_opt == H5Option::copy)
+			{
+				//write view to h5
+				copy_realized(h5_filename, true);
+				//save the rest data structure to pb
+				h5_opt = H5Option::skip;
+				get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
 
-		get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
+			}
+			else if(h5_opt == H5Option::move)
+			{
+				//mv the h5
+				get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
+				//write view to h5
+				copy_realized(h5_filename, true);
+
+			}
+			else
+				throw(domain_error("Only 'copy' or 'move' H5Option is supported for the indexed CytoFrameView object!"));
+		}
+		else
+			get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
+
 	};
 	void set_channel(const string & oldname, const string &newname)
 	{
@@ -190,16 +206,16 @@ public:
 	 * Realize the delayed subsetting (i.e. cols() and rows()) operations to the underlying data
 	 * and clear the view
 	 */
-	CytoFrameView copy_realized(const string & h5_filename = "") const
+	CytoFrameView copy_realized(const string & h5_filename = "", bool overwrite = false) const
 	{
 		if(is_row_indexed_ && is_col_indexed_){
-			return get_cytoframe_ptr()->copy(row_idx_, col_idx_, h5_filename);
+			return get_cytoframe_ptr()->copy(row_idx_, col_idx_, h5_filename, overwrite);
 		}else if(is_row_indexed_){
-			return get_cytoframe_ptr()->copy(row_idx_, true, h5_filename);
+			return get_cytoframe_ptr()->copy(row_idx_, true, h5_filename, overwrite);
 		}else if(is_col_indexed_){
-			return get_cytoframe_ptr()->copy(col_idx_, false, h5_filename);
+			return get_cytoframe_ptr()->copy(col_idx_, false, h5_filename, overwrite);
 		}else{
-			return get_cytoframe_ptr()->copy(h5_filename);
+			return get_cytoframe_ptr()->copy(h5_filename, overwrite);
 		}
 	}
 	void set_data(const EVENT_DATA_VEC & data_in);

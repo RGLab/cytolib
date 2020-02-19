@@ -1034,23 +1034,6 @@ namespace cytolib
 		}
 	}
 
-	CytoFramePtr MemCytoFrame::copy(uvec idx, bool is_row_indexed, const string & h5_filename) const
-	{
-		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
-		ptr->set_readonly(false);
-		ptr->realize_(idx, is_row_indexed);
-		
-		return CytoFramePtr(ptr.release());
-	}
-
-	CytoFramePtr MemCytoFrame::copy(uvec row_idx, uvec col_idx, const string & h5_filename) const
-	{
-		unique_ptr<MemCytoFrame> ptr(new MemCytoFrame(*this));
-		ptr->set_readonly(false);
-		ptr->realize_(row_idx, col_idx);
-
-		return CytoFramePtr(ptr.release());
-	}
 
 
 

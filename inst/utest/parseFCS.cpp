@@ -3,8 +3,6 @@
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/H5CytoFrame.hpp>
 #include "fixture.hpp"
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
 #include <cytolib/global.hpp>
 using namespace cytolib;
 
@@ -36,7 +34,7 @@ BOOST_AUTO_TEST_CASE(sample_1071)
 	BOOST_CHECK_EQUAL(cytofrm.n_rows(), 23981);
 //	BOOST_CHECK_EQUAL_COLLECTIONS(myTest.isEqual.begin(), myTest.isEqual.end(),isTrue.begin(), isTrue.end());
 
-	string h5file = generate_unique_filename(fs::temp_directory_path(), "", ".h5");
+	string h5file = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 	cytofrm.write_h5(h5file);
 	H5CytoFrame h5fr(h5file);
 	BOOST_CHECK_EQUAL(h5fr.n_cols(), 8);
