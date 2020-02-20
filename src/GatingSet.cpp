@@ -619,6 +619,27 @@ namespace cytolib
 	CytoFrameView & GatingSet::add_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 		if(!is_cytoFrame_only())
 			throw(domain_error("Can't add cytoframes to gs when it is not data-only object! "));
+		//validity check
+		if(size()>0)
+		{
+			string msg = "Found channel inconsistency across samples. ";
+			auto c1 = get_channels();
+			unordered_set<string> old_ch(c1.begin(), c1.end());
+			auto c2 = frame_view.get_channels();
+			unordered_set<string> new_ch(c2.begin(), c2.end());
+			for(auto ch : c1)
+			{
+				if(new_ch.find(ch) == new_ch.end())
+					throw(domain_error(msg + "'" + ch + "' is missing from "  + sample_uid));
+
+			}
+			for(auto ch : c2)
+			{
+				if(old_ch.find(ch) == old_ch.end())
+					throw(domain_error(msg + sample_uid + " has the channel '" + ch + "' that is not found in other samples!"));
+
+			}
+		}
 		GatingHierarchyPtr gh = add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(frame_view)), sample_uid);
 		return gh->get_cytoframe_view_ref();
 
