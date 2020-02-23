@@ -81,6 +81,22 @@ public:
 	{
 		get_cytoframe_ptr()->set_channel(oldname, newname);
 	}
+	void set_channels(const vector<string> & channels)
+	{
+		auto n1 = n_cols();
+		auto n2 = channels.size();
+		if(n2!=n1)
+			throw(domain_error("The size of the input of 'set_channels' (" + to_string(n2) + ") is different from the original one (" + to_string(n1) + ")"));
+		//update the original vector of channels
+		auto idx = get_original_col_ids();
+		auto old = get_cytoframe_ptr()->get_channels();
+		for(unsigned i = 0; i < n1; i++)
+		{
+			old[idx[i]] = channels[i];
+		}
+		//update the cf
+		get_cytoframe_ptr()->set_channels(old);
+	}
 	string get_marker(const string & channel)
 	{
 		return get_cytoframe_ptr()->get_marker(channel);

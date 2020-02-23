@@ -220,6 +220,36 @@ public:
 
 	virtual void set_channels(const CHANNEL_MAP & chnl_map);
 	/**
+	 * Replace the entire channels
+	 * It is to address the issue of rotating the original channels which
+	 * can't be handled by one-by-one setter set_channel() API due to its duplication checks
+	 * @param channels
+	 */
+	virtual void set_channels(const vector<string> & channels)
+	{
+		auto n1 = n_cols();
+		auto n2 = channels.size();
+		if(n2!=n1)
+			throw(domain_error("The size of the input of 'set_channels' (" + to_string(n2) + ") is different from the original one (" + to_string(n1) + ")"));
+		//duplication check
+		set<string> tmp(channels.begin(), channels.end());
+		if(tmp.size() < n1)
+			throw(domain_error("The input of 'set_channels' has duplicates!"));
+		for(unsigned i = 0; i < n1; i++)
+		{
+			params[i].channel = channels[i];
+		}
+		build_hash();
+		//update_keywords
+		for(unsigned i = 0; i < n1; i++)
+		{
+			auto kn = "$P" + to_string(i+1) + "N";
+			set_keyword(kn, channels[i]);
+		}
+
+
+	}
+	/**
 	 * get all the marker names
 	 * @return
 	 */
