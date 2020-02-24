@@ -78,7 +78,7 @@ public:
 						while( !chnl.second.empty()){
 							dup_idx = chnl.second.front();
 							chnl.second.pop();
-							marker[dup_idx] = marker[dup_idx] + "-" + to_string(suffix++);
+							marker[dup_idx] = marker[dup_idx] + "-" + std::to_string(suffix++);
 						}
 					}
 				}
@@ -90,6 +90,22 @@ public:
 
 		}
 
+	}
+	/**
+	 * convert spillover matrix to FCS keyword string
+	 * @return
+	 */
+	string to_string() const
+	{
+		auto n = marker.size();
+		string res = std::to_string(n);
+		for(auto c : marker)
+		{
+			res += "," + c;
+		}
+		for(auto i : spillOver)
+			res += "," + std::to_string(i);
+		return res;
 	}
 	/**
 	 * convert spillover matrix from row-majored std::vector
