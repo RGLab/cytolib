@@ -14,6 +14,9 @@ using namespace arma;
 
 #include "readFCSHeader.hpp"
 #include "compensation.hpp"
+#include <boost/lexical_cast.hpp>
+#include <cytolib/global.hpp>
+#include <unordered_map>
 
 #include <H5Cpp.h>
 using namespace H5;
@@ -90,7 +93,20 @@ public:
 
 	CytoFrame(CytoFrame && frm);
 
-	compensation get_compensation(const string & key = "SPILL");
+
+	compensation get_compensation(const string & key = "SPILL")
+		{
+			compensation comp;
+
+			if(keys_.find(key)!=keys_.end())
+			{
+				string val = keys_[key];
+				comp = compensation(val);
+			}
+			return comp;
+		}
+
+
 	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const = 0;
 
 	virtual void set_readonly(bool flag){

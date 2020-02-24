@@ -181,8 +181,8 @@ namespace cytolib
 					data_orig = data_in;
 				
 				
-				//write back to ptr_
-				get_cytoframe_ptr()->set_data(data_orig);
+			//write back to ptr_
+			get_cytoframe_ptr()->set_data(data_orig);
 		}
 	}
 	EVENT_DATA_VEC CytoFrameView::get_data() const
