@@ -233,8 +233,58 @@ public:
 	 * @return
 	 */
 	virtual vector<string> get_channels() const;
+	virtual void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true)
+	{
+		int id = get_col_idx(oldname, ColType::channel);
+		if(id<0)
+			throw(domain_error("colname not found: " + oldname));
+		if(oldname!=newname)
+		{
 
-	virtual void set_channels(const CHANNEL_MAP & chnl_map);
+			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT(oldname + "-->"  + newname + "\n");
+			int id1 = get_col_idx(newname, ColType::channel);
+			if(id1>=0&&id1!=id)
+				throw(domain_error("colname already exists: " + newname));
+			params[id].channel=newname;
+			channel_vs_idx.erase(oldname);
+			channel_vs_idx[newname] = id;
+
+			//update keywords(linear time, not sure how to improve it other than optionally skip it
+			if(is_update_keywords)
+			{
+				for(auto & it : keys_)
+					if(it.second == oldname)
+						it.second = newname;
+
+				for(auto k : spillover_keys)
+				{
+					auto s = get_keyword(k);
+					if(s!="")
+					{
+						boost::replace_all(s, oldname, newname);
+						set_keyword(k, s);
+					}
+				}
+			}
+
+		}
+	}
+	virtual void set_channels(const CHANNEL_MAP & chnl_map)	{
+		for(auto & it : chnl_map)
+		{
+			try//catch the unmatched col error so that it can proceed the rest
+			{
+				set_channel(it.first, it.second);
+			}catch (const domain_error & e){
+				string msg = e.what();
+				if(msg.find("colname not found") == string::npos)
+					throw(e);
+			}
+
+		}
+
+	}
 	/**
 	 * Replace the entire channels
 	 * It is to address the issue of rotating the original channels which
@@ -243,6 +293,8 @@ public:
 	 */
 	virtual void set_channels(const vector<string> & channels)
 	{
+		auto old = get_channels();
+
 		auto n1 = n_cols();
 		auto n2 = channels.size();
 		if(n2!=n1)
@@ -261,9 +313,30 @@ public:
 		{
 			auto kn = "$P" + to_string(i+1) + "N";
 			set_keyword(kn, channels[i]);
+		}//TODO: also sync other keywords that contains channel info
+
+		//spillover
+		for(auto k : spillover_keys)
+		{
+			auto s = get_keyword(k);
+			if(s!="")
+			{
+				//can't simply match/replace substr since channels might be ordered differently from the one in spillover keywords
+				//parse the channels info from keyword
+				auto comp = compensation(s);
+				for(auto & c: comp.marker)
+				{
+					auto it = find(old.begin(), old.end(), c);
+					if(it==old.end())
+						throw(domain_error(c + " is in spillover matrix but not found in cytoframe!"));
+					auto idx = std::distance(old.begin(), it);
+					c = channels[idx]; //set it to the equivalent new value
+				}
+				//recollapse it to text
+				s = comp.to_string();
+				set_keyword(k, s);
+			}
 		}
-
-
 	}
 	/**
 	 * get all the marker names
@@ -286,7 +359,6 @@ public:
 	 */
 	virtual int get_col_idx(const string & colname, ColType type) const;
 	uvec get_col_idx(vector<string> colnames, ColType col_type) const;
-	virtual void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true);
 
 	virtual void set_marker(const string & channelname, const string & markername);
 

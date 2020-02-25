@@ -327,22 +327,7 @@ namespace cytolib
 		return res;
 	}
 
-	void CytoFrame::set_channels(const CHANNEL_MAP & chnl_map)
-	{
-		for(auto & it : chnl_map)
-		{
-			try//catch the unmatched col error so that it can proceed the rest
-			{
-				set_channel(it.first, it.second);
-			}catch (const domain_error & e){
-				string msg = e.what();
-				if(msg.find("colname not found") == string::npos)
-					throw(e);
-			}
 
-		}
-
-	}
 	/**
 	 * get all the marker names
 	 * @return
@@ -431,33 +416,7 @@ namespace cytolib
 		}
 		return col_idx;
 	}
-	void CytoFrame::set_channel(const string & oldname, const string &newname, bool is_update_keywords)
-	{
-		int id = get_col_idx(oldname, ColType::channel);
-		if(id<0)
-			throw(domain_error("colname not found: " + oldname));
-		if(oldname!=newname)
-		{
 
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT(oldname + "-->"  + newname + "\n");
-			int id1 = get_col_idx(newname, ColType::channel);
-			if(id1>=0&&id1!=id)
-				throw(domain_error("colname already exists: " + newname));
-			params[id].channel=newname;
-			channel_vs_idx.erase(oldname);
-			channel_vs_idx[newname] = id;
-
-			//update keywords(linear time, not sure how to improve it other than optionally skip it
-			if(is_update_keywords)
-			{
-				for(auto & it : keys_)
-					if(it.second == oldname)
-						it.second = newname;
-			}
-
-		}
-	}
 
 	void CytoFrame::set_marker(const string & channelname, const string & markername)
 	{
