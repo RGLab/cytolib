@@ -53,21 +53,13 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
-			if(h5_opt == H5Option::copy)
+			if(h5_opt == H5Option::copy||h5_opt == H5Option::move)
 			{
 				//write view to h5
 				copy_realized(h5_filename, true);
 				//save the rest data structure to pb
 				h5_opt = H5Option::skip;
 				get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
-
-			}
-			else if(h5_opt == H5Option::move)
-			{
-				//mv the h5
-				get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
-				//write view to h5
-				copy_realized(h5_filename, true);
 
 			}
 			else
