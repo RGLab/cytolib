@@ -81,7 +81,7 @@ public:
 	{
 		get_cytoframe_ptr()->set_channel(oldname, newname);
 	}
-	void set_channels(const vector<string> & channels)
+	int set_channels(const vector<string> & channels)
 	{
 		auto n1 = n_cols();
 		auto n2 = channels.size();
@@ -95,7 +95,7 @@ public:
 			old[idx[i]] = channels[i];
 		}
 		//update the cf
-		get_cytoframe_ptr()->set_channels(old);
+		return get_cytoframe_ptr()->set_channels(old);
 	}
 	string get_marker(const string & channel)
 	{

@@ -291,7 +291,7 @@ public:
 	 * can't be handled by one-by-one setter set_channel() API due to its duplication checks
 	 * @param channels
 	 */
-	virtual void set_channels(const vector<string> & channels)
+	virtual int set_channels(const vector<string> & channels)
 	{
 		auto old = get_channels();
 
@@ -328,7 +328,10 @@ public:
 				{
 					auto it = find(old.begin(), old.end(), c);
 					if(it==old.end())
-						throw(domain_error(c + " is in spillover matrix but not found in cytoframe!"));
+					{
+						return -1;
+//						throw(domain_error(c + " is in spillover matrix but not found in cytoframe!"));
+					}
 					auto idx = std::distance(old.begin(), it);
 					c = channels[idx]; //set it to the equivalent new value
 				}
@@ -337,6 +340,7 @@ public:
 				set_keyword(k, s);
 			}
 		}
+		return 0;
 	}
 	/**
 	 * get all the marker names
