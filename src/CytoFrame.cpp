@@ -425,13 +425,13 @@ namespace cytolib
 			throw(domain_error("channel not found: " + channelname));
                 string oldmarkername = params[id].marker;
 		if(oldmarkername!=markername)
-		{
-			if(markername.size() > 0)
-			{
-				int id1 = get_col_idx(markername, ColType::marker);
-				if(id1>=0&&id1!=id)
-					throw(domain_error("marker already exists: " + markername));
-			}
+		{//skip duplication check at this level because we need to handle rotation case
+//			if(markername.size() > 0)
+//			{
+//				int id1 = get_col_idx(markername, ColType::marker);
+//				if(id1>=0&&id1!=id)
+//					throw(domain_error("marker already exists: " + markername));
+//			}
 			params[id].marker=markername;
 			marker_vs_idx.erase(oldmarkername);
 			marker_vs_idx[markername] = id;
