@@ -16,6 +16,7 @@
 #include <ctype.h>
 #include <vector>
 #include <chrono>
+#include <unordered_set>
 #include "datatype.hpp"
 using namespace std;
 
@@ -57,6 +58,33 @@ namespace cytolib
 	string path_dir_name(const string & full_path);
 	string path_base_name(const string & full_path);
 
+	/**
+	 *
+	 * @param oldv the existing data
+	 * @param newv the new data to be checked
+	 * @param sample_uid the sample name of the new data
+	 */
+	template<class T1, class T2> void channel_consistency_check(const T1 & oldv, const T2 & newv, const string & sample_uid)
+	{
+		string msg = "Found channel inconsistency across samples. ";
+		auto c1 = oldv.get_channels();
+		unordered_set<string> old_ch(c1.begin(), c1.end());
+		auto c2 = newv.get_channels();
+		unordered_set<string> new_ch(c2.begin(), c2.end());
+		for(auto ch : c1)
+		{
+			if(new_ch.find(ch) == new_ch.end())
+				throw(domain_error(msg + "'" + ch + "' is missing from "  + sample_uid));
+
+		}
+		for(auto ch : c2)
+		{
+			if(old_ch.find(ch) == old_ch.end())
+				throw(domain_error(msg + sample_uid + " has the channel '" + ch + "' that is not found in other samples!"));
+
+		}
+
+	}
 	struct TM_ext
 	{
 		tm _time;

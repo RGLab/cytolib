@@ -532,7 +532,7 @@ namespace cytolib
 	}
 	GatingHierarchyPtr GatingSet::add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
 			if(ghs_.find(sample_uid)!=ghs_.end())
-				throw(domain_error("Can't add new GatingHierarchy since it already exists for: " + sample_uid));
+				throw(domain_error("Can't add new sample since it already exists for: " + sample_uid));
 			ghs_[sample_uid] = gh;
 			sample_names_.push_back(sample_uid);
 			return ghs_[sample_uid];
@@ -622,23 +622,7 @@ namespace cytolib
 		//validity check
 		if(size()>0)
 		{
-			string msg = "Found channel inconsistency across samples. ";
-			auto c1 = get_channels();
-			unordered_set<string> old_ch(c1.begin(), c1.end());
-			auto c2 = frame_view.get_channels();
-			unordered_set<string> new_ch(c2.begin(), c2.end());
-			for(auto ch : c1)
-			{
-				if(new_ch.find(ch) == new_ch.end())
-					throw(domain_error(msg + "'" + ch + "' is missing from "  + sample_uid));
-
-			}
-			for(auto ch : c2)
-			{
-				if(old_ch.find(ch) == old_ch.end())
-					throw(domain_error(msg + sample_uid + " has the channel '" + ch + "' that is not found in other samples!"));
-
-			}
+			channel_consistency_check<GatingSet, CytoFrameView>(*this, frame_view, sample_uid);
 		}
 		GatingHierarchyPtr gh = add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(frame_view)), sample_uid);
 		return gh->get_cytoframe_view_ref();
@@ -653,6 +637,7 @@ namespace cytolib
 	void GatingSet::update_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 		if(find(sample_uid) == end())
 			throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
+		channel_consistency_check<GatingSet, CytoFrameView>(*this, frame_view, sample_uid);
 		ghs_[sample_uid]->set_cytoframe_view(frame_view);
 	}
 
