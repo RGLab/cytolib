@@ -10,6 +10,9 @@
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #include "CytoFrame.hpp"
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 namespace cytolib
 {
 class CytoFrameView{
@@ -55,12 +58,17 @@ public:
 		{
 			if(h5_opt == H5Option::copy||h5_opt == H5Option::move)
 			{
-				//write view to h5
-				copy_realized(h5_filename, true);
-				//save the rest data structure to pb
-				h5_opt = H5Option::skip;
-				get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
+				//realize view
+				auto cfv = copy_realized(h5_filename, true);
+				//trigger archive logic on the new cfv (which will skip overwriting itself)
+				cfv.convertToPb(fr_pb, h5_filename, h5_opt);
+				auto oldh5 = get_h5_file_path();
+				if(h5_opt == H5Option::move&&oldh5!="")
+				{
+					if(!fs::equivalent(fs::path(oldh5), fs::path(h5_filename)))
+						fs::remove(oldh5);
 
+				}
 			}
 			else
 				throw(domain_error("Only 'copy' or 'move' H5Option is supported for the indexed CytoFrameView object!"));
