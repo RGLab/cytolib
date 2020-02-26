@@ -653,7 +653,7 @@ namespace cytolib
 	void GatingSet::update_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 		if(find(sample_uid) == end())
 			throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
-		ghs_[sample_uid].reset(new GatingHierarchy(frame_view));
+		ghs_[sample_uid]->set_cytoframe_view(frame_view);
 	}
 
 	/**
