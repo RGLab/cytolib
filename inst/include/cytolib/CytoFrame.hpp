@@ -24,7 +24,6 @@ using namespace H5;
 
 namespace cytolib
 {
-enum class ColType {channel, marker, unknown};
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
 enum class H5Option {copy, move, skip, link, symlink};

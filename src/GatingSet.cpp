@@ -368,7 +368,7 @@ namespace cytolib
 				}
 				//only add the sample that is present in gs_data(in case fs was subsetted when gs was archived in legacy pb)
 				if(gs_data.find(sn)!=gs_data.end())
-					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, trans_tbl)), sn);
+					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, trans_tbl)), sn, false);
 			}
 
 			if(gs_data.size()>0)
@@ -400,7 +400,7 @@ namespace cytolib
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+sn+"... \n");
-			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, (h5_dir/sn).string()), sn);
+			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, (h5_dir/sn).string()), sn, is_copy_data);
 
 		}
 
@@ -419,7 +419,7 @@ namespace cytolib
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
-			GatingHierarchyPtr gh = add_GatingHierarchy(gh_template.copy(false, false, ""), sn);
+			auto gh = gh_template.copy(false, false, "");
 			auto cfv = cs.get_cytoframe_view(sn);
 			string h5_filename = cfv.get_h5_file_path();
 			if(h5_filename=="")
@@ -447,6 +447,8 @@ namespace cytolib
 			}
 			//attach to gh
 			gh->set_cytoframe_view(cfv);
+			add_GatingHierarchy(gh, sn, false);
+
 		}
 
 	}
@@ -530,14 +532,6 @@ namespace cytolib
 		else
 			return it->second;
 	}
-	GatingHierarchyPtr GatingSet::add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid){
-			if(ghs_.find(sample_uid)!=ghs_.end())
-				throw(domain_error("Can't add new sample since it already exists for: " + sample_uid));
-			ghs_[sample_uid] = gh;
-			sample_names_.push_back(sample_uid);
-			return ghs_[sample_uid];
-	}
-
 
 	/**
 	 *
@@ -620,11 +614,8 @@ namespace cytolib
 		if(!is_cytoFrame_only())
 			throw(domain_error("Can't add cytoframes to gs when it is not data-only object! "));
 		//validity check
-		if(size()>0)
-		{
-			channel_consistency_check<GatingSet, CytoFrameView>(*this, frame_view, sample_uid);
-		}
-		GatingHierarchyPtr gh = add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(frame_view)), sample_uid);
+		auto res = channel_consistency_check<GatingSet, CytoFrameView>(*this, frame_view, sample_uid);
+		GatingHierarchyPtr gh = add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(res)), sample_uid);
 		return gh->get_cytoframe_view_ref();
 
 	}
@@ -637,8 +628,8 @@ namespace cytolib
 	void GatingSet::update_cytoframe_view(string sample_uid, const CytoFrameView & frame_view){
 		if(find(sample_uid) == end())
 			throw(domain_error("Can't update the cytoframe since it doesn't exists: " + sample_uid));
-		channel_consistency_check<GatingSet, CytoFrameView>(*this, frame_view, sample_uid);
-		ghs_[sample_uid]->set_cytoframe_view(frame_view);
+		auto res = channel_consistency_check<GatingSet, CytoFrameView>(*this, frame_view, sample_uid);
+		ghs_[sample_uid]->set_cytoframe_view(res);
 	}
 
 	/**

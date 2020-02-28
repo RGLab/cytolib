@@ -37,6 +37,7 @@ namespace cytolib
 	const int bsti = 1;  // Byte swap test integer
 	#define is_host_big_endian() ( (*(char*)&bsti) == 0 )
 
+	enum class ColType {channel, marker, unknown};
 
 	#define PRT true
 	string fs_tmp_path();
@@ -59,31 +60,44 @@ namespace cytolib
 	string path_base_name(const string & full_path);
 
 	/**
-	 *
+	 * validity check and reordering(if needed) channels for newv
 	 * @param oldv the existing data
 	 * @param newv the new data to be checked
 	 * @param sample_uid the sample name of the new data
 	 */
-	template<class T1, class T2> void channel_consistency_check(const T1 & oldv, const T2 & newv, const string & sample_uid)
+	template<class T1, class T2> T2 channel_consistency_check(const T1 & oldv, const T2 & newv, const string & sample_uid)
 	{
-		string msg = "Found channel inconsistency across samples. ";
-		auto c1 = oldv.get_channels();
-		unordered_set<string> old_ch(c1.begin(), c1.end());
-		auto c2 = newv.get_channels();
-		unordered_set<string> new_ch(c2.begin(), c2.end());
-		for(auto ch : c1)
+		auto res = newv;
+		if(oldv.size()>0)
 		{
-			if(new_ch.find(ch) == new_ch.end())
-				throw(domain_error(msg + "'" + ch + "' is missing from "  + sample_uid));
+			string msg = "Found channel inconsistency across samples. ";
+			auto c1 = oldv.get_channels();
+			unordered_set<string> old_ch(c1.begin(), c1.end());
+			auto c2 = newv.get_channels();
+			unordered_set<string> new_ch(c2.begin(), c2.end());
+			for(auto ch : c1)
+			{
+				if(new_ch.find(ch) == new_ch.end())
+					throw(domain_error(msg + "'" + ch + "' is missing from "  + sample_uid));
 
+			}
+			for(auto ch : c2)
+			{
+				if(old_ch.find(ch) == old_ch.end())
+					throw(domain_error(msg + sample_uid + " has the channel '" + ch + "' that is not found in other samples!"));
+
+			}
+			//check if need to order newv
+			for(unsigned i = 0; i < c1.size(); i++)
+			{
+				if(c1[i]!=c2[i])
+				{
+					res.cols_(c1, ColType::channel);
+					break;
+				}
+			}
 		}
-		for(auto ch : c2)
-		{
-			if(old_ch.find(ch) == old_ch.end())
-				throw(domain_error(msg + sample_uid + " has the channel '" + ch + "' that is not found in other samples!"));
-
-		}
-
+		return res;
 	}
 	struct TM_ext
 	{

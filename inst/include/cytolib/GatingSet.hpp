@@ -137,7 +137,26 @@ public:
 		add_GatingHierarchy(gh, sample_uid);
 		return gh;
 	}
-	GatingHierarchyPtr add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid);
+	/**
+	 *
+	 * @param gh
+	 * @param sample_uid
+	 * @param validity_check only set it to false when adding the legacy gh that has no data associated
+	 * @return
+	 */
+	GatingHierarchyPtr add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid, bool validity_check = true)
+	{
+			if(ghs_.find(sample_uid)!=ghs_.end())
+				throw(domain_error("Can't add new sample since it already exists for: " + sample_uid));
+			if(validity_check)
+			{
+				auto view = channel_consistency_check<GatingSet, CytoFrameView>(*this, gh->get_cytoframe_view(), sample_uid);
+				gh->set_cytoframe_view(view);//update potentially reordered view
+			}
+			ghs_[sample_uid] = gh;
+			sample_names_.push_back(sample_uid);
+			return ghs_[sample_uid];
+	}
 
 	 /**
 	  * forward to the first element's getChannels
