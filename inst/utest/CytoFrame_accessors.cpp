@@ -31,6 +31,18 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+BOOST_AUTO_TEST_CASE(spillover)
+{
+	auto comp = fr.get_compensation();
+	auto markers = fr.get_channels();
+	BOOST_CHECK_EQUAL_COLLECTIONS(comp.marker.begin(), comp.marker.end(), markers.begin()+3, markers.end());
+	auto txt = comp.to_string();
+	auto comp1 = compensation(txt);
+	BOOST_CHECK_EQUAL_COLLECTIONS(comp.marker.begin(), comp.marker.end(), comp1.marker.begin(), comp1.marker.end());
+	for(auto i = 0; i < comp.spillOver.size(); i++)
+		BOOST_CHECK_CLOSE(comp.spillOver[i], comp1.spillOver[i], 1);
+
+}
 BOOST_AUTO_TEST_CASE(profile_get_data)
 {
 	auto fr1 = MemCytoFrame("../flowWorkspace/wsTestSuite/profile_get_data.fcs", config);

@@ -1,10 +1,6 @@
 // Copyright 2019 Fred Hutchinson Cancer Research Center
 // See the included LICENSE file for details on the licence that is granted to the user of this software.
 #include <cytolib/CytoFrame.hpp>
-#include <boost/lexical_cast.hpp>
-#include <cytolib/global.hpp>
-#include <unordered_map>
-#include <queue>
 
 
 namespace cytolib
@@ -64,66 +60,6 @@ namespace cytolib
 		swap(params, frm.params);
 		swap(channel_vs_idx, frm.channel_vs_idx);
 	}
-
-	compensation CytoFrame::get_compensation(const string & key)
-	{
-		compensation comp;
-
-		if(keys_.find(key)!=keys_.end())
-		{
-			string val = keys_[key];
-			vector<string> valVec;
-			boost::split(valVec, val, boost::is_any_of(","));
-			int n = boost::lexical_cast<int>(valVec[0]);
-			unordered_map<string, queue<int>> chnls;
-			if(n > 0)
-			{
-				comp.spillOver.resize(n*n);
-				comp.marker.resize(n);
-				bool isDuplicate = false;
-				for(int i = 0; i < n; i++)//param name
-				{
-					comp.marker[i] = valVec[i+1];
-
-					// Keep track of where this marker has appeared
-					auto found = chnls.find(comp.marker[i]);
-					if( found == chnls.end()){
-						chnls[comp.marker[i]] = queue<int>();
-						chnls[comp.marker[i]].push(i);
-					}else{
-						isDuplicate = true;
-						found->second.push(i);
-					}
-				}
-				
-				// Disambiguate duplicates by appending -<N>
-				if(isDuplicate){
-					PRINT("channel_alias: Duplicate channel names in spillover matrix!\n"
-		            "Integer suffixes added to disambiguate channels.\n"
-		            "It is recommended to verify correct mapping of spillover matrix columns.\n");
-					for ( auto chnl : chnls ){
-						if( chnl.second.size() > 1 ){
-							int dup_idx;
-							int suffix = 1;
-							while( !chnl.second.empty()){
-								dup_idx = chnl.second.front();
-								chnl.second.pop();
-								comp.marker[dup_idx] = comp.marker[dup_idx] + "-" + to_string(suffix++);
-							}
-						}
-					}
-				}
-				for(unsigned i = n + 1; i < valVec.size(); i++)//param name
-				{
-					comp.spillOver[i-n-1] = boost::lexical_cast<double>(valVec[i]);
-				}
-
-			}
-
-		}
-		return comp;
-	}
-
 
 
 	void CytoFrame::compensate(const compensation & comp)
@@ -271,9 +207,10 @@ namespace cytolib
 		DSetCreatPropList plist;
 		if(dim_key[0] > 0){
 			plist.setChunk(1, dim_key);
-		}else{
-			hsize_t chunk_dim[] ={1};
 		}
+//		else{
+//			hsize_t chunk_dim[] ={1};
+//		}
 		DataSet ds = file.createDataSet( "keywords", key_type, dsp_key, plist);
 
 		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
@@ -390,22 +327,7 @@ namespace cytolib
 		return res;
 	}
 
-	void CytoFrame::set_channels(const CHANNEL_MAP & chnl_map)
-	{
-		for(auto & it : chnl_map)
-		{
-			try//catch the unmatched col error so that it can proceed the rest
-			{
-				set_channel(it.first, it.second);
-			}catch (const domain_error & e){
-				string msg = e.what();
-				if(msg.find("colname not found") == string::npos)
-					throw(e);
-			}
 
-		}
-
-	}
 	/**
 	 * get all the marker names
 	 * @return
@@ -494,33 +416,7 @@ namespace cytolib
 		}
 		return col_idx;
 	}
-	void CytoFrame::set_channel(const string & oldname, const string &newname, bool is_update_keywords)
-	{
-		int id = get_col_idx(oldname, ColType::channel);
-		if(id<0)
-			throw(domain_error("colname not found: " + oldname));
-		if(oldname!=newname)
-		{
 
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT(oldname + "-->"  + newname + "\n");
-			int id1 = get_col_idx(newname, ColType::channel);
-			if(id1>=0&&id1!=id)
-				throw(domain_error("colname already exists: " + newname));
-			params[id].channel=newname;
-			channel_vs_idx.erase(oldname);
-			channel_vs_idx[newname] = id;
-
-			//update keywords(linear time, not sure how to improve it other than optionally skip it
-			if(is_update_keywords)
-			{
-				for(auto & it : keys_)
-					if(it.second == oldname)
-						it.second = newname;
-			}
-
-		}
-	}
 
 	void CytoFrame::set_marker(const string & channelname, const string & markername)
 	{
@@ -529,13 +425,13 @@ namespace cytolib
 			throw(domain_error("channel not found: " + channelname));
                 string oldmarkername = params[id].marker;
 		if(oldmarkername!=markername)
-		{
-			if(markername.size() > 0)
-			{
-				int id1 = get_col_idx(markername, ColType::marker);
-				if(id1>=0&&id1!=id)
-					throw(domain_error("marker already exists: " + markername));
-			}
+		{//skip duplication check at this level because we need to handle rotation case
+//			if(markername.size() > 0)
+//			{
+//				int id1 = get_col_idx(markername, ColType::marker);
+//				if(id1>=0&&id1!=id)
+//					throw(domain_error("marker already exists: " + markername));
+//			}
 			params[id].marker=markername;
 			marker_vs_idx.erase(oldmarkername);
 			marker_vs_idx[markername] = id;

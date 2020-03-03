@@ -16,6 +16,7 @@ namespace cytolib
 {
 	bool my_throw_on_error = true;
 	unsigned short g_loglevel = 0;
+	vector<string> spillover_keys = {"SPILL", "spillover", "$SPILLOVER"};
 
 	void PRINT(string a){
 	#ifdef ROUT

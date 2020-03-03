@@ -119,6 +119,13 @@ public:
 		if(is_update_keywords)
 			is_dirty_keys = true;
 	}
+	int set_channels(const vector<string> & channels)
+	{
+		int res = CytoFrame::set_channels(channels);
+		is_dirty_params = true;
+		is_dirty_keys = true;
+		return res;
+	}
 	void set_marker(const string & channelname, const string & markername)
 	{
 		CytoFrame::set_marker(channelname, markername);

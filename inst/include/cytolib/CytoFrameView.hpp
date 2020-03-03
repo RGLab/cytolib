@@ -10,6 +10,9 @@
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #include "CytoFrame.hpp"
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 namespace cytolib
 {
 class CytoFrameView{
@@ -53,22 +56,19 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
-			if(h5_opt == H5Option::copy)
+			if(h5_opt == H5Option::copy||h5_opt == H5Option::move)
 			{
-				//write view to h5
-				copy_realized(h5_filename, true);
-				//save the rest data structure to pb
-				h5_opt = H5Option::skip;
-				get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
+				//realize view
+				auto cfv = copy_realized(h5_filename, true);
+				//trigger archive logic on the new cfv (which will skip overwriting itself)
+				cfv.convertToPb(fr_pb, h5_filename, h5_opt);
+				auto oldh5 = get_h5_file_path();
+				if(h5_opt == H5Option::move&&oldh5!="")
+				{
+					if(!fs::equivalent(fs::path(oldh5), fs::path(h5_filename)))
+						fs::remove(oldh5);
 
-			}
-			else if(h5_opt == H5Option::move)
-			{
-				//mv the h5
-				get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
-				//write view to h5
-				copy_realized(h5_filename, true);
-
+				}
 			}
 			else
 				throw(domain_error("Only 'copy' or 'move' H5Option is supported for the indexed CytoFrameView object!"));
@@ -80,6 +80,22 @@ public:
 	void set_channel(const string & oldname, const string &newname)
 	{
 		get_cytoframe_ptr()->set_channel(oldname, newname);
+	}
+	int set_channels(const vector<string> & channels)
+	{
+		auto n1 = n_cols();
+		auto n2 = channels.size();
+		if(n2!=n1)
+			throw(domain_error("The size of the input of 'set_channels' (" + to_string(n2) + ") is different from the original one (" + to_string(n1) + ")"));
+		//update the original vector of channels
+		auto idx = get_original_col_ids();
+		auto old = get_cytoframe_ptr()->get_channels();
+		for(unsigned i = 0; i < n1; i++)
+		{
+			old[idx[i]] = channels[i];
+		}
+		//update the cf
+		return get_cytoframe_ptr()->set_channels(old);
 	}
 	string get_marker(const string & channel)
 	{
