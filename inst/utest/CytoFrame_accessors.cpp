@@ -2,7 +2,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cytolib/GatingSet.hpp>
-#include <cytolib/H5CytoFrame.hpp>
+#include <cytolib/H5RCytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 
 #include "fixture.hpp"
@@ -13,12 +13,12 @@ struct CFFixture{
 		//
 		file_path = "../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs";
 		fr = MemCytoFrame(file_path, config);
-		fr.read_fcs();
+//		fr.read_fcs();
 		//create h5 version
 		string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 //		cout << tmp << endl;
-		fr.write_h5(tmp);
-		fr_h5.reset(new H5CytoFrame(tmp));
+//		fr.write_h5(tmp);
+//		fr_h5.reset(new H5CytoFrame(tmp));
 	};
 
 	~CFFixture(){
@@ -31,6 +31,14 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+BOOST_AUTO_TEST_CASE(s3)
+{
+	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);
+	auto ch = cf.get_channels();
+	BOOST_CHECK_EQUAL(ch.size(), 10);
+
+
+}
 BOOST_AUTO_TEST_CASE(spillover)
 {
 	auto comp = fr.get_compensation();
@@ -39,7 +47,7 @@ BOOST_AUTO_TEST_CASE(spillover)
 	auto txt = comp.to_string();
 	auto comp1 = compensation(txt);
 	BOOST_CHECK_EQUAL_COLLECTIONS(comp.marker.begin(), comp.marker.end(), comp1.marker.begin(), comp1.marker.end());
-	for(auto i = 0; i < comp.spillOver.size(); i++)
+	for(unsigned i = 0; i < comp.spillOver.size(); i++)
 		BOOST_CHECK_CLOSE(comp.spillOver[i], comp1.spillOver[i], 1);
 
 }

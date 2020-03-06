@@ -30,9 +30,10 @@ protected:
 	bool is_dirty_params;
 	bool is_dirty_keys;
 	bool is_dirty_pdata;
+	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 	EVENT_DATA_VEC read_data(uvec col_idx) const;
 public:
-	const unsigned int default_flags = H5F_ACC_RDWR;
+	unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta();
 	void flush_params();
 
@@ -51,6 +52,7 @@ public:
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
 		readonly_ = frm.readonly_;
+		access_plist_ = frm.access_plist_;
 		memcpy(dims, frm.dims, sizeof(dims));
 
 	}
@@ -63,6 +65,7 @@ public:
 //		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(filename_, frm.filename_);
 		swap(dims, frm.dims);
+		swap(access_plist_, frm.access_plist_);
 
 		swap(readonly_, frm.readonly_);
 		swap(is_dirty_params, frm.is_dirty_params);
@@ -77,6 +80,7 @@ public:
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
 		readonly_ = frm.readonly_;
+		access_plist_ = frm.access_plist_;
 		memcpy(dims, frm.dims, sizeof(dims));
 		return *this;
 	}
@@ -89,6 +93,7 @@ public:
 		swap(is_dirty_keys, frm.is_dirty_keys);
 		swap(is_dirty_pdata, frm.is_dirty_pdata);
 		swap(readonly_, frm.readonly_);
+		swap(access_plist_, frm.access_plist_);
 		return *this;
 	}
 
@@ -157,12 +162,36 @@ public:
 	 * @param h5_filename
 	 */
 	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename
-			, bool readonly = false);
+			, bool readonly = false):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	{
+		MemCytoFrame fr(fcs_filename, config);
+		fr.read_fcs();
+		fr.write_h5(h5_filename);
+		*this = H5CytoFrame(h5_filename, readonly);
+	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, bool readonly = true);
+	H5CytoFrame(const string & h5_filename, bool readonly = true, bool init = true):CytoFrame(),filename_(h5_filename), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	{
+		access_plist_ = FileAccPropList::DEFAULT;
+		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
+			init_load();
+	}
+	void init_load(){
+		//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
+		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		load_meta();
+
+
+		//open dataset for event data
+
+		auto dataset = file.openDataSet(DATASET_NAME);
+		auto dataspace = dataset.getSpace();
+		dataspace.getSimpleExtentDims(dims);
+
+	}
 	/**
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */
