@@ -113,7 +113,12 @@ public:
 					if(gs_pb_file.empty())
 						gs_pb_file = p;
 					else
-					  throw(domain_error(errmsg + "Can't determine the pb file for gs since multiple .pb files not matched to any h5 files!"));
+					{
+						errmsg += " Can't determine the pb file for gs since both .pb files do not match to any h5 sample files!";
+						errmsg += gs_pb_file.string() + ", " +  p.string();
+						throw(domain_error(errmsg));
+
+					}
 
 				}
 				else
@@ -139,7 +144,7 @@ public:
 				for(auto sn : h5_samples)
 				{
 					if(pb_samples.find(sn)==pb_samples.end())
-						  throw(domain_error(errmsg + "No .pb file found for " + sn));
+						  throw(domain_error(errmsg + "No .pb file found for sample " + sn + ".h5"));
 				}
 			}
 

@@ -80,9 +80,19 @@ namespace cytolib
 
 					}
 
-					if(!gs_pb_file.empty())
+					if(gs_pb_file.empty())
+					{
+						if(pb_samples.size()>0)
+						{
+							throw(domain_error(errmsg + "pb file missing for gs"));
+						}
+					}
+					else
+					{
 						if(gs_pb_file.stem() != uid_)
 							throw(domain_error(errmsg + "The pb file doesn't match to the uid of GatingSet!"));
+					}
+
 					for(const auto & it : ghs_)
 					{
 						auto sn = it.first;
