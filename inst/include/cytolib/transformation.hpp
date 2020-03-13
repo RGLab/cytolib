@@ -258,14 +258,18 @@ public:
 class scaleTrans:public linTrans{
 	int t_scale; //transformed scale
 	int r_scale; // raw scale
+	EVENT_DATA_TYPE scale_factor;
 
 public:
 
 	scaleTrans();
 	scaleTrans(int _t_scale, int _r_scale);
+	scaleTrans(EVENT_DATA_TYPE _scale_factor);
 	void transforming(EVENT_DATA_TYPE * input, int nSize);
 
 	TransPtr clone() const;
+	void convertToPb(pb::transformation & trans_pb);
+	scaleTrans(const pb::transformation & trans_pb);
 
 	TransPtr getInverseTransformation();
 

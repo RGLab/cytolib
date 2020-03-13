@@ -52,12 +52,9 @@ namespace cytolib
 
 	TransPtr trans_local::getTran(string channel)const{
 		TransPtr res(NULL);
-		if(channel!="Time"&&channel!="time")
-		{
-			trans_map::const_iterator it=tp.find(channel);
-			if(it!=tp.end())
-				res=it->second;
-		}
+		trans_map::const_iterator it=tp.find(channel);
+		if(it!=tp.end())
+			res=it->second;
 		return res;
 	}
 

@@ -257,6 +257,9 @@ namespace cytolib
 						case pb::PB_LOGICLE:
 							trans_tbl[old_address] = TransPtr(new logicleTrans(trans_pb));
 							break;
+						case pb::PB_SCALE:
+							trans_tbl[old_address] = TransPtr(new scaleTrans(trans_pb));
+							break;
 						default:
 							throw(domain_error("unknown type of transformation archive!"));
 						}
@@ -351,7 +354,7 @@ namespace cytolib
 				gh->compensate(fr);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... transform_data: "+sn+"... \n");
-				fr.scale_time_channel();
+				// fr.scale_time_channel();
 				gh->transform_data(fr);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... gating: "+sn+"... \n");
