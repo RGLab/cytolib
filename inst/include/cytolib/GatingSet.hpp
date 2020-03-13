@@ -76,8 +76,321 @@ public:
 	 * constructor from the archives (de-serialization)
 	 * @param path
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
+	 * @param select_sample_idx samples to load
 	 */
-	GatingSet(string path, bool is_skip_data = false, bool readonly = true, vector<string> select_samples = {}, bool print_lib_ver = false);
+
+	GatingSet(string path, bool is_skip_data = false, bool readonly = true, vector<string> select_samples = {}, bool print_lib_ver = false)
+	{
+
+		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
+		fs::path gs_pb_file;
+		unordered_set<string> h5_samples;
+		unordered_set<string> pb_samples;
+		//search for h5
+		for(auto & e : fs::directory_iterator(path))
+		{
+			fs::path p = e;
+			string ext = p.extension().string();
+			string fn = p.stem().string();
+			if(ext == ".h5")
+			{
+				h5_samples.insert(fn);
+			}
+			else if(ext != ".pb")
+				throw(domain_error(errmsg + "File not recognized: " + p.string()));
+
+		}
+		//search for pb file
+		for(auto & e : fs::directory_iterator(path))
+		{
+			fs::path p = e;
+			string ext = p.extension().string();
+			string fn = p.stem().string();
+			if(ext == ".pb")
+			{
+				if(h5_samples.find(fn)==h5_samples.end())
+				{
+					if(gs_pb_file.empty())
+						gs_pb_file = p;
+					else
+					{
+						errmsg += " Can't determine the pb file for gs since both .pb files do not match to any h5 sample files!";
+						errmsg += gs_pb_file.string() + ", " +  p.string();
+						throw(domain_error(errmsg));
+
+					}
+
+				}
+				else
+					pb_samples.insert(fn);
+
+
+			}
+
+		}
+
+		if(gs_pb_file.empty())
+		  throw(domain_error(errmsg + "No .pb file found for gs!"));
+
+		if(pb_samples.size()==0)
+		{
+			cout << path + " seems to be the legacy archive and it is recommended to convert to the new format by saving it to the new folder!" << endl;
+			deserialize_legacy(path, is_skip_data, readonly, select_samples, print_lib_ver);
+		}
+		else
+		{
+			if(pb_samples.size()<h5_samples.size())
+			{
+				for(auto sn : h5_samples)
+				{
+					if(pb_samples.find(sn)==pb_samples.end())
+						  throw(domain_error(errmsg + "No .pb file found for sample " + sn + ".h5"));
+				}
+			}
+
+
+			GOOGLE_PROTOBUF_VERIFY_VERSION;
+			ifstream input(gs_pb_file.string(), ios::in | ios::binary);
+			if (!input) {
+				throw(invalid_argument("File not found.." + gs_pb_file.string()));
+			} else{
+				 pb::GatingSet pbGS;
+				 //read entire file into buffer since message-lite doesn't support iostream
+				 input.seekg (0, input.end);
+				 int length = input.tellg();
+				 input.seekg (0, input.beg);
+				 vector<char> buf(length);
+				 input.read(buf.data(), length);
+
+				 google::protobuf::io::ArrayInputStream raw_input(buf.data(), length);
+				 //read gs message
+				 bool success = readDelimitedFrom(raw_input, pbGS);
+
+				if (!success) {
+					throw(domain_error("Failed to parse GatingSet."));
+				}
+				if(print_lib_ver)
+				{
+					PRINT("The GatingSet was archived by:\n");
+					PRINT("cytolib: ");
+					string cv = pbGS.cytolib_verion();
+					if(cv=="")
+						cv = "unknown";
+					PRINT(cv);
+					PRINT("\n");
+					PRINT("protobuf: ");
+					string pv = pbGS.pb_verion();
+					if(pv=="")
+						pv = "unknown";
+					PRINT(pv);
+					PRINT("\n");
+					PRINT("HDF5: ");
+					string hv = pbGS.h5_verion();
+					if(hv=="")
+						hv = "unknown";
+					PRINT(hv);
+					PRINT("\n");
+
+				}
+				uid_ = pbGS.guid();
+
+				auto nSelect = select_samples.size();
+				auto nTotal = pbGS.samplename_size();
+				unordered_map<string,bool> sn_hash;
+
+				//prescan select and update hash
+				if(nSelect>0)
+				{
+					for(int i = 0; i < nTotal; i++){
+						string sn = pbGS.samplename(i);
+						sn_hash[sn] = false;
+					}
+					for(unsigned i = 0; i < nSelect; i++)
+					{
+						auto sel = select_samples[i];
+						auto it = sn_hash.find(sel);
+						if(it == sn_hash.end())
+							throw(domain_error("sample selection is out of boundary: " + sel));
+						it->second = true;
+
+					}
+				}
+				//read gating hierarchy messages
+				for(int i = 0; i < nTotal; i++){
+					string sn = pbGS.samplename(i);
+
+					//conditional add gh
+					if(nSelect==0||sn_hash.find(sn)->second)
+					{
+						string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
+						ifstream input(gh_pb_file, ios::in | ios::binary);
+						if (!input) {
+							throw(invalid_argument("File not found.." + gh_pb_file));
+						}
+						else
+						{
+							pb::GatingHierarchy gh_pb;
+							 //read entire file into buffer since message-lite doesn't support iostream
+							 input.seekg (0, input.end);
+							 int length = input.tellg();
+							 input.seekg (0, input.beg);
+							 vector<char> buf(length);
+							 input.read(buf.data(), length);
+
+							 google::protobuf::io::ArrayInputStream raw_input(buf.data(), length);
+							 //read gs message
+							 bool success = readDelimitedFrom(raw_input, gh_pb);
+
+							if (!success) {
+								throw(domain_error("Failed to parse GatingHierarchy " + sn));
+							}
+
+						pb::CytoFrame fr = *gh_pb.mutable_frame();
+						string h5_filename = (fs::path(path) / (sn + ".h5")).string();
+
+						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
+						}
+					}
+				}
+
+
+				//reorder view based on select
+				if(nSelect>0)
+				{
+					uid_ = generate_uid();
+					sample_names_ = select_samples;
+				}
+			}
+		}
+	}
+	/**
+	 * legacy de-serialization for single pb file
+	 * @param path
+	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
+	 */
+	void deserialize_legacy(string path, bool is_skip_data = false, bool readonly = true, vector<string> select_samples = {}, bool print_lib_ver = false)
+	{
+		GatingSet gs;
+		fs::path pb_file;
+		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
+		for(auto & e : fs::directory_iterator(path))
+		{
+			fs::path p = e;
+			string ext = p.extension().string();
+			if(ext == ".pb")
+			{
+				if(pb_file.empty())
+					pb_file = p;
+				else
+				  throw(domain_error(errmsg + "Multiple .pb files found!"));
+			}
+			else if(ext != ".h5")
+				throw(domain_error(errmsg + "File not recognized: " + p.string()));
+
+		}
+
+		if(pb_file.empty())
+		  throw(domain_error(errmsg + "No .pb file found!"));
+
+
+		GOOGLE_PROTOBUF_VERIFY_VERSION;
+		ifstream input(pb_file.string(), ios::in | ios::binary);
+		if (!input) {
+			throw(invalid_argument("File not found.." ));
+		} else{
+			 pb::GatingSet pbGS;
+			 //read entire file into buffer since message-lite doesn't support iostream
+			 input.seekg (0, input.end);
+			 int length = input.tellg();
+			 input.seekg (0, input.beg);
+			 vector<char> buf(length);
+			 input.read(buf.data(), length);
+
+			 google::protobuf::io::ArrayInputStream raw_input(buf.data(), length);
+			 //read gs message
+			 bool success = readDelimitedFrom(raw_input, pbGS);
+
+			if (!success) {
+				throw(domain_error("Failed to parse GatingSet."));
+			}
+			if(print_lib_ver)
+			{
+				PRINT("The GatingSet was archived by:\n");
+				PRINT("cytolib: ");
+				string cv = pbGS.cytolib_verion();
+				if(cv=="")
+					cv = "unknown";
+				PRINT(cv);
+				PRINT("\n");
+				PRINT("protobuf: ");
+				string pv = pbGS.pb_verion();
+				if(pv=="")
+					pv = "unknown";
+				PRINT(pv);
+				PRINT("\n");
+				PRINT("HDF5: ");
+				string hv = pbGS.h5_verion();
+				if(hv=="")
+					hv = "unknown";
+				PRINT(hv);
+				PRINT("\n");
+
+			}
+			uid_ = pbGS.guid();
+
+			auto nSelect = select_samples.size();
+			auto nTotal = pbGS.samplename_size();
+			unordered_map<string,bool> sn_hash;
+
+			//prescan select and update hash
+			if(nSelect>0)
+			{
+				for(int i = 0; i < nTotal; i++){
+					string sn = pbGS.samplename(i);
+					sn_hash[sn] = false;
+				}
+				for(unsigned i = 0; i < nSelect; i++)
+				{
+					auto sel = select_samples[i];
+					auto it = sn_hash.find(sel);
+					if(it == sn_hash.end())
+						throw(domain_error("sample selection is out of boundary: " + sel));
+					it->second = true;
+
+				}
+			}
+			//read gating hierarchy messages
+			for(int i = 0; i < nTotal; i++){
+				string sn = pbGS.samplename(i);
+//				all_samples[i] =sn;
+				//gh message is stored as the same order as sample name vector in gs
+				pb::GatingHierarchy gh_pb;
+				bool success = readDelimitedFrom(raw_input, gh_pb);
+
+				if (!success) {
+					throw(domain_error("Failed to parse GatingHierarchy."));
+				}
+				//conditional add gh (thus avoid to load h5)
+				if(nSelect==0||sn_hash.find(sn)->second)
+				{
+					pb::CytoFrame fr = *gh_pb.mutable_frame();
+					string h5_filename = (fs::path(path) / (sn + ".h5")).string();
+
+					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
+				}
+			}
+
+
+			//reorder view based on select
+			if(nSelect>0)
+			{
+				uid_ = generate_uid();
+				sample_names_ = select_samples;
+			}
+		}
+
+	}
+	/**
 	/**
 	 * constructor from the legacy archives (de-serialization)
 	 * @param filename

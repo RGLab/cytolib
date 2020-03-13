@@ -211,7 +211,8 @@ public:
 			fr_pb.set_is_h5(true);
 			if(h5_opt != H5Option::skip)
 			{
-				auto dest = fs::path(h5_filename).parent_path();
+				auto h5path = fs::path(h5_filename);
+				auto dest = h5path.parent_path();
 				if(!fs::exists(dest))
 					throw(logic_error(dest.string() + "doesn't exist!"));
 
@@ -220,20 +221,32 @@ public:
 					switch(h5_opt)
 					{
 					case H5Option::copy:
-						fs::copy(filename_, h5_filename);
-						break;
+						{
+							if(fs::exists(h5path))
+								fs::remove(h5path);
+							fs::copy(filename_, h5_filename);
+							break;
+						}
 					case H5Option::move:
-						fs::rename(filename_, h5_filename);
-						break;
+						{
+							if(fs::exists(h5path))
+								fs::remove(h5path);
+							fs::rename(filename_, h5_filename);
+							break;
+						}
 					case H5Option::link:
-					{
-						throw(logic_error("'link' option for H5CytoFrame is no longer supported!"));
-						fs::create_hard_link(filename_, h5_filename);
-						break;
-					}
+						{
+							throw(logic_error("'link' option for H5CytoFrame is no longer supported!"));
+							fs::create_hard_link(filename_, h5_filename);
+							break;
+						}
 					case H5Option::symlink:
-						fs::create_symlink(filename_, h5_filename);
-						break;
+						{
+							if(fs::exists(h5path))
+								fs::remove(h5path);
+							fs::create_symlink(filename_, h5_filename);
+							break;
+						}
 					default:
 						throw(logic_error("invalid h5_opt!"));
 					}
