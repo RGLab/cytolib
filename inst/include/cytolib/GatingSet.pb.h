@@ -265,11 +265,12 @@ enum TRANS_TYPE : int {
   PB_FASIGNH = 4,
   PB_BIEXP = 5,
   PB_LOGICLE = 6,
-  PB_LOGGML2 = 7
+  PB_LOGGML2 = 7,
+  PB_SCALE = 8
 };
 bool TRANS_TYPE_IsValid(int value);
 constexpr TRANS_TYPE TRANS_TYPE_MIN = PB_CALTBL;
-constexpr TRANS_TYPE TRANS_TYPE_MAX = PB_LOGGML2;
+constexpr TRANS_TYPE TRANS_TYPE_MAX = PB_SCALE;
 constexpr int TRANS_TYPE_ARRAYSIZE = TRANS_TYPE_MAX + 1;
 
 const std::string& TRANS_TYPE_Name(TRANS_TYPE value);
@@ -2946,6 +2947,8 @@ class scaleTrans :
 
   enum : int {
     kScaleFactorFieldNumber = 1,
+    kTScaleFieldNumber = 2,
+    kRScaleFieldNumber = 3,
   };
   // optional float scale_factor = 1;
   bool has_scale_factor() const;
@@ -2960,6 +2963,32 @@ class scaleTrans :
   void _internal_set_scale_factor(float value);
   public:
 
+  // optional float t_scale = 2;
+  bool has_t_scale() const;
+  private:
+  bool _internal_has_t_scale() const;
+  public:
+  void clear_t_scale();
+  float t_scale() const;
+  void set_t_scale(float value);
+  private:
+  float _internal_t_scale() const;
+  void _internal_set_t_scale(float value);
+  public:
+
+  // optional float r_scale = 3;
+  bool has_r_scale() const;
+  private:
+  bool _internal_has_r_scale() const;
+  public:
+  void clear_r_scale();
+  float r_scale() const;
+  void set_r_scale(float value);
+  private:
+  float _internal_r_scale() const;
+  void _internal_set_r_scale(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:pb.scaleTrans)
  private:
   class _Internal;
@@ -2968,6 +2997,8 @@ class scaleTrans :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float scale_factor_;
+  float t_scale_;
+  float r_scale_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -8481,6 +8512,62 @@ inline void scaleTrans::_internal_set_scale_factor(float value) {
 inline void scaleTrans::set_scale_factor(float value) {
   _internal_set_scale_factor(value);
   // @@protoc_insertion_point(field_set:pb.scaleTrans.scale_factor)
+}
+
+// optional float t_scale = 2;
+inline bool scaleTrans::_internal_has_t_scale() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool scaleTrans::has_t_scale() const {
+  return _internal_has_t_scale();
+}
+inline void scaleTrans::clear_t_scale() {
+  t_scale_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline float scaleTrans::_internal_t_scale() const {
+  return t_scale_;
+}
+inline float scaleTrans::t_scale() const {
+  // @@protoc_insertion_point(field_get:pb.scaleTrans.t_scale)
+  return _internal_t_scale();
+}
+inline void scaleTrans::_internal_set_t_scale(float value) {
+  _has_bits_[0] |= 0x00000002u;
+  t_scale_ = value;
+}
+inline void scaleTrans::set_t_scale(float value) {
+  _internal_set_t_scale(value);
+  // @@protoc_insertion_point(field_set:pb.scaleTrans.t_scale)
+}
+
+// optional float r_scale = 3;
+inline bool scaleTrans::_internal_has_r_scale() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool scaleTrans::has_r_scale() const {
+  return _internal_has_r_scale();
+}
+inline void scaleTrans::clear_r_scale() {
+  r_scale_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline float scaleTrans::_internal_r_scale() const {
+  return r_scale_;
+}
+inline float scaleTrans::r_scale() const {
+  // @@protoc_insertion_point(field_get:pb.scaleTrans.r_scale)
+  return _internal_r_scale();
+}
+inline void scaleTrans::_internal_set_r_scale(float value) {
+  _has_bits_[0] |= 0x00000004u;
+  r_scale_ = value;
+}
+inline void scaleTrans::set_r_scale(float value) {
+  _internal_set_r_scale(value);
+  // @@protoc_insertion_point(field_set:pb.scaleTrans.r_scale)
 }
 
 // -------------------------------------------------------------------

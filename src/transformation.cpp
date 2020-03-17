@@ -561,21 +561,53 @@ namespace cytolib
 
 
 
-	scaleTrans::scaleTrans():linTrans(),t_scale(256), r_scale(262144){isGateOnly = true;}
-	scaleTrans::scaleTrans(int _t_scale, int _r_scale):linTrans(),t_scale(_t_scale), r_scale(_r_scale){isGateOnly = true;}
+	scaleTrans::scaleTrans():linTrans(),t_scale(256), r_scale(262144){
+		isGateOnly = true;
+		scale_factor = t_scale/(EVENT_DATA_TYPE)r_scale;
+	}
+	scaleTrans::scaleTrans(int _t_scale, int _r_scale):linTrans(),t_scale(_t_scale), r_scale(_r_scale){
+		isGateOnly = true;
+		scale_factor = t_scale/(EVENT_DATA_TYPE)r_scale;
+	}
+
+	// Defines a scaleTrans solely on float scale factor (not as a ratio of ints)
+	scaleTrans::scaleTrans(EVENT_DATA_TYPE _scale_factor):linTrans(),t_scale(0), r_scale(0), scale_factor(_scale_factor){isGateOnly = true;}
 
 	void scaleTrans::transforming(EVENT_DATA_TYPE * input, int nSize){
 		for(int i=0;i<nSize;i++)
-			input[i]*=(t_scale/(EVENT_DATA_TYPE)r_scale);
+			input[i]*=scale_factor;
 	}
 
 	TransPtr scaleTrans::clone() const{return TransPtr(new scaleTrans(*this));};
 
-	TransPtr scaleTrans::getInverseTransformation(){
-		return TransPtr(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
+	void scaleTrans::convertToPb(pb::transformation & trans_pb){
+		transformation::convertToPb(trans_pb);
+		trans_pb.set_trans_type(pb::PB_SCALE);
+		// PICKUP and fix this for scaleTrans
+		pb::scaleTrans * st_pb = trans_pb.mutable_st();
+		st_pb->set_scale_factor(scale_factor);
+		st_pb->set_t_scale(t_scale);
+		st_pb->set_r_scale(r_scale);
 	}
 
-	void scaleTrans::setTransformedScale(int _scale){t_scale = _scale;};
+	scaleTrans::scaleTrans(const pb::transformation & trans_pb):linTrans(trans_pb){
+		const pb::scaleTrans & st_pb = trans_pb.st();
+		scale_factor = st_pb.scale_factor();
+		t_scale = st_pb.t_scale();
+		r_scale = st_pb.r_scale();
+	}
+
+	TransPtr scaleTrans::getInverseTransformation(){
+		if(t_scale == 0)
+			return TransPtr(new scaleTrans(1.0/scale_factor)); //just invert the scale factor
+		else
+			return TransPtr(new scaleTrans(r_scale, t_scale));//swap the raw and trans scale
+	}
+
+	void scaleTrans::setTransformedScale(int _scale){
+		t_scale = _scale;
+		scale_factor = t_scale/(EVENT_DATA_TYPE)r_scale;
+	};
 
 	flinTrans::flinTrans():transformation(false,FLIN),min(0),max(0){
 		calTbl.setInterpolated(true);
