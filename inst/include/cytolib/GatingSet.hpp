@@ -96,56 +96,56 @@ public:
 			{
 				h5_samples.insert(fn);
 			}
-			else if(ext != ".pb")
-				throw(domain_error(errmsg + "File not recognized: " + p.string()));
-
-		}
-		//search for pb file
-		for(auto & e : fs::directory_iterator(path))
-		{
-			fs::path p = e;
-			string ext = p.extension().string();
-			string fn = p.stem().string();
-			if(ext == ".pb")
+			else if(ext == ".pb")
 			{
-				if(h5_samples.find(fn)==h5_samples.end())
-				{
-					if(gs_pb_file.empty())
-						gs_pb_file = p;
-					else
-					{
-						errmsg += " Can't determine the pb file for gs since both .pb files do not match to any h5 sample files!";
-						errmsg += gs_pb_file.string() + ", " +  p.string();
-						throw(domain_error(errmsg));
-
-					}
-
-				}
-				else
-					pb_samples.insert(fn);
-
+				pb_samples.insert(fn);
 
 			}
-
+			else if(ext == ".gs")
+			{
+				if(gs_pb_file.empty())
+					gs_pb_file = p;
+				else
+					throw(domain_error(errmsg + "Multiple .gs files found for the same gs object!"));
+			}
+			else
+				throw(domain_error(errmsg + "File not recognized: " + p.string()));
 		}
 
+		bool is_legacy = false;
 		if(gs_pb_file.empty())
-		  throw(domain_error(errmsg + "No .pb file found for gs!"));
+		{
+			if(pb_samples.size()==1)
+			{
+				auto id = *(pb_samples.begin());//check if pb file seems like a guid of a legacy gs
+				if(h5_samples.find(id)==h5_samples.end())
+				{
+					is_legacy = true;
+				}
+				else
+				  throw(domain_error(errmsg + "No .gs file found!"));
+			}
+			else
+			  throw(domain_error(errmsg + "No .gs file found!"));
+		}
 
-		if(pb_samples.size()==0)
+		if(is_legacy)
 		{
 			cout << path + " seems to be the legacy archive and it is recommended to convert to the new format by saving it to the new folder!" << endl;
 			deserialize_legacy(path, is_skip_data, readonly, select_samples, print_lib_ver);
 		}
 		else
 		{
-			if(pb_samples.size()<h5_samples.size())
+			for(auto sn : h5_samples)
 			{
-				for(auto sn : h5_samples)
-				{
-					if(pb_samples.find(sn)==pb_samples.end())
-						  throw(domain_error(errmsg + "No .pb file found for sample " + sn + ".h5"));
-				}
+				if(pb_samples.find(sn)==pb_samples.end())
+					  throw(domain_error(errmsg + "No .pb file matched for sample " + sn + ".h5"));
+			}
+
+			for(auto sn : pb_samples)
+			{
+				if(h5_samples.find(sn)==h5_samples.end())
+					  throw(domain_error(errmsg + "No .h5 file matched for sample " + sn + ".pb"));
 			}
 
 
