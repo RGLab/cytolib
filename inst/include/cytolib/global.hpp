@@ -22,6 +22,22 @@ using namespace std;
 
 namespace cytolib
 {
+	bool is_remote_path(const string &);
+	struct S3Cred
+	{
+		string access_key_id_;
+		string access_key_;
+		string region_;
+		S3Cred()
+		{
+			access_key_id_ = "";
+			access_key_ = "";
+			region_ = "us-west-1";
+		}
+		S3Cred(const string & secret_id
+				, const string & secret_key
+				, const string & aws_region):access_key_id_(secret_id), access_key_(secret_key), region_(aws_region){};
+	};
 	#define GATING_SET_LEVEL 1
 	#define GATING_HIERARCHY_LEVEL 2
 	#define POPULATION_LEVEL 3

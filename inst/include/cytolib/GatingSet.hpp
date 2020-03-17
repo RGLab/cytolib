@@ -79,7 +79,11 @@ public:
 	 * @param select_sample_idx samples to load
 	 */
 
-	GatingSet(string path, bool is_skip_data = false, bool readonly = true, vector<string> select_samples = {}, bool print_lib_ver = false)
+	GatingSet(string path, bool is_skip_data = false
+			, bool readonly = true
+			, vector<string> select_samples = {}
+			, bool print_lib_ver = false
+			, const S3Cred & cred = S3Cred())
 	{
 
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -248,7 +252,7 @@ public:
 						pb::CytoFrame fr = *gh_pb.mutable_frame();
 						string h5_filename = (fs::path(path) / (sn + ".h5")).string();
 
-						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
+						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly, cred)), sn);
 						}
 					}
 				}

@@ -21,6 +21,16 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
+BOOST_AUTO_TEST_CASE(s3)
+{
+	gs = GatingSet(path,false,true,{},true);
+
+	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);
+	auto ch = cf.get_channels();
+	BOOST_CHECK_EQUAL(ch.size(), 10);
+
+
+}
 BOOST_AUTO_TEST_CASE(quadgate) {
 
 	GatingSet gs1({"../flowWorkspace/output/s5a01.fcs"}, FCS_READ_PARAM());

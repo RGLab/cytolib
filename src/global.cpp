@@ -10,6 +10,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <regex>
 namespace fs = boost::filesystem;
 
 namespace cytolib
@@ -33,6 +34,10 @@ namespace cytolib
 	 cout << a;
 	#endif
 
+	}
+	bool is_remote_path(const string & path)
+	{
+		return regex_match(path, regex("^https://"));
 	}
 	string fs_tmp_path()
 	{

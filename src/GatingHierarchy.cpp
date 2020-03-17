@@ -1,7 +1,6 @@
 // Copyright 2019 Fred Hutchinson Cancer Research Center
 // See the included LICENSE file for details on the licence that is granted to the user of this software.
 #include <cytolib/GatingHierarchy.hpp>
-#include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/global.hpp>
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -307,50 +306,6 @@ namespace cytolib
 
 	}
 
-	GatingHierarchy::GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data, bool readonly){
-		const pb::populationTree & tree_pb =  pb_gh.tree();
-		int nNodes = tree_pb.node_size();
-
-		tree = populationTree(nNodes);
-		for(int i = 0; i < nNodes; i++){
-			const pb::treeNodes & node_pb = tree_pb.node(i);
-			const pb::nodeProperties & np_pb = node_pb.node();
-
-			VertexID curChildID = i;
-			tree[curChildID] = nodeProperties(np_pb);
-
-			if(node_pb.has_parent()){
-				VertexID parentID = node_pb.parent();
-				boost::add_edge(parentID,curChildID,tree);
-			}
-
-		}
-		//restore comp
-		comp = compensation(pb_gh.comp());
-		//restore trans flag
-		for(int i = 0; i < pb_gh.transflag_size(); i++){
-			transFlag.push_back(PARAM(pb_gh.transflag(i)));
-		}
-		//restore trans local
-		trans = trans_local(pb_gh.trans());
-
-		//restore fr
-		if(!is_skip_data)
-		{
-			CytoFramePtr ptr;
-
-			if(fs::exists(h5_filename))
-			{
-			 ptr.reset(new H5CytoFrame(h5_filename, readonly));
-			 pb::CytoFrame fr = *pb_gh.mutable_frame();
-			 if(!fr.is_h5())
-				 ptr.reset(new MemCytoFrame(*ptr));
-			 frame_ = CytoFrameView(ptr);
-			}
-			else
-			 throw(domain_error("H5 file missing for sample: " + h5_filename));
-		}
-	}
 
 	//load legacy pb
 	GatingHierarchy::GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, TransPtr> & trans_tbl){
