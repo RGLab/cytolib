@@ -119,6 +119,9 @@ namespace cytolib
 				case pb::PB_LOGICLE:
 					tp[tp_pb.name()].reset(new logicleTrans(trans_pb));
 					break;
+				case pb::PB_SCALE:
+					tp[tp_pb.name()].reset(new scaleTrans(trans_pb));
+					break;
 				default:
 					throw(domain_error("unknown type of transformation archive!"));
 				}
