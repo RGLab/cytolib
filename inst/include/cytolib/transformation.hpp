@@ -33,6 +33,7 @@ namespace cytolib
 #define BIEXP 5
 #define LOGICLE 6
 #define LOGGML2 7
+#define SCALE 8
 /* case insensitive compare predicate*/
 struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 {
@@ -256,11 +257,10 @@ public:
  * This class is dedicated to scale the EllipsoidGate
  */
 class scaleTrans:public linTrans{
+public:
 	int t_scale; //transformed scale
 	int r_scale; // raw scale
 	EVENT_DATA_TYPE scale_factor;
-
-public:
 
 	scaleTrans();
 	scaleTrans(int _t_scale, int _r_scale);

@@ -73,9 +73,12 @@ namespace cytolib
 			case  LOGICLE :
 				ctype = "LOGICLE";
 				break;
-		  case  LOGGML2 :
-		    ctype = "LOGGML2";
-		    break;
+			case  LOGGML2 :
+				ctype = "LOGGML2";
+				break;
+			case  SCALE :
+				ctype = "SCALE";
+				break;
 			default:
 				throw(domain_error("unknown trans type id: " + to_string(type)));
 		}
@@ -567,6 +570,8 @@ namespace cytolib
 	}
 	scaleTrans::scaleTrans(int _t_scale, int _r_scale):linTrans(),t_scale(_t_scale), r_scale(_r_scale){
 		isGateOnly = true;
+		if((_r_scale == 0) || (_t_scale == 0))
+			throw(domain_error("Illegal arguments provided to scaleTrans constructor: t_scale and r_scale must be nonzero"));
 		scale_factor = t_scale/(EVENT_DATA_TYPE)r_scale;
 	}
 
