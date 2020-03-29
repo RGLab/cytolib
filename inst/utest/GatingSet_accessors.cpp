@@ -24,11 +24,11 @@ BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
 BOOST_AUTO_TEST_CASE(s3_gs)
 {
 	S3Cred cred;
-	gs = GatingSet(path,false,true,{},true, "https://mike-h5.s3.amazonaws.com", cred);
+	gs = GatingSet(path,false,true,{},false, "https://mike-h5.s3.amazonaws.com/test", cred);
 
 	auto cf = gs.begin()->second->get_cytoframe_view();
 	auto ch = cf.get_channels();
-	BOOST_CHECK_EQUAL(ch.size(), 10);
+	BOOST_CHECK_EQUAL(ch.size(), 12);
 
 
 }

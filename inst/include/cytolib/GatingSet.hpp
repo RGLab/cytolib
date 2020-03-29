@@ -143,19 +143,22 @@ public:
 		}
 		else
 		{
-			for(auto sn : h5_samples)
+			//TODO: how to do validity check for remote
+			if(remote_path == "")
 			{
-				if(pb_samples.find(sn)==pb_samples.end())
-					  throw(domain_error(errmsg + "No .pb file matched for sample " + sn + ".h5"));
+				for(auto sn : h5_samples)
+				{
+					if(pb_samples.find(sn)==pb_samples.end())
+						  throw(domain_error(errmsg + "No .pb file matched for sample " + sn + ".h5"));
+				}
+
+				for(auto sn : pb_samples)
+				{
+					if(h5_samples.find(sn)==h5_samples.end())
+						  throw(domain_error(errmsg + "No .h5 file matched for sample " + sn + ".pb"));
+				}
+
 			}
-
-			for(auto sn : pb_samples)
-			{
-				if(h5_samples.find(sn)==h5_samples.end())
-					  throw(domain_error(errmsg + "No .h5 file matched for sample " + sn + ".pb"));
-			}
-
-
 			GOOGLE_PROTOBUF_VERIFY_VERSION;
 			ifstream input(gs_pb_file.string(), ios::in | ios::binary);
 			if (!input) {

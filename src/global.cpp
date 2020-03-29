@@ -37,7 +37,7 @@ namespace cytolib
 	}
 	bool is_remote_path(const string & path)
 	{
-		return regex_match(path, regex("^https://"));
+		return regex_match(path, regex("^(https://)(.*)"));
 	}
 	string fs_tmp_path()
 	{

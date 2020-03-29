@@ -193,6 +193,7 @@ public:
 					{
 						//TODO: exist check
 						ptr.reset(new H5RCytoFrame(h5_filename, readonly, cred));
+						 frame_ = CytoFrameView(ptr);
 					}
 					else
 					{
