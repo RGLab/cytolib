@@ -189,21 +189,25 @@ public:
 			{
 				CytoFramePtr ptr;
 
-				if(fs::exists(h5_filename))
-				{
 					if(is_remote_path(h5_filename))
 					{
+						//TODO: exist check
 						ptr.reset(new H5RCytoFrame(h5_filename, readonly, cred));
 					}
 					else
+					{
+						if(fs::exists(h5_filename))
+						{
+
 						ptr.reset(new H5CytoFrame(h5_filename, readonly));
-				 pb::CytoFrame fr = *pb_gh.mutable_frame();
-				 if(!fr.is_h5())
-					 ptr.reset(new MemCytoFrame(*ptr));
-				 frame_ = CytoFrameView(ptr);
-				}
-				else
-				 throw(domain_error("H5 file missing for sample: " + h5_filename));
+						 pb::CytoFrame fr = *pb_gh.mutable_frame();
+						 if(!fr.is_h5())
+							 ptr.reset(new MemCytoFrame(*ptr));
+						 frame_ = CytoFrameView(ptr);
+						}
+						else
+						 throw(domain_error("H5 file missing for sample: " + h5_filename));
+					}
 			}
 		}
 

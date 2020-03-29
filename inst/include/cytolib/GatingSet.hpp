@@ -77,12 +77,15 @@ public:
 	 * @param path
 	 * @param is_skip_data whether to skip loading cytoframe data from h5. It should typically remain as default unless for debug purpose (e.g. legacy pb archive)
 	 * @param select_sample_idx samples to load
+	 * @param remote_path when this is supplied, path is the temp local folder that holds pb file
+	 * 						and h5 files stay at remote_path and will be loaded through H5RCytoFrame class
 	 */
 
 	GatingSet(string path, bool is_skip_data = false
 			, bool readonly = true
 			, vector<string> select_samples = {}
 			, bool print_lib_ver = false
+			, string remote_path = ""
 			, const S3Cred & cred = S3Cred())
 	{
 
@@ -250,8 +253,12 @@ public:
 							}
 
 						pb::CytoFrame fr = *gh_pb.mutable_frame();
-						string h5_filename = (fs::path(path) / (sn + ".h5")).string();
 
+						string h5_filename;
+						if(remote_path=="")
+							h5_filename = (fs::path(path) / (sn + ".h5")).string();
+						else
+							h5_filename = (fs::path(remote_path) / (sn + ".h5")).string();
 						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly, cred)), sn);
 						}
 					}
