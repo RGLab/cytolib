@@ -184,6 +184,10 @@ BOOST_AUTO_TEST_CASE(subset_by_cols)
 	BOOST_CHECK_EQUAL(mat.n_cols, sub_channels.size());//check the size of data matrix
 	BOOST_CHECK_EQUAL(fr.n_cols(), channels.size());//original object is not modified
 
+	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
+	cr_new.write_h5(tmp);
+	auto cf = H5CytoFrame(tmp);
+	BOOST_CHECK_EQUAL(cf.n_cols(), sub_channels.size());
 }
 BOOST_AUTO_TEST_CASE(subset_by_rows)
 {
@@ -201,6 +205,10 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 	CytoFrameView fr_copy = cr_new.copy();
 	BOOST_CHECK_EQUAL(fr_copy.n_rows(), 3);
 
+	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
+	cr_new.write_h5(tmp);
+	auto cf = H5CytoFrame(tmp);
+	BOOST_CHECK_EQUAL(cf.n_rows(), 3);
 }
 BOOST_AUTO_TEST_CASE(set_channel)
 {

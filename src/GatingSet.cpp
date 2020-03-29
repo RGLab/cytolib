@@ -46,34 +46,36 @@ namespace cytolib
 					{
 						fs::path p = e;
 						string ext = p.extension().string();
-						if(ext == ".pb")
+						if(ext == ".gs")
 						{
 							string fn = p.stem().string();
 							if(fn == uid_)
 							{
-								//this check maybe not necessary since no two files with the same name should be present under the same folder
 								if(gs_pb_file.empty())
 									gs_pb_file = p;
 								else
-									throw(domain_error(errmsg + "Multiple .pb files found for the same gs object!"));
+									throw(domain_error(errmsg + "Multiple .gs files found for the same gs object!"));
 							}
 							else
 							{
-								if(find(fn) == end())
-								  throw(domain_error(errmsg + "pb file not matched to GatingSet uid or any sample name in GatingSet: " + p.string()));
-								else
-									pb_samples.insert(p.stem().string());
+								  throw(domain_error(errmsg + "gs file not matched to GatingSet uid: " + p.string()));
 
 							}
 
 						}
-						else if(ext == ".h5")
+						else if(ext == ".pb"||ext == ".h5")
 						{
 							string sample_uid = p.stem().string();
 							if(find(sample_uid) == end())
-							  throw(domain_error(errmsg + "h5 file not matched to any sample in GatingSet: " + p.string()));
+							  throw(domain_error(errmsg + "file not matched to any sample in GatingSet: " + p.string()));
 							else
-								h5_samples.insert(p.stem().string());
+							{
+								if(ext == ".pb")
+									pb_samples.insert(p.stem().string());
+								else
+									h5_samples.insert(p.stem().string());
+							}
+
 						}
 						else
 						  throw(domain_error(errmsg + "File not recognized: " + p.string()));
@@ -84,13 +86,8 @@ namespace cytolib
 					{
 						if(pb_samples.size()>0)
 						{
-							throw(domain_error(errmsg + "pb file missing for gs"));
+							throw(domain_error(errmsg + "gs file missing"));
 						}
-					}
-					else
-					{
-						if(gs_pb_file.stem() != uid_)
-							throw(domain_error(errmsg + "The pb file doesn't match to the uid of GatingSet!"));
 					}
 
 					for(const auto & it : ghs_)
@@ -118,7 +115,7 @@ namespace cytolib
 		// compatible with the version of the headers we compiled against.
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
 		//init the output stream for gs
-		string filename = (fs::path(path) / uid_).string() + ".pb";
+		string filename = (fs::path(path) / uid_).string() + ".gs";
 		ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
 		string buf;
 		google::protobuf::io::StringOutputStream raw_output(&buf);
@@ -257,6 +254,9 @@ namespace cytolib
 						case pb::PB_LOGICLE:
 							trans_tbl[old_address] = TransPtr(new logicleTrans(trans_pb));
 							break;
+						case pb::PB_SCALE:
+							trans_tbl[old_address] = TransPtr(new scaleTrans(trans_pb));
+							break;
 						default:
 							throw(domain_error("unknown type of transformation archive!"));
 						}
@@ -351,7 +351,7 @@ namespace cytolib
 				gh->compensate(fr);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... transform_data: "+sn+"... \n");
-				fr.scale_time_channel();
+				// fr.scale_time_channel();
 				gh->transform_data(fr);
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... gating: "+sn+"... \n");

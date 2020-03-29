@@ -9,7 +9,7 @@
 
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
-#include "CytoFrame.hpp"
+#include "MemCytoFrame.hpp"
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
@@ -116,7 +116,12 @@ public:
 	}
 	void write_h5(const string & filename) const
 	{
-		get_cytoframe_ptr()->write_h5(filename);
+		//create a mem-based cfv to avoid extra disk write IO from realization call
+		CytoFrameView cv(*this);
+		cv.ptr_ = CytoFramePtr(new MemCytoFrame(*(get_cytoframe_ptr())));
+		//TODO:it would less overhead if we could have in-place realize method without creating the copy
+		auto cv1 = cv.copy_realized();
+		cv1.get_cytoframe_ptr()->write_h5(filename);
 	}
 
 	KEY_WORDS get_keywords() const{

@@ -101,12 +101,12 @@ enum TRANS_TYPE {
 		PB_CALTBL = 0;
 		PB_LOG = 1 ;
 		PB_LIN = 2;
-//		PB_SCALE = 4;
 		PB_FLIN = 3;
 		PB_FASIGNH = 4;
 		PB_BIEXP = 5;
 		PB_LOGICLE = 6;
 		PB_LOGGML2 = 7;
+		PB_SCALE = 8;
 	}
 message biexpTrans{
 	optional uint32 channelRange = 1;
@@ -124,6 +124,8 @@ message fasinhTrans{
 }
 message scaleTrans{
  optional float scale_factor = 1;
+ optional float t_scale = 2;
+ optional float r_scale = 3;
 }
 message flinTrans{
 	optional float min = 1;

@@ -876,13 +876,14 @@ bool TRANS_TYPE_IsValid(int value) {
     case 5:
     case 6:
     case 7:
+    case 8:
       return true;
     default:
       return false;
   }
 }
 
-static ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<std::string> TRANS_TYPE_strings[8] = {};
+static ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<std::string> TRANS_TYPE_strings[9] = {};
 
 static const char TRANS_TYPE_names[] =
   "PB_BIEXP"
@@ -892,7 +893,8 @@ static const char TRANS_TYPE_names[] =
   "PB_LIN"
   "PB_LOG"
   "PB_LOGGML2"
-  "PB_LOGICLE";
+  "PB_LOGICLE"
+  "PB_SCALE";
 
 static const ::PROTOBUF_NAMESPACE_ID::internal::EnumEntry TRANS_TYPE_entries[] = {
   { {TRANS_TYPE_names + 0, 8}, 5 },
@@ -903,6 +905,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::EnumEntry TRANS_TYPE_entries[] =
   { {TRANS_TYPE_names + 40, 6}, 1 },
   { {TRANS_TYPE_names + 46, 10}, 7 },
   { {TRANS_TYPE_names + 56, 10}, 6 },
+  { {TRANS_TYPE_names + 66, 8}, 8 },
 };
 
 static const int TRANS_TYPE_entries_by_number[] = {
@@ -914,6 +917,7 @@ static const int TRANS_TYPE_entries_by_number[] = {
   0, // 5 -> PB_BIEXP
   7, // 6 -> PB_LOGICLE
   6, // 7 -> PB_LOGGML2
+  8, // 8 -> PB_SCALE
 };
 
 const std::string& TRANS_TYPE_Name(
@@ -922,12 +926,12 @@ const std::string& TRANS_TYPE_Name(
       ::PROTOBUF_NAMESPACE_ID::internal::InitializeEnumStrings(
           TRANS_TYPE_entries,
           TRANS_TYPE_entries_by_number,
-          8, TRANS_TYPE_strings);
+          9, TRANS_TYPE_strings);
   (void) dummy;
   int idx = ::PROTOBUF_NAMESPACE_ID::internal::LookUpEnumName(
       TRANS_TYPE_entries,
       TRANS_TYPE_entries_by_number,
-      8, value);
+      9, value);
   return idx == -1 ? ::PROTOBUF_NAMESPACE_ID::internal::GetEmptyString() :
                      TRANS_TYPE_strings[idx].get();
 }
@@ -935,7 +939,7 @@ bool TRANS_TYPE_Parse(
     const std::string& name, TRANS_TYPE* value) {
   int int_value;
   bool success = ::PROTOBUF_NAMESPACE_ID::internal::LookUpEnumValue(
-      TRANS_TYPE_entries, 8, name, &int_value);
+      TRANS_TYPE_entries, 9, name, &int_value);
   if (success) {
     *value = static_cast<TRANS_TYPE>(int_value);
   }
@@ -5139,6 +5143,12 @@ class scaleTrans::_Internal {
   static void set_has_scale_factor(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
+  static void set_has_t_scale(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
+  }
+  static void set_has_r_scale(HasBits* has_bits) {
+    (*has_bits)[0] |= 4u;
+  }
 };
 
 scaleTrans::scaleTrans()
@@ -5151,12 +5161,16 @@ scaleTrans::scaleTrans(const scaleTrans& from)
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  scale_factor_ = from.scale_factor_;
+  ::memcpy(&scale_factor_, &from.scale_factor_,
+    static_cast<size_t>(reinterpret_cast<char*>(&r_scale_) -
+    reinterpret_cast<char*>(&scale_factor_)) + sizeof(r_scale_));
   // @@protoc_insertion_point(copy_constructor:pb.scaleTrans)
 }
 
 void scaleTrans::SharedCtor() {
-  scale_factor_ = 0;
+  ::memset(&scale_factor_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&r_scale_) -
+      reinterpret_cast<char*>(&scale_factor_)) + sizeof(r_scale_));
 }
 
 scaleTrans::~scaleTrans() {
@@ -5182,7 +5196,12 @@ void scaleTrans::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  scale_factor_ = 0;
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000007u) {
+    ::memset(&scale_factor_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&r_scale_) -
+        reinterpret_cast<char*>(&scale_factor_)) + sizeof(r_scale_));
+  }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
 }
@@ -5200,6 +5219,22 @@ const char* scaleTrans::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
           _Internal::set_has_scale_factor(&has_bits);
           scale_factor_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // optional float t_scale = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+          _Internal::set_has_t_scale(&has_bits);
+          t_scale_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // optional float r_scale = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29)) {
+          _Internal::set_has_r_scale(&has_bits);
+          r_scale_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
@@ -5237,6 +5272,18 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_scale_factor(), target);
   }
 
+  // optional float t_scale = 2;
+  if (cached_has_bits & 0x00000002u) {
+    stream->EnsureSpace(&target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(2, this->_internal_t_scale(), target);
+  }
+
+  // optional float r_scale = 3;
+  if (cached_has_bits & 0x00000004u) {
+    stream->EnsureSpace(&target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(3, this->_internal_r_scale(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = stream->WriteRaw(_internal_metadata_.unknown_fields().data(),
         static_cast<int>(_internal_metadata_.unknown_fields().size()), target);
@@ -5253,12 +5300,24 @@ size_t scaleTrans::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // optional float scale_factor = 1;
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    total_size += 1 + 4;
-  }
+  if (cached_has_bits & 0x00000007u) {
+    // optional float scale_factor = 1;
+    if (cached_has_bits & 0x00000001u) {
+      total_size += 1 + 4;
+    }
 
+    // optional float t_scale = 2;
+    if (cached_has_bits & 0x00000002u) {
+      total_size += 1 + 4;
+    }
+
+    // optional float r_scale = 3;
+    if (cached_has_bits & 0x00000004u) {
+      total_size += 1 + 4;
+    }
+
+  }
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     total_size += _internal_metadata_.unknown_fields().size();
   }
@@ -5280,8 +5339,18 @@ void scaleTrans::MergeFrom(const scaleTrans& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_scale_factor()) {
-    _internal_set_scale_factor(from._internal_scale_factor());
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000007u) {
+    if (cached_has_bits & 0x00000001u) {
+      scale_factor_ = from.scale_factor_;
+    }
+    if (cached_has_bits & 0x00000002u) {
+      t_scale_ = from.t_scale_;
+    }
+    if (cached_has_bits & 0x00000004u) {
+      r_scale_ = from.r_scale_;
+    }
+    _has_bits_[0] |= cached_has_bits;
   }
 }
 
@@ -5301,6 +5370,8 @@ void scaleTrans::InternalSwap(scaleTrans* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   swap(scale_factor_, other->scale_factor_);
+  swap(t_scale_, other->t_scale_);
+  swap(r_scale_, other->r_scale_);
 }
 
 std::string scaleTrans::GetTypeName() const {
