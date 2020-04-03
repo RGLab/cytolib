@@ -609,6 +609,36 @@ namespace cytolib
 				}
 			}
 	}
+
+	/*
+	 * Apply post-transformation shifts to gates (needed for magnetic gates)
+	 */
+	void GatingHierarchy::shift_gate(){
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				PRINT("\nstart applying shifts to gates \n");
+
+
+			VertexID_vec vertices=getVertices(0);
+
+			for(VertexID_vec::iterator it=vertices.begin();it!=vertices.end();it++)
+			{
+				VertexID u=*it;
+				nodeProperties & node=getNodeProperty(u);
+				if(u!=0)
+				{
+					gatePtr g=node.getGate();
+					if(g==NULL)
+						throw(domain_error("no gate available for this node"));
+					if(g_loglevel>=POPULATION_LEVEL)
+						PRINT(node.getName()+"\n");
+					unsigned short gateType= g->getType();
+					if(gateType!=BOOLGATE && gateType!=CLUSTERGATE && gateType!=LOGICALGATE)
+						g->shiftGate();
+
+				}
+			}
+	}
+
 	void GatingHierarchy::check_ungated_bool_node(VertexID u){
 		nodeProperties & node = getNodeProperty(u);
 		if(!node.isGated())

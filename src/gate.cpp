@@ -147,6 +147,11 @@ namespace cytolib
 
 	}
 
+	void rangeGate::shiftGate(){
+		param.setMin(param.getMin() + shift[0]);
+		param.setMax(param.getMax() + shift[0]);
+	}
+
 	INDICE_TYPE rangeGate::gating(MemCytoFrame & fdata, INDICE_TYPE & parentInd){
 
 		EVENT_DATA_TYPE * data_1d = fdata.get_data_memptr(param.getName(), ColType::channel);
@@ -325,6 +330,16 @@ namespace cytolib
 
 
 	}
+
+	void polygonGate::shiftGate(){
+		vector<coordinate> vertices=param.getVertices();
+		for(unsigned i=0;i<vertices.size();i++){
+			vertices[i].x += shift[0];
+			vertices[i].y += shift[1];
+		}
+		param.setVertices(vertices);
+	}
+
 	 /*
 	 *
 	 *  reimplement c++ version of inPolygon_c
@@ -452,13 +467,14 @@ namespace cytolib
 		isTransformed = true;
 		isGained = true;
 		neg = false;
+		setShift(EVENT_DATA_VEC{0.0,0.0});
 	}
 
 	ellipseGate::ellipseGate(vector<coordinate> _antipodal, vector<string> _params):antipodal_vertices(_antipodal),dist(1){
 		isTransformed = false;
 		isGained = false;
 		neg = false;
-
+		setShift(EVENT_DATA_VEC{0.0,0.0});
 		/*
 		 * init the dummy vertices for base class
 		 * (this deprecated inheritance exists for the sake of legacy archive)
@@ -652,6 +668,12 @@ namespace cytolib
 		antipodal_vertices.push_back(coordinate(mu.x-a_vec(0), mu.y-a_vec(1)));
 		antipodal_vertices.push_back(coordinate(mu.x+b_vec(0), mu.y+b_vec(1)));
 		antipodal_vertices.push_back(coordinate(mu.x-b_vec(0), mu.y-b_vec(1)));
+	}
+
+	void ellipseGate::shiftGate(){
+		mu.x += shift[0];
+		mu.y += shift[1];
+		computeAntipodalVerts();
 	}
 
 	/*
@@ -918,6 +940,19 @@ namespace cytolib
 		}
 
 	}
+
+	void ellipsoidGate::shiftGate(){
+		//Let polygonGate::shiftGate() shift the interpolated points
+		polygonGate::shiftGate();
+
+		//Still need to shift the antipodal vertices
+		for(auto & i : antipodal_vertices)
+		{
+			i.x += shift[0];
+			i.y += shift[1];
+		}
+	}
+
 	void boolGate::convertToPb(pb::gate & gate_pb){
 		gate::convertToPb(gate_pb);
 
