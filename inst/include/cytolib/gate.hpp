@@ -160,8 +160,8 @@ public:
 	virtual void setNegate(bool _neg){neg=_neg;};
 	virtual bool Transformed() const{return isTransformed;};
 	virtual void setTransformed(bool _isTransformed){isTransformed=_isTransformed;};
-	virtual void setShift(EVENT_DATA_VEC) {throw(domain_error("undefined setShift function!"));};
-	virtual EVENT_DATA_VEC getShift() const{throw(domain_error("undefined getShift function!"));};
+	virtual void setShift(vector<EVENT_DATA_TYPE>) {throw(domain_error("undefined setShift function!"));};
+	virtual vector<EVENT_DATA_TYPE> getShift() const{throw(domain_error("undefined getShift function!"));};
 	virtual void shiftGate() {throw(domain_error("undefined shiftGate function!"));}
 };
 
@@ -169,10 +169,10 @@ public:
 class rangeGate:public gate {
 private:
 	paramRange param;
-	EVENT_DATA_VEC shift;
+	vector<EVENT_DATA_TYPE> shift;
 public:
-	rangeGate():gate(), shift(EVENT_DATA_VEC{0.0}){}
-	rangeGate(const pb::gate & gate_pb):gate(gate_pb),param(paramRange(gate_pb.rg().param())), shift(EVENT_DATA_VEC{0.0}){}
+	rangeGate():gate(), shift(vector<EVENT_DATA_TYPE>{0.0}){}
+	rangeGate(const pb::gate & gate_pb):gate(gate_pb),param(paramRange(gate_pb.rg().param())), shift(vector<EVENT_DATA_TYPE>{0.0}){}
 	void convertToPb(pb::gate & gate_pb);
 	unsigned short getType() const{return RANGEGATE;}
 	void transforming(trans_local & trans);
@@ -187,8 +187,8 @@ public:
 	void update_channels(const CHANNEL_MAP & chnl_map){param.update_channels(chnl_map);};
 	vertices_vector getVertices() const{return param.toVector();};
 	gatePtr clone() const{return gatePtr(new rangeGate(*this));};
-	void setShift(EVENT_DATA_VEC _shift) {shift=_shift;};
-	EVENT_DATA_VEC getShift() const{return shift;};
+	void setShift(vector<EVENT_DATA_TYPE> _shift) {shift=_shift;};
+	vector<EVENT_DATA_TYPE> getShift() const{return shift;};
 	void shiftGate();
 };
 
@@ -206,9 +206,9 @@ public:
 class polygonGate:public gate {
 protected:
 	paramPoly param;
-	EVENT_DATA_VEC shift;
+	vector<EVENT_DATA_TYPE> shift;
 public:
-	polygonGate():gate(), shift(EVENT_DATA_VEC{0.0, 0.0}){};
+	polygonGate():gate(), shift(vector<EVENT_DATA_TYPE>{0.0, 0.0}){};
 	virtual unsigned short getType() const{return POLYGONGATE;}
 	/*
 	 * when the original gate vertices are at the threshold
@@ -244,9 +244,9 @@ public:
 	virtual vector<string> getParamNames() const{return param.getNameArray();};
 	virtual gatePtr clone() const{return gatePtr(new polygonGate(*this));};
 	void convertToPb(pb::gate & gate_pb);
-	polygonGate(const pb::gate & gate_pb):gate(gate_pb),param(paramPoly(gate_pb.pg().param())),shift(EVENT_DATA_VEC{0.0,0.0}){}
-	void setShift(EVENT_DATA_VEC _shift) {shift=_shift;};
-	EVENT_DATA_VEC getShift() const{return shift;};
+	polygonGate(const pb::gate & gate_pb):gate(gate_pb),param(paramPoly(gate_pb.pg().param())),shift(vector<EVENT_DATA_TYPE>{0.0,0.0}){}
+	void setShift(vector<EVENT_DATA_TYPE> _shift) {shift=_shift;};
+	vector<EVENT_DATA_TYPE> getShift() const{return shift;};
 	void shiftGate();
 };
 
@@ -375,7 +375,7 @@ protected:
 	vector<coordinate> cov;//covariance matrix
 	EVENT_DATA_TYPE dist; //size of ellipse
 public:
-	ellipseGate(){dist = 1; setShift(EVENT_DATA_VEC{0.0,0.0});};
+	ellipseGate(){dist = 1; setShift(vector<EVENT_DATA_TYPE>{0.0,0.0});};
 	vector<coordinate> getCovarianceMat() const;
 	coordinate getMu() const;
 	EVENT_DATA_TYPE getDist() const;

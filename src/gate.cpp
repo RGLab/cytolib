@@ -467,14 +467,14 @@ namespace cytolib
 		isTransformed = true;
 		isGained = true;
 		neg = false;
-		setShift(EVENT_DATA_VEC{0.0,0.0});
+		setShift(vector<EVENT_DATA_TYPE>{0.0,0.0});
 	}
 
 	ellipseGate::ellipseGate(vector<coordinate> _antipodal, vector<string> _params):antipodal_vertices(_antipodal),dist(1){
 		isTransformed = false;
 		isGained = false;
 		neg = false;
-		setShift(EVENT_DATA_VEC{0.0,0.0});
+		setShift(vector<EVENT_DATA_TYPE>{0.0,0.0});
 		/*
 		 * init the dummy vertices for base class
 		 * (this deprecated inheritance exists for the sake of legacy archive)
