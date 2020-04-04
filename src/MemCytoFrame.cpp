@@ -132,7 +132,8 @@ namespace cytolib
 				 * (this slows down things quite a bit, but still a lot faster than R version,
 				 *  and this double delimiter logic is not normally invoked anyway)
 				 */
-				boost::replace_all(token, soddChar, doubleDelimiter);
+
+				boost::replace_all(token, soddChar, string(1, delimiter));//unescape the double delimiter to single one
 	//				std::PRINT( token;
 			}
 //				PRINT("\n");
