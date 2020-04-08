@@ -14,6 +14,7 @@ using namespace arma;
 
 #include "transformation.hpp"
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <queue>
 #include "global.hpp"
 namespace cytolib
@@ -85,6 +86,8 @@ public:
 			}
 			for(unsigned i = n + 1; i < valVec.size(); i++)//param name
 			{
+				//Removing any formatting padding from spillover matrix entries
+				boost::algorithm::trim(valVec[i]);
 				spillOver[i-n-1] = boost::lexical_cast<double>(valVec[i]);
 			}
 
