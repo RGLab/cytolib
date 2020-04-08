@@ -239,34 +239,7 @@ public:
 			return get_cytoframe_ptr()->copy(h5_filename, overwrite);
 		}
 	}
-
-	void set_data(const EVENT_DATA_VEC & data_in, bool force = false){
-			if(is_empty()){
-				// Setting empty to empty is an allowed no-op, but not setting empty to non-empty
-				if(!data_in.is_empty()){
-					throw(domain_error("Cannot assign non-empty input data to empty CytoFrameView!"));
-				}
-			}else{
-				//fetch the original view of data
-				EVENT_DATA_VEC data_orig = get_cytoframe_ptr()->get_data();
-				//update it
-				if(is_col_indexed_&&is_row_indexed_)
-					data_orig.submat(row_idx_, col_idx_) = data_in;
-				else if(is_row_indexed_)
-					data_orig.rows(row_idx_) = data_in;
-				else if(is_col_indexed_)
-					data_orig.cols(col_idx_) = data_in;
-				else
-					if(!force&&(data_orig.n_cols!=data_in.n_cols||data_orig.n_rows!=data_in.n_rows))
-						throw(domain_error("The size of the input data is different from the original data matrix of cytoframe!To bypass the validity check, set force = true ."));
-					else
-						data_orig = data_in;
-
-
-				//write back to ptr_
-				get_cytoframe_ptr()->set_data(data_orig);
-			}
-		}
+	void set_data(const EVENT_DATA_VEC & data_in);
 	EVENT_DATA_VEC get_data() const;
 
 	CytoFrameView copy(const string & h5_filename = "") const;
