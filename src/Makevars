@@ -20,7 +20,7 @@ USERLIB = ${USERDIR}/${BOOSTFSLIB}
 
 	
 CXX_STD = CXX11
-PKG_CPPFLAGS =-DROUT -I../inst/include -Wno-deprecated-declarations -DBOOST_NO_AUTO_PTR -Wno-unknown-pragmas -Wno-comment 
+PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
 
 RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
     "${R_HOME}/bin/R" --vanilla --slave)
