@@ -17,6 +17,14 @@ boost_fs_objs=${boost_fs_src:.cpp=.o}
 
 PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
 
+cytolib_src=${wildcard *.cpp}
+cytolib_objs=${cytolib_src:.cpp=.o} GatingSet.pb.o
+
+BOOSTFSLIB = libboost_fs.a
+USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
+USERLIB = ${USERDIR}/libcytolib.a
+
+OBJECTS=dummy.o
 
 #needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
 RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")')
@@ -32,11 +40,15 @@ endif
 
 all: $(SHLIB) 
 
-$(SHLIB): ${boost_fs_objs}
+$(SHLIB): $(USERLIB)
+
+$(USERLIB): ${boost_fs_objs} ${cytolib_objs} 
+	mkdir -p "${USERDIR}"
+	$(AR) rs "${USERLIB}" ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs}
 
 $(boost_fs_objs): ${boost_sys_objs}
 
 
 clean:
-	rm -f $(OBJECTS) ${boost_fs_objs} ${boost_sys_objs}
+	rm -f $(OBJECTS) ${boost_fs_objs} ${boost_sys_objs} $(SHLIB)
  

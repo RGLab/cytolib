@@ -21,64 +21,11 @@ CxxFlags <- function() {
 #' @importFrom RProtoBufLib LdFlags
 #' @importFrom RcppParallel RcppParallelLibs
 cytolib_LdFlags <- function() {
-   cat(cytolibLdFlags())
-}
-
-# alias for backward compatibility
-cytolibLibs <- function() {
-   cytolib_LdFlags()
+   cat(res <- asBuildPath(system.file("lib/libcytolib.a", package = "cytolib")))
 }
 
 
-cytolibCxxFlags <- function() {
-   
-   flags <- c()
-   
-   
-   flags
-}
 
-# Return the linker flags requried for cytolib on this platform
-cytolibLdFlags <- function() {
-   # on Windows and Solaris we need to explicitly link against cytolib.dll
-   if ((Sys.info()['sysname'] %in% c("Windows", "SunOS")) && !isSparc()) {
-	  res <- asBuildPath(cytolibLibPath())
-   } else {
-     res <- ""
-   }
-	# if(all)
-	  # res <- paste(res, gslibs)
-	res
-}
-
-# Determine the platform-specific path to the cytolib library
-cytolibLibPath <- function(suffix = "") {
-   sysname <- Sys.info()['sysname']
-   cytolibSupported <- list(
-      "Darwin" = paste("cytolib", suffix, ".so", sep = ""), 
-      "Linux" = paste("cytolib", suffix, ".so", sep = ""), 
-      "Windows" = paste("libcytolib", suffix, ".a", sep = ""),
-      "SunOS" = paste("cytolib", suffix, ".so", sep = "")
-   )
-   # browser()
-   if ((sysname %in% names(cytolibSupported)) && !isSparc()) {
-      
-      if (sysname == "Windows")
-	  {
-		  libDir <- "lib/"
-         libDir <- paste(libDir, .Platform$r_arch, "/", sep="")
-	 }else
-		 libDir <- "libs/"
-      system.file(paste(libDir, cytolibSupported[[sysname]], sep = ""), 
-                  package = "cytolib")
-   } else {
-      NULL
-   }
-}
-
-isSparc <- function() {
-   Sys.info()['sysname'] == "SunOS" && Sys.info()[["machine"]] != "i86pc"
-}
 
 # Helper function to ape the behavior of the R build system
 # when providing paths to libraries
