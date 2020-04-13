@@ -293,7 +293,7 @@ public:
 			 */
 			for(auto i : parentInd)
 			{
-				bool inX,inY;
+				bool inX=false,inY=false;
 				EVENT_DATA_TYPE xMin=vertices[0].x;
 				EVENT_DATA_TYPE yMin=vertices[0].y;
 
