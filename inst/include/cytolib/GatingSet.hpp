@@ -404,7 +404,7 @@ public:
 		}
 
 	}
-	/**
+
 	/**
 	 * constructor from the legacy archives (de-serialization)
 	 * @param filename

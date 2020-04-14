@@ -271,6 +271,12 @@ public:
 	 * transform gates
 	 */
 	void transform_gate();
+
+	/*
+	 * Apply post-transformation shifts to gates (like for magnetic gates)
+	 */
+	void shift_gate();
+
 	void check_ungated_bool_node(VertexID u);
 	/*
 	 * traverse the tree to gate each pops
