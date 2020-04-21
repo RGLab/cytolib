@@ -13,7 +13,7 @@ boost_sys_objs=${boost_sys_src:.cpp=.o}
 boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
 boost_fs_objs=${boost_fs_src:.cpp=.o}
 
-PKG_CPPFLAGS =-DROUT -I../inst/include -DRCPP_PARALLEL_USE_TBB=1 -fpermissive -Wno-deprecated-declarations -DBOOST_NO_AUTO_PTR -Wno-unknown-pragmas -Wno-comment 
+PKG_CPPFLAGS =-DROUT -I../inst/include -DRCPP_PARALLEL_USE_TBB=1 -fpermissive -DBOOST_NO_AUTO_PTR 
 
 	
 RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
