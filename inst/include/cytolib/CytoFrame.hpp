@@ -163,6 +163,38 @@ public:
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
+	void CytoFrame::write_tile(const string & filename) const
+		{
+			H5File file( filename, H5F_ACC_TRUNC );
+
+			write_h5_params(file);
+
+			write_h5_keys(file);
+
+			write_h5_pheno_data(file);
+
+
+			 /*
+			* store events data as fixed
+			* size dataset.
+			*/
+			unsigned nEvents = n_rows();
+			hsize_t dimsf[2] = {n_cols(), nEvents};              // dataset dimensions
+			DSetCreatPropList plist;
+			hsize_t	chunk_dims[2] = {1, (nEvents > 0 ? nEvents : 1)};
+			plist.setChunk(2, chunk_dims);
+		//	plist.setFilter()
+			hsize_t dim_max[] = {H5S_UNLIMITED, H5S_UNLIMITED};
+
+			DataSpace dataspace( 2, dimsf, dim_max);
+			DataSet dataset = file.createDataSet( DATASET_NAME, h5_datatype_data(DataTypeLocation::H5), dataspace, plist);
+			/*
+			* Write the data to the dataset using default memory space, file
+			* space, and transfer properties.
+			*/
+			EVENT_DATA_VEC dat = get_data();
+			dataset.write(dat.mem, h5_datatype_data(DataTypeLocation::MEM));
+		}
 	/**
 	 * get the data of entire event matrix
 	 * @return
