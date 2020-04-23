@@ -231,20 +231,7 @@ namespace cytolib
 	}
 
 
-	/**
-	 * Read data from disk.
-	 * The caller will directly receive the data vector without the copy overhead thanks to the move semantics supported for vector container in c++11
-	 * @return
-	 */
 
-
-	EVENT_DATA_VEC H5CytoFrame::get_data() const{
-		unsigned n = n_cols();
-		uvec col_idx(n);
-		for(unsigned i = 0; i < n; i++)
-			col_idx[i] = i;
-		return read_data(col_idx);
-	}
 
 
 	/**

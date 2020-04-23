@@ -134,7 +134,19 @@ public:
 		return data_;
 	}
 
-	EVENT_DATA_VEC get_data(uvec col_idx) const;
+
+	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
+	{
+		if(is_col)
+			return data_.cols(idx);
+		else
+			return data_.rows(idx);
+	}
+	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
+	{
+		return data_.submat(row_idx, col_idx);
+	}
+
 	/**
 	 * copy setter
 	 * @param _data

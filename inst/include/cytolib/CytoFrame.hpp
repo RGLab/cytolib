@@ -163,7 +163,7 @@ public:
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
-	void CytoFrame::write_tile(const string & filename) const
+	void write_tile(const string & filename) const
 		{
 			H5File file( filename, H5F_ACC_TRUNC );
 
@@ -200,10 +200,11 @@ public:
 	 * @return
 	 */
 	virtual EVENT_DATA_VEC get_data() const=0;
-	virtual EVENT_DATA_VEC get_data(uvec col_idx) const=0;
+	virtual EVENT_DATA_VEC get_data(uvec idx, bool is_col) const=0;
+	virtual EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const=0;
 	virtual EVENT_DATA_VEC get_data(vector<string>cols, ColType col_type) const
 	{
-		return get_data(get_col_idx(cols, col_type));
+		return get_data(get_col_idx(cols, col_type), true);
 	}
 
 	virtual void set_data(const EVENT_DATA_VEC &)=0;

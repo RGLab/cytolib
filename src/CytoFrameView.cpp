@@ -191,19 +191,14 @@ namespace cytolib
 		if(is_empty()){
 			data = EVENT_DATA_VEC(n_rows(), n_cols());
 		}else{
-			if(is_col_indexed())
-				data = get_cytoframe_ptr()->get_data(col_idx_);
-			else
+			auto ptr = get_cytoframe_ptr();
+			if(is_col_indexed()&&is_row_indexed())
+				data = ptr->get_data(row_idx_, col_idx_);
+			else if(is_col_indexed())
 			{
-//				double start = gettime();
-				data = get_cytoframe_ptr()->get_data();
-//					double runtime = (gettime() - start);
-//					cout << runtime << endl;
-			}
-
-			
-			if(is_row_indexed())
-				data = data.rows(row_idx_);
+				data = ptr->get_data(col_idx_, true);
+			}else
+				data = ptr->get_data(row_idx_, false);
 		}
 		return data;
 	}

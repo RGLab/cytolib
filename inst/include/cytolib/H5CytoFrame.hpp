@@ -260,15 +260,29 @@ public:
 	 */
 
 
-	EVENT_DATA_VEC get_data() const;
+	EVENT_DATA_VEC get_data() const
+	{
+		unsigned n = n_cols();
+		uvec col_idx(n);
+		for(unsigned i = 0; i < n; i++)
+			col_idx[i] = i;
+		return read_data(col_idx);
+	}
 	/**
 	 * Partial IO
 	 * @param col_idx
 	 * @return
 	 */
-	EVENT_DATA_VEC get_data(uvec col_idx) const
+	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
 	{
-		return read_data(col_idx);
+		if(is_col)
+			return read_data(idx);
+		else
+			return get_data().rows(idx);
+	}
+	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
+	{
+		return read_data(col_idx).rows(row_idx);
 	}
 	/*
 	 * protect the h5 from being overwritten accidentally

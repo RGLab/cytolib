@@ -1038,10 +1038,6 @@ namespace cytolib
 
 
 
-	EVENT_DATA_VEC MemCytoFrame::get_data(uvec col_idx) const
-	{
-		return data_.cols(col_idx);
-	}
 
 
 	/**
