@@ -207,50 +207,50 @@ public:
 
 	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
 	{
-			fr_pb.set_is_h5(true);
-			if(h5_opt != H5Option::skip)
-			{
-				auto h5path = fs::path(h5_filename);
-				auto dest = h5path.parent_path();
-				if(!fs::exists(dest))
-					throw(logic_error(dest.string() + "doesn't exist!"));
-
-				if(!fs::equivalent(fs::path(filename_).parent_path(), dest))
-				{
-					switch(h5_opt)
-					{
-					case H5Option::copy:
-						{
-							if(fs::exists(h5path))
-								fs::remove(h5path);
-							fs::copy(filename_, h5_filename);
-							break;
-						}
-					case H5Option::move:
-						{
-							if(fs::exists(h5path))
-								fs::remove(h5path);
-							fs::rename(filename_, h5_filename);
-							break;
-						}
-					case H5Option::link:
-						{
-							throw(logic_error("'link' option for TileCytoFrame is no longer supported!"));
-							fs::create_hard_link(filename_, h5_filename);
-							break;
-						}
-					case H5Option::symlink:
-						{
-							if(fs::exists(h5path))
-								fs::remove(h5path);
-							fs::create_symlink(filename_, h5_filename);
-							break;
-						}
-					default:
-						throw(logic_error("invalid h5_opt!"));
-					}
-				}
-			}
+//			fr_pb.set_is_h5(true);
+//			if(h5_opt != H5Option::skip)
+//			{
+//				auto h5path = fs::path(h5_filename);
+//				auto dest = h5path.parent_path();
+//				if(!fs::exists(dest))
+//					throw(logic_error(dest.string() + "doesn't exist!"));
+//
+//				if(!fs::equivalent(fs::path(filename_).parent_path(), dest))
+//				{
+//					switch(h5_opt)
+//					{
+//					case H5Option::copy:
+//						{
+//							if(fs::exists(h5path))
+//								fs::remove(h5path);
+//							fs::copy(filename_, h5_filename);
+//							break;
+//						}
+//					case H5Option::move:
+//						{
+//							if(fs::exists(h5path))
+//								fs::remove(h5path);
+//							fs::rename(filename_, h5_filename);
+//							break;
+//						}
+//					case H5Option::link:
+//						{
+//							throw(logic_error("'link' option for TileCytoFrame is no longer supported!"));
+//							fs::create_hard_link(filename_, h5_filename);
+//							break;
+//						}
+//					case H5Option::symlink:
+//						{
+//							if(fs::exists(h5path))
+//								fs::remove(h5path);
+//							fs::create_symlink(filename_, h5_filename);
+//							break;
+//						}
+//					default:
+//						throw(logic_error("invalid h5_opt!"));
+//					}
+//				}
+//			}
 		}
 	/**
 	 * Read data from disk.
@@ -259,15 +259,22 @@ public:
 	 */
 
 
-	EVENT_DATA_VEC get_data() const;
+	EVENT_DATA_VEC get_data() const
+	{
+		return EVENT_DATA_VEC();
+	}
 	/**
 	 * Partial IO
 	 * @param col_idx
 	 * @return
 	 */
-	EVENT_DATA_VEC get_data(uvec col_idx) const
+	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
 	{
-		return read_data(col_idx);
+		return EVENT_DATA_VEC();
+	}
+	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
+	{
+		return EVENT_DATA_VEC();
 	}
 	/*
 	 * protect the h5 from being overwritten accidentally
