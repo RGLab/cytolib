@@ -18,6 +18,8 @@
 #include <chrono>
 #include <unordered_set>
 #include "datatype.hpp"
+#include <tiledb/tiledb>
+
 using namespace std;
 
 namespace cytolib

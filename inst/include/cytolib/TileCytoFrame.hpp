@@ -10,7 +10,6 @@
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/global.hpp>
 #include <boost/filesystem.hpp>
-#include <tiledb/tiledb.h>
 namespace fs = boost::filesystem;
 
 namespace cytolib
@@ -31,6 +30,8 @@ protected:
 	bool is_dirty_pdata;
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 	EVENT_DATA_VEC read_data(uvec col_idx) const;
+	tiledb::Context ctx;
+
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta();

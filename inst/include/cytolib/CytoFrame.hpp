@@ -20,7 +20,8 @@ using namespace arma;
 
 #include <H5Cpp.h>
 using namespace H5;
-
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 namespace cytolib
 {
@@ -80,6 +81,7 @@ protected:
 	 *
 	 */
 	virtual void build_hash();
+	tiledb::Context ctx;
 public:
 	virtual ~CytoFrame(){};
 //	virtual void close_h5() =0;
@@ -163,38 +165,115 @@ public:
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
-	void write_tile(const string & filename) const
+	void write_tile(const string & uri) const
+	{
+		tiledb::VFS vfs(ctx);
+		tiledb::VFS::filebuf buf(vfs);
+
+		if(vfs.is_dir(uri))
 		{
-			H5File file( filename, H5F_ACC_TRUNC );
+			throw(domain_error("Can't create new TileCytoFrame at " + uri + " since it already exists!"));
 
-			write_h5_params(file);
-
-			write_h5_keys(file);
-
-			write_h5_pheno_data(file);
-
-
-			 /*
-			* store events data as fixed
-			* size dataset.
-			*/
-			unsigned nEvents = n_rows();
-			hsize_t dimsf[2] = {n_cols(), nEvents};              // dataset dimensions
-			DSetCreatPropList plist;
-			hsize_t	chunk_dims[2] = {1, (nEvents > 0 ? nEvents : 1)};
-			plist.setChunk(2, chunk_dims);
-		//	plist.setFilter()
-			hsize_t dim_max[] = {H5S_UNLIMITED, H5S_UNLIMITED};
-
-			DataSpace dataspace( 2, dimsf, dim_max);
-			DataSet dataset = file.createDataSet( DATASET_NAME, h5_datatype_data(DataTypeLocation::H5), dataspace, plist);
-			/*
-			* Write the data to the dataset using default memory space, file
-			* space, and transfer properties.
-			*/
-			EVENT_DATA_VEC dat = get_data();
-			dataset.write(dat.mem, h5_datatype_data(DataTypeLocation::MEM));
 		}
+		else
+		{
+			vfs.create_dir(uri);
+		}
+		fs::path arraypath(uri);
+		auto mat_uri = (arraypath / "mat").string();
+		write_tile_data_pd(mat_uri);
+
+		auto params_uri = (arraypath / "params").string();
+		write_tile_params(params_uri);
+
+		auto kw_uri = (arraypath / "keywords").string();
+		write_tile_kw(kw_uri);
+	}
+	void write_tile_data_pd(const string & uri) const
+	{
+		tiledb::Domain domain(ctx);
+		int nEvents = n_rows();
+		int nch = n_cols();
+		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, nEvents}, 100));
+		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch}, 1));
+		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+		schema.set_domain(domain);
+		schema.add_attribute(tiledb::Attribute::create<double>(ctx, "mat"));
+		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+		tiledb::Array::create(uri, schema);
+		tiledb::Array array(ctx, uri, TILEDB_WRITE);
+		tiledb::Query query(ctx, array);
+		query.set_layout(TILEDB_COL_MAJOR);
+		EVENT_DATA_VEC dat = get_data();
+
+		query.set_buffer("mat", const_cast<EVENT_DATA_TYPE *>(dat.mem), nch * nEvents);
+		query.submit();
+		query.finalize();
+
+		//attach pdata as meta to param array(for convenience since mat can't attach two
+		for(auto it : pheno_data_)
+			array.put_metadata(it.first, TILEDB_STRING_UTF16, 1, &(it.second));
+
+	}
+	void write_tile_kw(const string & uri) const
+	{
+		tiledb::Domain domain(ctx);
+		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "dummy", {1, 2}, 1));
+		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+		schema.set_domain(domain);
+		schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
+//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+		tiledb::Array::create(uri, schema);
+		tiledb::Array array(ctx, uri, TILEDB_WRITE);
+//		tiledb::Query query(ctx, array);
+//		query.set_layout(TILEDB_COL_MAJOR);
+//		EVENT_DATA_VEC dat = get_data();
+//
+//		query.set_buffer("mat", const_cast<EVENT_DATA_TYPE *>(dat.mem), nch * nEvents);
+//		query.submit();
+//		query.finalize();
+
+		//attach kw as meta to mat array
+		for(auto it : keys_)
+			array.put_metadata(it.first, TILEDB_STRING_UTF16, 1, &(it.second));
+
+	}
+	void write_tile_params(const string & uri) const
+	{
+
+		tiledb::Domain domain(ctx);
+		int nch = n_cols();
+		auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch}, 1);
+		domain.add_dimension(a1);
+
+		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+		schema.set_domain(domain);
+		schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
+		schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
+
+		tiledb::Array::create(uri, schema);
+		tiledb::Array array(ctx, uri, TILEDB_WRITE);
+		tiledb::Query query(ctx, array);
+		query.set_layout(TILEDB_GLOBAL_ORDER);
+		vector<float> min_vec(nch);
+		for(int i = 0; i < nch; i++)
+			min_vec[i] = params[i].min;
+		query.set_buffer("min", min_vec);
+		vector<float> max_vec(nch);
+		for(int i = 0; i < nch; i++)
+			max_vec[i] = params[i].max;
+		query.set_buffer("max", max_vec);
+		query.submit();
+		query.finalize();
+
+		//attach chnl and marker as meta since val-length writing to arry attr is not feasible
+		//due to empty markers do not meet the strict ascending buffer offset requirement
+		for(auto it : params)
+			array.put_metadata(it.channel, TILEDB_STRING_UTF16, 1, &(it.marker));
+
+	}
 	/**
 	 * get the data of entire event matrix
 	 * @return

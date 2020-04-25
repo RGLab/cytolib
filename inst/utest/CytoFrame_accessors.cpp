@@ -13,7 +13,7 @@ struct CFFixture{
 		//
 		file_path = "../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs";
 		fr = MemCytoFrame(file_path, config);
-//		fr.read_fcs();
+		fr.read_fcs();
 		//create h5 version
 		string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 //		cout << tmp << endl;
@@ -31,6 +31,15 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+BOOST_AUTO_TEST_CASE(tile)
+{
+	fr.write_tile("/tmp/test.tile");
+//	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);
+//	auto ch = cf.get_channels();
+//	BOOST_CHECK_EQUAL(ch.size(), 10);
+
+
+}
 BOOST_AUTO_TEST_CASE(s3)
 {
 	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);

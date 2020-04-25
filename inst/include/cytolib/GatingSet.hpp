@@ -39,6 +39,8 @@ class GatingSet{
 	vector<string> sample_names_;
 	GatingHierarchyPtr get_first_gh() const;
 	string uid_;
+	tiledb::Context ctx;
+
 public:
 	typedef typename ghMap::iterator iterator;
 	typedef typename ghMap::const_iterator const_iterator;
