@@ -213,7 +213,7 @@ public:
 
 		//attach pdata as meta to param array(for convenience since mat can't attach two
 		for(auto it : pheno_data_)
-			array.put_metadata(it.first, TILEDB_STRING_UTF16, 1, &(it.second));
+			array.put_metadata(it.first, TILEDB_STRING_ASCII, 1, &(it.second));//TODO:switch to TILEDB_STRING_UTF16
 
 	}
 	void write_tile_kw(const string & uri) const
@@ -237,8 +237,8 @@ public:
 
 		//attach kw as meta to mat array
 		for(auto it : keys_)
-			array.put_metadata(it.first, TILEDB_STRING_UTF16, 1, &(it.second));
-
+			array.put_metadata(it.first, TILEDB_STRING_ASCII, 1, &(it.second));
+		//TODO:switch to TILEDB_STRING_UTF16
 	}
 	void write_tile_params(const string & uri) const
 	{
@@ -271,8 +271,8 @@ public:
 		//attach chnl and marker as meta since val-length writing to arry attr is not feasible
 		//due to empty markers do not meet the strict ascending buffer offset requirement
 		for(auto it : params)
-			array.put_metadata(it.channel, TILEDB_STRING_UTF16, 1, &(it.marker));
-
+			array.put_metadata(it.channel, TILEDB_STRING_ASCII, 1, &(it.marker));
+		//TODO:switch to TILEDB_STRING_UTF16
 	}
 	/**
 	 * get the data of entire event matrix

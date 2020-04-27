@@ -2,6 +2,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cytolib/GatingSet.hpp>
+#include <cytolib/TileCytoFrame.hpp>
 #include <cytolib/H5RCytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 
@@ -33,7 +34,10 @@ struct CFFixture{
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 BOOST_AUTO_TEST_CASE(tile)
 {
-	fr.write_tile("/tmp/test.tile");
+	auto uri = "/tmp/test.tile";
+	fr.write_tile(uri);
+	auto cf = TileCytoFrame(uri);
+
 //	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);
 //	auto ch = cf.get_channels();
 //	BOOST_CHECK_EQUAL(ch.size(), 10);

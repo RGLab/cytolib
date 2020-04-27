@@ -21,7 +21,7 @@ namespace cytolib
  */
 class TileCytoFrame:public CytoFrame{
 protected:
-	string filename_;
+	string uri_;
 	hsize_t dims[2];              // dataset dimensions
 	bool readonly_;//whether allow the public API to modify it, can't rely on h5 flag mechanism since its behavior is uncerntain for multiple opennings
 	//flags indicating if cached meta data needs to be flushed to h5
@@ -29,16 +29,16 @@ protected:
 	bool is_dirty_keys;
 	bool is_dirty_pdata;
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
-	EVENT_DATA_VEC read_data(uvec col_idx) const;
+	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
 	tiledb::Context ctx;
 
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
-	void flush_meta();
-	void flush_params();
+	void flush_meta(){};
+	void flush_params(){};
 
-	void flush_keys();
-	void flush_pheno_data();
+	void flush_keys(){};
+	void flush_pheno_data(){};
 	void set_readonly(bool flag){
 		readonly_ = flag;
 	}
@@ -47,7 +47,7 @@ public:
 	}
 	TileCytoFrame(const TileCytoFrame & frm):CytoFrame(frm)
 	{
-		filename_ = frm.filename_;
+		uri_ = frm.uri_;
 		is_dirty_params = frm.is_dirty_params;
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
@@ -63,7 +63,7 @@ public:
 //		swap(params, frm.params);
 //		swap(channel_vs_idx, frm.channel_vs_idx);
 //		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(filename_, frm.filename_);
+		swap(uri_, frm.uri_);
 		swap(dims, frm.dims);
 		swap(access_plist_, frm.access_plist_);
 
@@ -75,7 +75,7 @@ public:
 	TileCytoFrame & operator=(const TileCytoFrame & frm)
 	{
 		CytoFrame::operator=(frm);
-		filename_ = frm.filename_;
+		uri_ = frm.uri_;
 		is_dirty_params = frm.is_dirty_params;
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
@@ -87,7 +87,7 @@ public:
 	TileCytoFrame & operator=(TileCytoFrame && frm)
 	{
 		CytoFrame::operator=(frm);
-		swap(filename_, frm.filename_);
+		swap(uri_, frm.uri_);
 		swap(dims, frm.dims);
 		swap(is_dirty_params, frm.is_dirty_params);
 		swap(is_dirty_keys, frm.is_dirty_keys);
@@ -161,44 +161,69 @@ public:
 	 * @param fcs_filename
 	 * @param h5_filename
 	 */
-	TileCytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename
-			, bool readonly = false):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	TileCytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & uri
+			, bool readonly = false):uri_(uri), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
-		fr.write_tile(h5_filename);
-		*this = TileCytoFrame(h5_filename, readonly);
+		fr.write_tile(uri);
+		*this = TileCytoFrame(uri, readonly);
 	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	TileCytoFrame(const string & h5_filename, bool readonly = true, bool init = true):CytoFrame(),filename_(h5_filename), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	TileCytoFrame(const string & uri, bool readonly = true, bool init = true):CytoFrame(),uri_(uri), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		access_plist_ = FileAccPropList::DEFAULT;
 		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
 			init_load();
 	}
 	void init_load(){
-		//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
-		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		fs::path arraypath(uri_);
+		auto mat_uri = (arraypath / "mat").string();
+//		write_tile_data_pd(mat_uri);
 		load_meta();
 
 
 		//open dataset for event data
 
-		auto dataset = file.openDataSet(DATASET_NAME);
-		auto dataspace = dataset.getSpace();
-		dataspace.getSimpleExtentDims(dims);
+//		auto dataset = file.openDataSet(DATASET_NAME);
+//		auto dataspace = dataset.getSpace();
+//		dataspace.getSimpleExtentDims(dims);
 
 	}
 	/**
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */
-	void load_meta();;;
+	void load_meta()
+	{
+		fs::path arraypath(uri_);
 
+		auto params_uri = (arraypath / "params").string();
+		load_params(params_uri);
+
+		auto kw_uri = (arraypath / "keywords").string();
+//		load_kw(kw_uri);
+
+	}
+	void load_params(const string & uri)
+	{
+		tiledb::Array array(ctx, uri, TILEDB_READ);
+		tiledb::ArraySchema schema(ctx, uri);
+		auto dm = schema.domain();
+		auto nch = dm.dimension("params").domain<int>().second;
+
+		tiledb::Query query(ctx, array);
+		query.set_layout(TILEDB_GLOBAL_ORDER);
+		vector<float> min_vec(nch);
+		query.set_buffer("min", min_vec);
+		query.submit();
+		query.finalize();
+
+	}
 	string get_h5_file_path() const{
-		return filename_;
+		return uri_;
 	}
 	void check_write_permission(){
 		if(readonly_)
@@ -283,7 +308,7 @@ public:
 	 */
 	void copy_overwrite_check(const string & dest) const
 	{
-		if(fs::equivalent(fs::path(filename_), fs::path(dest)))
+		if(fs::equivalent(fs::path(uri_), fs::path(dest)))
 			throw(domain_error("Copying TileCytoFrame to itself is not supported! "+ dest));
 	}
 
@@ -297,7 +322,7 @@ public:
 			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 			fs::remove(new_filename);
 		}
-		fs::copy_file(filename_, new_filename);
+		fs::copy_file(uri_, new_filename);
 		CytoFramePtr ptr(new TileCytoFrame(new_filename, false));
 		//copy cached meta
 		ptr->set_params(get_params());
@@ -341,7 +366,10 @@ public:
 	 * copy setter
 	 * @param _data
 	 */
-	void set_data(const EVENT_DATA_VEC & _data);
+	void set_data(const EVENT_DATA_VEC & _data)
+	{
+
+	}
 
 	void set_data(EVENT_DATA_VEC && _data)
 	{
