@@ -271,8 +271,8 @@ public:
 		//attach chnl and marker as meta since val-length writing to arry attr is not feasible
 		//due to empty markers do not meet the strict ascending buffer offset requirement
 		for(auto it : params)
-			array.put_metadata(it.channel, TILEDB_STRING_ASCII, 1, &(it.marker));
-		//TODO:switch to TILEDB_STRING_UTF16
+			array.put_metadata(it.channel, TILEDB_CHAR, it.marker.size(), it.marker.c_str());
+		//TODO:switch to TILEDB_STRING_UTF16,TILEDB_STRING_ASCII
 	}
 	/**
 	 * get the data of entire event matrix

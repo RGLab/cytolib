@@ -38,9 +38,8 @@ BOOST_AUTO_TEST_CASE(tile)
 	fr.write_tile(uri);
 	auto cf = TileCytoFrame(uri);
 
-//	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);
-//	auto ch = cf.get_channels();
-//	BOOST_CHECK_EQUAL(ch.size(), 10);
+	auto ch = cf.get_channels();
+	BOOST_CHECK_EQUAL(ch.size(), 9);
 
 
 }

@@ -210,16 +210,36 @@ public:
 	void load_params(const string & uri)
 	{
 		tiledb::Array array(ctx, uri, TILEDB_READ);
-		tiledb::ArraySchema schema(ctx, uri);
-		auto dm = schema.domain();
-		auto nch = dm.dimension("params").domain<int>().second;
+//		tiledb::ArraySchema schema(ctx, uri);
+//		auto dm = schema.domain();
+//		auto nch = dm.dimension("params").domain<int>().second;
+		uint64_t nch = array.metadata_num();
+		const std::vector<int> subarray = {1, nch};
 
 		tiledb::Query query(ctx, array);
+		query.set_subarray(subarray);
 		query.set_layout(TILEDB_GLOBAL_ORDER);
 		vector<float> min_vec(nch);
 		query.set_buffer("min", min_vec);
+		vector<float> max_vec(nch);
+		query.set_buffer("max", max_vec);
 		query.submit();
 		query.finalize();
+
+		params.resize(nch);
+
+		uint32_t v_num;
+		tiledb_datatype_t v_type;
+		for (uint64_t i = 0; i < nch; ++i) {
+			const void* v;
+			array.get_metadata_from_index(i, &params[i].channel, &v_type, &v_num, &v);
+			params[i].marker = string(static_cast<const char *>(v));
+			params[i].marker.resize(v_num);
+			params[i].min = min_vec[i];
+			params[i].max = max_vec[i];
+
+		}
+
 
 	}
 	string get_h5_file_path() const{
