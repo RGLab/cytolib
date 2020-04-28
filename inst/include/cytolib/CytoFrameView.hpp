@@ -47,8 +47,8 @@ public:
 	virtual void load_meta(){
 		get_cytoframe_ptr()->load_meta();
 	};
-	string get_h5_file_path() const{
-			return get_cytoframe_ptr()->get_h5_file_path();
+	string get_uri() const{
+			return get_cytoframe_ptr()->get_uri();
 		}
 	vector<string> get_channels() const;
 	vector<string> get_markers() const;
@@ -62,7 +62,7 @@ public:
 				auto cfv = copy_realized(h5_filename, true);
 				//trigger archive logic on the new cfv (which will skip overwriting itself)
 				cfv.convertToPb(fr_pb, h5_filename, h5_opt);
-				auto oldh5 = get_h5_file_path();
+				auto oldh5 = get_uri();
 				if(h5_opt == H5Option::move&&oldh5!="")
 				{
 					if(!fs::equivalent(fs::path(oldh5), fs::path(h5_filename)))

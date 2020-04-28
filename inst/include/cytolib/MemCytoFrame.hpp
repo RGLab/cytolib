@@ -173,7 +173,7 @@ public:
 	 * @return
 	 */
 	EVENT_DATA_TYPE * get_data_memptr(const string & colname, ColType type);
-	string get_h5_file_path() const{
+	string get_uri() const{
 		return "";
 	}
 

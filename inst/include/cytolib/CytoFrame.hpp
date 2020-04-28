@@ -507,7 +507,7 @@ public:
 	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "", bool overwrite = false) const=0;
 	
 	
-	virtual string get_h5_file_path() const=0;
+	virtual string get_uri() const=0;
 	virtual void flush_meta(){};
 	virtual void load_meta(){};
 

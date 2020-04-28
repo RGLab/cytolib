@@ -29,7 +29,7 @@ protected:
 	bool is_dirty_keys;
 	bool is_dirty_pdata;
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
-	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
+//	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
 	tiledb::Context ctx;
 
 public:
@@ -300,7 +300,7 @@ public:
 
 
 	}
-	string get_h5_file_path() const{
+	string get_uri() const{
 		return uri_;
 	}
 	void check_write_permission(){

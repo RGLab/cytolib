@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(h5_vs_mem)
 BOOST_AUTO_TEST_CASE(flags)
 {
 	//get a safe cp
-	string h5file = fr_h5->copy()->get_h5_file_path();
+	string h5file = fr_h5->copy()->get_uri();
 	//load it by default readonly flag
 	unique_ptr<H5CytoFrame> fr1(new H5CytoFrame(h5file));
 	//update meta data
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE(shallow_copy)
 	//meta data is not changed for original cp
 	BOOST_CHECK_EQUAL(fr_orig->get_channels()[2], oldname);
 	BOOST_CHECK_EQUAL(fr_orig->get_keyword("$P3N"), oldname);
-	BOOST_CHECK_EQUAL(fr_orig->get_h5_file_path(), fr1.get_h5_file_path());
+	BOOST_CHECK_EQUAL(fr_orig->get_uri(), fr1.get_uri());
 	//update data
 	EVENT_DATA_VEC dat = fr1.get_data();
 	float newval = 100;
@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 	fr1->set_data(dat);
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
-	BOOST_CHECK_NE(fr_h5->get_h5_file_path(), fr1->get_h5_file_path());
+	BOOST_CHECK_NE(fr_h5->get_uri(), fr1->get_uri());
 	//original cp is not affected by any change in meta and event data
 	BOOST_CHECK_EQUAL(fr_h5->get_channels()[2], oldname);
 	BOOST_CHECK_EQUAL(fr_h5->get_keyword("$P3N"), oldname);
@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 {
 	//deep cp
 	CytoFramePtr fr1 = fr_h5->copy();
-	string h5file = fr1->get_h5_file_path();
+	string h5file = fr1->get_uri();
 	//update meta data
 	string oldname = fr1->get_channels()[2];
 	string newname = "test";

@@ -338,7 +338,7 @@ namespace cytolib
 				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
 			auto gh = gh_template.copy(false, false, "");
 			auto cfv = cs.get_cytoframe_view(sn);
-			string h5_filename = cfv.get_h5_file_path();
+			string h5_filename = cfv.get_uri();
 			if(h5_filename=="")
 				throw(logic_error("in-memory version of cs is not supported!"));
 			if(execute)

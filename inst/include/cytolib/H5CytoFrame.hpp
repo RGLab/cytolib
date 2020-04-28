@@ -197,7 +197,7 @@ public:
 	 */
 	void load_meta();;;
 
-	string get_h5_file_path() const{
+	string get_uri() const{
 		return filename_;
 	}
 	void check_write_permission(){
