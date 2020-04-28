@@ -42,9 +42,26 @@ BOOST_AUTO_TEST_CASE(tile)
 
 	auto ch = cf.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 9);
-	BOOST_CHECK_CLOSE(fr.get_data().mem[100], cf.get_data().mem[100], 1);
-	BOOST_CHECK_CLOSE(fr.get_data().mem[1000], cf.get_data().mem[1000], 1);
-	BOOST_CHECK_CLOSE(fr.get_data().mem[6006], cf.get_data().mem[6006], 1);
+	//read all
+	auto mat1 = fr.get_data();
+	auto mat2 = cf.get_data();
+	for(auto i : {100,1000,6000})
+		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
+	//idx by row and col
+	mat1 = fr.get_data({1,100}, {3,8});
+	mat2 = cf.get_data({1,100}, {3,8});
+	for(auto i : {0,1,2,3})
+		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
+	//idx by row
+	mat1 = fr.get_data({1,100}, false);
+	mat2 = cf.get_data({1,100}, false);
+	for(auto i : {0,10,15})
+		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
+	//idx by col
+	mat1 = fr.get_data({1,3}, true);
+	mat2 = cf.get_data({1,3}, true);
+	for(auto i : {0,1000,5500})
+		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 }
 BOOST_AUTO_TEST_CASE(s3)
 {

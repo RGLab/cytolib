@@ -267,7 +267,7 @@ public:
 //		tiledb::ArraySchema schema(ctx, uri);
 //		auto dm = schema.domain();
 //		auto nch = dm.dimension("params").domain<int>().second;
-		uint64_t nch = array.metadata_num();
+		int nch = array.metadata_num();
 		const std::vector<int> subarray = {1, nch};
 
 		tiledb::Query query(ctx, array);
@@ -284,7 +284,7 @@ public:
 
 		uint32_t v_num;
 		tiledb_datatype_t v_type;
-		for (uint64_t i = 0; i < nch; ++i) {
+		for (int i = 0; i < nch; ++i) {
 			const void* v;
 			array.get_metadata_from_index(i, &params[i].channel, &v_type, &v_num, &v);
 			if(v)
@@ -370,10 +370,9 @@ public:
 
 		//open dataset for event data
 		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
-		tiledb::ArraySchema schema(ctx, mat_uri);
-		auto dm = schema.domain();
-		auto ncol = dm.dimension("channel").domain<int>().second;
-		auto nrow = dm.dimension("cell").domain<int>().second;
+
+		int ncol = dims[1];
+		int nrow = dims[0];
 
 		const std::vector<int> subarray = {1, nrow, 1, ncol};
 
@@ -396,11 +395,71 @@ public:
 	 */
 	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
 	{
-		return EVENT_DATA_VEC();
+		fs::path arraypath(uri_);
+		auto mat_uri = (arraypath / "mat").string();
+
+		//open dataset for event data
+		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
+		tiledb::Query query(ctx, array);
+		query.set_layout(TILEDB_COL_MAJOR);
+		int ncol,nrow, dim_idx;
+		if(is_col)
+		{
+			ncol = idx.size();
+			nrow = dims[0];
+			dim_idx = 1;
+			query.add_range<int>(0, 1, nrow);//select all rows
+		}
+		else
+		{
+			nrow = idx.size();
+			ncol = dims[1];
+			dim_idx  = 0;
+			query.add_range<int>(1, 1, ncol);//select all cols
+		}
+
+		//tiledb idx starting from 1
+		for(int i : idx)
+			query.add_range<int>(dim_idx, i+1, i+1);
+
+
+		EVENT_DATA_VEC data(nrow, ncol);
+
+		query.set_buffer<double>("mat", data.memptr(), nrow * ncol);
+		query.submit();
+		query.finalize();
+
+
+		return data;
+
 	}
 	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
 	{
-		return EVENT_DATA_VEC();
+		fs::path arraypath(uri_);
+		auto mat_uri = (arraypath / "mat").string();
+
+		//open dataset for event data
+		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
+		auto ncol = col_idx.size();
+		auto nrow = row_idx.size();
+
+
+		tiledb::Query query(ctx, array);
+		query.set_layout(TILEDB_COL_MAJOR);
+		//tiledb idx starting from 1
+		for(int i : row_idx)
+			query.add_range<int>(0, i+1, i+1);
+		for(int i : col_idx)
+			query.add_range<int>(1, i+1, i+1);
+
+		EVENT_DATA_VEC data(nrow, ncol);
+
+		query.set_buffer<double>("mat", data.memptr(), nrow * ncol);
+		query.submit();
+		query.finalize();
+
+
+		return data;
 	}
 	/*
 	 * protect the h5 from being overwritten accidentally
