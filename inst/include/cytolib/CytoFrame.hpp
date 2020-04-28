@@ -213,7 +213,7 @@ public:
 
 		//attach pdata as meta to param array(for convenience since mat can't attach two
 		for(auto it : pheno_data_)
-			array.put_metadata(it.first, TILEDB_STRING_ASCII, 1, &(it.second));//TODO:switch to TILEDB_STRING_UTF16
+			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());//TODO:switch to TILEDB_STRING_UTF16
 
 	}
 	void write_tile_kw(const string & uri) const
@@ -237,7 +237,7 @@ public:
 
 		//attach kw as meta to mat array
 		for(auto it : keys_)
-			array.put_metadata(it.first, TILEDB_STRING_ASCII, 1, &(it.second));
+			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());
 		//TODO:switch to TILEDB_STRING_UTF16
 	}
 	void write_tile_params(const string & uri) const

@@ -180,13 +180,46 @@ public:
 			init_load();
 	}
 	void init_load(){
-		fs::path arraypath(uri_);
-		auto mat_uri = (arraypath / "mat").string();
-//		write_tile_data_pd(mat_uri);
 		load_meta();
 
+		fs::path arraypath(uri_);
+		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
+		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
+		tiledb::ArraySchema schema(ctx, mat_uri);
+		auto dm = schema.domain();
+		auto nch = dm.dimension("channel").domain<int>().second;
+		auto nevent = dm.dimension("cell").domain<int>().second;
+		dims[0] = nevent;
+		dims[1] = nch;
+//		const std::vector<int> subarray = {1, nch};
+//
+//		tiledb::Query query(ctx, array);
+//		query.set_subarray(subarray);
+//		query.set_layout(TILEDB_GLOBAL_ORDER);
+//		vector<float> min_vec(nch);
+//		query.set_buffer("min", min_vec);
+//		vector<float> max_vec(nch);
+//		query.set_buffer("max", max_vec);
+//		query.submit();
+//		query.finalize();
+
+		uint64_t npd = array.metadata_num();
+		uint32_t v_num;
+		tiledb_datatype_t v_type;
+		for (uint64_t i = 0; i < npd; ++i) {
+			string pn,pv;
+
+			const void* v;
+			array.get_metadata_from_index(i, &pn, &v_type, &v_num, &v);
+			if(v)
+			{
+				pv = string(static_cast<const char *>(v));
+				pv.resize(v_num);
+			}
+			pheno_data_[pn] = pv;
+		}
 
 //		auto dataset = file.openDataSet(DATASET_NAME);
 //		auto dataspace = dataset.getSpace();
@@ -204,7 +237,28 @@ public:
 		load_params(params_uri);
 
 		auto kw_uri = (arraypath / "keywords").string();
-//		load_kw(kw_uri);
+		load_kw(kw_uri);
+
+	}
+	void load_kw(const string & uri)
+	{
+		tiledb::Array array(ctx, uri, TILEDB_READ);
+		uint64_t nkw = array.metadata_num();
+
+		keys_.resize(nkw);
+
+		uint32_t v_num;
+		tiledb_datatype_t v_type;
+		for (uint64_t i = 0; i < nkw; ++i) {
+			const void* v;
+			array.get_metadata_from_index(i, &keys_[i].first, &v_type, &v_num, &v);
+			if(v)
+			{
+				keys_[i].second = string(static_cast<const char *>(v));
+				keys_[i].second.resize(v_num);
+			}
+
+		}
 
 	}
 	void load_params(const string & uri)
@@ -233,8 +287,12 @@ public:
 		for (uint64_t i = 0; i < nch; ++i) {
 			const void* v;
 			array.get_metadata_from_index(i, &params[i].channel, &v_type, &v_num, &v);
-			params[i].marker = string(static_cast<const char *>(v));
-			params[i].marker.resize(v_num);
+			if(v)
+			{
+				params[i].marker = string(static_cast<const char *>(v));
+				params[i].marker.resize(v_num);
+			}
+
 			params[i].min = min_vec[i];
 			params[i].max = max_vec[i];
 
@@ -307,7 +365,29 @@ public:
 
 	EVENT_DATA_VEC get_data() const
 	{
-		return EVENT_DATA_VEC();
+		fs::path arraypath(uri_);
+		auto mat_uri = (arraypath / "mat").string();
+
+		//open dataset for event data
+		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
+		tiledb::ArraySchema schema(ctx, mat_uri);
+		auto dm = schema.domain();
+		auto ncol = dm.dimension("channel").domain<int>().second;
+		auto nrow = dm.dimension("cell").domain<int>().second;
+
+		const std::vector<int> subarray = {1, nrow, 1, ncol};
+
+		tiledb::Query query(ctx, array);
+		query.set_subarray(subarray);
+		query.set_layout(TILEDB_GLOBAL_ORDER);
+		EVENT_DATA_VEC data(nrow, ncol);
+
+		query.set_buffer<double>("mat", data.memptr(), nrow * ncol);
+		query.submit();
+		query.finalize();
+
+
+		return data;
 	}
 	/**
 	 * Partial IO

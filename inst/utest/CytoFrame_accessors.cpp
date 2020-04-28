@@ -35,13 +35,16 @@ BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 BOOST_AUTO_TEST_CASE(tile)
 {
 	auto uri = "/tmp/test.tile";
+	if(fs::exists(uri))
+		fs::remove_all(uri);
 	fr.write_tile(uri);
 	auto cf = TileCytoFrame(uri);
 
 	auto ch = cf.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 9);
-
-
+	BOOST_CHECK_CLOSE(fr.get_data().mem[100], cf.get_data().mem[100], 1);
+	BOOST_CHECK_CLOSE(fr.get_data().mem[1000], cf.get_data().mem[1000], 1);
+	BOOST_CHECK_CLOSE(fr.get_data().mem[6006], cf.get_data().mem[6006], 1);
 }
 BOOST_AUTO_TEST_CASE(s3)
 {
