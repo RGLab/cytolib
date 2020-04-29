@@ -114,14 +114,18 @@ public:
 	{
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
-	void write_h5(const string & filename) const
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE) const
 	{
 		//create a mem-based cfv to avoid extra disk write IO from realization call
 		CytoFrameView cv(*this);
 		cv.ptr_ = CytoFramePtr(new MemCytoFrame(*(get_cytoframe_ptr())));
 		//TODO:it would less overhead if we could have in-place realize method without creating the copy
 		auto cv1 = cv.copy_realized();
-		cv1.get_cytoframe_ptr()->write_h5(filename);
+		auto ptr = cv1.get_cytoframe_ptr();
+		if(format == FileFormat::H5)
+			ptr->write_h5(filename);
+		else
+			ptr->write_tile(filename);
 	}
 
 	KEY_WORDS get_keywords() const{

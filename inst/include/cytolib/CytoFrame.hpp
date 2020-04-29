@@ -29,6 +29,8 @@ enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
 enum class H5Option {copy, move, skip, link, symlink};
 enum DataTypeLocation {MEM, H5};
+enum class FileFormat {TILE, H5};
+
 typedef unordered_map<string, string> PDATA;
 
 
