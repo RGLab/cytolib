@@ -81,7 +81,6 @@ protected:
 	 *
 	 */
 	virtual void build_hash();
-	tiledb::Context ctx;
 public:
 	virtual ~CytoFrame(){};
 //	virtual void close_h5() =0;
@@ -165,10 +164,10 @@ public:
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
-	void write_tile(const string & uri) const
+	void write_tile(const string & uri, const tiledb::Context & ctx = tiledb::Context()) const
 	{
 		tiledb::VFS vfs(ctx);
-		tiledb::VFS::filebuf buf(vfs);
+//		tiledb::VFS::filebuf buf(vfs);
 
 		if(vfs.is_dir(uri))
 		{
@@ -181,15 +180,15 @@ public:
 		}
 		fs::path arraypath(uri);
 		auto mat_uri = (arraypath / "mat").string();
-		write_tile_data_pd(mat_uri);
+		write_tile_data_pd(mat_uri, ctx);
 
 		auto params_uri = (arraypath / "params").string();
-		write_tile_params(params_uri);
+		write_tile_params(params_uri, ctx);
 
 		auto kw_uri = (arraypath / "keywords").string();
-		write_tile_kw(kw_uri);
+		write_tile_kw(kw_uri, ctx);
 	}
-	void write_tile_data_pd(const string & uri) const
+	void write_tile_data_pd(const string & uri, const tiledb::Context & ctx) const
 	{
 		tiledb::Domain domain(ctx);
 		int nEvents = n_rows();
@@ -216,7 +215,7 @@ public:
 			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());//TODO:switch to TILEDB_STRING_UTF16
 
 	}
-	void write_tile_kw(const string & uri) const
+	void write_tile_kw(const string & uri, const tiledb::Context & ctx) const
 	{
 		tiledb::Domain domain(ctx);
 		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "dummy", {1, 2}, 1));
@@ -240,7 +239,7 @@ public:
 			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());
 		//TODO:switch to TILEDB_STRING_UTF16
 	}
-	void write_tile_params(const string & uri) const
+	void write_tile_params(const string & uri, const tiledb::Context & ctx) const
 	{
 
 		tiledb::Domain domain(ctx);

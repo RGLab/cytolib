@@ -30,7 +30,7 @@ protected:
 	bool is_dirty_pdata;
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 //	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
-	tiledb::Context ctx;
+	tiledb::Context ctx_;
 
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
@@ -162,18 +162,18 @@ public:
 	 * @param h5_filename
 	 */
 	TileCytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & uri
-			, bool readonly = false):uri_(uri), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+			, bool readonly = false, const tiledb::Context & ctx = tiledb::Context()):uri_(uri), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
 		fr.write_tile(uri);
-		*this = TileCytoFrame(uri, readonly);
+		*this = TileCytoFrame(uri, readonly, true, ctx);
 	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	TileCytoFrame(const string & uri, bool readonly = true, bool init = true):CytoFrame(),uri_(uri), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	TileCytoFrame(const string & uri, bool readonly = true, bool init = true, const tiledb::Context & ctx = tiledb::Context()):CytoFrame(),uri_(uri), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), ctx_(ctx)
 	{
 		access_plist_ = FileAccPropList::DEFAULT;
 		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
@@ -186,8 +186,8 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
-		tiledb::ArraySchema schema(ctx, mat_uri);
+		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
+		tiledb::ArraySchema schema(ctx_, mat_uri);
 		auto dm = schema.domain();
 		auto nch = dm.dimension("channel").domain<int>().second;
 		auto nevent = dm.dimension("cell").domain<int>().second;
@@ -242,7 +242,7 @@ public:
 	}
 	void load_kw(const string & uri)
 	{
-		tiledb::Array array(ctx, uri, TILEDB_READ);
+		tiledb::Array array(ctx_, uri, TILEDB_READ);
 		uint64_t nkw = array.metadata_num();
 
 		keys_.resize(nkw);
@@ -263,14 +263,14 @@ public:
 	}
 	void load_params(const string & uri)
 	{
-		tiledb::Array array(ctx, uri, TILEDB_READ);
+		tiledb::Array array(ctx_, uri, TILEDB_READ);
 //		tiledb::ArraySchema schema(ctx, uri);
 //		auto dm = schema.domain();
 //		auto nch = dm.dimension("params").domain<int>().second;
 		int nch = array.metadata_num();
 		const std::vector<int> subarray = {1, nch};
 
-		tiledb::Query query(ctx, array);
+		tiledb::Query query(ctx_, array);
 		query.set_subarray(subarray);
 		query.set_layout(TILEDB_GLOBAL_ORDER);
 		vector<float> min_vec(nch);
@@ -369,14 +369,14 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
+		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
 
 		int ncol = dims[1];
 		int nrow = dims[0];
 
 		const std::vector<int> subarray = {1, nrow, 1, ncol};
 
-		tiledb::Query query(ctx, array);
+		tiledb::Query query(ctx_, array);
 		query.set_subarray(subarray);
 		query.set_layout(TILEDB_GLOBAL_ORDER);
 		EVENT_DATA_VEC data(nrow, ncol);
@@ -399,8 +399,8 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
-		tiledb::Query query(ctx, array);
+		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
+		tiledb::Query query(ctx_, array);
 		query.set_layout(TILEDB_COL_MAJOR);
 		int ncol,nrow, dim_idx;
 		if(is_col)
@@ -439,12 +439,12 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		tiledb::Array array(ctx, mat_uri, TILEDB_READ);
+		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
 		auto ncol = col_idx.size();
 		auto nrow = row_idx.size();
 
 
-		tiledb::Query query(ctx, array);
+		tiledb::Query query(ctx_, array);
 		query.set_layout(TILEDB_COL_MAJOR);
 		//tiledb idx starting from 1
 		for(int i : row_idx)

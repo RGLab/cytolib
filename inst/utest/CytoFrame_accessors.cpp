@@ -34,11 +34,21 @@ struct CFFixture{
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 BOOST_AUTO_TEST_CASE(tile)
 {
-	auto uri = "/tmp/test.tile";
-	if(fs::exists(uri))
-		fs::remove_all(uri);
-	fr.write_tile(uri);
-	auto cf = TileCytoFrame(uri);
+	auto uri = "s3://mike-h5/test.tile";//"/tmp/test.tile";
+	tiledb::Config cfg;
+//	cfg["vfs.s3.aws_access_key_id"] =
+//	cfg["vfs.s3.aws_secret_access_key"] =
+
+	cfg["vfs.s3.region"] = "us-west-1";
+
+	tiledb::Context ctx(cfg);
+
+	tiledb::VFS vfs(ctx);
+
+	if(vfs.is_dir(uri))
+		vfs.remove_dir(uri);
+	fr.write_tile(uri, ctx);
+	auto cf = TileCytoFrame(uri, true, true, ctx);
 
 	auto ch = cf.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 9);
