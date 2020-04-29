@@ -162,20 +162,31 @@ public:
 	 * @param h5_filename
 	 */
 	TileCytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & uri
-			, bool readonly = false, const tiledb::Context & ctx = tiledb::Context()):uri_(uri), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+			, bool readonly = false, const S3Cred & cred = S3Cred()):uri_(uri), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
-		fr.write_tile(uri);
-		*this = TileCytoFrame(uri, readonly, true, ctx);
+		tiledb::Config cfg;
+		cfg["vfs.s3.aws_access_key_id"] = cred.access_key_id_;
+		cfg["vfs.s3.aws_secret_access_key"] = cred.access_key_;
+		cfg["vfs.s3.region"] = cred.region_;
+		ctx_ = tiledb::Context(cfg);
+		fr.write_tile(uri, ctx_);
+		*this = TileCytoFrame(uri, readonly, true, cred);
 	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	TileCytoFrame(const string & uri, bool readonly = true, bool init = true, const tiledb::Context & ctx = tiledb::Context()):CytoFrame(),uri_(uri), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), ctx_(ctx)
+	TileCytoFrame(const string & uri, bool readonly = true, bool init = true
+			, const S3Cred & cred = S3Cred()):CytoFrame(),uri_(uri), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		access_plist_ = FileAccPropList::DEFAULT;
+		tiledb::Config cfg;
+		cfg["vfs.s3.aws_access_key_id"] = cred.access_key_id_;
+		cfg["vfs.s3.aws_secret_access_key"] = cred.access_key_;
+		cfg["vfs.s3.region"] = cred.region_;
+		ctx_ = tiledb::Context(cfg);
 		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
 			init_load();
 	}

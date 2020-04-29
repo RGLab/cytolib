@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(tile)
 	if(vfs.is_dir(uri))
 		vfs.remove_dir(uri);
 	fr.write_tile(uri, ctx);
-	auto cf = TileCytoFrame(uri, true, true, ctx);
+	auto cf = TileCytoFrame(uri, true, true);
 
 	auto ch = cf.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 9);
