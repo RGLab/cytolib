@@ -197,8 +197,10 @@ namespace cytolib
 			else if(is_col_indexed())
 			{
 				data = ptr->get_data(col_idx_, true);
-			}else
+			}else if(is_row_indexed())
 				data = ptr->get_data(row_idx_, false);
+			else
+				data = ptr->get_data();
 		}
 		return data;
 	}
