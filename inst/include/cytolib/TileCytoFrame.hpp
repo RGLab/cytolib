@@ -98,7 +98,7 @@ public:
 	}
 
 	unsigned n_rows() const{
-				return dims[1];
+				return dims[0];
 		}
 
 	void set_params(const vector<cytoParam> & _params)
