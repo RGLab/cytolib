@@ -114,7 +114,7 @@ public:
 	{
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
-	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE) const
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE, const S3Cred & cred = S3Cred()) const
 	{
 		//create a mem-based cfv to avoid extra disk write IO from realization call
 		CytoFrameView cv(*this);
@@ -125,7 +125,18 @@ public:
 		if(format == FileFormat::H5)
 			ptr->write_h5(filename);
 		else
-			ptr->write_tile(filename);
+		{
+			tiledb::Config cfg;
+			cfg["vfs.s3.aws_access_key_id"] = cred.access_key_id_;
+			cfg["vfs.s3.aws_secret_access_key"] = cred.access_key_;
+			cfg["vfs.s3.region"] = cred.region_;
+
+			tiledb::Context ctx(cfg);
+
+
+			ptr->write_tile(filename, ctx);
+		}
+
 	}
 
 	KEY_WORDS get_keywords() const{
