@@ -110,7 +110,11 @@ namespace cytolib
 			unsigned max_idx = row_idx.max();
 			unsigned min_idx = row_idx.min();
 			if(max_idx >= n_rows() || min_idx < 0)
-				throw(domain_error("The size of the new row index is not within the original mat size!"));
+				throw(domain_error("The size of the new row index ("
+						+ to_string(min_idx) + "," + to_string(min_idx)
+						+ ") is not within the original mat size (0, " + to_string(n_rows()) + ")"
+						)
+					);
 			if(is_row_indexed())
 			{
 				for(auto & i : row_idx)
@@ -176,7 +180,7 @@ namespace cytolib
 				data_orig.cols(col_idx_) = data_in;
 			else
 				if(data_orig.n_cols!=data_in.n_cols||data_orig.n_rows!=data_in.n_rows)
-					throw(domain_error("The size of theinput data is different from the cytoframeview!"));
+					throw(domain_error("The size of the input data is different from the cytoframeview!"));
 				else
 					data_orig = data_in;
 				
