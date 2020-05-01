@@ -195,7 +195,8 @@ public:
 		tiledb::Domain domain(ctx);
 		int nEvents = n_rows();
 		int nch = n_cols();
-		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, nEvents}, 100));
+		//2k is to meet 64k minimal recommended tile size to fit into L1 cache
+		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, nEvents}, 2000));
 		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch}, 1));
 		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 		schema.set_domain(domain);

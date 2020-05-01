@@ -18,8 +18,8 @@ struct CFFixture{
 		//create h5 version
 		string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 //		cout << tmp << endl;
-//		fr.write_to_disk(tmp);
-//		fr_h5.reset(new H5CytoFrame(tmp));
+		fr.write_h5(tmp);
+		fr_h5.reset(new H5CytoFrame(tmp));
 	};
 
 	~CFFixture(){
@@ -49,28 +49,51 @@ BOOST_AUTO_TEST_CASE(tile)
 	if(vfs.is_dir(uri))
 		vfs.remove_dir(uri);
 	fr.write_tile(uri, ctx);
-	auto cf = TileCytoFrame(uri, true, true);
+	auto cf_tile = TileCytoFrame(uri, true, true);
 
-	auto ch = cf.get_channels();
+	auto ch = cf_tile.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 9);
+
 	//read all
-	auto mat1 = fr.get_data();
-	auto mat2 = cf.get_data();
+	double start = gettime();
+	auto mat1 = fr_h5->get_data();
+	double runtime = (gettime() - start);
+	cout << "fr_h5->get_data(): " << runtime << endl;
+
+	start = gettime();
+	auto mat2 = cf_tile.get_data();
+	runtime = (gettime() - start);
+	cout << "cf_tile->get_data(): " << runtime << endl;
+
 	for(auto i : {100,1000,6000})
 		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
+
 	//idx by row and col
-	mat1 = fr.get_data({1,100}, {3,8});
-	mat2 = cf.get_data({1,100}, {3,8});
+	auto nrow = 200;
+	uvec ridx(nrow);
+	srand (1);//seed
+	for(int i = 0; i < nrow; i++)
+		ridx[i] = rand()%fr.n_rows();
+
+	start = gettime();
+	mat1 = fr_h5->get_data(ridx, {3,8});
+	runtime = (gettime() - start);
+	cout << "fr_h5->get_data(ridx,cidx): " << runtime << endl;
+
+	start = gettime();
+	mat2 = cf_tile.get_data(ridx, {3,8});
+	runtime = (gettime() - start);
+	cout << "cf_tile->get_data(ridx, cidx): " << runtime << endl;
 	for(auto i : {0,1,2,3})
 		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 	//idx by row
-	mat1 = fr.get_data({1,100}, false);
-	mat2 = cf.get_data({1,100}, false);
+	mat1 = fr_h5->get_data({1,100}, false);
+	mat2 = cf_tile.get_data({1,100}, false);
 	for(auto i : {0,10,15})
 		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 	//idx by col
-	mat1 = fr.get_data({1,3}, true);
-	mat2 = cf.get_data({1,3}, true);
+	mat1 = fr_h5->get_data({1,3}, true);
+	mat2 = cf_tile.get_data({1,3}, true);
 	for(auto i : {0,1000,5500})
 		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 }
