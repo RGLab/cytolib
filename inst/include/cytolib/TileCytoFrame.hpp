@@ -179,13 +179,15 @@ public:
 	 * @param _filename H5 file path
 	 */
 	TileCytoFrame(const string & uri, bool readonly = true, bool init = true
-			, const S3Cred & cred = S3Cred()):CytoFrame(),uri_(uri), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+			, const S3Cred & cred = S3Cred(), int num_threads = 1):CytoFrame(),uri_(uri), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		access_plist_ = FileAccPropList::DEFAULT;
 		tiledb::Config cfg;
 		cfg["vfs.s3.aws_access_key_id"] = cred.access_key_id_;
 		cfg["vfs.s3.aws_secret_access_key"] = cred.access_key_;
 		cfg["vfs.s3.region"] = cred.region_;
+		cfg["vfs.num_threads"] = num_threads;
+
 		ctx_ = tiledb::Context(cfg);
 		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
 			init_load();
