@@ -18,7 +18,7 @@ struct CFFixture{
 		//create h5 version
 		string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 //		cout << tmp << endl;
-//		fr.write_h5(tmp);
+//		fr.write_to_disk(tmp);
 //		fr_h5.reset(new H5CytoFrame(tmp));
 	};
 
@@ -34,7 +34,8 @@ struct CFFixture{
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 BOOST_AUTO_TEST_CASE(tile)
 {
-	auto uri = "s3://mike-h5/test.tile";//"/tmp/test.tile";
+//	auto uri = "s3://mike-h5/test.tile";
+	auto uri = "/tmp/test.tile";
 	tiledb::Config cfg;
 //	cfg["vfs.s3.aws_access_key_id"] =
 //	cfg["vfs.s3.aws_secret_access_key"] =
@@ -185,11 +186,11 @@ BOOST_AUTO_TEST_CASE(flags)
 	BOOST_CHECK_CLOSE(fr3.get_data()[100], newval, 1e-6);//fr1 is updated
 
 //	try{
-//		fr3.write_h5(h5file);
+//		fr3.write_to_disk(h5file);
 //	}catch(H5::FileIException & ex){
 //		cout << ex.getDetailMsg() << endl;
 //	}
-//	BOOST_CHECK_EXCEPTION(fr3.write_h5(h5file);, H5::FileIException,
+//	BOOST_CHECK_EXCEPTION(fr3.write_to_disk(h5file);, H5::FileIException,
 //						[](const H5::FileIException & ex) {return ex.getDetailMsg().find("H5Fcreate failed") != string::npos;});
 
 }
@@ -227,7 +228,7 @@ BOOST_AUTO_TEST_CASE(subset_by_cols)
 	BOOST_CHECK_EQUAL(fr.n_cols(), channels.size());//original object is not modified
 
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-	cr_new.write_h5(tmp);
+	cr_new.write_to_disk(tmp);
 	auto cf = H5CytoFrame(tmp);
 	BOOST_CHECK_EQUAL(cf.n_cols(), sub_channels.size());
 }
@@ -248,7 +249,7 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 	BOOST_CHECK_EQUAL(fr_copy.n_rows(), 3);
 
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-	cr_new.write_h5(tmp);
+	cr_new.write_to_disk(tmp);
 	auto cf = H5CytoFrame(tmp);
 	BOOST_CHECK_EQUAL(cf.n_rows(), 3);
 }

@@ -199,7 +199,7 @@ public:
 		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch}, 1));
 		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 		schema.set_domain(domain);
-		schema.add_attribute(tiledb::Attribute::create<double>(ctx, "mat"));
+		schema.add_attribute(tiledb::Attribute::create<float>(ctx, "mat"));
 		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
 
 		tiledb::Array::create(uri, schema);
@@ -207,8 +207,10 @@ public:
 		tiledb::Query query(ctx, array);
 		query.set_layout(TILEDB_COL_MAJOR);
 		EVENT_DATA_VEC dat = get_data();
+		//convert to float
+		vector<float> buf(dat.mem, dat.mem + nch * nEvents);
 
-		query.set_buffer("mat", const_cast<EVENT_DATA_TYPE *>(dat.mem), nch * nEvents);
+		query.set_buffer("mat", buf);
 		query.submit();
 		query.finalize();
 
