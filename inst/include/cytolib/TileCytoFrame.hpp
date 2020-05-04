@@ -378,11 +378,7 @@ public:
 
 	EVENT_DATA_VEC get_data() const
 	{
-//		fs::path arraypath(uri_);
-//		auto mat_uri = (arraypath / "mat").string();
-
-		//open dataset for event data
-
+//		double start = gettime();
 		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
 		{
 			mat_array_ptr_->open(TILEDB_READ);
@@ -401,22 +397,23 @@ public:
 		query.set_buffer("mat", buf);
 		query.submit();
 		query.finalize();
+//		double runtime = (gettime() - start);
+//		cout << "get all: " << runtime << endl;
+
+//		EVENT_DATA_TYPE * res = new EVENT_DATA_TYPE[nrow*ncol];
+//		for(int i = 0; i < nrow * ncol; i++)
+//			res[i] = buf[i];
+//		EVENT_DATA_VEC data(res, nrow, ncol, false);
 
 		EVENT_DATA_VEC data(nrow, ncol);
+
 		for(int i = 0; i < nrow * ncol; i++)
 			data.memptr()[i] = buf[i];
 		return data;
 	}
-	/**
-	 * Partial IO
-	 * @param col_idx
-	 * @return
-	 */
-	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
+
+	EVENT_DATA_VEC read_cols(uvec cidx) const
 	{
-
-		double start = gettime();
-
 		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
 		{
 			mat_array_ptr_->open(TILEDB_READ);
@@ -424,23 +421,13 @@ public:
 		tiledb::Query query(ctx_, *mat_array_ptr_);
 		query.set_layout(TILEDB_COL_MAJOR);
 		int ncol,nrow, dim_idx;
-		if(is_col)
-		{
-			ncol = idx.size();
-			nrow = dims[0];
-			dim_idx = 1;
-			query.add_range<int>(0, 1, nrow);//select all rows
-		}
-		else
-		{
-			nrow = idx.size();
-			ncol = dims[1];
-			dim_idx  = 0;
-			query.add_range<int>(1, 1, ncol);//select all cols
-		}
+		ncol = cidx.size();
+		nrow = dims[0];
+		dim_idx = 1;
+		query.add_range<int>(0, 1, nrow);//select all rows
 
 		//tiledb idx starting from 1
-		for(int i : idx)
+		for(int i : cidx)
 			query.add_range<int>(dim_idx, i+1, i+1);
 
 
@@ -451,8 +438,6 @@ public:
 		query.set_buffer("mat", buf);
 		query.submit();
 		query.finalize();
-		double runtime = (gettime() - start);
-		cout << "get_data(): " << runtime << endl;
 		EVENT_DATA_VEC data(nrow, ncol);
 		for(int i = 0; i < nrow * ncol; i++)
 			data.memptr()[i] = buf[i];
@@ -461,34 +446,38 @@ public:
 		return data;
 
 	}
+	/**
+	 * Partial IO
+	 * @param col_idx
+	 * @return
+	 */
+	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
+	{
+		EVENT_DATA_VEC data;
+
+		int ncol,nrow, dim_idx;
+		if(is_col)
+		{
+			data = read_cols(idx);
+		}
+		else
+		{
+			data = get_data().rows(idx);
+
+		}
+
+
+
+
+		return data;
+
+	}
 	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
 	{
-		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
-		{
-			mat_array_ptr_->open(TILEDB_READ);
-		}
-		auto ncol = col_idx.size();
-		auto nrow = row_idx.size();
 
 
-		tiledb::Query query(ctx_, *mat_array_ptr_);
-		query.set_layout(TILEDB_COL_MAJOR);
-		//tiledb idx starting from 1
-		for(int i : row_idx)
-			query.add_range<int>(0, i+1, i+1);
-		for(int i : col_idx)
-			query.add_range<int>(1, i+1, i+1);
+		return read_cols(col_idx).rows(row_idx);
 
-		vector<float> buf(nrow * ncol);
-
-		query.set_buffer("mat", buf);
-		query.submit();
-		query.finalize();
-
-		EVENT_DATA_VEC data(nrow, ncol);
-		for(int i = 0; i < nrow * ncol; i++)
-			data.memptr()[i] = buf[i];
-		return data;
 	}
 	/*
 	 * protect the h5 from being overwritten accidentally
