@@ -44,12 +44,12 @@ BOOST_AUTO_TEST_CASE(tile)
 
 	tiledb::Context ctx(cfg);
 
-	tiledb::VFS vfs(ctx);
-
-	if(vfs.is_dir(uri))
-		vfs.remove_dir(uri);
-	fr.write_tile(uri, ctx);
-	auto cf_tile = TileCytoFrame(uri, true, true, S3Cred(), 4);
+//	tiledb::VFS vfs(ctx);
+//
+//	if(vfs.is_dir(uri))
+//		vfs.remove_dir(uri);
+//	fr.write_tile(uri, ctx);
+	auto cf_tile = TileCytoFrame(uri, true, true, S3Cred(), 1);
 
 	auto ch = cf_tile.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 9);

@@ -31,7 +31,7 @@ protected:
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 //	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
 	tiledb::Context ctx_;
-
+	shared_ptr<tiledb::Array> mat_array_ptr_;
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta(){};
@@ -199,7 +199,7 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
+		mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
 		tiledb::ArraySchema schema(ctx_, mat_uri);
 		auto dm = schema.domain();
 		auto nch = dm.dimension("channel").domain<int>().second;
@@ -218,14 +218,14 @@ public:
 //		query.submit();
 //		query.finalize();
 
-		uint64_t npd = array.metadata_num();
+		uint64_t npd = mat_array_ptr_->metadata_num();
 		uint32_t v_num;
 		tiledb_datatype_t v_type;
 		for (uint64_t i = 0; i < npd; ++i) {
 			string pn,pv;
 
 			const void* v;
-			array.get_metadata_from_index(i, &pn, &v_type, &v_num, &v);
+			mat_array_ptr_->get_metadata_from_index(i, &pn, &v_type, &v_num, &v);
 			if(v)
 			{
 				pv = string(static_cast<const char *>(v));
@@ -378,18 +378,21 @@ public:
 
 	EVENT_DATA_VEC get_data() const
 	{
-		fs::path arraypath(uri_);
-		auto mat_uri = (arraypath / "mat").string();
+//		fs::path arraypath(uri_);
+//		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
 
+		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
+		{
+			mat_array_ptr_->open(TILEDB_READ);
+		}
 		int ncol = dims[1];
 		int nrow = dims[0];
 
 		const std::vector<int> subarray = {1, nrow, 1, ncol};
 
-		tiledb::Query query(ctx_, array);
+		tiledb::Query query(ctx_, *mat_array_ptr_);
 		query.set_subarray(subarray);
 		query.set_layout(TILEDB_GLOBAL_ORDER);
 
@@ -411,12 +414,14 @@ public:
 	 */
 	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
 	{
-		fs::path arraypath(uri_);
-		auto mat_uri = (arraypath / "mat").string();
 
-		//open dataset for event data
-		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
-		tiledb::Query query(ctx_, array);
+		double start = gettime();
+
+		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
+		{
+			mat_array_ptr_->open(TILEDB_READ);
+		}
+		tiledb::Query query(ctx_, *mat_array_ptr_);
 		query.set_layout(TILEDB_COL_MAJOR);
 		int ncol,nrow, dim_idx;
 		if(is_col)
@@ -441,29 +446,32 @@ public:
 
 		vector<float> buf(nrow * ncol);
 
+
+
 		query.set_buffer("mat", buf);
 		query.submit();
 		query.finalize();
-
+		double runtime = (gettime() - start);
+		cout << "get_data(): " << runtime << endl;
 		EVENT_DATA_VEC data(nrow, ncol);
 		for(int i = 0; i < nrow * ncol; i++)
 			data.memptr()[i] = buf[i];
+
 
 		return data;
 
 	}
 	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
 	{
-		fs::path arraypath(uri_);
-		auto mat_uri = (arraypath / "mat").string();
-
-		//open dataset for event data
-		tiledb::Array array(ctx_, mat_uri, TILEDB_READ);
+		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
+		{
+			mat_array_ptr_->open(TILEDB_READ);
+		}
 		auto ncol = col_idx.size();
 		auto nrow = row_idx.size();
 
 
-		tiledb::Query query(ctx_, array);
+		tiledb::Query query(ctx_, *mat_array_ptr_);
 		query.set_layout(TILEDB_COL_MAJOR);
 		//tiledb idx starting from 1
 		for(int i : row_idx)
