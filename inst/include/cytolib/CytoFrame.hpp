@@ -180,31 +180,34 @@ public:
 		{
 			vfs.create_dir(uri);
 		}
-		fs::path arraypath(uri);
-		auto mat_uri = (arraypath / "mat").string();
-		write_tile_data_pd(mat_uri, ctx);
+		write_tile_data(uri, ctx);
 
-		auto params_uri = (arraypath / "params").string();
-		write_tile_params(params_uri, ctx);
+		write_tile_pd(uri, ctx);
 
-		auto kw_uri = (arraypath / "keywords").string();
-		write_tile_kw(kw_uri, ctx);
+		write_tile_params(uri, ctx);
+
+		write_tile_kw(uri, ctx);
 	}
-	void write_tile_data_pd(const string & uri, const tiledb::Context & ctx) const
+	void write_tile_data(const string & uri, const tiledb::Context & ctx) const
 	{
-		tiledb::Domain domain(ctx);
 		int nEvents = n_rows();
 		int nch = n_cols();
-		//2k is to meet 64k minimal recommended tile size to fit into L1 cache
-		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, nEvents}, nEvents));
-		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch}, 1));
-		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-		schema.set_domain(domain);
-		schema.add_attribute(tiledb::Attribute::create<float>(ctx, "mat"));
-		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+		auto array_uri = (fs::path(uri) / "mat").string();
+		tiledb::VFS vfs(ctx);
+		if(!vfs.is_dir(array_uri))
+		{
+			tiledb::Domain domain(ctx);
+			//2k is to meet 64k minimal recommended tile size to fit into L1 cache
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, nEvents}, nEvents));
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch}, 1));
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "mat"));
+			schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
 
-		tiledb::Array::create(uri, schema);
-		tiledb::Array array(ctx, uri, TILEDB_WRITE);
+			tiledb::Array::create(array_uri, schema);
+		}
+		tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
 		tiledb::Query query(ctx, array);
 		query.set_layout(TILEDB_GLOBAL_ORDER);
 		//global order write require subarray to match the boundary
@@ -218,31 +221,68 @@ public:
 		query.submit();
 		query.finalize();
 
-		//attach pdata as meta to param array(for convenience since mat can't attach two
-		for(auto it : pheno_data_)
-			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());//TODO:switch to TILEDB_STRING_UTF16
+	}
+
+	void delete_tile_meta(tiledb::Array &array) const
+	{
+		tiledb_datatype_t v_type;
+		uint32_t v_num;
+		const void* v;
+		uint64_t num = array.metadata_num();
+		vector<string> key(num);
+		for (uint64_t i = 0; i < num; ++i) {
+		  array.get_metadata_from_index(i, &key[i], &v_type, &v_num, &v);
+		}
+		array.close();
+		array.open(TILEDB_WRITE);
+		for(auto i : key)
+			array.delete_metadata(i);
 
 	}
+
+	void write_tile_pd(const string & uri, const tiledb::Context & ctx) const
+	{
+		tiledb::VFS vfs(ctx);
+		auto array_uri = (fs::path(uri) / "pdata").string();
+		if(!vfs.is_dir(array_uri))
+		{
+			//dummy array
+			tiledb::Domain domain(ctx);
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "pd", {1, 2}, 1));
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
+	//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+			tiledb::Array::create(array_uri, schema);
+		}
+		tiledb::Array array(ctx, array_uri, TILEDB_READ);
+		delete_tile_meta(array);
+
+		for(auto it : pheno_data_)
+			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());//TODO:switch to TILEDB_STRING_UTF16
+		//TODO:switch to TILEDB_STRING_UTF16
+	}
+
 	void write_tile_kw(const string & uri, const tiledb::Context & ctx) const
 	{
-		tiledb::Domain domain(ctx);
-		domain.add_dimension(tiledb::Dimension::create<int>(ctx, "dummy", {1, 2}, 1));
-		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-		schema.set_domain(domain);
-		schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
-//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+		tiledb::VFS vfs(ctx);
+		auto array_uri = (fs::path(uri) / "keywords").string();
+		if(!vfs.is_dir(array_uri))
+		{
+			tiledb::Domain domain(ctx);
+			//dummy array
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "kw", {1, 2}, 1));
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
+	//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
 
-		tiledb::Array::create(uri, schema);
-		tiledb::Array array(ctx, uri, TILEDB_WRITE);
-//		tiledb::Query query(ctx, array);
-//		query.set_layout(TILEDB_COL_MAJOR);
-//		EVENT_DATA_VEC dat = get_data();
-//
-//		query.set_buffer("mat", const_cast<EVENT_DATA_TYPE *>(dat.mem), nch * nEvents);
-//		query.submit();
-//		query.finalize();
+			tiledb::Array::create(array_uri, schema);
+		}
+		tiledb::Array array(ctx, array_uri, TILEDB_READ);
+		delete_tile_meta(array);
 
-		//attach kw as meta to mat array
 		for(auto it : keys_)
 			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());
 		//TODO:switch to TILEDB_STRING_UTF16
@@ -250,18 +290,25 @@ public:
 	void write_tile_params(const string & uri, const tiledb::Context & ctx) const
 	{
 
-		tiledb::Domain domain(ctx);
+		auto array_uri = (fs::path(uri) / "params").string();
+
 		int nch = n_cols();
-		auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch}, 1);
-		domain.add_dimension(a1);
+		tiledb::VFS vfs(ctx);
+		if(!vfs.is_dir(array_uri))
+		{
 
-		tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-		schema.set_domain(domain);
-		schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
-		schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
+			tiledb::Domain domain(ctx);
+			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch}, 1);
+			domain.add_dimension(a1);
 
-		tiledb::Array::create(uri, schema);
-		tiledb::Array array(ctx, uri, TILEDB_WRITE);
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
+			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
+
+			tiledb::Array::create(array_uri, schema);
+		}
+		tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
 		tiledb::Query query(ctx, array);
 		query.set_layout(TILEDB_GLOBAL_ORDER);
 		vector<float> min_vec(nch);
@@ -277,6 +324,9 @@ public:
 
 		//attach chnl and marker as meta since val-length writing to arry attr is not feasible
 		//due to empty markers do not meet the strict ascending buffer offset requirement
+		array.close();
+		array.open(TILEDB_READ);
+		delete_tile_meta(array);
 		for(auto it : params)
 			array.put_metadata(it.channel, TILEDB_CHAR, it.marker.size(), it.marker.c_str());
 		//TODO:switch to TILEDB_STRING_UTF16,TILEDB_STRING_ASCII

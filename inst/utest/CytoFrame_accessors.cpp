@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(tile)
 //
 //	if(vfs.is_dir(uri))
 //		vfs.remove_dir(uri);
-//	fr.write_tile(uri, ctx);
+	fr.write_tile(uri, ctx);
 	auto cf_tile = TileCytoFrame(uri, true, true, S3Cred(), 1);
 
 	auto ch = cf_tile.get_channels();

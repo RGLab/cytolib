@@ -34,11 +34,35 @@ protected:
 	shared_ptr<tiledb::Array> mat_array_ptr_;
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
-	void flush_meta(){};
-	void flush_params(){};
+	void flush_meta(){
+		//flush the cached meta data from CytoFrame into h5
+		if(is_dirty_params)
+			flush_params();
+		if(is_dirty_keys)
+			flush_keys();
+		if(is_dirty_pdata)
+			flush_pheno_data();
 
-	void flush_keys(){};
-	void flush_pheno_data(){};
+	};
+	void flush_params(){
+		check_write_permission();
+		write_tile_params(uri_, ctx_);
+		is_dirty_params = false;
+
+	};
+
+	void flush_keys(){
+		check_write_permission();
+		write_tile_kw(uri_, ctx_);
+		is_dirty_keys = false;
+
+	};
+	void flush_pheno_data(){
+		check_write_permission();
+		write_tile_pd(uri_, ctx_);
+		is_dirty_pdata = false;
+
+	};
 	void set_readonly(bool flag){
 		readonly_ = flag;
 	}
@@ -532,6 +556,8 @@ public:
 	 */
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
+		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type()!=TILEDB_WRITE)
+					mat_array_ptr_->open(TILEDB_WRITE);
 
 	}
 
