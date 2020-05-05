@@ -18,15 +18,27 @@ struct CFFixture{
 		//create h5 version
 		string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 //		cout << tmp << endl;
-		fr.write_h5(tmp);
-		fr_h5.reset(new H5CytoFrame(tmp));
+		if(file_format == FileFormat::TILE)
+		{
+			fr.write_tile(tmp);
+			cf_disk.reset(new TileCytoFrame(tmp));
+		}
+		else
+		{
+			fr.write_h5(tmp);
+			cf_disk.reset(new H5CytoFrame(tmp));
+
+		}
 	};
 
 	~CFFixture(){
 
 	};
 	MemCytoFrame fr;
-	unique_ptr<H5CytoFrame> fr_h5;
+	FileFormat file_format = FileFormat::TILE;
+//	FileFormat file_format = FileFormat::H5;
+//	unique_ptr<H5CytoFrame> cf_disk;
+	unique_ptr<CytoFrame> cf_disk;
    string file_path;
    FCS_READ_PARAM config;
 };
@@ -48,7 +60,10 @@ BOOST_AUTO_TEST_CASE(tile)
 //
 //	if(vfs.is_dir(uri))
 //		vfs.remove_dir(uri);
-	fr.write_tile(uri, ctx);
+	auto h5 = "/tmp/test.h5";
+	fr.write_h5(h5);
+	H5CytoFrame fr_h5(h5);
+//	fr.write_tile(uri, ctx);
 	auto cf_tile = TileCytoFrame(uri, true, true, S3Cred(), 1);
 
 	auto ch = cf_tile.get_channels();
@@ -56,9 +71,9 @@ BOOST_AUTO_TEST_CASE(tile)
 
 	//read all
 	double start = gettime();
-	auto mat1 = fr_h5->get_data();
+	auto mat1 = fr_h5.get_data();
 	double runtime = (gettime() - start);
-	cout << "fr_h5->get_data(): " << runtime << endl;
+	cout << "fr_h5.get_data(): " << runtime << endl;
 
 	start = gettime();
 	auto mat2 = cf_tile.get_data();
@@ -76,9 +91,9 @@ BOOST_AUTO_TEST_CASE(tile)
 		ridx[i] = rand()%fr.n_rows();
 
 	start = gettime();
-	mat1 = fr_h5->get_data(ridx, {3,8});
+	mat1 = fr_h5.get_data(ridx, {3,8});
 	runtime = (gettime() - start);
-	cout << "fr_h5->get_data(ridx,cidx): " << runtime << endl;
+	cout << "fr_h5.get_data(ridx,cidx): " << runtime << endl;
 
 	start = gettime();
 	mat2 = cf_tile.get_data(ridx, {3,8});
@@ -87,21 +102,21 @@ BOOST_AUTO_TEST_CASE(tile)
 //	for(auto i : {0,1,2,3})
 //		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 //	//idx by row
-//	mat1 = fr_h5->get_data({1,100}, false);
+//	mat1 = fr_h5.get_data({1,100}, false);
 //	mat2 = cf_tile.get_data({1,100}, false);
 //	for(auto i : {0,10,15})
 //		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 //	//idx by col
-//	mat1 = fr_h5->get_data({1,3}, true);
+//	mat1 = fr_h5.get_data({1,3}, true);
 //	mat2 = cf_tile.get_data({1,3}, true);
 //	for(auto i : {0,1000,5500})
 //		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 }
 BOOST_AUTO_TEST_CASE(s3)
 {
-	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);
-	auto ch = cf.get_channels();
-	BOOST_CHECK_EQUAL(ch.size(), 10);
+//	H5RCytoFrame cf = H5RCytoFrame("https://mike-h5.s3.amazonaws.com/bcell.h5", true);
+//	auto ch = cf.get_channels();
+//	BOOST_CHECK_EQUAL(ch.size(), 10);
 
 
 }
@@ -146,14 +161,14 @@ BOOST_AUTO_TEST_CASE(get_time_step)
 BOOST_AUTO_TEST_CASE(h5_vs_mem)
 {
 	//check if h5 version is consistent with mem
-	BOOST_CHECK_EQUAL(fr.get_params().size(), fr_h5->get_params().size());
-	BOOST_CHECK_EQUAL(fr.get_params().begin()->max, fr_h5->get_params().begin()->max);
+	BOOST_CHECK_EQUAL(fr.get_params().size(), cf_disk->get_params().size());
+	BOOST_CHECK_EQUAL(fr.get_params().begin()->max, cf_disk->get_params().begin()->max);
 
 }
 BOOST_AUTO_TEST_CASE(flags)
 {
 	//get a safe cp
-	string h5file = fr_h5->copy()->get_uri();
+	string h5file = cf_disk->copy()->get_uri();
 	//load it by default readonly flag
 	unique_ptr<H5CytoFrame> fr1(new H5CytoFrame(h5file));
 	//update meta data
@@ -251,9 +266,19 @@ BOOST_AUTO_TEST_CASE(subset_by_cols)
 	BOOST_CHECK_EQUAL(fr.n_cols(), channels.size());//original object is not modified
 
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-	cr_new.write_to_disk(tmp);
-	auto cf = H5CytoFrame(tmp);
-	BOOST_CHECK_EQUAL(cf.n_cols(), sub_channels.size());
+	shared_ptr<CytoFrame> cf;;
+	if(file_format == FileFormat::TILE)
+	{
+		cr_new.write_to_disk(tmp, FileFormat::TILE);
+		cf.reset(new TileCytoFrame(tmp));
+	}
+	else
+	{
+		cr_new.write_to_disk(tmp, FileFormat::H5);
+		cf.reset(new H5CytoFrame(tmp));
+	}
+
+	BOOST_CHECK_EQUAL(cf->n_cols(), sub_channels.size());
 }
 BOOST_AUTO_TEST_CASE(subset_by_rows)
 {
@@ -301,14 +326,14 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(key, newname);
 
 	//h5
-	CytoFramePtr fr2 = fr_h5->copy();
+	CytoFramePtr fr2 = cf_disk->copy();
 	fr2->set_channel(oldname, newname);
 	key = fr2->get_keyword("$P3N");
 	BOOST_CHECK_EQUAL(fr2->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
 
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-	fr2 = fr_h5->copy({1,2,3}, {1,2}, tmp);//channel order may change
+	fr2 = cf_disk->copy({1,2,3}, {1,2}, tmp);//channel order may change
 	fr2->set_channel(oldname, newname);
 	key = fr2->get_keyword("$P3N");
 	BOOST_CHECK_GT(fr2->get_col_idx(newname, ColType::channel), 0);
@@ -327,7 +352,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 }
 BOOST_AUTO_TEST_CASE(shallow_copy)
 {
-	CytoFramePtr fr_orig = fr_h5->copy();//create a safe copy to test with by deep copying
+	CytoFramePtr fr_orig = cf_disk->copy();//create a safe copy to test with by deep copying
 	//perform shallow copy
 	H5CytoFrame fr1 = *(dynamic_cast<H5CytoFrame*>(fr_orig.get()));
 
@@ -358,7 +383,7 @@ BOOST_AUTO_TEST_CASE(shallow_copy)
 BOOST_AUTO_TEST_CASE(deep_copy)
 {
 	//deep cp
-	CytoFramePtr fr1 = fr_h5->copy();
+	CytoFramePtr fr1 = cf_disk->copy();
 //	fr1->copy(fr1->get_h5_file_path());
 	//update meta data
 	string oldname = fr1->get_channels()[2];
@@ -373,13 +398,13 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 	fr1->set_data(dat);
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
-	BOOST_CHECK_NE(fr_h5->get_uri(), fr1->get_uri());
+	BOOST_CHECK_NE(cf_disk->get_uri(), fr1->get_uri());
 	//original cp is not affected by any change in meta and event data
-	BOOST_CHECK_EQUAL(fr_h5->get_channels()[2], oldname);
-	BOOST_CHECK_EQUAL(fr_h5->get_keyword("$P3N"), oldname);
+	BOOST_CHECK_EQUAL(cf_disk->get_channels()[2], oldname);
+	BOOST_CHECK_EQUAL(cf_disk->get_keyword("$P3N"), oldname);
 
 	BOOST_CHECK_CLOSE(fr1->get_data()[100], newval, 1e-6);
-	BOOST_CHECK_CLOSE(fr_h5->get_data()[100], old_val, 1e-6);
+	BOOST_CHECK_CLOSE(cf_disk->get_data()[100], old_val, 1e-6);
 
 
 
@@ -387,7 +412,7 @@ BOOST_AUTO_TEST_CASE(deep_copy)
 BOOST_AUTO_TEST_CASE(flush_meta)
 {
 	//deep cp
-	CytoFramePtr fr1 = fr_h5->copy();
+	CytoFramePtr fr1 = cf_disk->copy();
 	string h5file = fr1->get_uri();
 	//update meta data
 	string oldname = fr1->get_channels()[2];
@@ -417,7 +442,7 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 BOOST_AUTO_TEST_CASE(CytoFrameView_copy)
 {
 	//
-	CytoFrameView fr1(fr_h5->copy());
+	CytoFrameView fr1(cf_disk->copy());
 
 	//subset data
 	fr1.rows_(vector<unsigned> ({1, 2, 3}));

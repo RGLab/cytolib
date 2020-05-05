@@ -268,18 +268,14 @@ public:
 	 */
 	void load_meta()
 	{
-		fs::path arraypath(uri_);
 
-		auto params_uri = (arraypath / "params").string();
-		load_params(params_uri);
-
-		auto kw_uri = (arraypath / "keywords").string();
-		load_kw(kw_uri);
-
+		load_params();
+		load_kw();
+		load_pd();
 	}
-	void load_kw(const string & uri)
+	void load_kw()
 	{
-		tiledb::Array array(ctx_, uri, TILEDB_READ);
+		tiledb::Array array(ctx_, (fs::path(uri_) / "keywords").string(), TILEDB_READ);
 		uint64_t nkw = array.metadata_num();
 
 		keys_.resize(nkw);
@@ -298,12 +294,29 @@ public:
 		}
 
 	}
-	void load_params(const string & uri)
+	void load_pd()
 	{
-		tiledb::Array array(ctx_, uri, TILEDB_READ);
-//		tiledb::ArraySchema schema(ctx, uri);
-//		auto dm = schema.domain();
-//		auto nch = dm.dimension("params").domain<int>().second;
+		tiledb::Array array(ctx_, (fs::path(uri_) / "pdata").string(), TILEDB_READ);
+		uint64_t nkw = array.metadata_num();
+
+		uint32_t v_num;
+		tiledb_datatype_t v_type;
+		for (uint64_t i = 0; i < nkw; ++i) {
+			const void* v;
+			string key, value;
+			array.get_metadata_from_index(i, &keys_[i].first, &v_type, &v_num, &v);
+			if(v)
+			{
+				value = string(static_cast<const char *>(v));
+				value.resize(v_num);
+			}
+			pheno_data_[key] = value;
+		}
+
+	}
+	void load_params()
+	{
+		tiledb::Array array(ctx_, (fs::path(uri_) / "params").string(), TILEDB_READ);
 		int nch = array.metadata_num();
 		const std::vector<int> subarray = {1, nch};
 
@@ -556,8 +569,9 @@ public:
 	 */
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
-		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type()!=TILEDB_WRITE)
-					mat_array_ptr_->open(TILEDB_WRITE);
+		write_tile_data(uri_, ctx_);
+		if(mat_array_ptr_->is_open())
+			mat_array_ptr_->reopen();
 
 	}
 
