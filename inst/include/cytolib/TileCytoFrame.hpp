@@ -392,24 +392,15 @@ public:
 		query.set_subarray(subarray);
 		query.set_layout(TILEDB_GLOBAL_ORDER);
 
-		vector<float> buf(nrow * ncol);
+		arma::Mat<float> buf(nrow, ncol);
 
-		query.set_buffer("mat", buf);
+		query.set_buffer("mat", buf.memptr(), nrow*ncol);
 		query.submit();
 		query.finalize();
 //		double runtime = (gettime() - start);
 //		cout << "get all: " << runtime << endl;
 
-//		EVENT_DATA_TYPE * res = new EVENT_DATA_TYPE[nrow*ncol];
-//		for(int i = 0; i < nrow * ncol; i++)
-//			res[i] = buf[i];
-//		EVENT_DATA_VEC data(res, nrow, ncol, false);
-
-		EVENT_DATA_VEC data(nrow, ncol);
-
-		for(int i = 0; i < nrow * ncol; i++)
-			data.memptr()[i] = buf[i];
-		return data;
+		return arma::conv_to<arma::mat>::from(buf);
 	}
 
 	EVENT_DATA_VEC read_cols(uvec cidx) const
@@ -431,19 +422,15 @@ public:
 			query.add_range<int>(dim_idx, i+1, i+1);
 
 
-		vector<float> buf(nrow * ncol);
+		arma::Mat<float> buf(nrow, ncol);
 
 
 
-		query.set_buffer("mat", buf);
+		query.set_buffer("mat", buf.memptr(), nrow * ncol);
 		query.submit();
 		query.finalize();
-		EVENT_DATA_VEC data(nrow, ncol);
-		for(int i = 0; i < nrow * ncol; i++)
-			data.memptr()[i] = buf[i];
 
-
-		return data;
+		return arma::conv_to<arma::mat>::from(buf);
 
 	}
 	/**

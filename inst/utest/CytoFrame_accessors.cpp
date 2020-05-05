@@ -34,8 +34,8 @@ struct CFFixture{
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
 BOOST_AUTO_TEST_CASE(tile)
 {
-	auto uri = "s3://mike-h5/file24ad1cad7ca7.tile";
-//	auto uri = "/tmp/test.tile";
+//	auto uri = "s3://mike-h5/file24ad1cad7ca7.tile";
+	auto uri = "/tmp/test.tile";
 	tiledb::Config cfg;
 	cfg["vfs.s3.aws_access_key_id"] =  string(std::getenv("AWS_ACCESS_KEY_ID"));
 	cfg["vfs.s3.aws_secret_access_key"] =  string(std::getenv("AWS_SECRET_ACCESS_KEY"));
@@ -58,15 +58,15 @@ BOOST_AUTO_TEST_CASE(tile)
 	double start = gettime();
 	auto mat1 = fr_h5->get_data();
 	double runtime = (gettime() - start);
-//	cout << "fr_h5->get_data(): " << runtime << endl;
-//
-//	start = gettime();
-//	auto mat2 = cf_tile.get_data();
-//	runtime = (gettime() - start);
-//	cout << "cf_tile->get_data(): " << runtime << endl;
-//
-//	for(auto i : {100,1000,6000})
-//		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
+	cout << "fr_h5->get_data(): " << runtime << endl;
+
+	start = gettime();
+	auto mat2 = cf_tile.get_data();
+	runtime = (gettime() - start);
+	cout << "cf_tile->get_data(): " << runtime << endl;
+
+	for(auto i : {100,1000,6000})
+		BOOST_CHECK_CLOSE(mat1.mem[i], mat2.mem[i], 1);
 
 	//idx by row and col
 	auto nrow = 200;
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(tile)
 	cout << "fr_h5->get_data(ridx,cidx): " << runtime << endl;
 
 	start = gettime();
-	auto mat2 = cf_tile.get_data(ridx, {3,8});
+	mat2 = cf_tile.get_data(ridx, {3,8});
 	runtime = (gettime() - start);
 	cout << "cf_tile->get_data(ridx, cidx): " << runtime << endl;
 //	for(auto i : {0,1,2,3})
