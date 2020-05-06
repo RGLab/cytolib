@@ -9,8 +9,7 @@
 #define INST_INCLUDE_CYTOLIB_TILECYTOFRAME_HPP_
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/global.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
+
 
 namespace cytolib
 {
@@ -523,7 +522,7 @@ public:
 			new_uri = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
 			fs::remove(new_uri);
 		}
-		fs::copy_directory(uri_, new_uri);
+		fs::copy(uri_, new_uri, fs::copy_options::recursive);
 		CytoFramePtr ptr(new TileCytoFrame(new_uri, false));
 		//copy cached meta
 		ptr->set_params(get_params());

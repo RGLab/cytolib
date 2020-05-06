@@ -10,8 +10,6 @@
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #include "MemCytoFrame.hpp"
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 namespace cytolib
 {

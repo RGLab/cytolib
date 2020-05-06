@@ -20,8 +20,6 @@ using namespace arma;
 
 #include <H5Cpp.h>
 using namespace H5;
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 namespace cytolib
 {

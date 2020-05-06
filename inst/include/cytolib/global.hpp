@@ -21,6 +21,8 @@
 #include <tiledb/tiledb>
 
 using namespace std;
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem::v1;
 
 namespace cytolib
 {
