@@ -183,7 +183,7 @@ public:
 	/**
 	 * constructor from FCS
 	 * @param fcs_filename
-	 * @param h5_filename
+	 * @param uri
 	 */
 	TileCytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & uri
 			, bool readonly = false, const S3Cred & cred = S3Cred()):uri_(uri), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
@@ -359,12 +359,12 @@ public:
 
 	}
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
+	void convertToPb(pb::CytoFrame & fr_pb, const string & uri, H5Option h5_opt) const
 	{
 //			fr_pb.set_is_h5(true);
 //			if(h5_opt != H5Option::skip)
 //			{
-//				auto h5path = fs::path(h5_filename);
+//				auto h5path = fs::path(uri);
 //				auto dest = h5path.parent_path();
 //				if(!fs::exists(dest))
 //					throw(logic_error(dest.string() + "doesn't exist!"));
@@ -377,27 +377,27 @@ public:
 //						{
 //							if(fs::exists(h5path))
 //								fs::remove(h5path);
-//							fs::copy(filename_, h5_filename);
+//							fs::copy(filename_, uri);
 //							break;
 //						}
 //					case H5Option::move:
 //						{
 //							if(fs::exists(h5path))
 //								fs::remove(h5path);
-//							fs::rename(filename_, h5_filename);
+//							fs::rename(filename_, uri);
 //							break;
 //						}
 //					case H5Option::link:
 //						{
 //							throw(logic_error("'link' option for TileCytoFrame is no longer supported!"));
-//							fs::create_hard_link(filename_, h5_filename);
+//							fs::create_hard_link(filename_, uri);
 //							break;
 //						}
 //					case H5Option::symlink:
 //						{
 //							if(fs::exists(h5path))
 //								fs::remove(h5path);
-//							fs::create_symlink(filename_, h5_filename);
+//							fs::create_symlink(filename_, uri);
 //							break;
 //						}
 //					default:
@@ -513,54 +513,54 @@ public:
 			throw(domain_error("Copying TileCytoFrame to itself is not supported! "+ dest));
 	}
 
-	CytoFramePtr copy(const string & h5_filename = "", bool overwrite = false) const
+	CytoFramePtr copy(const string & uri = "", bool overwrite = false) const
 	{
 		if(!overwrite)
-			copy_overwrite_check(h5_filename);
-		string new_filename = h5_filename;
-		if(new_filename == "")
+			copy_overwrite_check(uri);
+		string new_uri = uri;
+		if(new_uri == "")
 		{
-			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-			fs::remove(new_filename);
+			new_uri = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
+			fs::remove(new_uri);
 		}
-		fs::copy_file(uri_, new_filename);
-		CytoFramePtr ptr(new TileCytoFrame(new_filename, false));
+		fs::copy_directory(uri_, new_uri);
+		CytoFramePtr ptr(new TileCytoFrame(new_uri, false));
 		//copy cached meta
 		ptr->set_params(get_params());
 		ptr->set_keywords(get_keywords());
 		ptr->set_pheno_data(get_pheno_data());
 		return ptr;
 	}
-	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "", bool overwrite = false) const
+	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & uri = "", bool overwrite = false) const
 	{
 
 		if(!overwrite)
-			copy_overwrite_check(h5_filename);
-		string new_filename = h5_filename;
-		if(new_filename == "")
+			copy_overwrite_check(uri);
+		string new_uri = uri;
+		if(new_uri == "")
 		{
-			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-			fs::remove(new_filename);
+			new_uri = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
+			fs::remove(new_uri);
 		}
 		MemCytoFrame fr(*this);
-		fr.copy(row_idx, col_idx)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new TileCytoFrame(new_filename, false));
+		fr.copy(row_idx, col_idx)->write_h5(new_uri);//this flushes the meta data as well
+		return CytoFramePtr(new TileCytoFrame(new_uri, false));
 	}
 
-	CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "", bool overwrite = false) const
+	CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & uri = "", bool overwrite = false) const
 	{
 
 		if(!overwrite)
-			copy_overwrite_check(h5_filename);
-		string new_filename = h5_filename;
-		if(new_filename == "")
+			copy_overwrite_check(uri);
+		string new_uri = uri;
+		if(new_uri == "")
 		{
-			new_filename = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
-			fs::remove(new_filename);
+			new_uri = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
+			fs::remove(new_uri);
 		}
 		MemCytoFrame fr(*this);
-		fr.copy(idx, is_row_indexed)->write_h5(new_filename);//this flushes the meta data as well
-		return CytoFramePtr(new TileCytoFrame(new_filename, false));
+		fr.copy(idx, is_row_indexed)->write_h5(new_uri);//this flushes the meta data as well
+		return CytoFramePtr(new TileCytoFrame(new_uri, false));
 	}
 
 	/**
