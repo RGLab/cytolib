@@ -303,7 +303,7 @@ public:
 			schema.set_domain(domain);
 			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
 			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
-
+			schema.add_attribute(tiledb::Attribute::create<string>(ctx, "channel"));
 			tiledb::Array::create(array_uri, schema);
 		}
 		tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
@@ -317,16 +317,31 @@ public:
 		for(int i = 0; i < nch; i++)
 			max_vec[i] = params[i].max;
 		query.set_buffer("max", max_vec);
+		vector<char> ch_vec;
+		vector<uint64_t> off(nch, 0);
+		//need this to preserve the channel order
+		for(int i = 0; i < nch; i++)
+		{
+			auto nchar = params[i].channel.size();
+			if(i > 0)
+				off[i] = off[i-1] + params[i-1].channel.size();
+			ch_vec.resize(ch_vec.size() + nchar);
+			memcpy(&ch_vec[off[i]], &params[i].channel[0], nchar * sizeof(char));
+		}
+		query.set_buffer("channel", off, ch_vec);
 		query.submit();
 		query.finalize();
 
-		//attach chnl and marker as meta since val-length writing to arry attr is not feasible
+		//attach marker as meta since val-length writing to arry attr is not feasible
 		//due to empty markers do not meet the strict ascending buffer offset requirement
 		array.close();
 		array.open(TILEDB_READ);
 		delete_tile_meta(array);
 		for(auto it : params)
+		{
 			array.put_metadata(it.channel, TILEDB_CHAR, it.marker.size(), it.marker.c_str());
+		}
+
 		//TODO:switch to TILEDB_STRING_UTF16,TILEDB_STRING_ASCII
 	}
 	/**

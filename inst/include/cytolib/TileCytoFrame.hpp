@@ -326,6 +326,14 @@ public:
 		query.set_buffer("min", min_vec);
 		vector<float> max_vec(nch);
 		query.set_buffer("max", max_vec);
+		auto max_buf = array.max_buffer_elements(subarray);
+		auto nbuf_size = max_buf["channel"].second;
+		vector<char> ch_vec(nbuf_size);
+		if(max_buf["channel"].first!=nch)
+			throw(domain_error("channel attribute length is not consistent with its marker meta data size!"));
+		vector<uint64_t> off(nch);
+		query.set_buffer("channel", off, ch_vec);
+
 		query.submit();
 		query.finalize();
 
@@ -334,8 +342,11 @@ public:
 		uint32_t v_num;
 		tiledb_datatype_t v_type;
 		for (int i = 0; i < nch; ++i) {
+			auto start = off[i];
+			auto nsize = (i< (nch - 1)?off[i+1]:nbuf_size) - start;
+			params[i].channel = string(&ch_vec[start], nsize);
 			const void* v;
-			array.get_metadata_from_index(i, &params[i].channel, &v_type, &v_num, &v);
+			array.get_metadata(params[i].channel, &v_type, &v_num, &v);
 			if(v)
 			{
 				params[i].marker = string(static_cast<const char *>(v));
@@ -542,7 +553,7 @@ public:
 			fs::remove(new_uri);
 		}
 		MemCytoFrame fr(*this);
-		fr.copy(row_idx, col_idx)->write_h5(new_uri);//this flushes the meta data as well
+		fr.copy(row_idx, col_idx)->write_tile(new_uri);//this flushes the meta data as well
 		return CytoFramePtr(new TileCytoFrame(new_uri, false));
 	}
 
@@ -554,11 +565,11 @@ public:
 		string new_uri = uri;
 		if(new_uri == "")
 		{
-			new_uri = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
+			new_uri = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
 			fs::remove(new_uri);
 		}
 		MemCytoFrame fr(*this);
-		fr.copy(idx, is_row_indexed)->write_h5(new_uri);//this flushes the meta data as well
+		fr.copy(idx, is_row_indexed)->write_tile(new_uri);//this flushes the meta data as well
 		return CytoFramePtr(new TileCytoFrame(new_uri, false));
 	}
 
