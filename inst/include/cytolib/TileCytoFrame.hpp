@@ -326,25 +326,36 @@ public:
 		query.set_buffer("min", min_vec);
 		vector<float> max_vec(nch);
 		query.set_buffer("max", max_vec);
-		auto max_buf = array.max_buffer_elements(subarray);
-		auto nbuf_size = max_buf["channel"].second;
-		vector<char> ch_vec(nbuf_size);
-		if(max_buf["channel"].first!=nch)
-			throw(domain_error("channel attribute length is not consistent with its marker meta data size!"));
-		vector<uint64_t> off(nch);
-		query.set_buffer("channel", off, ch_vec);
+//		auto max_buf = array.max_buffer_elements(subarray);
+//		auto nbuf_size = max_buf["channel"].second;
+//		vector<char> ch_vec(nbuf_size);
+//		if(max_buf["channel"].first!=nch)
+//			throw(domain_error("channel attribute length is not consistent with its marker meta data size!"));
+//		vector<uint64_t> off(nch);
+//		query.set_buffer("channel", off, ch_vec);
 
 		query.submit();
 		query.finalize();
 
 		params.resize(nch);
-
+		//get channel in order
+		tiledb::Array array1(ctx_, (fs::path(uri_) / "channel_idx").string(), TILEDB_READ);
 		uint32_t v_num;
 		tiledb_datatype_t v_type;
 		for (int i = 0; i < nch; ++i) {
-			auto start = off[i];
-			auto nsize = (i< (nch - 1)?off[i+1]:nbuf_size) - start;
-			params[i].channel = string(&ch_vec[start], nsize);
+				const void* v;
+				string channel;
+				array1.get_metadata_from_index(i, &channel, &v_type, &v_num, &v);
+				int idx = *(static_cast<const int *>(v));
+				params[idx].channel = channel;
+
+			}
+
+
+		for (int i = 0; i < nch; ++i) {
+//			auto start = off[i];
+//			auto nsize = (i< (nch - 1)?off[i+1]:nbuf_size) - start;
+//			params[i].channel = string(&ch_vec[start], nsize);
 			const void* v;
 			array.get_metadata(params[i].channel, &v_type, &v_num, &v);
 			if(v)
@@ -358,7 +369,7 @@ public:
 
 		}
 
-
+		build_hash();
 	}
 	string get_uri() const{
 		return uri_;

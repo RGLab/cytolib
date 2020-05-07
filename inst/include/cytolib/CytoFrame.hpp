@@ -303,7 +303,6 @@ public:
 			schema.set_domain(domain);
 			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
 			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
-			schema.add_attribute(tiledb::Attribute::create<string>(ctx, "channel"));
 			tiledb::Array::create(array_uri, schema);
 		}
 		tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
@@ -317,18 +316,18 @@ public:
 		for(int i = 0; i < nch; i++)
 			max_vec[i] = params[i].max;
 		query.set_buffer("max", max_vec);
-		vector<char> ch_vec;
-		vector<uint64_t> off(nch, 0);
-		//need this to preserve the channel order
-		for(int i = 0; i < nch; i++)
-		{
-			auto nchar = params[i].channel.size();
-			if(i > 0)
-				off[i] = off[i-1] + params[i-1].channel.size();
-			ch_vec.resize(ch_vec.size() + nchar);
-			memcpy(&ch_vec[off[i]], &params[i].channel[0], nchar * sizeof(char));
-		}
-		query.set_buffer("channel", off, ch_vec);
+//		vector<char> ch_vec;
+//		vector<uint64_t> off(nch, 0);
+//		//need this to preserve the channel order
+//		for(int i = 0; i < nch; i++)
+//		{
+//			auto nchar = params[i].channel.size();
+//			if(i > 0)
+//				off[i] = off[i-1] + params[i-1].channel.size();
+//			ch_vec.resize(ch_vec.size() + nchar);
+//			memcpy(&ch_vec[off[i]], &params[i].channel[0], nchar * sizeof(char));
+//		}
+//		query.set_buffer("channel", off, ch_vec);
 		query.submit();
 		query.finalize();
 
@@ -342,7 +341,26 @@ public:
 			array.put_metadata(it.channel, TILEDB_CHAR, it.marker.size(), it.marker.c_str());
 		}
 
-		//TODO:switch to TILEDB_STRING_UTF16,TILEDB_STRING_ASCII
+		//hack to preserve channel order
+		array_uri = (fs::path(uri) / "channel_idx").string();
+		if(!vfs.is_dir(array_uri))
+		{
+			tiledb::Domain domain(ctx);
+			//dummy array
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cidx", {1, 2}, 1));
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
+	//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+			tiledb::Array::create(array_uri, schema);
+		}
+		tiledb::Array array1(ctx, array_uri, TILEDB_READ);
+		delete_tile_meta(array1);
+
+		for(int i = 0; i < nch; i++)
+			array1.put_metadata(params[i].channel, TILEDB_INT32, 1, &i);
+		//TODO:switch to TILEDB_STRING_UTF16
 	}
 	/**
 	 * get the data of entire event matrix

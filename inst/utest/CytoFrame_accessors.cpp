@@ -340,44 +340,57 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(key, newname);
 
 	//h5 is not synced by setter immediately
-	H5CytoFrame fr3(tmp);
-	BOOST_CHECK_EQUAL(fr3.get_col_idx(newname, ColType::channel), -1);
-	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), oldname);
+	shared_ptr<CytoFrame> fr3;
+	if(file_format == FileFormat::H5)
+		fr3.reset(new H5CytoFrame (tmp));
+	else
+		fr3.reset(new TileCytoFrame (tmp));
+	BOOST_CHECK_EQUAL(fr3->get_col_idx(newname, ColType::channel), -1);
+	BOOST_CHECK_EQUAL(fr3->get_keyword("$P3N"), oldname);
 	//cached meta data is NoT flushed to h5 even when the object is destroyed
 	fr2.reset();
-	fr3 = H5CytoFrame(tmp);
-	BOOST_CHECK_GT(fr3.get_col_idx(oldname, ColType::channel), 0);
-	BOOST_CHECK_EQUAL(fr3.get_keyword("$P3N"), oldname);
+	if(file_format == FileFormat::H5)
+		fr3.reset(new H5CytoFrame (tmp));
+	else
+		fr3.reset(new TileCytoFrame (tmp));
+	BOOST_CHECK_GT(fr3->get_col_idx(oldname, ColType::channel), 0);
+	BOOST_CHECK_EQUAL(fr3->get_keyword("$P3N"), oldname);
 
 }
 BOOST_AUTO_TEST_CASE(shallow_copy)
 {
 	CytoFramePtr fr_orig = cf_disk->copy();//create a safe copy to test with by deep copying
 	//perform shallow copy
-	H5CytoFrame fr1 = *(dynamic_cast<H5CytoFrame*>(fr_orig.get()));
+	shared_ptr<CytoFrame> fr1;
+	if(file_format == FileFormat::H5)
+		fr1.reset(new H5CytoFrame(*dynamic_cast<H5CytoFrame*>(fr_orig.get())));
+	else
+		fr1.reset(new TileCytoFrame(*dynamic_cast<TileCytoFrame*>(fr_orig.get())));
+
+
 
 	//update meta data
-	string oldname = fr1.get_channels()[2];
+	string oldname = fr1->get_channels()[2];
 	string newname = "test";
-	fr1.set_channel(oldname, newname);
-	string key = fr1.get_keyword("$P3N");
-	BOOST_CHECK_EQUAL(fr1.get_channels()[2], newname);
+	fr1->set_channel(oldname, newname);
+	string key = fr1->get_keyword("$P3N");
+	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(key, newname);
 	//meta data is not changed for original cp
 	BOOST_CHECK_EQUAL(fr_orig->get_channels()[2], oldname);
 	BOOST_CHECK_EQUAL(fr_orig->get_keyword("$P3N"), oldname);
-	BOOST_CHECK_EQUAL(fr_orig->get_uri(), fr1.get_uri());
+	BOOST_CHECK_EQUAL(fr_orig->get_uri(), fr1->get_uri());
 	//update data
-	EVENT_DATA_VEC dat = fr1.get_data();
+	EVENT_DATA_VEC dat = fr1->get_data();
 	float newval = 100;
 	dat[100] = newval;
-	fr1.set_data(dat);
-	BOOST_CHECK_CLOSE(fr1.get_data()[100], newval, 1e-6);//fr1 is updated
+	fr1->set_data(dat);
+	BOOST_CHECK_CLOSE(fr1->get_data()[100], newval, 1e-6);//fr1 is updated
 	BOOST_CHECK_CLOSE(fr_orig->get_data()[100], newval, 1e-6);//original cp is also updated
 
 	//delete fr_orig to ensure its copy still has valid access to h5 data
 	fr_orig.reset();
-	BOOST_CHECK_CLOSE(fr1.get_data()[100], newval, 1e-6);
+	BOOST_CHECK_CLOSE(fr1->get_data()[100], newval, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(deep_copy)
