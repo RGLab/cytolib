@@ -8,40 +8,15 @@ ifneq (,)
 This makefile requires GNU Make.
 endif
 
-
-boost_sys_src=${wildcard boost/libs/system/src/*.cpp}
-boost_sys_objs=${boost_sys_src:.cpp=.o}
-boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
-boost_fs_objs=${boost_fs_src:.cpp=.o}
-
-BOOSTFSLIB = libboost_fs.a
-USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
-USERLIB = ${USERDIR}/${BOOSTFSLIB}
-
 	
-CXX_STD = CXX11
+CXX_STD = CXX17
 PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
 
 RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
     "${R_HOME}/bin/R" --vanilla --slave)
 
 TILEDB_LIBS = -ltiledb
+FSLIB = -lstdc++fs
 
-PKG_LIBS = ${boost_fs_objs} ${boost_sys_objs} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) $(TILEDB_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
+PKG_LIBS = $(FSLIB) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) $(TILEDB_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
 
-.PHONY: all clean 
-
-all: $(SHLIB) 
-
-$(SHLIB): $(USERLIB)
-
-$(USERLIB): ${boost_fs_objs}
-	mkdir -p "${USERDIR}"
-	$(AR) rs "${USERLIB}" ${boost_fs_objs} ${boost_sys_objs}
-
-$(boost_fs_objs): ${boost_sys_objs}
-
-
-clean:
-	rm -f $(OBJECTS) $(SHLIB)
- 
