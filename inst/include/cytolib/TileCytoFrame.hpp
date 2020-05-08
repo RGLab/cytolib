@@ -595,6 +595,8 @@ public:
 	 */
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
+		check_write_permission();
+
 		write_tile_data(uri_, ctx_, _data);
 //		if(mat_array_ptr_->is_open())
 //			mat_array_ptr_->reopen();
@@ -603,7 +605,6 @@ public:
 
 	void set_data(EVENT_DATA_VEC && _data)
 	{
-		check_write_permission();
 		set_data(_data);
 	}
 };
