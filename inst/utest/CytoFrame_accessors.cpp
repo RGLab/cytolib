@@ -44,7 +44,7 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
-BOOST_AUTO_TEST_CASE(tile_test)
+BOOST_AUTO_TEST_CASE(tile_write_block_test)
 {
 	/*
 	 * create and wirte array
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(tile_test)
 	tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
 	tiledb::Query query(ctx, array);
 	query.set_layout(TILEDB_GLOBAL_ORDER);
-
+	query.set_subarray({1,4});
 	vector<int> buf = {1, 2, 3, 4};
 
 	query.set_buffer("a1", buf);
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(tile_test)
 	query1.set_buffer("a1", buf1);
 	query1.submit();
 	query1.finalize();
-	array.close();
+//	array.close();
 	/*
 	 * open it with another array object
 	 */

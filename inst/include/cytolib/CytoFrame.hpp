@@ -200,7 +200,8 @@ public:
 		{
 			tiledb::Domain domain(ctx);
 			//2k is to meet 64k minimal recommended tile size to fit into L1 cache
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, nEvents}, nEvents));
+			auto ncell = nEvents==0?1:nEvents;
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, ncell}, ncell));
 			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch}, 1));
 			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 			schema.set_domain(domain);
@@ -209,20 +210,22 @@ public:
 
 			tiledb::Array::create(array_uri, schema);
 		}
-		tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
-		tiledb::Query query(ctx, array);
-		query.set_layout(TILEDB_GLOBAL_ORDER);
-		//global order write require subarray to match the boundary
-//		std::vector<int> subarray = {1, nEvents, 1, nch};
-//		query.set_subarray(subarray);
 
-		//convert to float
-		vector<float> buf(_data.mem, _data.mem + nch * nEvents);
+		if(nch * nEvents>0)
+		{
+			tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
+			tiledb::Query query(ctx, array);
+			query.set_layout(TILEDB_GLOBAL_ORDER);
+			//global order write require subarray to match the boundary
+//			std::vector<int> subarray = {1, nEvents, 1, nch};
+//			query.set_subarray(subarray);
+			//convert to float
+			vector<float> buf(_data.mem, _data.mem + nch * nEvents);
 
-		query.set_buffer("mat", buf);
-		query.submit();
-		query.finalize();
-
+			query.set_buffer("mat", buf);
+			query.submit();
+			query.finalize();
+		}
 	}
 
 	void delete_tile_meta(tiledb::Array &array) const
@@ -300,7 +303,7 @@ public:
 		{
 
 			tiledb::Domain domain(ctx);
-			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch}, 1);
+			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch==0?1:nch}, 1);
 			domain.add_dimension(a1);
 
 			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
