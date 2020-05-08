@@ -123,14 +123,14 @@ BOOST_AUTO_TEST_CASE(tile)
 
 	tiledb::Context ctx(cfg);
 
-//	tiledb::VFS vfs(ctx);
-//
-//	if(vfs.is_dir(uri))
-//		vfs.remove_dir(uri);
+	tiledb::VFS vfs(ctx);
+
+	if(vfs.is_dir(uri))
+		vfs.remove_dir(uri);
 	auto h5 = "/tmp/test.h5";
 	fr.write_h5(h5);
 	H5CytoFrame fr_h5(h5);
-//	fr.write_tile(uri, ctx);
+	fr.write_tile(uri, ctx);
 	auto cf_tile = TileCytoFrame(uri, true, true, S3Cred(), 1);
 
 	auto ch = cf_tile.get_channels();
@@ -514,7 +514,13 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 	fr1->set_channel(newname, oldname);
 	fr1.reset();
 	//load it back and see the change has NOT taken effect
-	fr1.reset(new H5CytoFrame(h5file));
+	//perform shallow copy
+	if(file_format == FileFormat::H5)
+		fr1.reset(new H5CytoFrame(h5file));
+	else
+		fr1.reset(new TileCytoFrame(h5file));
+
+
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), newname);
 
