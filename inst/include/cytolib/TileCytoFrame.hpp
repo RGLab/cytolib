@@ -30,7 +30,7 @@ protected:
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 //	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
 	tiledb::Context ctx_;
-//	shared_ptr<tiledb::Array> mat_array_ptr_;//existing opened array seems to block the new writer array query
+	shared_ptr<tiledb::Array> mat_array_ptr_;
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta(){
@@ -223,7 +223,7 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		auto mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
+		mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
 		tiledb::ArraySchema schema(ctx_, mat_uri);
 		auto dm = schema.domain();
 		auto nch = dm.dimension("channel").domain<int>().second;
@@ -437,8 +437,6 @@ public:
 
 	EVENT_DATA_VEC get_data() const
 	{
-		auto mat_uri = (fs::path(uri_) / "mat").string();
-		auto mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
 		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
 		{
 			mat_array_ptr_->open(TILEDB_READ);
@@ -465,9 +463,6 @@ public:
 
 	EVENT_DATA_VEC read_cols(uvec cidx) const
 	{
-
-		auto mat_uri = (fs::path(uri_) / "mat").string();
-		auto mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
 
 		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
 		{
@@ -598,8 +593,8 @@ public:
 		check_write_permission();
 
 		write_tile_data(uri_, ctx_, _data);
-//		if(mat_array_ptr_->is_open())
-//			mat_array_ptr_->reopen();
+		if(mat_array_ptr_->is_open())
+			mat_array_ptr_->reopen();
 
 	}
 

@@ -234,6 +234,8 @@ BOOST_AUTO_TEST_CASE(h5_vs_mem)
 }
 BOOST_AUTO_TEST_CASE(flags)
 {
+	if(file_format == FileFormat::H5)
+	{
 	//get a safe cp
 	string h5file = cf_disk->copy()->get_uri();
 	//load it by default readonly flag
@@ -289,7 +291,7 @@ BOOST_AUTO_TEST_CASE(flags)
 	H5CytoFrame fr3(h5file, false);
 	fr3.set_data(dat);
 	BOOST_CHECK_CLOSE(fr3.get_data()[100], newval, 1e-6);//fr1 is updated
-
+	}
 //	try{
 //		fr3.write_to_disk(h5file);
 //	}catch(H5::FileIException & ex){
@@ -365,8 +367,12 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 	cr_new.write_to_disk(tmp);
-	auto cf = H5CytoFrame(tmp);
-	BOOST_CHECK_EQUAL(cf.n_rows(), 3);
+	CytoFramePtr cf;
+	if(file_format==FileFormat::H5)
+		cf.reset(new H5CytoFrame(tmp));
+	else
+		cf.reset(new TileCytoFrame(tmp));
+	BOOST_CHECK_EQUAL(cf->n_rows(), 3);
 }
 BOOST_AUTO_TEST_CASE(set_channel)
 {
