@@ -44,6 +44,73 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+BOOST_AUTO_TEST_CASE(tile_test)
+{
+	/*
+	 * create and wirte array
+	 */
+	tiledb::Context ctx;
+	tiledb::Domain domain(ctx);
+	domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, 4}, 2));
+
+	tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+	schema.set_domain(domain);
+	schema.add_attribute(tiledb::Attribute::create<int>(ctx, "a1"));
+	schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+	auto array_uri = "/tmp/test.tile";
+	tiledb::VFS vfs(ctx);
+	if(vfs.is_dir(array_uri))
+		vfs.remove_dir(array_uri);
+	tiledb::Array::create(array_uri, schema);
+	tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
+	tiledb::Query query(ctx, array);
+	query.set_layout(TILEDB_GLOBAL_ORDER);
+
+	vector<int> buf = {1, 2, 3, 4};
+
+	query.set_buffer("a1", buf);
+	query.submit();
+	query.finalize();
+
+	/*
+	 * open the array and read it
+	 */
+	array.close();
+	tiledb::Array array1(ctx, array_uri, TILEDB_READ);
+	vector<int> buf1(4);
+	tiledb::Query query1(ctx, array1);
+	query1.set_subarray({1,4});
+	query1.set_layout(TILEDB_GLOBAL_ORDER);
+	query1.set_buffer("a1", buf1);
+	query1.submit();
+	query1.finalize();
+	array.close();
+	/*
+	 * open it with another array object
+	 */
+	tiledb::Array array2(ctx, array_uri, TILEDB_WRITE);
+	vector<int> buf2= {5,6,7,8};
+	tiledb::Query query2(ctx, array2);
+	query2.set_subarray({1,4});
+	query2.set_layout(TILEDB_GLOBAL_ORDER);
+	query2.set_buffer("a1", buf2);
+	query2.submit();
+//	query2.submit_async([]() { std::cout << "Callback: Query completed\n"; });
+	query2.finalize();
+
+	array.close();
+	array.open(TILEDB_READ);
+	tiledb::Query query3(ctx, array);
+	query3.set_subarray({1,4});
+	query3.set_layout(TILEDB_GLOBAL_ORDER);
+	query3.set_buffer("a1", buf1);
+	query3.submit();
+	query3.finalize();
+
+	for(auto i : buf1)
+		cout << i << endl;
+}
 BOOST_AUTO_TEST_CASE(tile)
 {
 //	auto uri = "s3://mike-h5/file24ad1cad7ca7.tile";
@@ -360,6 +427,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 BOOST_AUTO_TEST_CASE(shallow_copy)
 {
 	CytoFramePtr fr_orig = cf_disk->copy();//create a safe copy to test with by deep copying
+
 	//perform shallow copy
 	shared_ptr<CytoFrame> fr1;
 	if(file_format == FileFormat::H5)

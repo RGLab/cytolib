@@ -30,7 +30,7 @@ protected:
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 //	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
 	tiledb::Context ctx_;
-	shared_ptr<tiledb::Array> mat_array_ptr_;
+//	shared_ptr<tiledb::Array> mat_array_ptr_;//existing opened array seems to block the new writer array query
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta(){
@@ -68,57 +68,58 @@ public:
 	bool get_readonly(){
 		return readonly_ ;
 	}
-	TileCytoFrame(const TileCytoFrame & frm):CytoFrame(frm)
-	{
-		uri_ = frm.uri_;
-		is_dirty_params = frm.is_dirty_params;
-		is_dirty_keys = frm.is_dirty_keys;
-		is_dirty_pdata = frm.is_dirty_pdata;
-		readonly_ = frm.readonly_;
-		access_plist_ = frm.access_plist_;
-		memcpy(dims, frm.dims, sizeof(dims));
-
-	}
-	TileCytoFrame(TileCytoFrame && frm):CytoFrame(frm)
-	{
-//		swap(pheno_data_, frm.pheno_data_);
-//		swap(keys_, frm.keys_);
-//		swap(params, frm.params);
-//		swap(channel_vs_idx, frm.channel_vs_idx);
-//		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(uri_, frm.uri_);
-		swap(dims, frm.dims);
-		swap(access_plist_, frm.access_plist_);
-
-		swap(readonly_, frm.readonly_);
-		swap(is_dirty_params, frm.is_dirty_params);
-		swap(is_dirty_keys, frm.is_dirty_keys);
-		swap(is_dirty_pdata, frm.is_dirty_pdata);
-	}
-	TileCytoFrame & operator=(const TileCytoFrame & frm)
-	{
-		CytoFrame::operator=(frm);
-		uri_ = frm.uri_;
-		is_dirty_params = frm.is_dirty_params;
-		is_dirty_keys = frm.is_dirty_keys;
-		is_dirty_pdata = frm.is_dirty_pdata;
-		readonly_ = frm.readonly_;
-		access_plist_ = frm.access_plist_;
-		memcpy(dims, frm.dims, sizeof(dims));
-		return *this;
-	}
-	TileCytoFrame & operator=(TileCytoFrame && frm)
-	{
-		CytoFrame::operator=(frm);
-		swap(uri_, frm.uri_);
-		swap(dims, frm.dims);
-		swap(is_dirty_params, frm.is_dirty_params);
-		swap(is_dirty_keys, frm.is_dirty_keys);
-		swap(is_dirty_pdata, frm.is_dirty_pdata);
-		swap(readonly_, frm.readonly_);
-		swap(access_plist_, frm.access_plist_);
-		return *this;
-	}
+//	TileCytoFrame(const TileCytoFrame & frm):CytoFrame(frm)
+//	{
+//		uri_ = frm.uri_;
+//		is_dirty_params = frm.is_dirty_params;
+//		is_dirty_keys = frm.is_dirty_keys;
+//		is_dirty_pdata = frm.is_dirty_pdata;
+//		readonly_ = frm.readonly_;
+//		access_plist_ = frm.access_plist_;
+//		memcpy(dims, frm.dims, sizeof(dims));
+//		ctx_ =
+//
+//	}
+//	TileCytoFrame(TileCytoFrame && frm):CytoFrame(frm)
+//	{
+////		swap(pheno_data_, frm.pheno_data_);
+////		swap(keys_, frm.keys_);
+////		swap(params, frm.params);
+////		swap(channel_vs_idx, frm.channel_vs_idx);
+////		swap(marker_vs_idx, frm.marker_vs_idx);
+//		swap(uri_, frm.uri_);
+//		swap(dims, frm.dims);
+//		swap(access_plist_, frm.access_plist_);
+//
+//		swap(readonly_, frm.readonly_);
+//		swap(is_dirty_params, frm.is_dirty_params);
+//		swap(is_dirty_keys, frm.is_dirty_keys);
+//		swap(is_dirty_pdata, frm.is_dirty_pdata);
+//	}
+//	TileCytoFrame & operator=(const TileCytoFrame & frm)
+//	{
+//		CytoFrame::operator=(frm);
+//		uri_ = frm.uri_;
+//		is_dirty_params = frm.is_dirty_params;
+//		is_dirty_keys = frm.is_dirty_keys;
+//		is_dirty_pdata = frm.is_dirty_pdata;
+//		readonly_ = frm.readonly_;
+//		access_plist_ = frm.access_plist_;
+//		memcpy(dims, frm.dims, sizeof(dims));
+//		return *this;
+//	}
+//	TileCytoFrame & operator=(TileCytoFrame && frm)
+//	{
+//		CytoFrame::operator=(frm);
+//		swap(uri_, frm.uri_);
+//		swap(dims, frm.dims);
+//		swap(is_dirty_params, frm.is_dirty_params);
+//		swap(is_dirty_keys, frm.is_dirty_keys);
+//		swap(is_dirty_pdata, frm.is_dirty_pdata);
+//		swap(readonly_, frm.readonly_);
+//		swap(access_plist_, frm.access_plist_);
+//		return *this;
+//	}
 
 	unsigned n_rows() const{
 				return dims[0];
@@ -222,7 +223,7 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
+		auto mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
 		tiledb::ArraySchema schema(ctx_, mat_uri);
 		auto dm = schema.domain();
 		auto nch = dm.dimension("channel").domain<int>().second;
@@ -436,7 +437,8 @@ public:
 
 	EVENT_DATA_VEC get_data() const
 	{
-//		double start = gettime();
+		auto mat_uri = (fs::path(uri_) / "mat").string();
+		auto mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
 		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
 		{
 			mat_array_ptr_->open(TILEDB_READ);
@@ -463,6 +465,10 @@ public:
 
 	EVENT_DATA_VEC read_cols(uvec cidx) const
 	{
+
+		auto mat_uri = (fs::path(uri_) / "mat").string();
+		auto mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
+
 		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
 		{
 			mat_array_ptr_->open(TILEDB_READ);
@@ -500,7 +506,6 @@ public:
 	{
 		EVENT_DATA_VEC data;
 
-		int ncol,nrow, dim_idx;
 		if(is_col)
 		{
 			data = read_cols(idx);
@@ -591,8 +596,8 @@ public:
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
 		write_tile_data(uri_, ctx_);
-		if(mat_array_ptr_->is_open())
-			mat_array_ptr_->reopen();
+//		if(mat_array_ptr_->is_open())
+//			mat_array_ptr_->reopen();
 
 	}
 
