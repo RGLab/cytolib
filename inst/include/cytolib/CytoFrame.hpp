@@ -188,6 +188,10 @@ public:
 	}
 	void write_tile_data(const string & uri, const tiledb::Context & ctx) const
 	{
+		write_tile_data(uri, ctx, get_data());
+	}
+	void write_tile_data(const string & uri, const tiledb::Context & ctx, const EVENT_DATA_VEC & _data) const
+	{
 		int nEvents = n_rows();
 		int nch = n_cols();
 		auto array_uri = (fs::path(uri) / "mat").string();
@@ -211,9 +215,9 @@ public:
 		//global order write require subarray to match the boundary
 //		std::vector<int> subarray = {1, nEvents, 1, nch};
 //		query.set_subarray(subarray);
-		EVENT_DATA_VEC dat = get_data();
+
 		//convert to float
-		vector<float> buf(dat.mem, dat.mem + nch * nEvents);
+		vector<float> buf(_data.mem, _data.mem + nch * nEvents);
 
 		query.set_buffer("mat", buf);
 		query.submit();

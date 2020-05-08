@@ -595,7 +595,7 @@ public:
 	 */
 	void set_data(const EVENT_DATA_VEC & _data)
 	{
-		write_tile_data(uri_, ctx_);
+		write_tile_data(uri_, ctx_, _data);
 //		if(mat_array_ptr_->is_open())
 //			mat_array_ptr_->reopen();
 
