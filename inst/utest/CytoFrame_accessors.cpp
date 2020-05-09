@@ -373,6 +373,10 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 	else
 		cf.reset(new TileCytoFrame(tmp));
 	BOOST_CHECK_EQUAL(cf->n_rows(), 3);
+	uvec idx = {};
+	auto cf1 = cf->copy(idx, idx, "", false);
+	BOOST_CHECK_EQUAL(cf1->n_rows(), 0);
+	BOOST_CHECK_EQUAL(cf1->n_cols(), 0);
 }
 BOOST_AUTO_TEST_CASE(set_channel)
 {

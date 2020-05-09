@@ -224,10 +224,11 @@ public:
 
 		//open dataset for event data
 		mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
-		tiledb::ArraySchema schema(ctx_, mat_uri);
-		auto dm = schema.domain();
-		auto nch = dm.dimension("channel").domain<int>().second;
-		auto nevent = dm.dimension("cell").domain<int>().second;
+
+//		tiledb::ArraySchema schema(ctx_, mat_uri);
+//		auto dm = schema.domain();
+		auto nch = mat_array_ptr_->non_empty_domain<int>("channel").second;//dm.dimension("channel").domain<int>().second;
+		auto nevent = mat_array_ptr_->non_empty_domain<int>("cell").second;//dm.dimension("cell").domain<int>().second;
 		dims[0] = nevent;
 		dims[1] = nch;
 //		const std::vector<int> subarray = {1, nch};
@@ -318,59 +319,62 @@ public:
 	{
 		tiledb::Array array(ctx_, (fs::path(uri_) / "params").string(), TILEDB_READ);
 		int nch = array.metadata_num();
-		const std::vector<int> subarray = {1, nch};
+		if(nch > 0)
+		{
+			const std::vector<int> subarray = {1, nch};
 
-		tiledb::Query query(ctx_, array);
-		query.set_subarray(subarray);
-		query.set_layout(TILEDB_GLOBAL_ORDER);
-		vector<float> min_vec(nch);
-		query.set_buffer("min", min_vec);
-		vector<float> max_vec(nch);
-		query.set_buffer("max", max_vec);
-//		auto max_buf = array.max_buffer_elements(subarray);
-//		auto nbuf_size = max_buf["channel"].second;
-//		vector<char> ch_vec(nbuf_size);
-//		if(max_buf["channel"].first!=nch)
-//			throw(domain_error("channel attribute length is not consistent with its marker meta data size!"));
-//		vector<uint64_t> off(nch);
-//		query.set_buffer("channel", off, ch_vec);
+			tiledb::Query query(ctx_, array);
+			query.set_subarray(subarray);
+			query.set_layout(TILEDB_GLOBAL_ORDER);
+			vector<float> min_vec(nch);
+			query.set_buffer("min", min_vec);
+			vector<float> max_vec(nch);
+			query.set_buffer("max", max_vec);
+	//		auto max_buf = array.max_buffer_elements(subarray);
+	//		auto nbuf_size = max_buf["channel"].second;
+	//		vector<char> ch_vec(nbuf_size);
+	//		if(max_buf["channel"].first!=nch)
+	//			throw(domain_error("channel attribute length is not consistent with its marker meta data size!"));
+	//		vector<uint64_t> off(nch);
+	//		query.set_buffer("channel", off, ch_vec);
 
-		query.submit();
-		query.finalize();
+			query.submit();
+			query.finalize();
 
-		params.resize(nch);
-		//get channel in order
-		tiledb::Array array1(ctx_, (fs::path(uri_) / "channel_idx").string(), TILEDB_READ);
-		uint32_t v_num;
-		tiledb_datatype_t v_type;
-		for (int i = 0; i < nch; ++i) {
+			params.resize(nch);
+			//get channel in order
+			tiledb::Array array1(ctx_, (fs::path(uri_) / "channel_idx").string(), TILEDB_READ);
+			uint32_t v_num;
+			tiledb_datatype_t v_type;
+			for (int i = 0; i < nch; ++i) {
+					const void* v;
+					string channel;
+					array1.get_metadata_from_index(i, &channel, &v_type, &v_num, &v);
+					int idx = *(static_cast<const int *>(v));
+					params[idx].channel = channel;
+
+				}
+
+
+			for (int i = 0; i < nch; ++i) {
+	//			auto start = off[i];
+	//			auto nsize = (i< (nch - 1)?off[i+1]:nbuf_size) - start;
+	//			params[i].channel = string(&ch_vec[start], nsize);
 				const void* v;
-				string channel;
-				array1.get_metadata_from_index(i, &channel, &v_type, &v_num, &v);
-				int idx = *(static_cast<const int *>(v));
-				params[idx].channel = channel;
+				array.get_metadata(params[i].channel, &v_type, &v_num, &v);
+				if(v)
+				{
+					params[i].marker = string(static_cast<const char *>(v));
+					params[i].marker.resize(v_num);
+				}
+
+				params[i].min = min_vec[i];
+				params[i].max = max_vec[i];
 
 			}
 
-
-		for (int i = 0; i < nch; ++i) {
-//			auto start = off[i];
-//			auto nsize = (i< (nch - 1)?off[i+1]:nbuf_size) - start;
-//			params[i].channel = string(&ch_vec[start], nsize);
-			const void* v;
-			array.get_metadata(params[i].channel, &v_type, &v_num, &v);
-			if(v)
-			{
-				params[i].marker = string(static_cast<const char *>(v));
-				params[i].marker.resize(v_num);
-			}
-
-			params[i].min = min_vec[i];
-			params[i].max = max_vec[i];
-
+			build_hash();
 		}
-
-		build_hash();
 	}
 	string get_uri() const{
 		return uri_;
@@ -444,21 +448,27 @@ public:
 		int ncol = dims[1];
 		int nrow = dims[0];
 
-		const std::vector<int> subarray = {1, nrow, 1, ncol};
+		if(ncol*nrow>0)
+		{
 
-		tiledb::Query query(ctx_, *mat_array_ptr_);
-		query.set_subarray(subarray);
-		query.set_layout(TILEDB_GLOBAL_ORDER);
+			const std::vector<int> subarray = {1, nrow, 1, ncol};
 
-		arma::Mat<float> buf(nrow, ncol);
+			tiledb::Query query(ctx_, *mat_array_ptr_);
+			query.set_subarray(subarray);
+			query.set_layout(TILEDB_GLOBAL_ORDER);
 
-		query.set_buffer("mat", buf.memptr(), nrow*ncol);
-		query.submit();
-		query.finalize();
-//		double runtime = (gettime() - start);
-//		cout << "get all: " << runtime << endl;
+			arma::Mat<float> buf(nrow, ncol);
 
-		return arma::conv_to<arma::mat>::from(buf);
+			query.set_buffer("mat", buf.memptr(), nrow*ncol);
+			query.submit();
+			query.finalize();
+	//		double runtime = (gettime() - start);
+	//		cout << "get all: " << runtime << endl;
+
+			return arma::conv_to<arma::mat>::from(buf);
+		}
+		else
+			return EVENT_DATA_VEC(nrow, ncol);
 	}
 
 	EVENT_DATA_VEC read_cols(uvec cidx) const
