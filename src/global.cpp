@@ -126,7 +126,12 @@ namespace cytolib
 		boost::split(time_vec, s, boost::is_any_of(":"));
 		if(time_vec.size() != 3)
 			throw(domain_error("expect time string in 'HH:MM:SS' format!"));
-		tm t;
+
+		time_t rawtime;
+		time(&rawtime);
+		struct tm * timeinfo = localtime (&rawtime);//The returned value points to an internal object
+		//init time member to avoid random values for day,month,year
+		tm t = *timeinfo;
 		t.tm_hour = boost::lexical_cast<int>(time_vec[0]);
 		t.tm_min = boost::lexical_cast<int>(time_vec[1]);
 		t.tm_sec = boost::lexical_cast<int>(time_vec[2]);
