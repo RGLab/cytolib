@@ -29,8 +29,20 @@ protected:
 	bool is_dirty_pdata;
 	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 //	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
-	tiledb::Context ctx_;
+	/*
+	 * storing context object itself doesn't make  mat_array_ptr_ safely copiable
+	 * because array store Context reference, once copied, still point to the original
+	 * ctx ref so we want to ensure it lives some cycle with mat_array
+	 * TODO:ideally treat them as atomic unit
+	 */
+	shared_ptr<tiledb::Context> ctx_ptr_;
 	shared_ptr<tiledb::Array> mat_array_ptr_;
+	tiledb::Array & get_mat_array_ref() const {
+		if(mat_array_ptr_)
+			return *mat_array_ptr_;
+		else
+			throw(domain_error("Empty mat_array_ptr_!"));
+	}
 public:
 	unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta(){
@@ -45,20 +57,20 @@ public:
 	};
 	void flush_params(){
 		check_write_permission();
-		write_tile_params(uri_, ctx_);
+		write_tile_params(uri_, *ctx_ptr_);
 		is_dirty_params = false;
 
 	};
 
 	void flush_keys(){
 		check_write_permission();
-		write_tile_kw(uri_, ctx_);
+		write_tile_kw(uri_, *ctx_ptr_);
 		is_dirty_keys = false;
 
 	};
 	void flush_pheno_data(){
 		check_write_permission();
-		write_tile_pd(uri_, ctx_);
+		write_tile_pd(uri_, *ctx_ptr_);
 		is_dirty_pdata = false;
 
 	};
@@ -194,7 +206,7 @@ public:
 		cfg["vfs.s3.aws_access_key_id"] = cred.access_key_id_;
 		cfg["vfs.s3.aws_secret_access_key"] = cred.access_key_;
 		cfg["vfs.s3.region"] = cred.region_;
-		ctx_ = tiledb::Context(cfg);
+		auto ctx_ = tiledb::Context(cfg);
 		fr.write_tile(uri, ctx_);
 		*this = TileCytoFrame(uri, readonly, true, cred);
 	}
@@ -212,7 +224,7 @@ public:
 		cfg["vfs.s3.region"] = cred.region_;
 		cfg["vfs.num_threads"] = num_threads;
 
-		ctx_ = tiledb::Context(cfg);
+		ctx_ptr_.reset(new tiledb::Context(cfg));
 		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
 			init_load();
 	}
@@ -223,9 +235,9 @@ public:
 		auto mat_uri = (arraypath / "mat").string();
 
 		//open dataset for event data
-		mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(ctx_, mat_uri, TILEDB_READ));
+		mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(*ctx_ptr_, mat_uri, TILEDB_READ));
 
-//		tiledb::ArraySchema schema(ctx_, mat_uri);
+//		tiledb::ArraySchema schema(*ctx_ptr_, mat_uri);
 //		auto dm = schema.domain();
 		auto nch = mat_array_ptr_->non_empty_domain<int>("channel").second;//dm.dimension("channel").domain<int>().second;
 		auto nevent = mat_array_ptr_->non_empty_domain<int>("cell").second;//dm.dimension("cell").domain<int>().second;
@@ -276,7 +288,7 @@ public:
 	}
 	void load_kw()
 	{
-		tiledb::Array array(ctx_, (fs::path(uri_) / "keywords").string(), TILEDB_READ);
+		tiledb::Array array(*ctx_ptr_, (fs::path(uri_) / "keywords").string(), TILEDB_READ);
 		uint64_t nkw = array.metadata_num();
 
 		keys_.resize(nkw);
@@ -297,7 +309,7 @@ public:
 	}
 	void load_pd()
 	{
-		tiledb::Array array(ctx_, (fs::path(uri_) / "pdata").string(), TILEDB_READ);
+		tiledb::Array array(*ctx_ptr_, (fs::path(uri_) / "pdata").string(), TILEDB_READ);
 		uint64_t nkw = array.metadata_num();
 
 		uint32_t v_num;
@@ -317,13 +329,13 @@ public:
 	}
 	void load_params()
 	{
-		tiledb::Array array(ctx_, (fs::path(uri_) / "params").string(), TILEDB_READ);
+		tiledb::Array array(*ctx_ptr_, (fs::path(uri_) / "params").string(), TILEDB_READ);
 		int nch = array.metadata_num();
 		if(nch > 0)
 		{
 			const std::vector<int> subarray = {1, nch};
 
-			tiledb::Query query(ctx_, array);
+			tiledb::Query query(*ctx_ptr_, array);
 			query.set_subarray(subarray);
 			query.set_layout(TILEDB_GLOBAL_ORDER);
 			vector<float> min_vec(nch);
@@ -343,7 +355,7 @@ public:
 
 			params.resize(nch);
 			//get channel in order
-			tiledb::Array array1(ctx_, (fs::path(uri_) / "channel_idx").string(), TILEDB_READ);
+			tiledb::Array array1(*ctx_ptr_, (fs::path(uri_) / "channel_idx").string(), TILEDB_READ);
 			uint32_t v_num;
 			tiledb_datatype_t v_type;
 			for (int i = 0; i < nch; ++i) {
@@ -441,9 +453,10 @@ public:
 
 	EVENT_DATA_VEC get_data() const
 	{
-		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
+		auto & array = get_mat_array_ref();
+		if(!array.is_open()||array.query_type() != TILEDB_READ)
 		{
-			mat_array_ptr_->open(TILEDB_READ);
+			array.open(TILEDB_READ);
 		}
 		int ncol = dims[1];
 		int nrow = dims[0];
@@ -453,7 +466,7 @@ public:
 
 			const std::vector<int> subarray = {1, nrow, 1, ncol};
 
-			tiledb::Query query(ctx_, *mat_array_ptr_);
+			tiledb::Query query(*ctx_ptr_, *mat_array_ptr_);
 			query.set_subarray(subarray);
 			query.set_layout(TILEDB_GLOBAL_ORDER);
 
@@ -473,12 +486,12 @@ public:
 
 	EVENT_DATA_VEC read_cols(uvec cidx) const
 	{
-
-		if(!mat_array_ptr_->is_open()||mat_array_ptr_->query_type() != TILEDB_READ)
+		auto & array = get_mat_array_ref();
+		if(!array.is_open()||array.query_type() != TILEDB_READ)
 		{
-			mat_array_ptr_->open(TILEDB_READ);
+			array.open(TILEDB_READ);
 		}
-		tiledb::Query query(ctx_, *mat_array_ptr_);
+		tiledb::Query query(*ctx_ptr_, *mat_array_ptr_);
 		query.set_layout(TILEDB_COL_MAJOR);
 		int ncol,nrow, dim_idx;
 		ncol = cidx.size();
@@ -602,9 +615,11 @@ public:
 	{
 		check_write_permission();
 
-		write_tile_data(uri_, ctx_, _data);
-		if(mat_array_ptr_->is_open())
-			mat_array_ptr_->reopen();
+		write_tile_data(uri_, *ctx_ptr_, _data);
+
+		auto & array = get_mat_array_ref();
+		if(array.is_open())
+			array.reopen();
 
 	}
 

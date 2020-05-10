@@ -44,6 +44,17 @@ struct CFFixture{
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+BOOST_AUTO_TEST_CASE(TileCytoFrameconstructor)
+{
+//	TileCytoFrame cf = *(dynamic_cast<TileCytoFrame*>(cf_disk.get()));
+//	cf_disk.reset();
+//	auto dat = cf.get_data();
+//	cout << dat[10] << endl;
+	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
+
+	auto cf = TileCytoFrame(file_path, config, tmp);
+	auto dat = cf.get_data();
+}
 BOOST_AUTO_TEST_CASE(tile_write_block_test)
 {
 	/*
