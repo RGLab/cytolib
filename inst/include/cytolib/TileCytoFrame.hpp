@@ -297,12 +297,15 @@ public:
 		tiledb_datatype_t v_type;
 		for (uint64_t i = 0; i < nkw; ++i) {
 			const void* v;
-			array.get_metadata_from_index(i, &keys_[i].first, &v_type, &v_num, &v);
+			array.get_metadata_from_index(i, &(keys_[i].first), &v_type, &v_num, &v);
 			if(v)
 			{
 				keys_[i].second = string(static_cast<const char *>(v));
 				keys_[i].second.resize(v_num);
 			}
+			else
+				keys_[i].second = "";
+
 
 		}
 
@@ -317,7 +320,7 @@ public:
 		for (uint64_t i = 0; i < nkw; ++i) {
 			const void* v;
 			string key, value;
-			array.get_metadata_from_index(i, &keys_[i].first, &v_type, &v_num, &v);
+			array.get_metadata_from_index(i, &key, &v_type, &v_num, &v);
 			if(v)
 			{
 				value = string(static_cast<const char *>(v));

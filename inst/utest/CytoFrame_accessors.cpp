@@ -83,6 +83,10 @@ BOOST_AUTO_TEST_CASE(tile_write_block_test)
 	query.set_buffer("a1", buf);
 	query.submit();
 	query.finalize();
+	string v1 = "v1";
+	array.put_metadata("k1", TILEDB_CHAR, v1.size(), v1.c_str());
+	v1 = "";
+	array.put_metadata("k2", TILEDB_CHAR, v1.size(), v1.c_str());
 
 	/*
 	 * open the array and read it
@@ -96,6 +100,24 @@ BOOST_AUTO_TEST_CASE(tile_write_block_test)
 	query1.set_buffer("a1", buf1);
 	query1.submit();
 	query1.finalize();
+
+	uint64_t nkw = array1.metadata_num();
+
+
+
+	uint32_t v_num;
+	tiledb_datatype_t v_type;
+	for (uint64_t i = 0; i < nkw; ++i) {
+		string key,val;
+		const void* v;
+		array1.get_metadata_from_index(i, &key, &v_type, &v_num, &v);
+		if(v)
+		{
+			val = string(static_cast<const char *>(v));
+			val.resize(v_num);
+		}
+		cout << key << ":" << val << endl;
+	}
 //	array.close();
 	/*
 	 * open it with another array object
@@ -515,6 +537,11 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 {
 	//deep cp
 	CytoFramePtr fr1 = cf_disk->copy();
+	for(auto k : cf_disk->get_keywords())
+	{
+		BOOST_CHECK_EQUAL(fr1->get_keyword(k.first), k.second);
+
+	}
 	string h5file = fr1->get_uri();
 	//update meta data
 	string oldname = fr1->get_channels()[2];
@@ -524,6 +551,11 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 	fr1->load_meta();
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], oldname);
 	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), oldname);
+	for(auto k : cf_disk->get_keywords())
+	{
+		BOOST_CHECK_EQUAL(fr1->get_keyword(k.first), k.second);
+
+	}
 
 	fr1->set_channel(oldname, newname);
 	//flush the change
@@ -531,6 +563,17 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 	fr1->load_meta();
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);
 	BOOST_CHECK_EQUAL(fr1->get_keyword("$P3N"), newname);
+
+	for(auto k : cf_disk->get_keywords())
+	{
+		auto key = k.first;
+		auto v1 = k.second;
+		auto v2 = fr1->get_keyword(key);
+		BOOST_CHECK_EQUAL(v1, v2);
+
+
+	}
+
 	//change it back and see if the destructor does the flushing
 	fr1->set_channel(newname, oldname);
 	fr1.reset();

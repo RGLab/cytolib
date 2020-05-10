@@ -236,7 +236,8 @@ public:
 		uint64_t num = array.metadata_num();
 		vector<string> key(num);
 		for (uint64_t i = 0; i < num; ++i) {
-		  array.get_metadata_from_index(i, &key[i], &v_type, &v_num, &v);
+			array.get_metadata_from_index(i, &key[i], &v_type, &v_num, &v);
+
 		}
 		array.close();
 		array.open(TILEDB_WRITE);
@@ -267,6 +268,7 @@ public:
 		for(auto it : pheno_data_)
 			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());//TODO:switch to TILEDB_STRING_UTF16
 		//TODO:switch to TILEDB_STRING_UTF16
+
 	}
 
 	void write_tile_kw(const string & uri, const tiledb::Context & ctx) const
@@ -289,8 +291,12 @@ public:
 		delete_tile_meta(array);
 
 		for(auto it : keys_)
+		{
+//			if(it.first == "$BEGINDATA"||it.second=="2589"||it.second=="")
+//				cout << it.first << ":" << it.second << endl;;
 			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());
-		//TODO:switch to TILEDB_STRING_UTF16
+		}//TODO:switch to TILEDB_STRING_UTF16
+//		array.consolidate_metadata(ctx, array_uri);
 	}
 	void write_tile_params(const string & uri, const tiledb::Context & ctx) const
 	{
