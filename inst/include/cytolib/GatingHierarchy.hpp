@@ -20,6 +20,7 @@
 #include "MemCytoFrame.hpp"
 #include "CytoFrameView.hpp"
 #include <cytolib/H5RCytoFrame.hpp>
+#include "TileCytoFrame.hpp"
 
 using namespace std;
 
@@ -151,13 +152,13 @@ public:
 	/**
 	 *
 	 * @param gh_pb
-	 * @param h5_filename
+	 * @param uri
 	 * @param h5_opt
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, H5Option h5_opt, bool is_skip_data = false);
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data
-			, bool readonly = true, const S3Cred & cred = S3Cred()){
+	void convertToPb(pb::GatingHierarchy & gh_pb, string uri, H5Option h5_opt, bool is_skip_data = false);
+	GatingHierarchy(pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
+			, bool readonly = true, const tiledb::Context &ctx= gctx_){
 			const pb::populationTree & tree_pb =  pb_gh.tree();
 			int nNodes = tree_pb.node_size();
 
@@ -188,27 +189,31 @@ public:
 			if(!is_skip_data)
 			{
 				CytoFramePtr ptr;
+				auto fmt = backend_type(uri);
+				tiledb::VFS vfs(ctx);
+				bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
+				if(!is_exist)
+				 throw(domain_error("cytoframe file missing for sample: " + uri));
+				if(fmt == FileFormat::H5&&is_remote_path(uri))
+				{
+					//TODO: exist check
+					ptr.reset(new H5RCytoFrame(uri, readonly, ctx));
 
-					if(is_remote_path(h5_filename))
-					{
-						//TODO: exist check
-						ptr.reset(new H5RCytoFrame(h5_filename, readonly, cred));
-						 frame_ = CytoFrameView(ptr);
-					}
+				}
+				else
+				{
+
+					if(fmt == FileFormat::H5)
+						ptr.reset(new H5CytoFrame(uri, readonly));
 					else
-					{
-						if(fs::exists(h5_filename))
-						{
+						ptr.reset(new TileCytoFrame(ctx, uri, readonly));
+					pb::CytoFrame fr = *pb_gh.mutable_frame();
+					if(!fr.is_h5())
+					 ptr.reset(new MemCytoFrame(*ptr));
 
-						ptr.reset(new H5CytoFrame(h5_filename, readonly));
-						 pb::CytoFrame fr = *pb_gh.mutable_frame();
-						 if(!fr.is_h5())
-							 ptr.reset(new MemCytoFrame(*ptr));
-						 frame_ = CytoFrameView(ptr);
-						}
-						else
-						 throw(domain_error("H5 file missing for sample: " + h5_filename));
-					}
+
+				}
+				frame_ = CytoFrameView(ptr);
 			}
 		}
 
@@ -488,7 +493,7 @@ public:
 	populationTree & getTree(){return tree;};
 
 
-	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & h5_filename) const;
+	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & uri) const;
 	/*
 	 * It is mainly used by Rcpp API addTrans to propagate global trans map to each sample
 	 * EDIT: But now also used by clone methods

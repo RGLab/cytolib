@@ -17,7 +17,7 @@ namespace cytolib
 	bool my_throw_on_error = true;
 	unsigned short g_loglevel = 0;
 	vector<string> spillover_keys = {"SPILL", "spillover", "$SPILLOVER"};
-
+	tiledb::Context gctx_;
 	void PRINT(string a){
 	#ifdef ROUT
 	 Rprintf(a.c_str());
@@ -37,6 +37,13 @@ namespace cytolib
 	bool is_remote_path(const string & path)
 	{
 		return regex_match(path, regex("^(https://)(.*)"));
+	}
+	FileFormat backend_type(const string & path)
+	{
+		if(regex_match(path, regex("\\.tile$")))
+			return FileFormat::TILE;
+		else
+			return FileFormat::H5;
 	}
 	string fs_tmp_path()
 	{

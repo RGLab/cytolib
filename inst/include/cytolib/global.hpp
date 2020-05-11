@@ -26,6 +26,9 @@ namespace fs = std::experimental::filesystem::v1;
 
 namespace cytolib
 {
+	enum class FileFormat {TILE, H5};
+	FileFormat backend_type(const string & path);
+
 	bool is_remote_path(const string &);
 	struct S3Cred
 	{
@@ -53,6 +56,7 @@ namespace cytolib
 	extern vector<string> spillover_keys;
 	extern unsigned short g_loglevel;// debug print is turned off by default
 	extern bool my_throw_on_error;//can be toggle off to get a partially parsed gating tree for debugging purpose
+	extern tiledb::Context gctx_;
 
 	const int bsti = 1;  // Byte swap test integer
 	#define is_host_big_endian() ( (*(char*)&bsti) == 0 )

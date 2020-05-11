@@ -39,7 +39,7 @@ class GatingSet{
 	vector<string> sample_names_;
 	GatingHierarchyPtr get_first_gh() const;
 	string uid_;
-	tiledb::Context ctx;
+	std::reference_wrapper<const tiledb::Context> ctx_;
 
 public:
 	typedef typename ghMap::iterator iterator;
@@ -64,7 +64,8 @@ public:
 	string get_uid(){return uid_;}
 	void set_uid(const string & uid){uid_ = uid;}
 
-	GatingSet(){
+	GatingSet(const tiledb::Context & ctx= gctx_):ctx_(ctx){
+
 		uid_ = generate_uid();
 	};
 	bool is_cytoFrame_only() const{return size() == 0||get_first_gh()->is_cytoFrame_only();};
@@ -88,22 +89,41 @@ public:
 			, vector<string> select_samples = {}
 			, bool print_lib_ver = false
 			, string remote_path = ""
-			, const S3Cred & cred = S3Cred())
+			, const tiledb::Context & ctx= gctx_):ctx_(ctx)
 	{
 
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
 		fs::path gs_pb_file;
-		unordered_set<string> h5_samples;
+		unordered_set<string> cf_samples;
 		unordered_set<string> pb_samples;
+		FileFormat fmt;
+		bool is_first_sample = true;
 		//search for h5
 		for(auto & e : fs::directory_iterator(path))
 		{
 			fs::path p = e;
 			string ext = p.extension().string();
 			string fn = p.stem().string();
-			if(ext == ".h5")
+			if(ext == ".h5"||ext == ".tile")
 			{
-				h5_samples.insert(fn);
+				//init fmt for the first sample file
+				if(is_first_sample)
+				{
+					if(ext == ".h5")
+						fmt = FileFormat::H5;
+					else
+						fmt = FileFormat::TILE;
+					is_first_sample = false;
+				}
+				else
+				{
+					//consistency check
+					if((fmt == FileFormat::H5&&ext==".tile")||(fmt == FileFormat::TILE&&ext==".h5"))
+						throw(domain_error(errmsg + "Multiple file formats found!"));
+				}
+
+
+				cf_samples.insert(fn);
 			}
 			else if(ext == ".pb")
 			{
@@ -127,7 +147,7 @@ public:
 			if(pb_samples.size()==1)
 			{
 				auto id = *(pb_samples.begin());//check if pb file seems like a guid of a legacy gs
-				if(h5_samples.find(id)==h5_samples.end())
+				if(cf_samples.find(id)==cf_samples.end())
 				{
 					is_legacy = true;
 				}
@@ -148,7 +168,7 @@ public:
 			//TODO: how to do validity check for remote
 			if(remote_path == "")
 			{
-				for(auto sn : h5_samples)
+				for(auto sn : cf_samples)
 				{
 					if(pb_samples.find(sn)==pb_samples.end())
 						  throw(domain_error(errmsg + "No .pb file matched for sample " + sn + ".h5"));
@@ -156,8 +176,8 @@ public:
 
 				for(auto sn : pb_samples)
 				{
-					if(h5_samples.find(sn)==h5_samples.end())
-						  throw(domain_error(errmsg + "No .h5 file matched for sample " + sn + ".pb"));
+					if(cf_samples.find(sn)==cf_samples.end())
+						  throw(domain_error(errmsg + "No cytoframe file matched for sample " + sn + ".pb"));
 				}
 
 			}
@@ -259,12 +279,13 @@ public:
 
 						pb::CytoFrame fr = *gh_pb.mutable_frame();
 
-						string h5_filename;
+						string uri;
+						auto cf_ext = fmt == FileFormat::H5?".h5":".tile";
 						if(remote_path=="")
-							h5_filename = (fs::path(path) / (sn + ".h5")).string();
+							uri = (fs::path(path) / (sn + cf_ext)).string();
 						else
-							h5_filename = (fs::path(remote_path) / (sn + ".h5")).string();
-						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly, cred)), sn);
+							uri = (fs::path(remote_path) / (sn + cf_ext)).string();
+						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, uri, is_skip_data, readonly, ctx_)), sn);
 						}
 					}
 				}
@@ -390,9 +411,9 @@ public:
 				if(nSelect==0||sn_hash.find(sn)->second)
 				{
 					pb::CytoFrame fr = *gh_pb.mutable_frame();
-					string h5_filename = (fs::path(path) / (sn + ".h5")).string();
+					string uri = (fs::path(path) / (sn + ".h5")).string();
 
-					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, h5_filename, is_skip_data, readonly)), sn);
+					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, uri, is_skip_data, readonly)), sn);
 				}
 			}
 
