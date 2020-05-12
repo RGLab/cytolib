@@ -30,7 +30,7 @@ enum DataTypeLocation {MEM, H5};
 
 typedef unordered_map<string, string> PDATA;
 
-
+typedef shared_ptr<tiledb::Context> CtxPtr;
 const H5std_string  DATASET_NAME( "data");
 
 /*
@@ -187,9 +187,9 @@ public:
 	}
 	void write_tile_data(const string & uri, const tiledb::Context & ctx) const
 	{
-		write_tile_data(uri, ctx, get_data());
+		write_tile_data(uri, get_data(), ctx);
 	}
-	void write_tile_data(const string & uri, const tiledb::Context & ctx, const EVENT_DATA_VEC & _data) const
+	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const tiledb::Context & ctx) const
 	{
 		int nEvents = n_rows();
 		int nch = n_cols();
@@ -200,8 +200,8 @@ public:
 			tiledb::Domain domain(ctx);
 			//2k is to meet 64k minimal recommended tile size to fit into L1 cache
 			auto ncell = nEvents==0?1:nEvents;
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, ncell}, ncell));
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch==0?1:nch}, 1));
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, ncell}, ncell)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch==0?1:nch}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
 			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 			schema.set_domain(domain);
 			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "mat"));
@@ -253,7 +253,7 @@ public:
 		{
 			//dummy array
 			tiledb::Domain domain(ctx);
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "pd", {1, 2}, 1));
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "pd", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
 			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 			schema.set_domain(domain);
 			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
@@ -278,7 +278,7 @@ public:
 		{
 			tiledb::Domain domain(ctx);
 			//dummy array
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "kw", {1, 2}, 1));
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "kw", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
 			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 			schema.set_domain(domain);
 			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
@@ -308,8 +308,8 @@ public:
 		{
 
 			tiledb::Domain domain(ctx);
-			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch==0?1:nch}, 1);
-			domain.add_dimension(a1);
+			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch==0?1:nch}, 1); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+			domain.add_dimension(a1); // @suppress("Invalid arguments")
 
 			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 			schema.set_domain(domain);
@@ -362,7 +362,7 @@ public:
 			{
 				tiledb::Domain domain(ctx);
 				//dummy array
-				domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cidx", {1, 2}, 1));
+				domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cidx", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
 				tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 				schema.set_domain(domain);
 				schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));

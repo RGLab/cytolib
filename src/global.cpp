@@ -17,7 +17,6 @@ namespace cytolib
 	bool my_throw_on_error = true;
 	unsigned short g_loglevel = 0;
 	vector<string> spillover_keys = {"SPILL", "spillover", "$SPILLOVER"};
-	tiledb::Context gctx_;
 	void PRINT(string a){
 	#ifdef ROUT
 	 Rprintf(a.c_str());

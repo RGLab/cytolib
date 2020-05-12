@@ -27,10 +27,10 @@ public:
 	void set_data(const EVENT_DATA_VEC & _data){throw(domain_error("Writing to the s3 based H5CytoFrame object is not supported yet!"));};
 	void set_data(EVENT_DATA_VEC && _data){throw(domain_error("Writing to the s3 based H5CytoFrame object is not supported yet!"));};
 	H5RCytoFrame(const string & h5_filename, bool readonly = true
-				, const tiledb::Context & ctx = gctx_):H5CytoFrame(h5_filename, readonly, false)
+				, CtxPtr ctxptr = CtxPtr(new tiledb::Context())):H5CytoFrame(h5_filename, readonly, false)
 				{
 
-		auto cfg = ctx.config();
+		auto cfg = (*ctxptr).config();
 		cred_.access_key_id_ = cfg["vfs.s3.aws_access_key_id"];
 		cred_.access_key_ = cfg["vfs.s3.aws_secret_access_key"];
 		cred_.region_ = cfg["vfs.s3.region"];

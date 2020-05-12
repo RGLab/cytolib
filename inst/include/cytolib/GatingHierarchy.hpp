@@ -157,8 +157,8 @@ public:
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
 	void convertToPb(pb::GatingHierarchy & gh_pb, string uri, H5Option h5_opt, bool is_skip_data = false);
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
-			, bool readonly = true, const tiledb::Context &ctx= gctx_){
+	GatingHierarchy(CtxPtr ctxptr, pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
+			, bool readonly = true){
 			const pb::populationTree & tree_pb =  pb_gh.tree();
 			int nNodes = tree_pb.node_size();
 
@@ -190,14 +190,14 @@ public:
 			{
 				CytoFramePtr ptr;
 				auto fmt = backend_type(uri);
-				tiledb::VFS vfs(ctx);
+				tiledb::VFS vfs(*ctxptr);
 				bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
 				if(!is_exist)
 				 throw(domain_error("cytoframe file missing for sample: " + uri));
 				if(fmt == FileFormat::H5&&is_remote_path(uri))
 				{
 					//TODO: exist check
-					ptr.reset(new H5RCytoFrame(uri, readonly, ctx));
+					ptr.reset(new H5RCytoFrame(uri, readonly, ctxptr));
 
 				}
 				else
@@ -206,7 +206,7 @@ public:
 					if(fmt == FileFormat::H5)
 						ptr.reset(new H5CytoFrame(uri, readonly));
 					else
-						ptr.reset(new TileCytoFrame(ctx, uri, readonly));
+						ptr.reset(new TileCytoFrame(uri, readonly, true, ctxptr));
 					pb::CytoFrame fr = *pb_gh.mutable_frame();
 					if(!fr.is_h5())
 					 ptr.reset(new MemCytoFrame(*ptr));

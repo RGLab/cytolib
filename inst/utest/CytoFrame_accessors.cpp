@@ -21,7 +21,7 @@ struct CFFixture{
 		if(file_format == FileFormat::TILE)
 		{
 			fr.write_tile(tmp);
-			cf_disk.reset(new TileCytoFrame(ctx, tmp));
+			cf_disk.reset(new TileCytoFrame(tmp));
 		}
 		else
 		{
@@ -36,7 +36,6 @@ struct CFFixture{
 	};
 	MemCytoFrame fr;
 	FileFormat file_format = FileFormat::TILE;
-	tiledb::Context ctx;
 //	FileFormat file_format = FileFormat::H5;
 //	unique_ptr<H5CytoFrame> cf_disk;
 	unique_ptr<CytoFrame> cf_disk;
@@ -53,7 +52,7 @@ BOOST_AUTO_TEST_CASE(TileCytoFrameconstructor)
 //	cout << dat[10] << endl;
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
 
-	auto cf = TileCytoFrame(ctx, file_path, config, tmp);
+	auto cf = TileCytoFrame(file_path, config, tmp);
 	auto dat = cf.get_data();
 }
 BOOST_AUTO_TEST_CASE(tile_write_block_test)
@@ -155,17 +154,17 @@ BOOST_AUTO_TEST_CASE(tile)
 
 	cfg["vfs.s3.region"] = "us-west-1";
 
-	tiledb::Context ctx(cfg);
+	CtxPtr ctx(new tiledb::Context(cfg));
 
-	tiledb::VFS vfs(ctx);
+	tiledb::VFS vfs(*ctx);
 
 	if(vfs.is_dir(uri))
 		vfs.remove_dir(uri);
 	auto h5 = "/tmp/test.h5";
 	fr.write_h5(h5);
 	H5CytoFrame fr_h5(h5);
-	fr.write_tile(uri, ctx);
-	auto cf_tile = TileCytoFrame(ctx, uri, true, true);
+	fr.write_tile(uri, *ctx);
+	auto cf_tile = TileCytoFrame(uri, true, true, ctx);
 
 	auto ch = cf_tile.get_channels();
 //	BOOST_CHECK_EQUAL(ch.size(), 9);
@@ -373,7 +372,7 @@ BOOST_AUTO_TEST_CASE(subset_by_cols)
 	if(file_format == FileFormat::TILE)
 	{
 		cr_new.write_to_disk(tmp, FileFormat::TILE);
-		cf.reset(new TileCytoFrame(ctx, tmp));
+		cf.reset(new TileCytoFrame(tmp));
 	}
 	else
 	{
@@ -405,7 +404,7 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 	if(file_format==FileFormat::H5)
 		cf.reset(new H5CytoFrame(tmp));
 	else
-		cf.reset(new TileCytoFrame(ctx, tmp));
+		cf.reset(new TileCytoFrame(tmp));
 	BOOST_CHECK_EQUAL(cf->n_rows(), 3);
 	uvec idx = {};
 	auto cf1 = cf->copy(idx, idx, "", false);
@@ -455,7 +454,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	if(file_format == FileFormat::H5)
 		fr3.reset(new H5CytoFrame (tmp));
 	else
-		fr3.reset(new TileCytoFrame(ctx, tmp));
+		fr3.reset(new TileCytoFrame(tmp));
 	BOOST_CHECK_EQUAL(fr3->get_col_idx(newname, ColType::channel), -1);
 	BOOST_CHECK_EQUAL(fr3->get_keyword("$P3N"), oldname);
 	//cached meta data is NoT flushed to h5 even when the object is destroyed
@@ -463,7 +462,7 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	if(file_format == FileFormat::H5)
 		fr3.reset(new H5CytoFrame (tmp));
 	else
-		fr3.reset(new TileCytoFrame(ctx, tmp));
+		fr3.reset(new TileCytoFrame(tmp));
 	BOOST_CHECK_GT(fr3->get_col_idx(oldname, ColType::channel), 0);
 	BOOST_CHECK_EQUAL(fr3->get_keyword("$P3N"), oldname);
 
@@ -584,7 +583,7 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 	if(file_format == FileFormat::H5)
 		fr1.reset(new H5CytoFrame(h5file));
 	else
-		fr1.reset(new TileCytoFrame(ctx, h5file));
+		fr1.reset(new TileCytoFrame(h5file));
 
 
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);

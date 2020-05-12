@@ -39,7 +39,7 @@ class GatingSet{
 	vector<string> sample_names_;
 	GatingHierarchyPtr get_first_gh() const;
 	string uid_;
-	std::reference_wrapper<const tiledb::Context> ctx_;
+	CtxPtr ctxptr_;
 
 public:
 	typedef typename ghMap::iterator iterator;
@@ -64,7 +64,7 @@ public:
 	string get_uid(){return uid_;}
 	void set_uid(const string & uid){uid_ = uid;}
 
-	GatingSet(const tiledb::Context & ctx= gctx_):ctx_(ctx){
+	GatingSet(CtxPtr ctxptr= CtxPtr(new tiledb::Context())):ctxptr_(ctxptr){
 
 		uid_ = generate_uid();
 	};
@@ -89,7 +89,7 @@ public:
 			, vector<string> select_samples = {}
 			, bool print_lib_ver = false
 			, string remote_path = ""
-			, const tiledb::Context & ctx= gctx_):ctx_(ctx)
+			, CtxPtr ctxptr= CtxPtr(new tiledb::Context())):ctxptr_(ctxptr)
 	{
 
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -285,7 +285,7 @@ public:
 							uri = (fs::path(path) / (sn + cf_ext)).string();
 						else
 							uri = (fs::path(remote_path) / (sn + cf_ext)).string();
-						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, uri, is_skip_data, readonly, ctx_)), sn);
+						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(ctxptr_, gh_pb, uri, is_skip_data, readonly)), sn);
 						}
 					}
 				}
@@ -413,7 +413,7 @@ public:
 					pb::CytoFrame fr = *gh_pb.mutable_frame();
 					string uri = (fs::path(path) / (sn + ".h5")).string();
 
-					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(gh_pb, uri, is_skip_data, readonly)), sn);
+					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(ctxptr_, gh_pb, uri, is_skip_data, readonly)), sn);
 				}
 			}
 
