@@ -25,7 +25,7 @@ namespace cytolib
 {
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
-enum class H5Option {copy, move, skip, link, symlink};
+enum class CytoFileOption {copy, move, skip, link, symlink};
 enum DataTypeLocation {MEM, H5};
 
 typedef unordered_map<string, string> PDATA;
@@ -106,7 +106,7 @@ public:
 		}
 
 
-	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const = 0;
+	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, CytoFileOption h5_opt) const = 0;
 
 	virtual void set_readonly(bool flag){
 	}

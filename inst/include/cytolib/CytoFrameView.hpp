@@ -51,17 +51,17 @@ public:
 	vector<string> get_channels() const;
 	vector<string> get_markers() const;
 	void set_channels(const CHANNEL_MAP & chnl_map){get_cytoframe_ptr()->set_channels(chnl_map);}
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const{
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, CytoFileOption h5_opt) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
-			if(h5_opt == H5Option::copy||h5_opt == H5Option::move)
+			if(h5_opt == CytoFileOption::copy||h5_opt == CytoFileOption::move)
 			{
 				//realize view
 				auto cfv = copy_realized(h5_filename, true);
 				//trigger archive logic on the new cfv (which will skip overwriting itself)
 				cfv.convertToPb(fr_pb, h5_filename, h5_opt);
 				auto oldh5 = get_uri();
-				if(h5_opt == H5Option::move&&oldh5!="")
+				if(h5_opt == CytoFileOption::move&&oldh5!="")
 				{
 					if(!fs::equivalent(fs::path(oldh5), fs::path(h5_filename)))
 						fs::remove(oldh5);

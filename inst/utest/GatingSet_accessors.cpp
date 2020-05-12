@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(quadgate) {
 					gh->getNodeProperty(gh->getNodeID("D")).getCounts());
 	//test pb
 	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs1.serialize_pb(tmp, H5Option::copy);
+	gs1.serialize_pb(tmp, CytoFileOption::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.begin()->second;
 	gh->gating(cf, 0, true, true);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(serialize) {
 	//archive
 //	string tmp = "/tmp/gsEGnOlP";
 	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs1.serialize_pb(tmp, H5Option::copy);
+	gs1.serialize_pb(tmp, CytoFileOption::copy);
 	//load it back
 	GatingSet gs2(tmp,false,false,{},true);
 	auto cf2 = gs2.begin()->second->get_cytoframe_view_ref();
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	//save legacy to new format
 	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
 	bool is_skip_data = true;
-	gs1.serialize_pb(tmp, H5Option::skip, is_skip_data);
+	gs1.serialize_pb(tmp, CytoFileOption::skip, is_skip_data);
 	gs1 = GatingSet(tmp, is_skip_data);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 
 	//save new to new format
 	tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs.serialize_pb(tmp, H5Option::copy);
+	gs.serialize_pb(tmp, CytoFileOption::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();

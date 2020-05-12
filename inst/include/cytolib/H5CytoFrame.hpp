@@ -204,10 +204,10 @@ public:
 
 	}
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
+	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, CytoFileOption h5_opt) const
 	{
 			fr_pb.set_is_h5(true);
-			if(h5_opt != H5Option::skip)
+			if(h5_opt != CytoFileOption::skip)
 			{
 				auto h5path = fs::path(h5_filename);
 				auto dest = h5path.parent_path();
@@ -218,27 +218,27 @@ public:
 				{
 					switch(h5_opt)
 					{
-					case H5Option::copy:
+					case CytoFileOption::copy:
 						{
 							if(fs::exists(h5path))
 								fs::remove(h5path);
 							fs::copy(filename_, h5_filename);
 							break;
 						}
-					case H5Option::move:
+					case CytoFileOption::move:
 						{
 							if(fs::exists(h5path))
 								fs::remove(h5path);
 							fs::rename(filename_, h5_filename);
 							break;
 						}
-					case H5Option::link:
+					case CytoFileOption::link:
 						{
 							throw(logic_error("'link' option for H5CytoFrame is no longer supported!"));
 							fs::create_hard_link(filename_, h5_filename);
 							break;
 						}
-					case H5Option::symlink:
+					case CytoFileOption::symlink:
 						{
 							if(fs::exists(h5path))
 								fs::remove(h5path);

@@ -258,7 +258,7 @@ namespace cytolib
 	 * @param h5_opt
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, H5Option h5_opt, bool is_skip_data){
+	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, CytoFileOption h5_opt, bool is_skip_data){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
 		 * cp tree
