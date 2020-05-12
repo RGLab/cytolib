@@ -183,7 +183,7 @@ namespace cytolib
 		 tmp[nTxt]='\0';//make it as c_string
 		 string txt(tmp);
 		 delete [] tmp;
-		 boost::trim_right(txt);
+		 boost::trim_right_if(txt, boost::is_any_of(" \t\r\n"));
 	     string_to_keywords(txt, emptyValue);
 
 		if(keys_.find("FCSversion")==keys_.end())
