@@ -440,7 +440,7 @@ public:
 	 * up to caller to free the memory
 	 */
 	GatingSet copy(bool is_copy_data = true, bool is_realize_data = true
-			, const string & new_h5_dir = fs_tmp_path()) const;
+			, const string & new_cf_dir = fs_tmp_path()) const;
 
 	/*Defunct
 	 * TODO:current version of this contructor is based on gating template ,simply copying
@@ -467,8 +467,16 @@ public:
 	 * @return a root-only GatingSet that carries the subsetted cytoframes
 	 */
 	GatingSet get_cytoset(string node_path);
-	string generate_h5_folder(string h5_dir) const;
 
+	string generate_cytoframe_folder(string cf_dir) const
+	{
+		cf_dir = (fs::path(cf_dir) / uid_).string();
+		if(fs::exists(cf_dir))
+			throw(domain_error(cf_dir + " already exists!"));
+		if(!fs::create_directories(cf_dir))
+			throw(domain_error("Failed to create directory: " + cf_dir));
+		return cf_dir;
+	}
 	/**
 	 * Retrieve the GatingHierarchy object from GatingSet by sample name.
 	 *
@@ -578,21 +586,66 @@ public:
 	 * Constructor from FCS files
 	 * @param file_paths
 	 * @param config
-	 * @param is_h5
-	 * @param h5_dir
+	 * @param fmt
+	 * @param cf_dir
 	 * @param is_add_root whether add root node. When false, gs is used as cytoset without gating tree
 	 */
-	GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config= FCS_READ_PARAM()
-			, bool is_h5 = true, string h5_dir = fs_tmp_path());
 
-	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path, const FCS_READ_PARAM & config = FCS_READ_PARAM()
-			, bool is_h5 = true, string h5_dir = fs_tmp_path()):GatingSet()
+	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path
+			, const FCS_READ_PARAM & config = FCS_READ_PARAM()
+			, FileFormat fmt = FileFormat::H5, string cf_dir = fs_tmp_path()
+			, CtxPtr ctxptr= CtxPtr(new tiledb::Context())):GatingSet(ctxptr)
 	{
-		add_fcs(sample_uid_vs_file_path, config, is_h5, h5_dir);
+		add_fcs(sample_uid_vs_file_path, config, fmt, cf_dir, false, ctxptr);
+	}
+	GatingSet(const vector<string> & file_paths
+			, const FCS_READ_PARAM & config= FCS_READ_PARAM()
+			, FileFormat fmt = FileFormat::H5, string cf_dir = fs_tmp_path()
+			, CtxPtr ctxptr = CtxPtr(new tiledb::Context())):GatingSet(ctxptr)
+	{
+		vector<pair<string,string>> map(file_paths.size());
+		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
+		add_fcs(map, config, fmt, cf_dir, false, ctxptr);
 	}
 
 	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path
-			, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, bool readonly = false);
+			, const FCS_READ_PARAM & config, FileFormat fmt, string cf_dir
+			, bool readonly = false
+			, CtxPtr ctxptr = CtxPtr(new tiledb::Context()))
+	{
+
+		fs::path cf_path;
+		if(fmt!= FileFormat::MEM)
+			cf_path = generate_cytoframe_folder(cf_dir);
+		for(const auto & it : sample_uid_vs_file_path)
+		{
+
+
+			CytoFramePtr fr_ptr(new MemCytoFrame(it.second,config));
+			//set pdata
+			fr_ptr->set_pheno_data("name", path_base_name(it.second));
+
+			dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
+
+			string cf_filename = (cf_path/it.first).string();
+			if(fmt == FileFormat::H5)
+			{
+				cf_filename += ".h5";
+				fr_ptr->write_h5(cf_filename);
+				fr_ptr.reset(new H5CytoFrame(cf_filename, readonly));
+			}
+			else if(fmt == FileFormat::TILE)
+			{
+				cf_filename += ".tile";
+				fr_ptr->write_tile(cf_filename);
+				fr_ptr.reset(new TileCytoFrame(cf_filename, readonly, true, ctxptr));
+			}
+
+			add_cytoframe_view(it.first, CytoFrameView(fr_ptr));
+
+		}
+	}
+
 	/**
 	 * Update sample id
 	 * @param _old

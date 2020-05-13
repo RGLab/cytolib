@@ -20,7 +20,7 @@ namespace cytolib
 	 * @param path the dir of filename
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void GatingSet::serialize_pb(string path, CytoFileOption h5_opt, bool is_skip_data)
+	void GatingSet::serialize_pb(string path, CytoFileOption cf_opt, bool is_skip_data)
 	{
 		/*
 		 * validity check for path
@@ -160,7 +160,7 @@ namespace cytolib
 
 
 			pb::GatingHierarchy pb_gh;
-			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, h5_opt, is_skip_data);
+			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, cf_opt, is_skip_data);
 
 
 			bool success = writeDelimitedTo(pb_gh, raw_output);
@@ -308,7 +308,7 @@ namespace cytolib
 		GatingSet gs;
 		fs::path h5_dir;
 		if(is_copy_data)
-			h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir).string());
+			h5_dir = gs.generate_cytoframe_folder(fs::path(new_h5_dir).string());
 		for(const string & sn : get_sample_uids())
 		{
 			GatingHierarchyPtr gh = getGatingHierarchy(sn);
@@ -423,15 +423,7 @@ namespace cytolib
 		}
 		return gs;
 	}
-	string GatingSet::generate_h5_folder(string h5_dir) const
-	{
-		h5_dir = (fs::path(h5_dir) / uid_).string();
-		if(fs::exists(h5_dir))
-			throw(domain_error(h5_dir + " already exists!"));
-		if(!fs::create_directories(h5_dir))
-			throw(domain_error("Failed to create directory: " + h5_dir));
-		return h5_dir;
-	}
+
 	/**
 	 * Retrieve the GatingHierarchy object from GatingSet by sample name.
 	 *
@@ -547,48 +539,6 @@ namespace cytolib
 		ghs_[sample_uid]->set_cytoframe_view(res);
 	}
 
-	/**
-	 * Constructor from FCS files
-	 * @param file_paths
-	 * @param config
-	 * @param is_h5
-	 * @param h5_dir
-	 * @param is_add_root whether add root node. When false, gs is used as cytoset without gating tree
-	 */
-	GatingSet::GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir):GatingSet()
-	{
-		vector<pair<string,string>> map(file_paths.size());
-		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
-		add_fcs(map, config, is_h5, h5_dir);
-	}
-
-	void GatingSet::add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path
-			, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, bool readonly)
-	{
-
-		fs::path h5_path;
-		if(is_h5)
-			h5_path = generate_h5_folder(h5_dir);
-		for(const auto & it : sample_uid_vs_file_path)
-		{
-
-
-			CytoFramePtr fr_ptr(new MemCytoFrame(it.second,config));
-			//set pdata
-			fr_ptr->set_pheno_data("name", path_base_name(it.second));
-
-			dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
-			if(is_h5)
-			{
-				string h5_filename = (h5_path/it.first).string() + ".h5";
-				fr_ptr->write_h5(h5_filename);
-				fr_ptr.reset(new H5CytoFrame(h5_filename, readonly));
-			}
-
-			add_cytoframe_view(it.first, CytoFrameView(fr_ptr));
-
-		}
-	}
 
 	/**
 	 * Update sample id

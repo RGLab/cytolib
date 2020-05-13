@@ -392,52 +392,52 @@ public:
 
 	}
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & uri, CytoFileOption h5_opt) const
+	void convertToPb(pb::CytoFrame & fr_pb, const string & uri, CytoFileOption file_opt) const
 	{
-//			fr_pb.set_is_h5(true);
-//			if(h5_opt != CytoFileOption::skip)
-//			{
-//				auto h5path = fs::path(uri);
-//				auto dest = h5path.parent_path();
-//				if(!fs::exists(dest))
-//					throw(logic_error(dest.string() + "doesn't exist!"));
-//
-//				if(!fs::equivalent(fs::path(filename_).parent_path(), dest))
-//				{
-//					switch(h5_opt)
-//					{
-//					case CytoFileOption::copy:
-//						{
-//							if(fs::exists(h5path))
-//								fs::remove(h5path);
-//							fs::copy(filename_, uri);
-//							break;
-//						}
-//					case CytoFileOption::move:
-//						{
-//							if(fs::exists(h5path))
-//								fs::remove(h5path);
-//							fs::rename(filename_, uri);
-//							break;
-//						}
-//					case CytoFileOption::link:
-//						{
-//							throw(logic_error("'link' option for TileCytoFrame is no longer supported!"));
-//							fs::create_hard_link(filename_, uri);
-//							break;
-//						}
-//					case CytoFileOption::symlink:
-//						{
-//							if(fs::exists(h5path))
-//								fs::remove(h5path);
-//							fs::create_symlink(filename_, uri);
-//							break;
-//						}
-//					default:
-//						throw(logic_error("invalid h5_opt!"));
-//					}
-//				}
-//			}
+			fr_pb.set_is_h5(true);
+			if(file_opt != CytoFileOption::skip)
+			{
+				auto filepath = fs::path(uri);
+				auto dest = filepath.parent_path();
+				if(!fs::exists(dest))
+					throw(logic_error(dest.string() + "doesn't exist!"));
+
+				if(!fs::equivalent(fs::path(uri_).parent_path(), dest))
+				{
+					switch(file_opt)
+					{
+					case CytoFileOption::copy:
+						{
+							if(fs::exists(filepath))
+								fs::remove(filepath);
+							fs::copy(uri_, uri, fs::copy_options::recursive);
+							break;
+						}
+					case CytoFileOption::move:
+						{
+							if(fs::exists(filepath))
+								fs::remove(filepath);
+							fs::rename(uri_, uri);
+							break;
+						}
+					case CytoFileOption::link:
+						{
+							throw(logic_error("'link' option for TileCytoFrame is no longer supported!"));
+							fs::create_hard_link(uri_, uri);
+							break;
+						}
+					case CytoFileOption::symlink:
+						{
+							if(fs::exists(filepath))
+								fs::remove(filepath);
+							fs::create_symlink(uri_, uri);
+							break;
+						}
+					default:
+						throw(logic_error("invalid file_opt!"));
+					}
+				}
+			}
 		}
 	/**
 	 * Read data from disk.
