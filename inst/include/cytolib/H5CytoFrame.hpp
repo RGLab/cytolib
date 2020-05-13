@@ -43,6 +43,9 @@ public:
 	bool get_readonly(){
 		return readonly_ ;
 	}
+	FileFormat get_backend_type() const{
+			return FileFormat::H5;
+		};
 	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
 	{
 		filename_ = frm.filename_;

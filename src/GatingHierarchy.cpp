@@ -254,11 +254,11 @@ namespace cytolib
 	/**
 	 *
 	 * @param gh_pb
-	 * @param h5_filename
+	 * @param cf_filename
 	 * @param h5_opt
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, CytoFileOption h5_opt, bool is_skip_data){
+	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb, string cf_filename, CytoFileOption h5_opt, bool is_skip_data){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
 		 * cp tree
@@ -298,7 +298,7 @@ namespace cytolib
 			frame_.flush_meta();
 			frame_.set_readonly(flag);//restore the lock
 
-			frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
+			frame_.convertToPb(*fr_pb, cf_filename, h5_opt);
 		}
 
 
@@ -1526,7 +1526,7 @@ namespace cytolib
 	}
 
 
-	GatingHierarchyPtr  GatingHierarchy::copy(bool is_copy_data, bool is_realize_data, const string & h5_filename) const{
+	GatingHierarchyPtr  GatingHierarchy::copy(bool is_copy_data, bool is_realize_data, const string & cf_filename) const{
 
 		GatingHierarchyPtr res(new GatingHierarchy());
 
@@ -1536,9 +1536,9 @@ namespace cytolib
 		res->trans = trans.copy();
 		if(is_copy_data)
 			if(is_realize_data)
-				res->frame_ = frame_.copy_realized(h5_filename);
+				res->frame_ = frame_.copy_realized(cf_filename);
 			else
-				res->frame_ = frame_.copy(h5_filename);
+				res->frame_ = frame_.copy(cf_filename);
 		else
 			res->frame_ = frame_;
 		return res;

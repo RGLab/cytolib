@@ -48,22 +48,25 @@ public:
 	string get_uri() const{
 			return get_cytoframe_ptr()->get_uri();
 		}
+	FileFormat get_backend_type()  const{
+		return get_cytoframe_ptr()->get_backend_type();
+	};
 	vector<string> get_channels() const;
 	vector<string> get_markers() const;
 	void set_channels(const CHANNEL_MAP & chnl_map){get_cytoframe_ptr()->set_channels(chnl_map);}
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, CytoFileOption h5_opt) const{
+	void convertToPb(pb::CytoFrame & fr_pb, const string & cf_filename, CytoFileOption h5_opt) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
 			if(h5_opt == CytoFileOption::copy||h5_opt == CytoFileOption::move)
 			{
 				//realize view
-				auto cfv = copy_realized(h5_filename, true);
+				auto cfv = copy_realized(cf_filename, true);
 				//trigger archive logic on the new cfv (which will skip overwriting itself)
-				cfv.convertToPb(fr_pb, h5_filename, h5_opt);
+				cfv.convertToPb(fr_pb, cf_filename, h5_opt);
 				auto oldh5 = get_uri();
 				if(h5_opt == CytoFileOption::move&&oldh5!="")
 				{
-					if(!fs::equivalent(fs::path(oldh5), fs::path(h5_filename)))
+					if(!fs::equivalent(fs::path(oldh5), fs::path(cf_filename)))
 						fs::remove(oldh5);
 
 				}
@@ -72,7 +75,7 @@ public:
 				throw(domain_error("Only 'copy' or 'move' H5Option is supported for the indexed CytoFrameView object!"));
 		}
 		else
-			get_cytoframe_ptr()->convertToPb(fr_pb, h5_filename, h5_opt);
+			get_cytoframe_ptr()->convertToPb(fr_pb, cf_filename, h5_opt);
 
 	};
 	void set_channel(const string & oldname, const string &newname)
@@ -240,22 +243,22 @@ public:
 	 * Realize the delayed subsetting (i.e. cols() and rows()) operations to the underlying data
 	 * and clear the view
 	 */
-	CytoFrameView copy_realized(const string & h5_filename = "", bool overwrite = false) const
+	CytoFrameView copy_realized(const string & cf_filename = "", bool overwrite = false) const
 	{
 		if(is_row_indexed_ && is_col_indexed_){
-			return get_cytoframe_ptr()->copy(row_idx_, col_idx_, h5_filename, overwrite);
+			return get_cytoframe_ptr()->copy(row_idx_, col_idx_, cf_filename, overwrite);
 		}else if(is_row_indexed_){
-			return get_cytoframe_ptr()->copy(row_idx_, true, h5_filename, overwrite);
+			return get_cytoframe_ptr()->copy(row_idx_, true, cf_filename, overwrite);
 		}else if(is_col_indexed_){
-			return get_cytoframe_ptr()->copy(col_idx_, false, h5_filename, overwrite);
+			return get_cytoframe_ptr()->copy(col_idx_, false, cf_filename, overwrite);
 		}else{
-			return get_cytoframe_ptr()->copy(h5_filename, overwrite);
+			return get_cytoframe_ptr()->copy(cf_filename, overwrite);
 		}
 	}
 	void set_data(const EVENT_DATA_VEC & data_in);
 	EVENT_DATA_VEC get_data() const;
 
-	CytoFrameView copy(const string & h5_filename = "") const;
+	CytoFrameView copy(const string & cf_filename = "") const;
 };
 }
 

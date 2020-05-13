@@ -151,7 +151,7 @@ namespace cytolib
 		//due to the single string buffer used by lite-message won't be enough to hold the all samples for large dataset
 		for(auto & sn : sample_names)
 		{
-			string h5_filename = (fs::path(path) / sn).string() + ".h5";
+			string cf_filename = (fs::path(path) / sn).string() + ".h5";
 			//init the output stream for gs
 			string filename = (fs::path(path) / sn).string() + ".pb";
 			ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
@@ -160,7 +160,7 @@ namespace cytolib
 
 
 			pb::GatingHierarchy pb_gh;
-			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, cf_opt, is_skip_data);
+			getGatingHierarchy(sn)->convertToPb(pb_gh, cf_filename, cf_opt, is_skip_data);
 
 
 			bool success = writeDelimitedTo(pb_gh, raw_output);
@@ -336,8 +336,8 @@ namespace cytolib
 				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
 			auto gh = gh_template.copy(false, false, "");
 			auto cfv = cs.get_cytoframe_view(sn);
-			string h5_filename = cfv.get_uri();
-			if(h5_filename=="")
+			string cf_filename = cfv.get_uri();
+			if(cf_filename=="")
 				throw(logic_error("in-memory version of cs is not supported!"));
 			if(execute)
 			{

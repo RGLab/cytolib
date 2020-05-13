@@ -70,6 +70,10 @@ public:
 
 	void read_fcs_data();
 
+	FileFormat get_backend_type() const
+	{
+		return FileFormat::MEM;
+	};
 	/**
 	 * parse the data segment of FCS
 	 *

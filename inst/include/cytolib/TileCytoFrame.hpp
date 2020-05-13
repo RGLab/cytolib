@@ -439,6 +439,9 @@ public:
 				}
 			}
 		}
+	FileFormat get_backend_type()  const{
+				return FileFormat::TILE;
+			};
 	/**
 	 * Read data from disk.
 	 * The caller will directly receive the data vector without the copy overhead thanks to the move semantics supported for vector container in c++11

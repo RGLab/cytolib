@@ -106,7 +106,7 @@ public:
 		}
 
 
-	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, CytoFileOption h5_opt) const = 0;
+	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & cf_filename, CytoFileOption h5_opt) const = 0;
 
 	virtual void set_readonly(bool flag){
 	}
@@ -606,10 +606,10 @@ public:
 	 */
 	EVENT_DATA_TYPE get_time_step(const string time_channel) const;
 
-	virtual CytoFramePtr copy(const string & h5_filename = "", bool overwrite = false) const=0;
-	virtual CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "", bool overwrite = false) const=0;
-	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "", bool overwrite = false) const=0;
-	
+	virtual CytoFramePtr copy(const string & cf_filename = "", bool overwrite = false) const=0;
+	virtual CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & cf_filename = "", bool overwrite = false) const=0;
+	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & cf_filename = "", bool overwrite = false) const=0;
+	virtual FileFormat get_backend_type() const=0;
 	
 	virtual string get_uri() const=0;
 	virtual void flush_meta(){};
