@@ -297,8 +297,14 @@ namespace cytolib
 			frame_.set_readonly(false);//temporary unlock it
 			frame_.flush_meta();
 			frame_.set_readonly(flag);//restore the lock
+			string ext;
+			if(frame_.get_backend_type() == FileFormat::TILE)
+				ext = ".tile";
+			else
+				ext = ".h5";
 
-			frame_.convertToPb(*fr_pb, cf_filename, h5_opt);
+
+			frame_.convertToPb(*fr_pb, cf_filename + ext, h5_opt);
 		}
 
 
@@ -389,23 +395,23 @@ namespace cytolib
 		}
 
 	}
-	/*
-	 * remove the node along with associated population properities including indices and gates
-	 */
-	void GatingHierarchy::removeNode(VertexID nodeID)
-	{
+
+   /*
+	* remove the node along with associated population properities including indices and gates
+	*/
+   void GatingHierarchy::removeNode(VertexID nodeID)
+   {
 
 
-		//remove edge associated with this node
-		EdgeID e=getInEdges(nodeID);
-		/*removing vertex cause the rearrange node index
-		 * so make sure do it after get edge descriptor
-		 */
-		boost::remove_edge(e,tree);
-		boost::remove_vertex(nodeID,tree);
+		   //remove edge associated with this node
+		   EdgeID e=getInEdges(nodeID);
+		   /*removing vertex cause the rearrange node index
+			* so make sure do it after get edge descriptor
+			*/
+		   boost::remove_edge(e,tree);
+	   boost::remove_vertex(nodeID,tree);
 
-	}
-
+   }
 	/**
 	 *
 	 * It moves one node to the target parent.

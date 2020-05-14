@@ -151,7 +151,7 @@ namespace cytolib
 		//due to the single string buffer used by lite-message won't be enough to hold the all samples for large dataset
 		for(auto & sn : sample_names)
 		{
-			string cf_filename = (fs::path(path) / sn).string() + ".h5";
+			string cf_filename = (fs::path(path) / sn).string();
 			//init the output stream for gs
 			string filename = (fs::path(path) / sn).string() + ".pb";
 			ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);

@@ -168,12 +168,7 @@ public:
 		tiledb::VFS vfs(ctx);
 //		tiledb::VFS::filebuf buf(vfs);
 
-		if(vfs.is_dir(uri))
-		{
-			throw(domain_error("Can't create new TileCytoFrame at " + uri + " since it already exists!"));
-
-		}
-		else
+		if(!vfs.is_dir(uri))
 		{
 			vfs.create_dir(uri);
 		}
