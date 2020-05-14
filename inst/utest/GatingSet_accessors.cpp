@@ -21,6 +21,19 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
+BOOST_AUTO_TEST_CASE(remove_node)
+{
+	auto gs1 = gs.copy();
+	auto gh = gs1.begin()->second;
+	gh->removeNode(0);
+	BOOST_CHECK_EQUAL(gh->getTree().m_vertices.size(), 23);
+
+	 gs1 = gs.copy();
+	 gh = gs1.begin()->second;
+	gh->removeNode("root");
+	BOOST_CHECK_EQUAL(gh->getTree().m_vertices.size(), 0);
+
+}
 BOOST_AUTO_TEST_CASE(quadgate) {
 
 	GatingSet gs1({"../flowWorkspace/output/s5a01.fcs"}, FCS_READ_PARAM());
