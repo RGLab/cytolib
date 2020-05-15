@@ -171,7 +171,7 @@ public:
 				for(auto sn : cf_samples)
 				{
 					if(pb_samples.find(sn)==pb_samples.end())
-						  throw(domain_error(errmsg + "No .pb file matched for sample " + sn + ".h5"));
+						  throw(domain_error(errmsg + "No .pb file matched for sample " + sn));
 				}
 
 				for(auto sn : pb_samples)

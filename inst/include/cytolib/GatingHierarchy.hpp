@@ -189,7 +189,7 @@ public:
 			if(!is_skip_data)
 			{
 				CytoFramePtr ptr;
-				auto fmt = backend_type(uri);
+				auto fmt = uri_backend_type(uri);
 				tiledb::VFS vfs(*ctxptr);
 				bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
 				if(!is_exist)

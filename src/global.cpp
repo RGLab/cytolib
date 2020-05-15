@@ -35,14 +35,16 @@ namespace cytolib
 	}
 	bool is_remote_path(const string & path)
 	{
-		return regex_match(path, regex("^(https://)(.*)"));
+		return regex_search(path, regex("^(https://)(.*)"));
 	}
-	FileFormat backend_type(const string & path)
+	FileFormat uri_backend_type(const string & path)
 	{
-		if(regex_match(path, regex("\\.tile$")))
+		if(regex_search(path, regex("(\\.tile)$")))
 			return FileFormat::TILE;
-		else
+		else if(regex_search(path, regex("(\\.h5)$")))
 			return FileFormat::H5;
+		else
+			throw(domain_error("unknown backend type: " + path));
 	}
 	string fs_tmp_path()
 	{

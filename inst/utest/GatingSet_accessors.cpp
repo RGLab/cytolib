@@ -2,12 +2,12 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <cytolib/GatingSet.hpp>
 #include <experimental/filesystem>
+#include <regex>
 
 #include "fixture.hpp"
 using namespace cytolib;
 struct GSFixture {
 	GSFixture() {
-
 		path = "../flowWorkspace/output/NHLBI/gs/gs";
 		gs = GatingSet(path,false,true,{},true);
 

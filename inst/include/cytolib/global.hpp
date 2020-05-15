@@ -27,7 +27,7 @@ namespace fs = std::experimental::filesystem::v1;
 namespace cytolib
 {
 	enum class FileFormat {TILE, H5, MEM};
-	FileFormat backend_type(const string & path);
+	FileFormat uri_backend_type(const string & path);
 
 	bool is_remote_path(const string &);
 	struct S3Cred
