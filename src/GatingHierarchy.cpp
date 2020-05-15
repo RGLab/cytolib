@@ -395,8 +395,6 @@ namespace cytolib
 		}
 
 	}
-
-
 	/**
 	 *
 	 * It moves one node to the target parent.
