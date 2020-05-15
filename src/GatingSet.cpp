@@ -38,7 +38,7 @@ namespace cytolib
 //				else
 //				{
 					fs::path gs_pb_file;
-					unordered_set<string> h5_samples;
+					unordered_set<string> cf_samples;
 					unordered_set<string> pb_samples;
 					for(auto & e : fs::directory_iterator(path))
 					{
@@ -61,7 +61,7 @@ namespace cytolib
 							}
 
 						}
-						else if(ext == ".pb"||ext == ".h5")
+						else if(ext == ".tile"||ext == ".h5"||ext == ".pb")
 						{
 							string sample_uid = p.stem().string();
 							if(find(sample_uid) == end())
@@ -71,7 +71,7 @@ namespace cytolib
 								if(ext == ".pb")
 									pb_samples.insert(p.stem().string());
 								else
-									h5_samples.insert(p.stem().string());
+									cf_samples.insert(p.stem().string());
 							}
 
 						}
@@ -91,7 +91,7 @@ namespace cytolib
 					for(const auto & it : ghs_)
 					{
 						auto sn = it.first;
-						if(h5_samples.find(sn) == h5_samples.end())
+						if(cf_samples.find(sn) == cf_samples.end())
 							throw(domain_error(errmsg + "h5 file missing for sample: " + sn));
 						/*
 						 * when no pb present, treat it as valid dest folder where h5 were pre-written
