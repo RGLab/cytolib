@@ -170,33 +170,34 @@ public:
 
 		if(vfs.is_dir(uri))
 		{
-			throw(domain_error("Can't create new TileCytoFrame at " + uri + " since it already exists!"));
-
+			cout << "overwriting the existing folder " + uri + "!";
+			vfs.remove_dir(uri);
 		}
-		else
-		{
-			vfs.create_dir(uri);
-		}
-		write_tile_data(uri, ctx);
 
-		write_tile_pd(uri, ctx);
+		vfs.create_dir(uri);
 
-		write_tile_params(uri, ctx);
+		write_tile_data(uri, ctx, true);
 
-		write_tile_kw(uri, ctx);
+		write_tile_pd(uri, ctx, true);
+
+		write_tile_params(uri, ctx, true);
+
+		write_tile_kw(uri, ctx, true);
 	}
-	void write_tile_data(const string & uri, const tiledb::Context & ctx) const
+	void write_tile_data(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
 	{
-		write_tile_data(uri, get_data(), ctx);
+		write_tile_data(uri, get_data(), ctx, is_new);
 	}
-	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const tiledb::Context & ctx) const
+	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const tiledb::Context & ctx, bool is_new = false) const
 	{
 		int nEvents = n_rows();
 		int nch = n_cols();
 		auto array_uri = (fs::path(uri) / "mat").string();
 		tiledb::VFS vfs(ctx);
-		if(!vfs.is_dir(array_uri))
+		if(is_new)
 		{
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
 			tiledb::Domain domain(ctx);
 			//2k is to meet 64k minimal recommended tile size to fit into L1 cache
 			auto ncell = nEvents==0?1:nEvents;
@@ -245,12 +246,14 @@ public:
 
 	}
 
-	void write_tile_pd(const string & uri, const tiledb::Context & ctx) const
+	void write_tile_pd(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
 	{
 		tiledb::VFS vfs(ctx);
 		auto array_uri = (fs::path(uri) / "pdata").string();
-		if(!vfs.is_dir(array_uri))
+		if(is_new)
 		{
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
 			//dummy array
 			tiledb::Domain domain(ctx);
 			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "pd", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
@@ -270,12 +273,14 @@ public:
 
 	}
 
-	void write_tile_kw(const string & uri, const tiledb::Context & ctx) const
+	void write_tile_kw(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
 	{
 		tiledb::VFS vfs(ctx);
 		auto array_uri = (fs::path(uri) / "keywords").string();
-		if(!vfs.is_dir(array_uri))
+		if(is_new)
 		{
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
 			tiledb::Domain domain(ctx);
 			//dummy array
 			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "kw", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
@@ -297,16 +302,17 @@ public:
 		}//TODO:switch to TILEDB_STRING_UTF16
 //		array.consolidate_metadata(ctx, array_uri);
 	}
-	void write_tile_params(const string & uri, const tiledb::Context & ctx) const
+	void write_tile_params(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
 	{
 
 		auto array_uri = (fs::path(uri) / "params").string();
 
 		int nch = n_cols();
 		tiledb::VFS vfs(ctx);
-		if(!vfs.is_dir(array_uri))
+		if(is_new)
 		{
-
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
 			tiledb::Domain domain(ctx);
 			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch==0?1:nch}, 1); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
 			domain.add_dimension(a1); // @suppress("Invalid arguments")
