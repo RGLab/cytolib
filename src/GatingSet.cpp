@@ -304,18 +304,18 @@ namespace cytolib
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data, const string & new_h5_dir) const{
+	GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data, const string & new_cf_dir) const{
 		GatingSet gs;
-		fs::path h5_dir;
+		fs::path cf_dir;
 		if(is_copy_data)
-			h5_dir = gs.generate_cytoframe_folder(fs::path(new_h5_dir).string());
+			cf_dir = gs.generate_cytoframe_folder(fs::path(new_cf_dir).string());
 		for(const string & sn : get_sample_uids())
 		{
 			GatingHierarchyPtr gh = getGatingHierarchy(sn);
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+sn+"... \n");
-			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, (h5_dir/sn).string()), sn, is_copy_data);
+			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, (cf_dir/sn).string()), sn, is_copy_data);
 
 		}
 

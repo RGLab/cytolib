@@ -170,7 +170,7 @@ public:
 
 		if(vfs.is_dir(uri))
 		{
-			cout << "overwriting the existing folder " + uri + "!";
+			PRINT("overwriting the existing folder " + uri + "!");
 			vfs.remove_dir(uri);
 		}
 

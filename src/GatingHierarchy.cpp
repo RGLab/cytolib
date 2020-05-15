@@ -1524,10 +1524,18 @@ namespace cytolib
 		res->transFlag = transFlag;
 		res->trans = trans.copy();
 		if(is_copy_data)
-			if(is_realize_data)
-				res->frame_ = frame_.copy_realized(cf_filename);
+		{
+			string ext;
+			if(frame_.get_backend_type() == FileFormat::TILE)
+				ext = ".tile";
 			else
-				res->frame_ = frame_.copy(cf_filename);
+				ext = ".h5";
+
+			if(is_realize_data)
+				res->frame_ = frame_.copy_realized(cf_filename + ext);
+			else
+				res->frame_ = frame_.copy(cf_filename + ext);
+		}
 		else
 			res->frame_ = frame_;
 		return res;
