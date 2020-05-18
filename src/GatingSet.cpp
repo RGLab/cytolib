@@ -92,7 +92,7 @@ namespace cytolib
 					{
 						auto sn = it.first;
 						if(cf_samples.find(sn) == cf_samples.end())
-							throw(domain_error(errmsg + "h5 file missing for sample: " + sn));
+							throw(domain_error(errmsg + "cytoframe file missing for sample: " + sn));
 						/*
 						 * when no pb present, treat it as valid dest folder where h5 were pre-written
 						 * e.g. when save_gs with cdf = skip

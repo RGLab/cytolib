@@ -67,12 +67,12 @@ public:
 				if(h5_opt == CytoFileOption::move&&oldh5!="")
 				{
 					if(!fs::equivalent(fs::path(oldh5), fs::path(cf_filename)))
-						fs::remove(oldh5);
+						fs::remove_all(oldh5);
 
 				}
 			}
 			else
-				throw(domain_error("Only 'copy' or 'move' H5Option is supported for the indexed CytoFrameView object!"));
+				throw(domain_error("Only 'copy' or 'move' option is supported for the indexed CytoFrameView object!"));
 		}
 		else
 			get_cytoframe_ptr()->convertToPb(fr_pb, cf_filename, h5_opt);

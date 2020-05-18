@@ -409,14 +409,14 @@ public:
 					case CytoFileOption::copy:
 						{
 							if(fs::exists(filepath))
-								fs::remove(filepath);
+								fs::remove_all(filepath);
 							fs::copy(uri_, uri, fs::copy_options::recursive);
 							break;
 						}
 					case CytoFileOption::move:
 						{
 							if(fs::exists(filepath))
-								fs::remove(filepath);
+								fs::remove_all(filepath);
 							fs::rename(uri_, uri);
 							break;
 						}
@@ -429,7 +429,7 @@ public:
 					case CytoFileOption::symlink:
 						{
 							if(fs::exists(filepath))
-								fs::remove(filepath);
+								fs::remove_all(filepath);
 							fs::create_symlink(uri_, uri);
 							break;
 						}
