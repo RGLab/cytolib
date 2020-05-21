@@ -270,9 +270,9 @@ public:
 	 * assuming data have already been compensated and transformed
 	 *
 	 */
-	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute=false, bool computeTerminalBool=true);
+	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute=false, bool computeTerminalBool=true, bool skip_faulty_node = false);
 	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute
-			, bool computeTerminalBool, INTINDICES &parentIndice);
+			, bool computeTerminalBool, bool skip_faulty_node, INTINDICES &parentIndice);
 	/*
 	 * bool gating operates on the indices of reference nodes
 	 * because they are global, thus needs to be combined with parent indices
