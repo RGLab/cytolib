@@ -25,14 +25,20 @@ class H5CytoFrame:public CytoFrame{
 protected:
 	string filename_;
 	hsize_t dims[2];              // dataset dimensions
-	bool readonly_;//whether allow the public API to modify it, can't rely on h5 flag mechanism since its behavior is uncerntain for multiple opennings
+	bool readonly_;//whether allow the public API to modify it, can't rely on h5 flag mechanism since
+//					its behavior is uncerntain for multiple opennings
 	//flags indicating if cached meta data needs to be flushed to h5
 	bool is_dirty_params;
 	bool is_dirty_keys;
 	bool is_dirty_pdata;
 	EVENT_DATA_VEC read_data(uvec col_idx) const;
+	int h5_flags() const{
+		if(get_readonly())
+			return H5F_ACC_RDONLY;
+		else
+			return H5F_ACC_RDWR;
+	};
 public:
-	const unsigned int default_flags = H5F_ACC_RDWR;
 	void flush_meta();
 	void flush_params();
 
@@ -41,7 +47,7 @@ public:
 	void set_readonly(bool flag){
 		readonly_ = flag;
 	}
-	bool get_readonly(){
+	bool get_readonly() const{
 		return readonly_ ;
 	}
 	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)

@@ -6,7 +6,7 @@ namespace cytolib
 {
 	EVENT_DATA_VEC H5CytoFrame::read_data(uvec col_idx) const
 	{
-		H5File file(filename_, default_flags);
+		H5File file(filename_, h5_flags());
 		auto dataset = file.openDataSet(DATASET_NAME);
 		auto dataspace = dataset.getSpace();
 
@@ -64,7 +64,7 @@ namespace cytolib
 	void H5CytoFrame::flush_params()
 	{
 		check_write_permission();
-		H5File file(filename_, default_flags);
+		H5File file(filename_, h5_flags());
 
 		CompType param_type = get_h5_datatype_params(DataTypeLocation::MEM);
 		DataSet ds = file.openDataSet("params");
@@ -80,7 +80,7 @@ namespace cytolib
 	void H5CytoFrame::flush_keys()
 	{
 		check_write_permission();
-		H5File file(filename_, default_flags);
+		H5File file(filename_, h5_flags());
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("keywords");
 		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
@@ -95,7 +95,7 @@ namespace cytolib
 	void H5CytoFrame::flush_pheno_data()
 	{
 		check_write_permission();
-		H5File file(filename_, default_flags);
+		H5File file(filename_, h5_flags());
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("pdata");
 
@@ -130,7 +130,7 @@ namespace cytolib
 	H5CytoFrame::H5CytoFrame(const string & h5_filename, bool readonly):CytoFrame(),filename_(h5_filename), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
 	{
 		//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
-		H5File file(filename_, default_flags);
+		H5File file(filename_, h5_flags());
 		load_meta();
 
 
@@ -145,7 +145,7 @@ namespace cytolib
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */
 	void H5CytoFrame::load_meta(){
-		H5File file(filename_, default_flags);
+		H5File file(filename_, h5_flags());
 		DataSet ds_param = file.openDataSet("params");
 	//	DataType param_type = ds_param.getDataType();
 
@@ -283,7 +283,7 @@ namespace cytolib
 	 */
 	void H5CytoFrame::set_data(const EVENT_DATA_VEC & _data)
 	{
-		H5File file(filename_, default_flags);
+		H5File file(filename_, h5_flags());
 		check_write_permission();
 		hsize_t dims_data[2] = {_data.n_cols, _data.n_rows};
 		auto dataset = file.openDataSet(DATASET_NAME);
