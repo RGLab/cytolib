@@ -110,7 +110,7 @@ public:
 
 	virtual void set_readonly(bool flag){
 	}
-	virtual bool get_readonly(){
+	virtual bool get_readonly() const{
 		return false;
 		}
 	virtual void compensate(const compensation & comp);

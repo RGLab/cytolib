@@ -6,7 +6,7 @@ namespace cytolib
 {
 	EVENT_DATA_VEC H5CytoFrame::read_data(uvec col_idx) const
 	{
-		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 		auto dataset = file.openDataSet(DATASET_NAME);
 		auto dataspace = dataset.getSpace();
 
@@ -64,7 +64,7 @@ namespace cytolib
 	void H5CytoFrame::flush_params()
 	{
 		check_write_permission();
-		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 
 		CompType param_type = get_h5_datatype_params(DataTypeLocation::MEM);
 		DataSet ds = file.openDataSet("params");
@@ -80,7 +80,7 @@ namespace cytolib
 	void H5CytoFrame::flush_keys()
 	{
 		check_write_permission();
-		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("keywords");
 		auto keyVec = to_kw_vec<KEY_WORDS>(keys_);
@@ -95,7 +95,7 @@ namespace cytolib
 	void H5CytoFrame::flush_pheno_data()
 	{
 		check_write_permission();
-		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 		CompType key_type = get_h5_datatype_keys();
 		DataSet ds = file.openDataSet("pdata");
 
@@ -111,11 +111,12 @@ namespace cytolib
 
 
 
+
 	/**
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */
 	void H5CytoFrame::load_meta(){
-		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 		DataSet ds_param = file.openDataSet("params");
 	//	DataType param_type = ds_param.getDataType();
 
@@ -240,7 +241,7 @@ namespace cytolib
 	 */
 	void H5CytoFrame::set_data(const EVENT_DATA_VEC & _data)
 	{
-		H5File file(filename_, default_flags, FileCreatPropList::DEFAULT, access_plist_);
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 		check_write_permission();
 		hsize_t dims_data[2] = {_data.n_cols, _data.n_rows};
 		auto dataset = file.openDataSet(DATASET_NAME);
