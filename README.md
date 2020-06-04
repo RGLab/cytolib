@@ -6,6 +6,17 @@ See the included LICENSE file for details on the license granted to the user of 
 
 `cytolib` provides the c++ library for users to use and interact with the `GatingSet` (the gated cytometry data structure) at c++ level.
 
+
+### Reporting Bugs or Issues
+- Use the issue template in github when creating a new issue. 
+- Follow the instructions in the template (do your background reading).
+- Search and verify that the issue hasn't already been addressed.
+- Check the Bioconductor support site. 
+- Make sure your flow packages are up to date.
+- THEN if your issue persists, file a bug report.
+
+Otherwise, we will close your issue without responding.
+
 ## Installation as a R package
 The **cytolib** package is installed via `R CMD INSTALL ...`. 
 
