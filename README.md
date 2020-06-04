@@ -15,7 +15,7 @@ See the included LICENSE file for details on the license granted to the user of 
 - Make sure your flow packages are up to date.
 - THEN if your issue persists, file a bug report.
 
-Otherwise, we will close your issue without responding.
+Otherwise, we may close your issue without responding.
 
 ## Installation as a R package
 The **cytolib** package is installed via `R CMD INSTALL ...`. 
