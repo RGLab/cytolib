@@ -22,8 +22,9 @@ USERLIB = ${USERDIR}/${BOOSTFSLIB}
 CXX_STD = CXX11
 PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
 
-RHDF5_LIBS= $(shell echo 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")'|\
-    "${R_HOME}/bin/R" --vanilla --slave)
+#needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
+RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")')
+    
 
 PKG_LIBS = ${boost_fs_objs} ${boost_sys_objs} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
 
