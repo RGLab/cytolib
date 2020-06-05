@@ -21,6 +21,19 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
+BOOST_AUTO_TEST_CASE(remove_node)
+{
+	auto gs1 = gs.copy();
+	auto gh = gs1.begin()->second;
+	gh->removeNode(0);
+	BOOST_CHECK_EQUAL(gh->getTree().m_vertices.size(), 23);
+
+	 gs1 = gs.copy();
+	 gh = gs1.begin()->second;
+	gh->removeNode("root");
+	BOOST_CHECK_EQUAL(gh->getTree().m_vertices.size(), 0);
+
+}
 BOOST_AUTO_TEST_CASE(quadgate) {
 
 	GatingSet gs1({"../flowWorkspace/output/s5a01.fcs"}, FCS_READ_PARAM());
@@ -81,8 +94,16 @@ BOOST_AUTO_TEST_CASE(serialize) {
 	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
 	gs1.serialize_pb(tmp, H5Option::copy);
 	//load it back
-	GatingSet gs2(tmp,false,false,{},true);
+	GatingSet gs2(tmp,false,true,{},true);
 	auto cf2 = gs2.begin()->second->get_cytoframe_view_ref();
+	BOOST_CHECK_EQUAL(cf2.get_readonly(), true);
+
+
+	//save gs and see if readonly flag changes
+	tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
+	gs2.serialize_pb(tmp, H5Option::copy);
+	BOOST_CHECK_EQUAL(cf2.get_readonly(), true);
+
 
 	BOOST_CHECK_EQUAL(cf2.get_channels()[0], newc);
 	BOOST_CHECK_EQUAL(cf2.get_keyword(kn), kv);

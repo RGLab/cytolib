@@ -179,8 +179,51 @@ public:
 	VertexID addGate(gatePtr g,VertexID parentID,string popName);
 	/*
 	 * remove the node along with associated population properities including indices and gates
+	 * can't do recursive removal here since vid is subject to change during the removal precoess
 	 */
-	void removeNode(VertexID nodeID);
+	void removeNode(VertexID nodeID)
+	{
+		if(nodeID>0)
+		{
+			//remove edge associated with this node
+			EdgeID e=getInEdges(nodeID);
+			/*removing vertex cause the rearrange node index
+			 * so make sure do it after get edge descriptor
+			 */
+			boost::remove_edge(e,tree);
+		}
+
+		boost::remove_vertex(nodeID,tree);
+	}
+	/**
+	 * recursive version
+	 * @param node
+	 */
+	void removeNode(string node)
+	{
+		auto nodeID = getNodeID(node);
+
+		//recursive to its children first
+
+		//get children name vec first before id is expired
+		auto childrenIDs = getChildren(nodeID);
+		auto n = childrenIDs.size();
+		if(n>0)
+		{
+			vector<string> children(n);
+			for(unsigned i = 0 ; i < n; i++)
+			{
+				children[i] = getNodePath(childrenIDs[i]);
+			}
+			for(auto child : children)
+			{
+				removeNode(child);
+			}
+		}
+
+		//actually delete the node
+		removeNode(nodeID);
+	}
 
 	/**
 	 *
@@ -227,9 +270,9 @@ public:
 	 * assuming data have already been compensated and transformed
 	 *
 	 */
-	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute=false, bool computeTerminalBool=true);
+	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute=false, bool computeTerminalBool=true, bool skip_faulty_node = false);
 	void gating(MemCytoFrame & cytoframe, VertexID u,bool recompute
-			, bool computeTerminalBool, INTINDICES &parentIndice);
+			, bool computeTerminalBool, bool skip_faulty_node, INTINDICES &parentIndice);
 	/*
 	 * bool gating operates on the indices of reference nodes
 	 * because they are global, thus needs to be combined with parent indices

@@ -436,23 +436,6 @@ namespace cytolib
 		}
 
 	}
-	/*
-	 * remove the node along with associated population properities including indices and gates
-	 */
-	void GatingHierarchy::removeNode(VertexID nodeID)
-	{
-
-
-		//remove edge associated with this node
-		EdgeID e=getInEdges(nodeID);
-		/*removing vertex cause the rearrange node index
-		 * so make sure do it after get edge descriptor
-		 */
-		boost::remove_edge(e,tree);
-		boost::remove_vertex(nodeID,tree);
-
-	}
-
 	/**
 	 *
 	 * It moves one node to the target parent.
@@ -655,7 +638,7 @@ namespace cytolib
 	 * assuming data have already been compensated and transformed
 	 *
 	 */
-	void GatingHierarchy::gating(MemCytoFrame & cytoframe, VertexID u,bool recompute, bool computeTerminalBool)
+	void GatingHierarchy::gating(MemCytoFrame & cytoframe, VertexID u,bool recompute, bool computeTerminalBool, bool skip_faulty_node)
 	{
 		//get parent ind
 		INTINDICES parentIndice;
@@ -669,15 +652,15 @@ namespace cytolib
 			 *
 			 */
 			if(!node.isGated())
-				gating(cytoframe, u, recompute, computeTerminalBool);
+				gating(cytoframe, u, recompute, computeTerminalBool, skip_faulty_node);
 
 			parentIndice = INTINDICES(node.getIndices());
 
 		}
 
-		gating(cytoframe, u, recompute, computeTerminalBool, parentIndice);
+		gating(cytoframe, u, recompute, computeTerminalBool, skip_faulty_node, parentIndice);
 	}
-	void GatingHierarchy::gating(MemCytoFrame & cytoframe, VertexID u,bool recompute, bool computeTerminalBool, INTINDICES &parentIndice)
+	void GatingHierarchy::gating(MemCytoFrame & cytoframe, VertexID u,bool recompute, bool computeTerminalBool, bool skip_faulty_node, INTINDICES &parentIndice)
 	{
 
 	//	if(!isLoaded)
@@ -696,8 +679,26 @@ namespace cytolib
 			 *
 			 */
 			if(recompute||!node.isGated())
-				calgate(cytoframe, u, computeTerminalBool, parentIndice);
+			{
+				try{
+					calgate(cytoframe, u, computeTerminalBool, parentIndice);
+				}
+				catch(const std::exception & e)
+				{
+					if(skip_faulty_node)
+					{
+						PRINT(e.what());
+						auto path = getNodePath(u, false);
+						PRINT("\n Skipping the faulty node '" + path + "' and its descendants \n");
+//						removeNode(path);//can't simply remove here since vertex ID will change and affect gating recursive call
+						return;
+					}
+					else
+						throw(domain_error(e.what()));
+				}
 
+
+			}
 		}
 
 		//recursively gate all the descendants of u
@@ -710,7 +711,7 @@ namespace cytolib
 				//add boost node
 				VertexID curChildID = *it;
 
-				gating(cytoframe, curChildID,recompute, computeTerminalBool, pind);
+				gating(cytoframe, curChildID,recompute, computeTerminalBool, skip_faulty_node, pind);
 			}
 
 		}
