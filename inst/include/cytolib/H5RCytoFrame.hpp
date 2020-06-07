@@ -50,8 +50,7 @@ public:
 
 		}
 		H5Pset_fapl_ros3(fapl_id, &fa);
-		//reset flag
-		default_flags = H5F_ACC_RDONLY;
+
 		init_load();
 	}
 };

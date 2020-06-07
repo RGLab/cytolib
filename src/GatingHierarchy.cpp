@@ -655,8 +655,6 @@ namespace cytolib
 					else
 						throw(domain_error(e.what()));
 				}
-
-
 			}
 		}
 
