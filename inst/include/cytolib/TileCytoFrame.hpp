@@ -45,7 +45,7 @@ protected:
 			throw(domain_error("Empty mat_array_ptr_!"));
 	}
 public:
-	unsigned int default_flags = H5F_ACC_RDWR;
+
 	void flush_meta(){
 		//flush the cached meta data from CytoFrame into h5
 		if(is_dirty_params)
@@ -78,7 +78,7 @@ public:
 	void set_readonly(bool flag){
 		readonly_ = flag;
 	}
-	bool get_readonly(){
+	bool get_readonly() const{
 		return readonly_ ;
 	}
 //	TileCytoFrame(const TileCytoFrame & frm):CytoFrame(frm)
