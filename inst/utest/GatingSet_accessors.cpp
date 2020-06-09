@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(serialize) {
 
 	//save gs and see if readonly flag changes
 	tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs2.serialize_pb(tmp, H5Option::copy);
+	gs2.serialize_pb(tmp, CytoFileOption::copy);
 	BOOST_CHECK_EQUAL(cf2.get_readonly(), true);
 
 
