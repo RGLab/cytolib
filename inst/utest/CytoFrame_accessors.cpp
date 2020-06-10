@@ -51,8 +51,10 @@ BOOST_AUTO_TEST_CASE(TileCytoFrameconstructor)
 //	auto dat = cf.get_data();
 //	cout << dat[10] << endl;
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
-
-	auto cf = TileCytoFrame(file_path, config, tmp);
+//	auto path = file_path;
+//	auto cf = TileCytoFrame(path, config, tmp);
+	auto path = "/tmp/Rtmpymp9pr/file751663dcef39/CytoTrol_CytoTrol_1.fcs.tile";
+	auto cf = TileCytoFrame(path, false);
 	auto dat = cf.get_data();
 }
 BOOST_AUTO_TEST_CASE(tile_write_block_test)
