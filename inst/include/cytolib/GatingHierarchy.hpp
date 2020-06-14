@@ -196,8 +196,8 @@ public:
 				 throw(domain_error("cytoframe file missing for sample: " + uri));
 				if(fmt == FileFormat::H5&&is_remote_path(uri))
 				{
-					//TODO: exist check
-					ptr.reset(new H5RCytoFrame(uri, readonly, ctxptr));
+
+					ptr.reset(new H5RCytoFrame(s3_to_http(uri), readonly, ctxptr));
 
 				}
 				else

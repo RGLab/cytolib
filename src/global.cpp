@@ -33,9 +33,24 @@ namespace cytolib
 	#endif
 
 	}
+	string s3_to_http(string uri)
+	{
+		boost::replace_first(uri, "s3://", "");
+		vector <string> tokens;
+		boost::split(tokens, uri, boost::is_any_of("/"));
+		if(tokens.size()==0)
+			throw(domain_error("invalid s3 path: " + uri));
+
+		uri = "https://" + tokens[0] + ".s3.amazonaws.com";
+		for(int i = 1; i < tokens.size(); i++)
+		{
+			uri += "/" + tokens[i];
+		}
+		return uri;
+	}
 	bool is_remote_path(const string & path)
 	{
-		return regex_search(path, regex("^(https://)(.*)"));
+		return regex_search(path, regex("^((https)|(s3))(://)(.*)"));
 	}
 	FileFormat uri_backend_type(const string & path)
 	{

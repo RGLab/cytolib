@@ -28,6 +28,7 @@ namespace cytolib
 {
 	enum class FileFormat {TILE, H5, MEM};
 	FileFormat uri_backend_type(const string & path);
+	string s3_to_http(string uri);
 
 	bool is_remote_path(const string &);
 	struct S3Cred

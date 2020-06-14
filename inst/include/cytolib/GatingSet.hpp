@@ -88,7 +88,6 @@ public:
 			, bool readonly = true
 			, vector<string> select_samples = {}
 			, bool print_lib_ver = false
-			, string remote_path = ""
 			, CtxPtr ctxptr= CtxPtr(new tiledb::Context())):ctxptr_(ctxptr)
 	{
 
@@ -99,9 +98,10 @@ public:
 		FileFormat fmt;
 		bool is_first_sample = true;
 		//search for h5
-		for(auto & e : fs::directory_iterator(path))
+		tiledb::VFS vfs(*ctxptr);
+		for(auto & e : vfs.ls(path))
 		{
-			fs::path p = e;
+			fs::path p(e);
 			string ext = p.extension().string();
 			string fn = p.stem().string();
 			if(ext == ".h5"||ext == ".tile")
@@ -165,32 +165,30 @@ public:
 		}
 		else
 		{
-			//TODO: how to do validity check for remote
-			if(remote_path == "")
+
+			for(auto sn : cf_samples)
 			{
-				for(auto sn : cf_samples)
-				{
-					if(pb_samples.find(sn)==pb_samples.end())
-						  throw(domain_error(errmsg + "No .pb file matched for sample " + sn));
-				}
-
-				for(auto sn : pb_samples)
-				{
-					if(cf_samples.find(sn)==cf_samples.end())
-						  throw(domain_error(errmsg + "No cytoframe file matched for sample " + sn + ".pb"));
-				}
-
+				if(pb_samples.find(sn)==pb_samples.end())
+					  throw(domain_error(errmsg + "No .pb file matched for sample " + sn));
 			}
+
+			for(auto sn : pb_samples)
+			{
+				if(cf_samples.find(sn)==cf_samples.end())
+					  throw(domain_error(errmsg + "No cytoframe file matched for sample " + sn + ".pb"));
+			}
+
 			GOOGLE_PROTOBUF_VERIFY_VERSION;
-			ifstream input(gs_pb_file.string(), ios::in | ios::binary);
+			tiledb::VFS::filebuf sbuf(vfs);
+			sbuf.open(gs_pb_file, ios::in);
+			istream input(&sbuf);
+
 			if (!input) {
 				throw(invalid_argument("File not found.." + gs_pb_file.string()));
 			} else{
 				 pb::GatingSet pbGS;
 				 //read entire file into buffer since message-lite doesn't support iostream
-				 input.seekg (0, input.end);
-				 int length = input.tellg();
-				 input.seekg (0, input.beg);
+				 auto length = vfs.file_size(gs_pb_file);
 				 vector<char> buf(length);
 				 input.read(buf.data(), length);
 
@@ -255,17 +253,16 @@ public:
 					if(nSelect==0||sn_hash.find(sn)->second)
 					{
 						string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
-						ifstream input(gh_pb_file, ios::in | ios::binary);
+						sbuf.open(gh_pb_file, ios::in);
+						istream input(&sbuf);
+
 						if (!input) {
 							throw(invalid_argument("File not found.." + gh_pb_file));
 						}
 						else
 						{
 							pb::GatingHierarchy gh_pb;
-							 //read entire file into buffer since message-lite doesn't support iostream
-							 input.seekg (0, input.end);
-							 int length = input.tellg();
-							 input.seekg (0, input.beg);
+							 auto length = vfs.file_size(gh_pb_file);
 							 vector<char> buf(length);
 							 input.read(buf.data(), length);
 
@@ -281,10 +278,7 @@ public:
 
 						string uri;
 						auto cf_ext = fmt == FileFormat::H5?".h5":".tile";
-						if(remote_path=="")
-							uri = (fs::path(path) / (sn + cf_ext)).string();
-						else
-							uri = (fs::path(remote_path) / (sn + cf_ext)).string();
+						uri = (fs::path(path) / (sn + cf_ext)).string();
 						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(ctxptr_, gh_pb, uri, is_skip_data, readonly)), sn);
 						}
 					}

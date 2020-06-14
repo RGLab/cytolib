@@ -9,7 +9,7 @@ using namespace cytolib;
 struct GSFixture {
 	GSFixture() {
 		path = "../flowWorkspace/output/NHLBI/gs/gs";
-		gs = GatingSet(path,false,true,{},true);
+		gs = GatingSet(path,false,true,{},false);
 
 	};
 
@@ -23,13 +23,26 @@ struct GSFixture {
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
 BOOST_AUTO_TEST_CASE(s3_gs)
 {
-	S3Cred cred;
-	gs = GatingSet(path,false,true,{},false, "https://mike-h5.s3.amazonaws.com/test");
+
+
+	tiledb::Config cfg;
+	cfg["vfs.s3.aws_access_key_id"] =  string(std::getenv("AWS_ACCESS_KEY_ID"));
+	cfg["vfs.s3.aws_secret_access_key"] =  string(std::getenv("AWS_SECRET_ACCESS_KEY"));
+
+	cfg["vfs.s3.region"] = "us-west-1";
+	auto remote = "s3://mike-h5/test";
+	CtxPtr ctx(new tiledb::Context(cfg));
+//	tiledb::VFS vfs(*ctx);
+//	for(auto p : vfs.ls(remote))
+//	{
+//		cout << p << endl;
+//	}
+	gs = GatingSet(remote,false,true,{},false, ctx);
 
 	auto cf = gs.begin()->second->get_cytoframe_view();
 	auto ch = cf.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 12);
-
+//
 
 }
 BOOST_AUTO_TEST_CASE(remove_node)
