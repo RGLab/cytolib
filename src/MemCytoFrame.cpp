@@ -255,7 +255,10 @@ namespace cytolib
 	MemCytoFrame::MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){
 			set_pheno_data("name", path_base_name(filename));
 		}
-	void MemCytoFrame::convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, CytoFileOption h5_opt) const
+	void MemCytoFrame::convertToPb(pb::CytoFrame & fr_pb
+			, const string & h5_filename
+			, CytoFileOption h5_opt
+			, const tiledb::Context & ctx) const
 	{
 		fr_pb.set_is_h5(false);
 		if(h5_opt != CytoFileOption::skip)

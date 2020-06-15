@@ -258,7 +258,11 @@ namespace cytolib
 	 * @param h5_opt
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb, string cf_filename, CytoFileOption h5_opt, bool is_skip_data){
+	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb
+			, string cf_filename
+			, CytoFileOption h5_opt
+			, bool is_skip_data
+			, const tiledb::Context & ctx){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
 		 * cp tree
@@ -302,7 +306,6 @@ namespace cytolib
 				ext = ".tile";
 			else
 				ext = ".h5";
-
 
 			frame_.convertToPb(*fr_pb, cf_filename + ext, h5_opt);
 		}

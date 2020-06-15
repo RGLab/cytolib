@@ -63,7 +63,10 @@ public:
 	 */
 	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config);
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, CytoFileOption h5_opt) const;
+	void convertToPb(pb::CytoFrame & fr_pb
+			, const string & h5_filename
+			, CytoFileOption h5_opt
+			, const tiledb::Context & ctx = tiledb::Context()) const;
 	unsigned n_rows() const;
 
 	void read_fcs();

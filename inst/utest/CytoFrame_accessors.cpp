@@ -3,7 +3,7 @@
 #include <boost/lexical_cast.hpp>
 #include <cytolib/GatingSet.hpp>
 #include <cytolib/TileCytoFrame.hpp>
-#include <cytolib/H5RCytoFrame.hpp>
+#include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 
 #include "fixture.hpp"
@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE(TileCytoFrameconstructor)
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
 //	auto path = file_path;
 //	auto cf = TileCytoFrame(path, config, tmp);
-	auto path = "/tmp/Rtmpymp9pr/file751663dcef39/CytoTrol_CytoTrol_1.fcs.tile";
-	auto cf = TileCytoFrame(path, false);
+	auto path = "/tmp/Rtmprb2X3k/file1be46cf4a372.tile";
+	auto cf = TileCytoFrame(path, true);
 	auto dat = cf.get_data();
 }
 BOOST_AUTO_TEST_CASE(tile_write_block_test)

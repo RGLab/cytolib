@@ -106,7 +106,10 @@ public:
 		}
 
 
-	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & cf_filename, CytoFileOption h5_opt) const = 0;
+	virtual void convertToPb(pb::CytoFrame & fr_pb
+			, const string & cf_filename
+			, CytoFileOption h5_opt
+			, const tiledb::Context & ctx = tiledb::Context()) const = 0;
 
 	virtual void set_readonly(bool flag){
 	}

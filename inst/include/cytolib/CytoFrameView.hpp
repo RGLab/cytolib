@@ -54,7 +54,10 @@ public:
 	vector<string> get_channels() const;
 	vector<string> get_markers() const;
 	void set_channels(const CHANNEL_MAP & chnl_map){get_cytoframe_ptr()->set_channels(chnl_map);}
-	void convertToPb(pb::CytoFrame & fr_pb, const string & cf_filename, CytoFileOption h5_opt) const{
+	void convertToPb(pb::CytoFrame & fr_pb
+			, const string & cf_filename
+			, CytoFileOption h5_opt
+			, const tiledb::Context & ctx = tiledb::Context()) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
 			if(h5_opt == CytoFileOption::copy||h5_opt == CytoFileOption::move)
@@ -62,7 +65,7 @@ public:
 				//realize view
 				auto cfv = copy_realized(cf_filename, true);
 				//trigger archive logic on the new cfv (which will skip overwriting itself)
-				cfv.convertToPb(fr_pb, cf_filename, h5_opt);
+				cfv.convertToPb(fr_pb, cf_filename, h5_opt, ctx);
 				auto oldh5 = get_uri();
 				if(h5_opt == CytoFileOption::move&&oldh5!="")
 				{
@@ -75,7 +78,7 @@ public:
 				throw(domain_error("Only 'copy' or 'move' option is supported for the indexed CytoFrameView object!"));
 		}
 		else
-			get_cytoframe_ptr()->convertToPb(fr_pb, cf_filename, h5_opt);
+			get_cytoframe_ptr()->convertToPb(fr_pb, cf_filename, h5_opt, ctx);
 
 	};
 	void set_channel(const string & oldname, const string &newname)
@@ -115,7 +118,8 @@ public:
 	{
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
-	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE, const S3Cred & cred = S3Cred()) const
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
+			, const tiledb::Context ctx = tiledb::Context()) const
 	{
 		//create a mem-based cfv to avoid extra disk write IO from realization call
 		CytoFrameView cv(*this);
@@ -127,14 +131,6 @@ public:
 			ptr->write_h5(filename);
 		else
 		{
-			tiledb::Config cfg;
-			cfg["vfs.s3.aws_access_key_id"] = cred.access_key_id_;
-			cfg["vfs.s3.aws_secret_access_key"] = cred.access_key_;
-			cfg["vfs.s3.region"] = cred.region_;
-
-			tiledb::Context ctx(cfg);
-
-
 			ptr->write_tile(filename, ctx);
 		}
 

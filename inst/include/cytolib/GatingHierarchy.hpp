@@ -19,9 +19,8 @@
 #include <algorithm>
 #include "MemCytoFrame.hpp"
 #include "CytoFrameView.hpp"
-#include <cytolib/H5RCytoFrame.hpp>
 #include "TileCytoFrame.hpp"
-
+#include "H5CytoFrame.hpp"
 using namespace std;
 
 namespace cytolib
@@ -156,7 +155,9 @@ public:
 	 * @param h5_opt
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void convertToPb(pb::GatingHierarchy & gh_pb, string uri, CytoFileOption h5_opt, bool is_skip_data = false);
+	void convertToPb(pb::GatingHierarchy & gh_pb, string uri, CytoFileOption h5_opt
+			, bool is_skip_data = false
+			, const tiledb::Context & ctx = tiledb::Context());
 	GatingHierarchy(CtxPtr ctxptr, pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
 			, bool readonly = true){
 			const pb::populationTree & tree_pb =  pb_gh.tree();
@@ -197,7 +198,7 @@ public:
 				if(fmt == FileFormat::H5&&is_remote_path(uri))
 				{
 
-					ptr.reset(new H5RCytoFrame(s3_to_http(uri), readonly, ctxptr));
+					 throw(domain_error("H5cytoframe doesn't support remote loading: " + uri));
 
 				}
 				else

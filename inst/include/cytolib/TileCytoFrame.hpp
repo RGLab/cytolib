@@ -398,44 +398,51 @@ public:
 
 	}
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & uri, CytoFileOption file_opt) const
+	void convertToPb(pb::CytoFrame & fr_pb
+			, const string & uri
+			, CytoFileOption file_opt
+			, const tiledb::Context & ctx = tiledb::Context()) const
 	{
 			fr_pb.set_is_h5(true);
 			if(file_opt != CytoFileOption::skip)
 			{
+				tiledb::VFS vfs(ctx);
+
 				auto filepath = fs::path(uri);
 				auto dest = filepath.parent_path();
-				if(!fs::exists(dest))
-					throw(logic_error(dest.string() + "doesn't exist!"));
+				//add extra / in case it is s3 path
+//				auto dest1 = dest;
+//				if(dest1. == "s3:")
+//					dest1[0] += "/";
+//				if(!vfs.is_dir(dest1.string()))
+//					throw(logic_error(dest1.string() + " doesn't exist!"));
 
 				if(!fs::equivalent(fs::path(uri_).parent_path(), dest))
 				{
+					if(vfs.is_dir(uri))
+						vfs.remove_dir(uri);
+
 					switch(file_opt)
 					{
 					case CytoFileOption::copy:
 						{
-							if(fs::exists(filepath))
-								fs::remove_all(filepath);
-							fs::copy(uri_, uri, fs::copy_options::recursive);
+							write_tile(uri, *ctxptr_);
 							break;
 						}
 					case CytoFileOption::move:
 						{
-							if(fs::exists(filepath))
-								fs::remove_all(filepath);
-							fs::rename(uri_, uri);
+							vfs.move_dir(uri_, uri);
 							break;
 						}
 					case CytoFileOption::link:
 						{
 							throw(logic_error("'link' option for TileCytoFrame is no longer supported!"));
-							fs::create_hard_link(uri_, uri);
 							break;
 						}
 					case CytoFileOption::symlink:
 						{
-							if(fs::exists(filepath))
-								fs::remove_all(filepath);
+							if(is_remote_path(uri)||is_remote_path(uri_))
+								throw(logic_error("'symlink' option for remote TileCytoFrame is not supported!"));
 							fs::create_symlink(uri_, uri);
 							break;
 						}

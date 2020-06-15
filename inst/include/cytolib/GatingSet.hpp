@@ -74,7 +74,9 @@ public:
 	 * @param path the dir of filename
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void serialize_pb(string path, CytoFileOption h5_opt, bool is_skip_data = false);
+	void serialize_pb(string path, CytoFileOption h5_opt
+			, bool is_skip_data = false
+			, const tiledb::Context & ctx = tiledb::Context());
 	/**
 	 * constructor from the archives (de-serialization)
 	 * @param path

@@ -31,15 +31,26 @@ BOOST_AUTO_TEST_CASE(s3_gs)
 
 	cfg["vfs.s3.region"] = "us-west-1";
 	auto remote = "s3://mike-h5/test";
+
 	CtxPtr ctx(new tiledb::Context(cfg));
+
+	//convert h5 to tile
+	auto gs1 = gs.copy();
+	auto gh = gs1.begin()->second;
+	auto cfv = gh->get_cytoframe_view();
+	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "") + ".tile";
+
+	cfv.write_to_disk(tmp, FileFormat::TILE, *ctx);
+	gh->set_cytoframe_view(CytoFramePtr(new TileCytoFrame(tmp)));
+	gs1.serialize_pb(remote, CytoFileOption::copy, false, *ctx);
 //	tiledb::VFS vfs(*ctx);
 //	for(auto p : vfs.ls(remote))
 //	{
 //		cout << p << endl;
 //	}
-	gs = GatingSet(remote,false,true,{},false, ctx);
+	auto gs2 = GatingSet(remote,false,true,{},false, ctx);
 
-	auto cf = gs.begin()->second->get_cytoframe_view();
+	auto cf = gs2.begin()->second->get_cytoframe_view();
 	auto ch = cf.get_channels();
 	BOOST_CHECK_EQUAL(ch.size(), 12);
 //

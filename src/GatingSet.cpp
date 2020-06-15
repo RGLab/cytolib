@@ -20,101 +20,103 @@ namespace cytolib
 	 * @param path the dir of filename
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void GatingSet::serialize_pb(string path, CytoFileOption cf_opt, bool is_skip_data)
+	void GatingSet::serialize_pb(string path
+			, CytoFileOption cf_opt
+			, bool is_skip_data
+			, const tiledb::Context & ctx)
 	{
 		/*
 		 * validity check for path
 		 */
-		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
-		if(fs::exists(path))
+		if(is_remote_path(path))
 		{
-			if(!fs::is_empty(fs::path(path)))
+			if(begin()->second->get_cytoframe_view_ref().get_backend_type()!=FileFormat::TILE)
+				throw(logic_error("Only tiledb backend supports saving to remote path!"));
+		}
+
+		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
+		tiledb::VFS vfs(ctx);
+		if(vfs.is_dir(path))
+		{
+			auto files = vfs.ls(path);
+			if(files.size()>0)
 			{
-//				if(is_overwrite)
-//				{
-//					fs::remove_all(path);
-//					fs::create_directory(path);
-//				}
-//				else
-//				{
-					fs::path gs_pb_file;
-					unordered_set<string> cf_samples;
-					unordered_set<string> pb_samples;
-					for(auto & e : fs::directory_iterator(path))
+				fs::path gs_pb_file;
+				unordered_set<string> cf_samples;
+				unordered_set<string> pb_samples;
+				for(auto & e : files)
+				{
+					fs::path p(e);
+					string ext = p.extension().string();
+					if(ext == ".gs")
 					{
-						fs::path p = e;
-						string ext = p.extension().string();
-						if(ext == ".gs")
+						string fn = p.stem().string();
+						if(fn == uid_)
 						{
-							string fn = p.stem().string();
-							if(fn == uid_)
-							{
-								if(gs_pb_file.empty())
-									gs_pb_file = p;
-								else
-									throw(domain_error(errmsg + "Multiple .gs files found for the same gs object!"));
-							}
+							if(gs_pb_file.empty())
+								gs_pb_file = p;
 							else
-							{
-								  throw(domain_error(errmsg + "gs file not matched to GatingSet uid: " + p.string()));
-
-							}
-
-						}
-						else if(ext == ".tile"||ext == ".h5"||ext == ".pb")
-						{
-							string sample_uid = p.stem().string();
-							if(find(sample_uid) == end())
-							  throw(domain_error(errmsg + "file not matched to any sample in GatingSet: " + p.string()));
-							else
-							{
-								if(ext == ".pb")
-									pb_samples.insert(p.stem().string());
-								else
-									cf_samples.insert(p.stem().string());
-							}
-
+								throw(domain_error(errmsg + "Multiple .gs files found for the same gs object!"));
 						}
 						else
-						  throw(domain_error(errmsg + "File not recognized: " + p.string()));
-
-					}
-
-					if(gs_pb_file.empty())
-					{
-						if(pb_samples.size()>0)
 						{
-							throw(domain_error(errmsg + "gs file missing"));
-						}
-					}
+							  throw(domain_error(errmsg + "gs file not matched to GatingSet uid: " + p.string()));
 
-					for(const auto & it : ghs_)
-					{
-						auto sn = it.first;
-						if(cf_samples.find(sn) == cf_samples.end())
-							throw(domain_error(errmsg + "cytoframe file missing for sample: " + sn));
-						/*
-						 * when no pb present, treat it as valid dest folder where h5 were pre-written
-						 * e.g. when save_gs with cdf = skip
-						 */
-						if(pb_samples.size()>0)
-						{
-							if(pb_samples.find(sn) == pb_samples.end())
-								throw(domain_error(errmsg + "pb file missing for sample: " + sn));
 						}
+
 					}
-//				}
+					else if(ext == ".tile"||ext == ".h5"||ext == ".pb")
+					{
+						string sample_uid = p.stem().string();
+						if(find(sample_uid) == end())
+						  throw(domain_error(errmsg + "file not matched to any sample in GatingSet: " + p.string()));
+						else
+						{
+							if(ext == ".pb")
+								pb_samples.insert(p.stem().string());
+							else
+								cf_samples.insert(p.stem().string());
+						}
+
+					}
+					else
+					  throw(domain_error(errmsg + "File not recognized: " + p.string()));
+
+				}
+
+				if(gs_pb_file.empty())
+				{
+					if(pb_samples.size()>0)
+					{
+						throw(domain_error(errmsg + "gs file missing"));
+					}
+				}
+
+				for(const auto & it : ghs_)
+				{
+					auto sn = it.first;
+					if(cf_samples.find(sn) == cf_samples.end())
+						throw(domain_error(errmsg + "cytoframe file missing for sample: " + sn));
+					/*
+					 * when no pb present, treat it as valid dest folder where h5 were pre-written
+					 * e.g. when save_gs with cdf = skip
+					 */
+					if(pb_samples.size()>0)
+					{
+						if(pb_samples.find(sn) == pb_samples.end())
+							throw(domain_error(errmsg + "pb file missing for sample: " + sn));
+					}
+				}
 			}
 		}
 		else
-			fs::create_directory(path);
+			vfs.create_dir(path);
 
 		// Verify that the version of the library that we linked against is
 		// compatible with the version of the headers we compiled against.
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
-		//init the output stream for gs
-		string filename = (fs::path(path) / uid_).string() + ".gs";
-		ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
+
+//		ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
 		string buf;
 		google::protobuf::io::StringOutputStream raw_output(&buf);
 
@@ -144,6 +146,11 @@ namespace cytolib
 			google::protobuf::ShutdownProtobufLibrary();
 			throw(domain_error("Failed to write GatingSet."));
 		}
+		//init the output stream for gs
+		string gs_pb_file = (fs::path(path) / uid_).string() + ".gs";
+		tiledb::VFS::filebuf sbuf(vfs);
+		sbuf.open(gs_pb_file, ios::out);
+		ostream output(&sbuf);
 		output.write(&buf[0], buf.size());
 
 		//write each gh as a separate message to stream due to the pb message size limit
@@ -152,15 +159,12 @@ namespace cytolib
 		for(auto & sn : sample_names)
 		{
 			string cf_filename = (fs::path(path) / sn).string();
-			//init the output stream for gs
-			string filename = (fs::path(path) / sn).string() + ".pb";
-			ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
 			string buf;
 			google::protobuf::io::StringOutputStream raw_output(&buf);
 
 
 			pb::GatingHierarchy pb_gh;
-			getGatingHierarchy(sn)->convertToPb(pb_gh, cf_filename, cf_opt, is_skip_data);
+			getGatingHierarchy(sn)->convertToPb(pb_gh, cf_filename, cf_opt, is_skip_data, ctx);
 
 
 			bool success = writeDelimitedTo(pb_gh, raw_output);
@@ -169,6 +173,11 @@ namespace cytolib
 				google::protobuf::ShutdownProtobufLibrary();
 				throw(domain_error("Failed to write GatingHierarchy."));
 			}
+			//init the output stream for gs
+			string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
+			tiledb::VFS::filebuf sbuf(vfs);
+			sbuf.open(gh_pb_file, ios::out);
+			ostream output(&sbuf);
 			output.write(&buf[0], buf.size());
 
 		}
