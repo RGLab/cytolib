@@ -27,7 +27,6 @@ protected:
 	bool is_dirty_params;
 	bool is_dirty_keys;
 	bool is_dirty_pdata;
-	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 //	EVENT_DATA_VEC read_data(uvec col_idx) const{return EVENT_DATA_VEC();};
 	/*
 	 * storing context object itself doesn't make  mat_array_ptr_ safely copiable
@@ -215,13 +214,6 @@ public:
 			, bool init = true, CtxPtr ctxptr = CtxPtr(new tiledb::Context())):CytoFrame(),uri_(uri)
 	, readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), ctxptr_(ctxptr)
 	{
-		if(get_readonly())//disable file lock to avoid failure due to the lacking write permission
-		{
-			auto cfg = ctxptr_->config();
-			cfg["vfs.file.enable_filelocks"] = "false";
-			ctxptr_.reset(new tiledb::Context(cfg));
-		}
-		access_plist_ = FileAccPropList::DEFAULT;
 
 		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
 			init_load();
