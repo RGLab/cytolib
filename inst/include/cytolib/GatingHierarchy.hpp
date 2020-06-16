@@ -189,31 +189,10 @@ public:
 			//restore fr
 			if(!is_skip_data)
 			{
-				CytoFramePtr ptr;
-				auto fmt = uri_backend_type(uri);
-				tiledb::VFS vfs(*ctxptr);
-				bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
-				if(!is_exist)
-				 throw(domain_error("cytoframe file missing for sample: " + uri));
-				if(fmt == FileFormat::H5&&is_remote_path(uri))
-				{
-
-					 throw(domain_error("H5cytoframe doesn't support remote loading: " + uri));
-
-				}
-				else
-				{
-
-					if(fmt == FileFormat::H5)
-						ptr.reset(new H5CytoFrame(uri, readonly));
-					else
-						ptr.reset(new TileCytoFrame(uri, readonly, true, ctxptr));
-					pb::CytoFrame fr = *pb_gh.mutable_frame();
-					if(!fr.is_h5())
-					 ptr.reset(new MemCytoFrame(*ptr));
-
-
-				}
+				CytoFramePtr ptr = load_cytoframe(uri, readonly, ctxptr);
+				pb::CytoFrame fr = *pb_gh.mutable_frame();
+				if(!fr.is_h5())
+					ptr.reset(new MemCytoFrame(*ptr));
 				frame_ = CytoFrameView(ptr);
 			}
 		}

@@ -10,7 +10,8 @@
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #include "MemCytoFrame.hpp"
-
+#include "H5CytoFrame.hpp"
+#include "TileCytoFrame.hpp"
 namespace cytolib
 {
 class CytoFrameView{
@@ -256,6 +257,33 @@ public:
 
 	CytoFrameView copy(const string & cf_filename = "") const;
 };
+
+inline CytoFramePtr load_cytoframe(const string & uri, bool readonly = true, CtxPtr ctxptr = CtxPtr(new tiledb::Context()))
+{
+	 CytoFramePtr ptr;
+	 auto fmt = uri_backend_type(uri);
+	tiledb::VFS vfs(*ctxptr);
+	bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
+	if(!is_exist)
+	 throw(domain_error("cytoframe file missing for sample: " + uri));
+	if(fmt == FileFormat::H5&&is_remote_path(uri))
+	{
+
+		 throw(domain_error("H5cytoframe doesn't support remote loading: " + uri));
+
+	}
+	else
+	{
+
+		if(fmt == FileFormat::H5)
+			ptr.reset(new H5CytoFrame(uri, readonly));
+		else
+			ptr.reset(new TileCytoFrame(uri, readonly, true, ctxptr));
+
+	}
+	return ptr;
+}
+
 }
 
 
