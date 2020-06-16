@@ -258,12 +258,14 @@ public:
 	CytoFrameView copy(const string & cf_filename = "") const;
 };
 
-inline CytoFramePtr load_cytoframe(const string & uri, bool readonly = true, CtxPtr ctxptr = CtxPtr(new tiledb::Context()))
+inline CytoFramePtr load_cytoframe(const string & uri, bool readonly = true
+		, CtxPtr ctxptr = CtxPtr(new tiledb::Context()))
 {
 	 CytoFramePtr ptr;
-	 auto fmt = uri_backend_type(uri);
+
 	tiledb::VFS vfs(*ctxptr);
-	bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
+	 auto fmt = uri_backend_type(uri, vfs);
+	 bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
 	if(!is_exist)
 	 throw(domain_error("cytoframe file missing for sample: " + uri));
 	if(fmt == FileFormat::H5&&is_remote_path(uri))

@@ -52,14 +52,15 @@ namespace cytolib
 	{
 		return regex_search(path, regex("^((https)|(s3))(://)(.*)"));
 	}
-	FileFormat uri_backend_type(const string & path)
+	FileFormat uri_backend_type(const string & path, const tiledb::VFS & vfs)
 	{
-		if(regex_search(path, regex("(\\.tile)$")))
+//		if(regex_search(path, regex("(\\.tile)$")))
+		if(vfs.is_dir(path))
 			return FileFormat::TILE;
-		else if(regex_search(path, regex("(\\.h5)$")))
+		else// if(regex_search(path, regex("(\\.h5)$")))
 			return FileFormat::H5;
-		else
-			throw(domain_error("unknown backend type: " + path));
+//		else
+//			throw(domain_error("unknown backend type: " + path));
 	}
 	string fs_tmp_path()
 	{
