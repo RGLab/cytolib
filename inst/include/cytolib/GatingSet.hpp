@@ -254,6 +254,8 @@ public:
 					//conditional add gh
 					if(nSelect==0||sn_hash.find(sn)->second)
 					{
+						if(is_remote_path(path))
+							PRINT("loading: " + sn + " \n");
 						string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
 						sbuf.open(gh_pb_file, ios::in);
 						istream input(&sbuf);

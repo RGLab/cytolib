@@ -158,13 +158,17 @@ namespace cytolib
 		//due to the single string buffer used by lite-message won't be enough to hold the all samples for large dataset
 		for(auto & sn : sample_names)
 		{
+			auto gh = getGatingHierarchy(sn);
+			auto src_uri = gh->get_cytoframe_view_ref().get_uri();
+			if(is_remote_path(path)||is_remote_path(src_uri))
+				PRINT("saving: " + sn + " \n");
 			string cf_filename = (fs::path(path) / sn).string();
 			string buf;
 			google::protobuf::io::StringOutputStream raw_output(&buf);
 
 
 			pb::GatingHierarchy pb_gh;
-			getGatingHierarchy(sn)->convertToPb(pb_gh, cf_filename, cf_opt, is_skip_data, ctx);
+			gh->convertToPb(pb_gh, cf_filename, cf_opt, is_skip_data, ctx);
 
 
 			bool success = writeDelimitedTo(pb_gh, raw_output);
