@@ -307,7 +307,7 @@ namespace cytolib
 			else
 				ext = ".h5";
 
-			frame_.convertToPb(*fr_pb, cf_filename + ext, h5_opt);
+			frame_.convertToPb(*fr_pb, cf_filename + ext, h5_opt, ctx);
 		}
 
 

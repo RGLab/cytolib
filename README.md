@@ -17,9 +17,30 @@ See the included LICENSE file for details on the license granted to the user of 
 
 Otherwise, we may close your issue without responding.
 
-## Installation as a R package
-The **cytolib** package is installed via `R CMD INSTALL ...`. 
+## Install tiledb
 
+```
+git clone https://github.com/TileDB-Inc/TileDB --depth=1 --branch=dev --single-branch
+cd TiledB
+mkdir build
+cd build
+../bootstrap --prefix=/path/to/tiledb --enable-s3
+make
+make install-tiledb
+```
+
+## Installation as a R package
+The **cytolib** package can be installed from Github
+
+```
+    remotes::install_github("RGLab/cytolib")
+```
+If the TileDB library is installed in a custom location, you need to pass the explicit path:
+
+    remotes::install_github("RGLab/cytolib",
+        args="--configure-args='--with-tiledb=/path/to/tiledb'")
+
+N
 R packages wishing to use the libraries in `cytolib` need to:
 
 - add `cytolib` to **LinkingTo** field in the **DESCRIPTION** file so the compiler knows where to find the headers when the user package is complied
