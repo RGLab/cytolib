@@ -161,7 +161,7 @@ namespace cytolib
 			auto gh = getGatingHierarchy(sn);
 			auto src_uri = gh->get_cytoframe_view_ref().get_uri();
 			if(is_remote_path(path)||is_remote_path(src_uri))
-				PRINT("saving: " + sn + " \n");
+				PRINT("saving GatingHierarchy: " + sn + " \n");
 			string cf_filename = (fs::path(path) / sn).string();
 			string buf;
 			google::protobuf::io::StringOutputStream raw_output(&buf);

@@ -399,17 +399,15 @@ public:
 			if(file_opt != CytoFileOption::skip)
 			{
 				tiledb::VFS vfs(ctx);
-
 				auto filepath = fs::path(uri);
 				auto dest = filepath.parent_path();
-				//add extra / in case it is s3 path
-//				auto dest1 = dest;
-//				if(dest1. == "s3:")
-//					dest1[0] += "/";
-//				if(!vfs.is_dir(dest1.string()))
-//					throw(logic_error(dest1.string() + " doesn't exist!"));
-
-				if(!fs::equivalent(fs::path(uri_).parent_path(), dest))
+				auto src = fs::path(uri_).parent_path();
+				bool is_eq;
+				if(is_remote_path(uri)||is_remote_path(uri_))
+					is_eq = uri == uri_;
+				else
+					is_eq = fs::equivalent(src, dest);
+				if(!is_eq)
 				{
 					if(vfs.is_dir(uri))
 						vfs.remove_dir(uri);
@@ -418,7 +416,7 @@ public:
 					{
 					case CytoFileOption::copy:
 						{
-							write_tile(uri, *ctxptr_);
+							write_tile(uri, *ctxptr_);//todo:cp dir for more efficient operations
 							break;
 						}
 					case CytoFileOption::move:
