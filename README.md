@@ -17,7 +17,8 @@ See the included LICENSE file for details on the license granted to the user of 
 
 Otherwise, we may close your issue without responding.
 
-## Install tiledb
+## Install tiledb (optional)
+When `tiledb` library is detected from the system, `cytolib` will try to build against it so that tiledb can be used as the alternative backend format. To build tiledb from source:  
 
 ```
 git clone https://github.com/TileDB-Inc/TileDB --depth=1 --branch=dev --single-branch
