@@ -58,7 +58,7 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb
 			, const string & cf_filename
 			, CytoFileOption h5_opt
-			, const tiledb::Context & ctx = tiledb::Context()) const{
+			, const CTX & ctx = CTX()) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
 			if(h5_opt == CytoFileOption::copy||h5_opt == CytoFileOption::move)
@@ -120,7 +120,7 @@ public:
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
 	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
-			, const tiledb::Context ctx = tiledb::Context()) const
+			, const CTX ctx = CTX()) const
 	{
 		//create a mem-based cfv to avoid extra disk write IO from realization call
 		CytoFrameView cv(*this);
@@ -128,12 +128,8 @@ public:
 		//TODO:it would less overhead if we could have in-place realize method without creating the copy
 		auto cv1 = cv.copy_realized();
 		auto ptr = cv1.get_cytoframe_ptr();
-		if(format == FileFormat::H5)
-			ptr->write_h5(filename);
-		else
-		{
-			ptr->write_tile(filename, ctx);
-		}
+
+		ptr->write_to_disk(filename);
 
 	}
 
@@ -259,11 +255,11 @@ public:
 };
 
 inline CytoFramePtr load_cytoframe(const string & uri, bool readonly = true
-		, CtxPtr ctxptr = CtxPtr(new tiledb::Context()))
+		, CtxPtr ctxptr = CtxPtr(new CTX()))
 {
 	 CytoFramePtr ptr;
 
-	tiledb::VFS vfs(*ctxptr);
+	CYTOVFS vfs(*ctxptr);
 	 auto fmt = uri_backend_type(uri, vfs);
 	 bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
 	if(!is_exist)
@@ -280,7 +276,11 @@ inline CytoFramePtr load_cytoframe(const string & uri, bool readonly = true
 		if(fmt == FileFormat::H5)
 			ptr.reset(new H5CytoFrame(uri, readonly));
 		else
+#ifdef HAVE_TILEDB
 			ptr.reset(new TileCytoFrame(uri, readonly, true, ctxptr));
+#else
+			throw(domain_error("unsupported format: " + fmt_to_str(fmt)));
+#endif
 
 	}
 	return ptr;

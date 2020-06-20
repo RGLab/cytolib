@@ -262,7 +262,7 @@ namespace cytolib
 			, string cf_filename
 			, CytoFileOption h5_opt
 			, bool is_skip_data
-			, const tiledb::Context & ctx){
+			, const CTX & ctx){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
 		 * cp tree

@@ -66,7 +66,7 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb
 			, const string & h5_filename
 			, CytoFileOption h5_opt
-			, const tiledb::Context & ctx = tiledb::Context()) const;
+			, const CTX & ctx = CTX()) const;
 	unsigned n_rows() const;
 
 	void read_fcs();

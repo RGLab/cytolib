@@ -18,17 +18,10 @@ struct CFFixture{
 		//create h5 version
 		string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 //		cout << tmp << endl;
-		if(file_format == FileFormat::TILE)
-		{
-			fr.write_tile(tmp);
-			cf_disk.reset(new TileCytoFrame(tmp));
-		}
-		else
-		{
-			fr.write_h5(tmp);
-			cf_disk.reset(new H5CytoFrame(tmp));
+		fr.write_to_disk(tmp, file_format);
+		cf_disk = load_cytoframe(tmp);
 
-		}
+
 	};
 
 	~CFFixture(){
@@ -38,12 +31,13 @@ struct CFFixture{
 	FileFormat file_format = FileFormat::TILE;
 //	FileFormat file_format = FileFormat::H5;
 //	unique_ptr<H5CytoFrame> cf_disk;
-	unique_ptr<CytoFrame> cf_disk;
+	CytoFramePtr cf_disk;
    string file_path;
    FCS_READ_PARAM config;
 };
 
 BOOST_FIXTURE_TEST_SUITE(CytoFrame_test,CFFixture)
+#ifdef HAVE_TILEDB
 BOOST_AUTO_TEST_CASE(TileCytoFrameconstructor)
 {
 //	TileCytoFrame cf = *(dynamic_cast<TileCytoFrame*>(cf_disk.get()));
@@ -54,8 +48,8 @@ BOOST_AUTO_TEST_CASE(TileCytoFrameconstructor)
 //	auto path = file_path;
 //	auto cf = TileCytoFrame(path, config, tmp);
 	auto path = "/tmp/Rtmprb2X3k/file1be46cf4a372.tile";
-	auto cf = TileCytoFrame(path, true);
-	auto dat = cf.get_data();
+	auto cf = load_cytoframe(path, true);
+	auto dat = cf->get_data();
 }
 BOOST_AUTO_TEST_CASE(tile_write_block_test)
 {
@@ -222,6 +216,7 @@ BOOST_AUTO_TEST_CASE(s3)
 
 
 }
+#endif
 BOOST_AUTO_TEST_CASE(spillover)
 {
 	auto comp = fr.get_compensation();
@@ -371,16 +366,8 @@ BOOST_AUTO_TEST_CASE(subset_by_cols)
 
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 	shared_ptr<CytoFrame> cf;;
-	if(file_format == FileFormat::TILE)
-	{
-		cr_new.write_to_disk(tmp, FileFormat::TILE);
-		cf.reset(new TileCytoFrame(tmp));
-	}
-	else
-	{
-		cr_new.write_to_disk(tmp, FileFormat::H5);
-		cf.reset(new H5CytoFrame(tmp));
-	}
+	cr_new.write_to_disk(tmp, file_format);
+	cf = load_cytoframe(tmp);
 
 	BOOST_CHECK_EQUAL(cf->n_cols(), sub_channels.size());
 }
@@ -403,10 +390,7 @@ BOOST_AUTO_TEST_CASE(subset_by_rows)
 	string tmp = generate_unique_filename(fs::temp_directory_path().string(), "", ".h5");
 	cr_new.write_to_disk(tmp);
 	CytoFramePtr cf;
-	if(file_format==FileFormat::H5)
-		cf.reset(new H5CytoFrame(tmp));
-	else
-		cf.reset(new TileCytoFrame(tmp));
+	cf = load_cytoframe(tmp);
 	BOOST_CHECK_EQUAL(cf->n_rows(), 3);
 	uvec idx = {};
 	auto cf1 = cf->copy(idx, idx, "", false);
@@ -453,18 +437,12 @@ BOOST_AUTO_TEST_CASE(set_channel)
 
 	//h5 is not synced by setter immediately
 	shared_ptr<CytoFrame> fr3;
-	if(file_format == FileFormat::H5)
-		fr3.reset(new H5CytoFrame (tmp));
-	else
-		fr3.reset(new TileCytoFrame(tmp));
+	fr3 = load_cytoframe(tmp);
 	BOOST_CHECK_EQUAL(fr3->get_col_idx(newname, ColType::channel), -1);
 	BOOST_CHECK_EQUAL(fr3->get_keyword("$P3N"), oldname);
 	//cached meta data is NoT flushed to h5 even when the object is destroyed
 	fr2.reset();
-	if(file_format == FileFormat::H5)
-		fr3.reset(new H5CytoFrame (tmp));
-	else
-		fr3.reset(new TileCytoFrame(tmp));
+	fr3 = load_cytoframe(tmp);
 	BOOST_CHECK_GT(fr3->get_col_idx(oldname, ColType::channel), 0);
 	BOOST_CHECK_EQUAL(fr3->get_keyword("$P3N"), oldname);
 
@@ -478,8 +456,12 @@ BOOST_AUTO_TEST_CASE(shallow_copy)
 	if(file_format == FileFormat::H5)
 		fr1.reset(new H5CytoFrame(*dynamic_cast<H5CytoFrame*>(fr_orig.get())));
 	else
+#ifdef HAVE_TILEDB
 		fr1.reset(new TileCytoFrame(*dynamic_cast<TileCytoFrame*>(fr_orig.get())));
+#else
+	throw(domain_error("unsupported format: " + fmt_to_str(file_format)));
 
+#endif
 
 
 	//update meta data
@@ -582,10 +564,7 @@ BOOST_AUTO_TEST_CASE(flush_meta)
 	fr1.reset();
 	//load it back and see the change has NOT taken effect
 	//perform shallow copy
-	if(file_format == FileFormat::H5)
-		fr1.reset(new H5CytoFrame(h5file));
-	else
-		fr1.reset(new TileCytoFrame(h5file));
+	fr1 = load_cytoframe(h5file);
 
 
 	BOOST_CHECK_EQUAL(fr1->get_channels()[2], newname);

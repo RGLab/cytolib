@@ -23,7 +23,7 @@ namespace cytolib
 	void GatingSet::serialize_pb(string path
 			, CytoFileOption cf_opt
 			, bool is_skip_data
-			, const tiledb::Context & ctx)
+			, const CTX & ctx)
 	{
 		/*
 		 * validity check for path
@@ -35,7 +35,7 @@ namespace cytolib
 		}
 
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
-		tiledb::VFS vfs(ctx);
+		CYTOVFS vfs(ctx);
 		if(vfs.is_dir(path))
 		{
 			auto files = vfs.ls(path);
@@ -148,9 +148,13 @@ namespace cytolib
 		}
 		//init the output stream for gs
 		string gs_pb_file = (fs::path(path) / uid_).string() + ".gs";
-		tiledb::VFS::filebuf sbuf(vfs);
+#ifdef HAVE_TILEDB
+		CYTOVFS::filebuf sbuf(vfs);
 		sbuf.open(gs_pb_file, ios::out);
 		ostream output(&sbuf);
+#else
+		ofstream output(gs_pb_file, ios::out | ios::binary);
+#endif
 		output.write(&buf[0], buf.size());
 
 		//write each gh as a separate message to stream due to the pb message size limit
@@ -179,9 +183,14 @@ namespace cytolib
 			}
 			//init the output stream for gs
 			string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
-			tiledb::VFS::filebuf sbuf(vfs);
+#ifdef HAVE_TILEDB
+			CYTOVFS::filebuf sbuf(vfs);
 			sbuf.open(gh_pb_file, ios::out);
 			ostream output(&sbuf);
+#else
+			ofstream output(gh_pb_file, ios::out | ios::binary);
+#endif
+
 			output.write(&buf[0], buf.size());
 
 		}

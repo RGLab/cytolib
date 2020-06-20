@@ -52,7 +52,7 @@ namespace cytolib
 	{
 		return regex_search(path, regex("^((https)|(s3))(://)(.*)"));
 	}
-	FileFormat uri_backend_type(const string & path, const tiledb::VFS & vfs)
+	FileFormat uri_backend_type(const string & path, const CYTOVFS & vfs)
 	{
 //		if(regex_search(path, regex("(\\.tile)$")))
 		if(vfs.is_dir(path))

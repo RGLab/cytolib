@@ -30,7 +30,6 @@ enum DataTypeLocation {MEM, H5};
 
 typedef unordered_map<string, string> PDATA;
 
-typedef shared_ptr<tiledb::Context> CtxPtr;
 const H5std_string  DATASET_NAME( "data");
 
 /*
@@ -109,7 +108,7 @@ public:
 	virtual void convertToPb(pb::CytoFrame & fr_pb
 			, const string & cf_filename
 			, CytoFileOption h5_opt
-			, const tiledb::Context & ctx = tiledb::Context()) const = 0;
+			, const CTX & ctx = CTX()) const = 0;
 
 	virtual void set_readonly(bool flag){
 	}
@@ -139,6 +138,22 @@ public:
 	CompType get_h5_datatype_params(DataTypeLocation storage_type) const;
 	CompType get_h5_datatype_keys() const;
 	virtual void write_h5_params(H5File file) const;
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
+				, const CTX ctx = CTX()) const
+		{
+
+			if(format == FileFormat::H5)
+				write_h5(filename);
+			else
+			{
+#ifdef HAVE_TILEDB
+				write_tile(filename, ctx);
+#else
+				throw(domain_error("unsupported format: " + fmt_to_str(format)));
+#endif
+			}
+
+		}
 	/**
 	 * Convert string to cstr in params for writing to h5
 	 * @return
@@ -166,10 +181,13 @@ public:
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
-	void write_tile(const string & uri, const tiledb::Context & ctx = tiledb::Context()) const
+
+#ifdef HAVE_TILEDB
+
+	void write_tile(const string & uri, const CTX & ctx = CTX()) const
 	{
-		tiledb::VFS vfs(ctx);
-//		tiledb::VFS::filebuf buf(vfs);
+		CYTOVFS vfs(ctx);
+//		CYTOVFS::filebuf buf(vfs);
 
 		if(vfs.is_dir(uri))
 		{
@@ -187,16 +205,16 @@ public:
 
 		write_tile_kw(uri, ctx, true);
 	}
-	void write_tile_data(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
+	void write_tile_data(const string & uri, const CTX & ctx, bool is_new = false) const
 	{
 		write_tile_data(uri, get_data(), ctx, is_new);
 	}
-	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const tiledb::Context & ctx, bool is_new = false) const
+	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const CTX & ctx, bool is_new = false) const
 	{
 		int nEvents = n_rows();
 		int nch = n_cols();
 		auto array_uri = (fs::path(uri) / "mat").string();
-		tiledb::VFS vfs(ctx);
+		CYTOVFS vfs(ctx);
 		if(is_new)
 		{
 			if(vfs.is_dir(array_uri))
@@ -249,9 +267,9 @@ public:
 
 	}
 
-	void write_tile_pd(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
+	void write_tile_pd(const string & uri, const CTX & ctx, bool is_new = false) const
 	{
-		tiledb::VFS vfs(ctx);
+		CYTOVFS vfs(ctx);
 		auto array_uri = (fs::path(uri) / "pdata").string();
 		if(is_new)
 		{
@@ -276,9 +294,9 @@ public:
 
 	}
 
-	void write_tile_kw(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
+	void write_tile_kw(const string & uri, const CTX & ctx, bool is_new = false) const
 	{
-		tiledb::VFS vfs(ctx);
+		CYTOVFS vfs(ctx);
 		auto array_uri = (fs::path(uri) / "keywords").string();
 		if(is_new)
 		{
@@ -305,13 +323,13 @@ public:
 		}//TODO:switch to TILEDB_STRING_UTF16
 //		array.consolidate_metadata(ctx, array_uri);
 	}
-	void write_tile_params(const string & uri, const tiledb::Context & ctx, bool is_new = false) const
+	void write_tile_params(const string & uri, const CTX & ctx, bool is_new = false) const
 	{
 
 		auto array_uri = (fs::path(uri) / "params").string();
 
 		int nch = n_cols();
-		tiledb::VFS vfs(ctx);
+		CYTOVFS vfs(ctx);
 		if(is_new)
 		{
 			if(vfs.is_dir(array_uri))
@@ -387,6 +405,7 @@ public:
 			//TODO:switch to TILEDB_STRING_UTF16
 		}
 	}
+#endif
 	/**
 	 * get the data of entire event matrix
 	 * @return

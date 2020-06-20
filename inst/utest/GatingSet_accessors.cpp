@@ -21,6 +21,8 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
+#ifdef HAVE_TILEDB
+
 BOOST_AUTO_TEST_CASE(s3_gs)
 {
 
@@ -56,6 +58,7 @@ BOOST_AUTO_TEST_CASE(s3_gs)
 //
 
 }
+#endif
 BOOST_AUTO_TEST_CASE(remove_node)
 {
 	auto gs1 = gs.copy();

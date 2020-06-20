@@ -64,7 +64,7 @@ public:
 	string get_uid(){return uid_;}
 	void set_uid(const string & uid){uid_ = uid;}
 
-	GatingSet(CtxPtr ctxptr= CtxPtr(new tiledb::Context())):ctxptr_(ctxptr){
+	GatingSet(CtxPtr ctxptr= CtxPtr(new CTX())):ctxptr_(ctxptr){
 
 		uid_ = generate_uid();
 	};
@@ -76,7 +76,7 @@ public:
 	 */
 	void serialize_pb(string path, CytoFileOption h5_opt
 			, bool is_skip_data = false
-			, const tiledb::Context & ctx = tiledb::Context());
+			, const CTX & ctx = CTX());
 	/**
 	 * constructor from the archives (de-serialization)
 	 * @param path
@@ -90,7 +90,7 @@ public:
 			, bool readonly = true
 			, vector<string> select_samples = {}
 			, bool print_lib_ver = false
-			, CtxPtr ctxptr= CtxPtr(new tiledb::Context())):ctxptr_(ctxptr)
+			, CtxPtr ctxptr= CtxPtr(new CTX())):ctxptr_(ctxptr)
 	{
 
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
@@ -100,7 +100,7 @@ public:
 		FileFormat fmt;
 		bool is_first_sample = true;
 		//search for h5
-		tiledb::VFS vfs(*ctxptr);
+		CYTOVFS vfs(*ctxptr);
 		for(auto & e : vfs.ls(path))
 		{
 			fs::path p(e);
@@ -181,10 +181,14 @@ public:
 			}
 
 			GOOGLE_PROTOBUF_VERIFY_VERSION;
-			tiledb::VFS::filebuf sbuf(vfs);
+
+#ifdef HAVE_TILEDB
+			CYTOVFS::filebuf sbuf(vfs);
 			sbuf.open(gs_pb_file, ios::in);
 			istream input(&sbuf);
-
+#else
+			ifstream input(gs_pb_file, ios::in | ios::binary);
+#endif
 			if (!input) {
 				throw(invalid_argument("File not found.." + gs_pb_file.string()));
 			} else{
@@ -257,8 +261,14 @@ public:
 						if(is_remote_path(path))
 							PRINT("loading GatingHierarchy: " + sn + " \n");
 						string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
-						sbuf.open(gh_pb_file, ios::in);
-						istream input(&sbuf);
+
+#ifdef HAVE_TILEDB
+			sbuf.open(gh_pb_file, ios::in);
+			istream input(&sbuf);
+#else
+			ifstream input(gh_pb_file, ios::in | ios::binary);
+#endif
+
 
 						if (!input) {
 							throw(invalid_argument("File not found.." + gh_pb_file));
@@ -281,7 +291,7 @@ public:
 						pb::CytoFrame fr = *gh_pb.mutable_frame();
 
 						string uri;
-						auto cf_ext = fmt == FileFormat::H5?".h5":".tile";
+						auto cf_ext = "." + fmt_to_str(fmt);
 						uri = (fs::path(path) / (sn + cf_ext)).string();
 						add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(ctxptr_, gh_pb, uri, is_skip_data, readonly)), sn);
 						}
@@ -592,14 +602,14 @@ public:
 	GatingSet(const vector<pair<string,string>> & sample_uid_vs_file_path
 			, const FCS_READ_PARAM & config = FCS_READ_PARAM()
 			, FileFormat fmt = FileFormat::H5, string cf_dir = fs_tmp_path()
-			, CtxPtr ctxptr= CtxPtr(new tiledb::Context())):GatingSet(ctxptr)
+			, CtxPtr ctxptr= CtxPtr(new CTX())):GatingSet(ctxptr)
 	{
 		add_fcs(sample_uid_vs_file_path, config, fmt, cf_dir, false, ctxptr);
 	}
 	GatingSet(const vector<string> & file_paths
 			, const FCS_READ_PARAM & config= FCS_READ_PARAM()
 			, FileFormat fmt = FileFormat::H5, string cf_dir = fs_tmp_path()
-			, CtxPtr ctxptr = CtxPtr(new tiledb::Context())):GatingSet(ctxptr)
+			, CtxPtr ctxptr = CtxPtr(new CTX())):GatingSet(ctxptr)
 	{
 		vector<pair<string,string>> map(file_paths.size());
 		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
@@ -609,7 +619,7 @@ public:
 	void add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path
 			, const FCS_READ_PARAM & config, FileFormat fmt, string cf_dir
 			, bool readonly = false
-			, CtxPtr ctxptr = CtxPtr(new tiledb::Context()))
+			, CtxPtr ctxptr = CtxPtr(new CTX()))
 	{
 
 		fs::path cf_path;
@@ -626,17 +636,11 @@ public:
 			dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
 
 			string cf_filename = (cf_path/it.first).string();
-			if(fmt == FileFormat::H5)
+			if(fmt != FileFormat::MEM)
 			{
-				cf_filename += ".h5";
-				fr_ptr->write_h5(cf_filename);
-				fr_ptr.reset(new H5CytoFrame(cf_filename, readonly));
-			}
-			else if(fmt == FileFormat::TILE)
-			{
-				cf_filename += ".tile";
-				fr_ptr->write_tile(cf_filename);
-				fr_ptr.reset(new TileCytoFrame(cf_filename, readonly, true, ctxptr));
+				cf_filename += "." + fmt_to_str(fmt);
+				fr_ptr->write_to_disk(cf_filename, fmt, *ctxptr);
+				fr_ptr = load_cytoframe(cf_filename, readonly, ctxptr);
 			}
 
 			add_cytoframe_view(it.first, CytoFrameView(fr_ptr));

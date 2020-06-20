@@ -10,7 +10,7 @@
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/global.hpp>
 
-
+#ifdef HAVE_TILEDB
 namespace cytolib
 {
 /**
@@ -635,5 +635,5 @@ public:
 
 
 
-
+#endif
 #endif /* INST_INCLUDE_CYTOLIB_TILECYTOFRAME_HPP_ */

@@ -18,7 +18,9 @@
 #include <chrono>
 #include <unordered_set>
 #include "datatype.hpp"
-#include <tiledb/tiledb>
+#ifdef HAVE_TILEDB
+	#include <tiledb/tiledb>
+#endif
 
 using namespace std;
 #include <experimental/filesystem>
@@ -26,8 +28,73 @@ namespace fs = std::experimental::filesystem::v1;
 
 namespace cytolib
 {
+#ifdef HAVE_TILEDB
+
+	typedef tiledb::Context CTX;
+
+	typedef tiledb::VFS CYTOVFS;
+#else
+	class CTX //dummy ctx
+	{
+
+	};
+	/**
+	 * dummy wrapper class around std::fs to mimic tiledb::VFS api
+	 */
+	class CYTOVFS
+	{
+	public:
+		CYTOVFS(CTX ctx)
+		{
+
+		}
+		vector<string> ls(string p)
+		{
+
+			vector<string>res;
+			for(auto e : fs::directory_iterator(p))
+				res.push_back(fs::path(e).string());
+			return res;
+		}
+		bool is_dir(string p) const
+		{
+
+			return fs::is_directory(p);
+		}
+		bool is_file(string p)
+		{
+			return !fs::is_directory(p)&&fs::exists(p);
+		}
+		void remove_dir(string p){
+			fs::remove_all(p);
+		}
+		bool create_dir(string p){
+			return fs::create_directory(p);
+			}
+		void move_dir(string p, string p1){
+			fs::rename(p, p1);
+				}
+		int file_size(string p){
+			return fs::file_size(p);
+				}
+	};
+#endif
+	typedef shared_ptr<CTX> CtxPtr;
 	enum class FileFormat {TILE, H5, MEM};
-	FileFormat uri_backend_type(const string & path, const tiledb::VFS & vfs);
+	inline string fmt_to_str(FileFormat fmt)
+	{
+		switch(fmt)
+		{
+		case FileFormat::H5:
+			return "h5";
+		case FileFormat::TILE:
+			return "tile";
+		default:
+			throw(domain_error("can't convert fmt to str"));
+		}
+
+	}
+	FileFormat uri_backend_type(const string & path, const CYTOVFS & vfs);
 	string s3_to_http(string uri);
 
 	bool is_remote_path(const string &);

@@ -157,7 +157,7 @@ public:
 	 */
 	void convertToPb(pb::GatingHierarchy & gh_pb, string uri, CytoFileOption h5_opt
 			, bool is_skip_data = false
-			, const tiledb::Context & ctx = tiledb::Context());
+			, const CTX & ctx = CTX());
 	GatingHierarchy(CtxPtr ctxptr, pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
 			, bool readonly = true){
 			const pb::populationTree & tree_pb =  pb_gh.tree();
