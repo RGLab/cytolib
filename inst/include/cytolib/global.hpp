@@ -31,12 +31,25 @@ namespace cytolib
 #ifdef HAVE_TILEDB
 
 	typedef tiledb::Context CTX;
-
+	typedef tiledb::Config CFG;
 	typedef tiledb::VFS CYTOVFS;
 #else
+
+	class CFG //dummy cfg
+	{
+		string ref;
+	public:
+		 string & operator[](const std::string& param)
+		{
+			return ref;
+		}
+
+	};
 	class CTX //dummy ctx
 	{
-
+	public:
+		CTX(){};
+		CTX(CFG cfg){};
 	};
 	/**
 	 * dummy wrapper class around std::fs to mimic tiledb::VFS api
