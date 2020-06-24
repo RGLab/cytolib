@@ -129,7 +129,7 @@ public:
 		auto cv1 = cv.copy_realized();
 		auto ptr = cv1.get_cytoframe_ptr();
 
-		ptr->write_to_disk(filename);
+		ptr->write_to_disk(filename, format, ctx);
 
 	}
 

@@ -33,7 +33,7 @@ namespace cytolib
 		case FileFormat::TILE:
 			return "tile";
 		default:
-			throw(domain_error("can't convert fmt to str"));
+			return "mem";
 		}
 
 	}
