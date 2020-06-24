@@ -70,7 +70,8 @@ struct OurVertexPropertyWriterR {
 class GatingHierarchy;
 typedef shared_ptr<GatingHierarchy> GatingHierarchyPtr;
 
-
+CytoFramePtr load_cytoframe(const string & uri, bool readonly = true
+			, CytoCtx ctxptr = CytoCtx());
 /**
  ** \class GatingHierarchy
  **
@@ -157,8 +158,8 @@ public:
 	 */
 	void convertToPb(pb::GatingHierarchy & gh_pb, string uri, CytoFileOption h5_opt
 			, bool is_skip_data = false
-			, const CTX & ctx = CTX());
-	GatingHierarchy(CtxPtr ctxptr, pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
+			, const CytoCtx & ctx = CytoCtx());
+	GatingHierarchy(CytoCtx ctx, pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
 			, bool readonly = true){
 			const pb::populationTree & tree_pb =  pb_gh.tree();
 			int nNodes = tree_pb.node_size();
@@ -189,7 +190,7 @@ public:
 			//restore fr
 			if(!is_skip_data)
 			{
-				CytoFramePtr ptr = load_cytoframe(uri, readonly, ctxptr);
+				CytoFramePtr ptr = load_cytoframe(uri, readonly, ctx);
 				pb::CytoFrame fr = *pb_gh.mutable_frame();
 				if(!fr.is_h5())
 					ptr.reset(new MemCytoFrame(*ptr));

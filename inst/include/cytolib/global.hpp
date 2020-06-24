@@ -18,81 +18,11 @@
 #include <chrono>
 #include <unordered_set>
 #include "datatype.hpp"
-#ifdef HAVE_TILEDB
-	#include <tiledb/tiledb>
-#endif
-
+#include "CytoVFS.hpp"
 using namespace std;
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem::v1;
 
 namespace cytolib
 {
-#ifdef HAVE_TILEDB
-
-	typedef tiledb::Context CTX;
-	typedef tiledb::Config CFG;
-	typedef tiledb::VFS CYTOVFS;
-#else
-
-	class CFG //dummy cfg
-	{
-		string ref;
-	public:
-		 string & operator[](const std::string& param)
-		{
-			return ref;
-		}
-
-	};
-	class CTX //dummy ctx
-	{
-	public:
-		CTX(){};
-		CTX(CFG cfg){};
-	};
-	/**
-	 * dummy wrapper class around std::fs to mimic tiledb::VFS api
-	 */
-	class CYTOVFS
-	{
-	public:
-		CYTOVFS(CTX ctx)
-		{
-
-		}
-		vector<string> ls(string p)
-		{
-
-			vector<string>res;
-			for(auto e : fs::directory_iterator(p))
-				res.push_back(fs::path(e).string());
-			return res;
-		}
-		bool is_dir(string p) const
-		{
-
-			return fs::is_directory(p);
-		}
-		bool is_file(string p)
-		{
-			return !fs::is_directory(p)&&fs::exists(p);
-		}
-		void remove_dir(string p){
-			fs::remove_all(p);
-		}
-		bool create_dir(string p){
-			return fs::create_directory(p);
-			}
-		void move_dir(string p, string p1){
-			fs::rename(p, p1);
-				}
-		int file_size(string p){
-			return fs::file_size(p);
-				}
-	};
-#endif
-	typedef shared_ptr<CTX> CtxPtr;
 	enum class FileFormat {TILE, H5, MEM};
 	inline string fmt_to_str(FileFormat fmt)
 	{
@@ -107,25 +37,11 @@ namespace cytolib
 		}
 
 	}
-	FileFormat uri_backend_type(const string & path, const CYTOVFS & vfs);
+	FileFormat uri_backend_type(const string & path, const CytoVFS & vfs);
 	string s3_to_http(string uri);
 
 	bool is_remote_path(const string &);
-	struct S3Cred
-	{
-		string access_key_id_;
-		string access_key_;
-		string region_;
-		S3Cred()
-		{
-			access_key_id_ = "";
-			access_key_ = "";
-			region_ = "us-west-1";
-		}
-		S3Cred(const string & secret_id
-				, const string & secret_key
-				, const string & aws_region):access_key_id_(secret_id), access_key_(secret_key), region_(aws_region){};
-	};
+
 	#define GATING_SET_LEVEL 1
 	#define GATING_HIERARCHY_LEVEL 2
 	#define POPULATION_LEVEL 3

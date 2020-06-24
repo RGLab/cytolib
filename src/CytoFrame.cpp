@@ -278,6 +278,269 @@ namespace cytolib
 		dataset.write(dat.mem, h5_datatype_data(DataTypeLocation::MEM));
 	}
 
+#ifdef HAVE_TILEDB
+#include <tiledb/tiledb>
+	void CytoFrame::write_tile(const string & uri, const CytoCtx & cytoctx) const
+	{
+		CytoVFS vfs(cytoctx);
+//		CytoVFS::filebuf buf(vfs);
+
+		if(vfs.is_dir(uri))
+		{
+			PRINT("overwriting the existing folder " + uri + "!\n");
+			vfs.remove_dir(uri);
+		}
+
+		vfs.create_dir(uri);
+
+		write_tile_data(uri, cytoctx, true);
+
+		write_tile_pd(uri, cytoctx, true);
+
+		write_tile_params(uri, cytoctx, true);
+
+		write_tile_kw(uri, cytoctx, true);
+	}
+	void CytoFrame::write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new)  const
+	{
+		write_tile_data(uri, get_data(), cytoctx, is_new);
+	}
+	void CytoFrame::write_tile_data(const string & uri, const EVENT_DATA_VEC & _data
+			, const CytoCtx & cytoctx, bool is_new) const
+	{
+		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
+
+		int nEvents = n_rows();
+		int nch = n_cols();
+		auto array_uri = (fs::path(uri) / "mat").string();
+		tiledb::VFS vfs(ctx);
+		if(is_new)
+		{
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
+			tiledb::Domain domain(ctx);
+			//2k is to meet 64k minimal recommended tile size to fit into L1 cache
+			auto ncell = nEvents==0?1:nEvents;
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, ncell}, ncell)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch==0?1:nch}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "mat"));
+			schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+			tiledb::Array::create(array_uri, schema);
+		}
+
+		if(nch * nEvents>0)
+		{
+			tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
+			tiledb::Query query(ctx, array);
+			query.set_layout(TILEDB_GLOBAL_ORDER);
+			//global order write require subarray to match the boundary
+//			std::vector<int> subarray = {1, nEvents, 1, nch};
+//			query.set_subarray(subarray);
+			//convert to float
+			vector<float> buf(_data.mem, _data.mem + nch * nEvents);
+
+			query.set_buffer("mat", buf);
+			query.submit();
+			query.finalize();
+		}
+	}
+
+	void delete_tile_meta(tiledb::Array &array)
+	{
+		tiledb_datatype_t v_type;
+		uint32_t v_num;
+		const void* v;
+		uint64_t num = array.metadata_num();
+		vector<string> key(num);
+		for (uint64_t i = 0; i < num; ++i) {
+			array.get_metadata_from_index(i, &key[i], &v_type, &v_num, &v);
+
+		}
+		array.close();
+		array.open(TILEDB_WRITE);
+		for(auto i : key)
+			array.delete_metadata(i);
+
+	}
+
+	void CytoFrame::write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new) const
+	{
+		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
+
+		tiledb::VFS vfs(ctx);
+		auto array_uri = (fs::path(uri) / "pdata").string();
+		if(is_new)
+		{
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
+			//dummy array
+			tiledb::Domain domain(ctx);
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "pd", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
+	//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+			tiledb::Array::create(array_uri, schema);
+		}
+		tiledb::Array array(ctx, array_uri, TILEDB_READ);
+		delete_tile_meta(array);
+
+		for(auto it : pheno_data_)
+			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());//TODO:switch to TILEDB_STRING_UTF16
+		//TODO:switch to TILEDB_STRING_UTF16
+
+	}
+
+	void CytoFrame::write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new) const
+	{
+		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
+
+		tiledb::VFS vfs(ctx);
+		auto array_uri = (fs::path(uri) / "keywords").string();
+		if(is_new)
+		{
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
+			tiledb::Domain domain(ctx);
+			//dummy array
+			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "kw", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
+	//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+			tiledb::Array::create(array_uri, schema);
+		}
+		tiledb::Array array(ctx, array_uri, TILEDB_READ);
+		delete_tile_meta(array);
+
+		for(auto it : keys_)
+		{
+//			if(it.first == "$BEGINDATA"||it.second=="2589"||it.second=="")
+//				cout << it.first << ":" << it.second << endl;;
+			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());
+		}//TODO:switch to TILEDB_STRING_UTF16
+//		array.consolidate_metadata(ctx, array_uri);
+	}
+	void CytoFrame::write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new) const
+	{
+		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
+
+		auto array_uri = (fs::path(uri) / "params").string();
+
+		int nch = n_cols();
+		tiledb::VFS vfs(ctx);
+		if(is_new)
+		{
+			if(vfs.is_dir(array_uri))
+				throw(domain_error("Can't  because it already exists!"));
+			tiledb::Domain domain(ctx);
+			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch==0?1:nch}, 1); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+			domain.add_dimension(a1); // @suppress("Invalid arguments")
+
+			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
+			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
+			tiledb::Array::create(array_uri, schema);
+		}
+		if(nch>0)
+		{
+
+			tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
+			tiledb::Query query(ctx, array);
+			query.set_layout(TILEDB_GLOBAL_ORDER);
+			vector<float> min_vec(nch);
+			for(int i = 0; i < nch; i++)
+				min_vec[i] = params[i].min;
+			query.set_buffer("min", min_vec);
+			vector<float> max_vec(nch);
+			for(int i = 0; i < nch; i++)
+				max_vec[i] = params[i].max;
+			query.set_buffer("max", max_vec);
+	//		vector<char> ch_vec;
+	//		vector<uint64_t> off(nch, 0);
+	//		//need this to preserve the channel order
+	//		for(int i = 0; i < nch; i++)
+	//		{
+	//			auto nchar = params[i].channel.size();
+	//			if(i > 0)
+	//				off[i] = off[i-1] + params[i-1].channel.size();
+	//			ch_vec.resize(ch_vec.size() + nchar);
+	//			memcpy(&ch_vec[off[i]], &params[i].channel[0], nchar * sizeof(char));
+	//		}
+	//		query.set_buffer("channel", off, ch_vec);
+			query.submit();
+			query.finalize();
+
+			//attach marker as meta since val-length writing to arry attr is not feasible
+			//due to empty markers do not meet the strict ascending buffer offset requirement
+			array.close();
+			array.open(TILEDB_READ);
+			delete_tile_meta(array);
+			for(auto it : params)
+			{
+				array.put_metadata(it.channel, TILEDB_CHAR, it.marker.size(), it.marker.c_str());
+			}
+
+			//hack to preserve channel order
+			array_uri = (fs::path(uri) / "channel_idx").string();
+			if(!vfs.is_dir(array_uri))
+			{
+				tiledb::Domain domain(ctx);
+				//dummy array
+				domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cidx", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+				tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+				schema.set_domain(domain);
+				schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
+		//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+				tiledb::Array::create(array_uri, schema);
+			}
+			tiledb::Array array1(ctx, array_uri, TILEDB_READ);
+			delete_tile_meta(array1);
+
+			for(int i = 0; i < nch; i++)
+				array1.put_metadata(params[i].channel, TILEDB_INT32, 1, &i);
+			//TODO:switch to TILEDB_STRING_UTF16
+		}
+	}
+#else
+	void CytoFrame::write_tile(const string & uri, const CytoCtx & cytoctx) const
+	{
+		throw(domain_error("cytolib is not built with tiledb support!"));
+	}
+	void CytoFrame::write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	{
+			throw(domain_error("cytolib is not built with tiledb support!"));
+		}
+	void CytoFrame::write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const CytoCtx & cytoctx, bool is_new) const;
+	{
+			throw(domain_error("cytolib is not built with tiledb support!"));
+		}
+//	void delete_tile_meta(tiledb::Array &array) const;
+	void CytoFrame::write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	{
+			throw(domain_error("cytolib is not built with tiledb support!"));
+		}
+	void CytoFrame::write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	{
+			throw(domain_error("cytolib is not built with tiledb support!"));
+		}
+	void CytoFrame::write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	{
+			throw(domain_error("cytolib is not built with tiledb support!"));
+		}
+
+
+#endif
+
+
+
 	/**
 	 * extract the value of the single keyword by keyword name
 	 *

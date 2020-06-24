@@ -258,7 +258,7 @@ namespace cytolib
 	void MemCytoFrame::convertToPb(pb::CytoFrame & fr_pb
 			, const string & h5_filename
 			, CytoFileOption h5_opt
-			, const CTX & ctx) const
+			, const CytoCtx & ctx) const
 	{
 		fr_pb.set_is_h5(false);
 		if(h5_opt != CytoFileOption::skip)

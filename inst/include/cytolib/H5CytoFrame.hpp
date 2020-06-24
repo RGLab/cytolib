@@ -216,7 +216,7 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb
 			, const string & h5_filename
 			, CytoFileOption h5_opt
-			, const CTX & ctx = CTX()) const
+			, const CytoCtx & ctx = CytoCtx()) const
 	{
 			fr_pb.set_is_h5(true);
 			if(h5_opt != CytoFileOption::skip)

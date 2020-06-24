@@ -144,22 +144,18 @@ BOOST_AUTO_TEST_CASE(tile)
 {
 //	auto uri = "s3://mike-h5/file24ad1cad7ca7.tile";
 	auto uri = "/tmp/test.tile";
-	tiledb::Config cfg;
-	cfg["vfs.s3.aws_access_key_id"] =  string(std::getenv("AWS_ACCESS_KEY_ID"));
-	cfg["vfs.s3.aws_secret_access_key"] =  string(std::getenv("AWS_SECRET_ACCESS_KEY"));
-
-	cfg["vfs.s3.region"] = "us-west-1";
-
-	CtxPtr ctx(new tiledb::Context(cfg));
-
-	tiledb::VFS vfs(*ctx);
+	CytoCtx ctx(string(std::getenv("AWS_ACCESS_KEY_ID"))
+					, string(std::getenv("AWS_SECRET_ACCESS_KEY"))
+					, "us-west-1"
+					);
+	CytoVFS vfs(ctx);
 
 	if(vfs.is_dir(uri))
 		vfs.remove_dir(uri);
 	auto h5 = "/tmp/test.h5";
 	fr.write_h5(h5);
 	H5CytoFrame fr_h5(h5);
-	fr.write_tile(uri, *ctx);
+	fr.write_tile(uri, ctx);
 	auto cf_tile = TileCytoFrame(uri, true, true, ctx);
 
 	auto ch = cf_tile.get_channels();

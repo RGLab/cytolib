@@ -11,6 +11,7 @@
 #include <cytolib/global.hpp>
 
 #ifdef HAVE_TILEDB
+#include <tiledb/tiledb>
 namespace cytolib
 {
 /**
@@ -34,7 +35,7 @@ protected:
 	 * ctx ref so we want to ensure it lives some cycle with mat_array
 	 * TODO:ideally treat them as atomic unit
 	 */
-	CtxPtr ctxptr_;
+	CytoCtx ctx_;
 
 	shared_ptr<tiledb::Array> mat_array_ptr_;
 	tiledb::Array & get_mat_array_ref() const {
@@ -57,20 +58,20 @@ public:
 	};
 	void flush_params(){
 		check_write_permission();
-		write_tile_params(uri_, *ctxptr_);
+		write_tile_params(uri_, ctx_);
 		is_dirty_params = false;
 
 	};
 
 	void flush_keys(){
 		check_write_permission();
-		write_tile_kw(uri_, *ctxptr_);
+		write_tile_kw(uri_, ctx_);
 		is_dirty_keys = false;
 
 	};
 	void flush_pheno_data(){
 		check_write_permission();
-		write_tile_pd(uri_, *ctxptr_);
+		write_tile_pd(uri_, ctx_);
 		is_dirty_pdata = false;
 
 	};
@@ -80,58 +81,7 @@ public:
 	bool get_readonly() const{
 		return readonly_ ;
 	}
-//	TileCytoFrame(const TileCytoFrame & frm):CytoFrame(frm)
-//	{
-//		uri_ = frm.uri_;
-//		is_dirty_params = frm.is_dirty_params;
-//		is_dirty_keys = frm.is_dirty_keys;
-//		is_dirty_pdata = frm.is_dirty_pdata;
-//		readonly_ = frm.readonly_;
-//		access_plist_ = frm.access_plist_;
-//		memcpy(dims, frm.dims, sizeof(dims));
-//		ctx_ =
-//
-//	}
-//	TileCytoFrame(TileCytoFrame && frm):CytoFrame(frm)
-//	{
-////		swap(pheno_data_, frm.pheno_data_);
-////		swap(keys_, frm.keys_);
-////		swap(params, frm.params);
-////		swap(channel_vs_idx, frm.channel_vs_idx);
-////		swap(marker_vs_idx, frm.marker_vs_idx);
-//		swap(uri_, frm.uri_);
-//		swap(dims, frm.dims);
-//		swap(access_plist_, frm.access_plist_);
-//
-//		swap(readonly_, frm.readonly_);
-//		swap(is_dirty_params, frm.is_dirty_params);
-//		swap(is_dirty_keys, frm.is_dirty_keys);
-//		swap(is_dirty_pdata, frm.is_dirty_pdata);
-//	}
-//	TileCytoFrame & operator=(const TileCytoFrame & frm)
-//	{
-//		CytoFrame::operator=(frm);
-//		uri_ = frm.uri_;
-//		is_dirty_params = frm.is_dirty_params;
-//		is_dirty_keys = frm.is_dirty_keys;
-//		is_dirty_pdata = frm.is_dirty_pdata;
-//		readonly_ = frm.readonly_;
-//		access_plist_ = frm.access_plist_;
-//		memcpy(dims, frm.dims, sizeof(dims));
-//		return *this;
-//	}
-//	TileCytoFrame & operator=(TileCytoFrame && frm)
-//	{
-//		CytoFrame::operator=(frm);
-//		swap(uri_, frm.uri_);
-//		swap(dims, frm.dims);
-//		swap(is_dirty_params, frm.is_dirty_params);
-//		swap(is_dirty_keys, frm.is_dirty_keys);
-//		swap(is_dirty_pdata, frm.is_dirty_pdata);
-//		swap(readonly_, frm.readonly_);
-//		swap(access_plist_, frm.access_plist_);
-//		return *this;
-//	}
+
 
 	unsigned n_rows() const{
 				return dims[0];
@@ -192,27 +142,28 @@ public:
 		CytoFrame::del_pheno_data(name);
 		is_dirty_pdata = true;
 	}
+
 	/**
 	 * constructor from FCS
 	 * @param fcs_filename
 	 * @param uri
 	 */
 	TileCytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & uri
-			, bool readonly = false, CtxPtr ctxptr = CtxPtr(new tiledb::Context())):uri_(uri)
-	, is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), ctxptr_(ctxptr)
+			, bool readonly = false, CytoCtx ctx = CytoCtx()):uri_(uri)
+	, is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), ctx_(ctx)
 	{
 		MemCytoFrame fr(fcs_filename, config);
 		fr.read_fcs();
-		fr.write_tile(uri, *ctxptr);
-		*this = TileCytoFrame(uri, readonly, true, ctxptr);
+		fr.write_tile(uri, ctx_);
+		*this = TileCytoFrame(uri, readonly, true, ctx_);
 	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
 	TileCytoFrame(const string & uri, bool readonly = true
-			, bool init = true, CtxPtr ctxptr = CtxPtr(new tiledb::Context())):CytoFrame(),uri_(uri)
-	, readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), ctxptr_(ctxptr)
+			, bool init = true, CytoCtx ctx = CytoCtx()):CytoFrame(),uri_(uri)
+	, readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false), ctx_(ctx)
 	{
 
 		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
@@ -223,7 +174,7 @@ public:
 
 		fs::path arraypath(uri_);
 		auto mat_uri = (arraypath / "mat").string();
-
+		auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
 		//open dataset for event data
 		mat_array_ptr_ = shared_ptr<tiledb::Array>(new tiledb::Array(*ctxptr_, mat_uri, TILEDB_READ));
 
@@ -278,6 +229,8 @@ public:
 	}
 	void load_kw()
 	{
+		auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
+
 		tiledb::Array array(*ctxptr_, (fs::path(uri_) / "keywords").string(), TILEDB_READ);
 		uint64_t nkw = array.metadata_num();
 
@@ -302,6 +255,7 @@ public:
 	}
 	void load_pd()
 	{
+		auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
 		tiledb::Array array(*ctxptr_, (fs::path(uri_) / "pdata").string(), TILEDB_READ);
 		uint64_t nkw = array.metadata_num();
 
@@ -322,6 +276,7 @@ public:
 	}
 	void load_params()
 	{
+		auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
 		tiledb::Array array(*ctxptr_, (fs::path(uri_) / "params").string(), TILEDB_READ);
 		int nch = array.metadata_num();
 		if(nch > 0)
@@ -393,12 +348,14 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb
 			, const string & uri
 			, CytoFileOption file_opt
-			, const tiledb::Context & ctx = tiledb::Context()) const
+			, const CytoCtx & ctx = CytoCtx()) const
 	{
 			fr_pb.set_is_h5(true);
 			if(file_opt != CytoFileOption::skip)
 			{
-				tiledb::VFS vfs(ctx);
+				auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
+
+				tiledb::VFS vfs(*ctxptr_);
 				auto filepath = fs::path(uri);
 				auto dest = filepath.parent_path();
 				auto src = fs::path(uri_).parent_path();
@@ -416,7 +373,7 @@ public:
 					{
 					case CytoFileOption::copy:
 						{
-							write_tile(uri, *ctxptr_);//todo:cp dir for more efficient operations
+							write_tile(uri, ctx_);//todo:cp dir for more efficient operations
 							break;
 						}
 					case CytoFileOption::move:
@@ -466,7 +423,7 @@ public:
 		{
 
 			const std::vector<int> subarray = {1, nrow, 1, ncol};
-
+			auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
 			tiledb::Query query(*ctxptr_, *mat_array_ptr_);
 			query.set_subarray(subarray);
 			query.set_layout(TILEDB_GLOBAL_ORDER);
@@ -492,6 +449,7 @@ public:
 		{
 			array.open(TILEDB_READ);
 		}
+		auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
 		tiledb::Query query(*ctxptr_, *mat_array_ptr_);
 		query.set_layout(TILEDB_COL_MAJOR);
 		int ncol,nrow, dim_idx;
@@ -569,7 +527,7 @@ public:
 			fs::remove(new_uri);
 		}
 		fs::copy(uri_, new_uri, fs::copy_options::recursive);
-		CytoFramePtr ptr(new TileCytoFrame(new_uri, false, true, ctxptr_));
+		CytoFramePtr ptr(new TileCytoFrame(new_uri, false, true, ctx_));
 		//copy cached meta
 		ptr->set_params(get_params());
 		ptr->set_keywords(get_keywords());
@@ -589,7 +547,7 @@ public:
 		}
 		MemCytoFrame fr(*this);
 		fr.copy(row_idx, col_idx)->write_tile(new_uri);//this flushes the meta data as well
-		return CytoFramePtr(new TileCytoFrame(new_uri, false, true, ctxptr_));
+		return CytoFramePtr(new TileCytoFrame(new_uri, false, true, ctx_));
 	}
 
 	CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & uri = "", bool overwrite = false) const
@@ -605,7 +563,7 @@ public:
 		}
 		MemCytoFrame fr(*this);
 		fr.copy(idx, is_row_indexed)->write_tile(new_uri);//this flushes the meta data as well
-		return CytoFramePtr(new TileCytoFrame(new_uri, false, true, ctxptr_));
+		return CytoFramePtr(new TileCytoFrame(new_uri, false, true, ctx_));
 	}
 
 	/**
@@ -616,7 +574,7 @@ public:
 	{
 		check_write_permission();
 
-		write_tile_data(uri_, _data, *ctxptr_);
+		write_tile_data(uri_, _data, ctx_);
 
 		auto & array = get_mat_array_ref();
 		if(array.is_open())

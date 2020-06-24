@@ -58,7 +58,7 @@ public:
 	void convertToPb(pb::CytoFrame & fr_pb
 			, const string & cf_filename
 			, CytoFileOption h5_opt
-			, const CTX & ctx = CTX()) const{
+			, const CytoCtx & ctx = CytoCtx()) const{
 		if(is_row_indexed_ || is_col_indexed_)
 		{
 			if(h5_opt == CytoFileOption::copy||h5_opt == CytoFileOption::move)
@@ -120,7 +120,7 @@ public:
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
 	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
-			, const CTX ctx = CTX()) const
+			, const CytoCtx ctx = CytoCtx()) const
 	{
 		//create a mem-based cfv to avoid extra disk write IO from realization call
 		CytoFrameView cv(*this);
@@ -254,37 +254,7 @@ public:
 	CytoFrameView copy(const string & cf_filename = "") const;
 };
 
-inline CytoFramePtr load_cytoframe(const string & uri, bool readonly = true
-		, CtxPtr ctxptr = CtxPtr(new CTX()))
-{
-	 CytoFramePtr ptr;
 
-	CYTOVFS vfs(*ctxptr);
-	 auto fmt = uri_backend_type(uri, vfs);
-	 bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
-	if(!is_exist)
-	 throw(domain_error("cytoframe file missing for sample: " + uri));
-	if(fmt == FileFormat::H5&&is_remote_path(uri))
-	{
-
-		 throw(domain_error("H5cytoframe doesn't support remote loading: " + uri));
-
-	}
-	else
-	{
-
-		if(fmt == FileFormat::H5)
-			ptr.reset(new H5CytoFrame(uri, readonly));
-		else
-#ifdef HAVE_TILEDB
-			ptr.reset(new TileCytoFrame(uri, readonly, true, ctxptr));
-#else
-			throw(domain_error("unsupported format: " + fmt_to_str(fmt)));
-#endif
-
-	}
-	return ptr;
-}
 
 }
 
