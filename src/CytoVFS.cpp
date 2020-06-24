@@ -12,7 +12,7 @@
 namespace cytolib
 {
 #ifdef HAVE_TILEDB
-
+	const bool have_tiledb = true;
 /**
  *  implementation tiledb::VFS
  * @param file
@@ -100,6 +100,7 @@ namespace cytolib
 	}
 
 #else
+	const bool have_tiledb = false;
 	/**
 	 *  implementation based on std::fs
 	 */

@@ -17,6 +17,7 @@ namespace fs = std::experimental::filesystem::v1;
 
 namespace cytolib
 {
+	extern const bool have_tiledb;
 /**
  * abstract layer so that the  tiledb:Context and tiledb::VFS is separated from
  * the rest code base and they can work when tiledb is disabled at compile time
