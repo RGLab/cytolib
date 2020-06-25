@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_CASE(append_columns)
   MemCytoFrame fr1 = *fr.copy();
   uvec copy_idx;
   copy_idx << 6 << 7 << 8;
-  EVENT_DATA_VEC new_cols = fr1.get_data(copy_idx);
+  EVENT_DATA_VEC new_cols = fr1.get_data(copy_idx, true);
   
   // Test all guards
   vector<string> new_names;
