@@ -514,24 +514,25 @@ namespace cytolib
 	{
 		throw(domain_error("cytolib is not built with tiledb support!"));
 	}
-	void CytoFrame::write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	void CytoFrame::write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new) const
 	{
 			throw(domain_error("cytolib is not built with tiledb support!"));
 		}
-	void CytoFrame::write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const CytoCtx & cytoctx, bool is_new) const;
+	void CytoFrame::write_tile_data(const string & uri, const EVENT_DATA_VEC & _data
+			, const CytoCtx & cytoctx, bool is_new) const
 	{
 			throw(domain_error("cytolib is not built with tiledb support!"));
 		}
 //	void delete_tile_meta(tiledb::Array &array) const;
-	void CytoFrame::write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	void CytoFrame::write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new) const
 	{
 			throw(domain_error("cytolib is not built with tiledb support!"));
 		}
-	void CytoFrame::write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	void CytoFrame::write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new) const
 	{
 			throw(domain_error("cytolib is not built with tiledb support!"));
 		}
-	void CytoFrame::write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new) const;
+	void CytoFrame::write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new) const
 	{
 			throw(domain_error("cytolib is not built with tiledb support!"));
 		}

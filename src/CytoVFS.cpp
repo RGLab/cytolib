@@ -8,6 +8,8 @@
 #include <cytolib/CytoVFS.hpp>
 #ifdef HAVE_TILEDB
 #include <tiledb/tiledb>
+#else
+#include <fstream>
 #endif
 namespace cytolib
 {
