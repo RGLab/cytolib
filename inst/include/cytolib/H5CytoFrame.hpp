@@ -138,6 +138,11 @@ public:
 		is_dirty_keys = true;
 		return res;
 	}
+
+	void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
+		throw(domain_error("append_columns not implemented for H5CytoFrame!"));
+	}
+
 	void set_marker(const string & channelname, const string & markername)
 	{
 		CytoFrame::set_marker(channelname, markername);

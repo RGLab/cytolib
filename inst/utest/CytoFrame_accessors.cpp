@@ -443,6 +443,65 @@ BOOST_AUTO_TEST_CASE(set_channel)
 	BOOST_CHECK_EQUAL(fr3->get_keyword("$P3N"), oldname);
 
 }
+
+BOOST_AUTO_TEST_CASE(append_columns)
+{
+  MemCytoFrame fr1 = *fr.copy();
+  uvec copy_idx;
+  copy_idx << 6 << 7 << 8;
+  EVENT_DATA_VEC new_cols = fr1.get_data(copy_idx);
+  
+  // Test all guards
+  vector<string> new_names;
+  // Empty colname vector
+  BOOST_CHECK_EXCEPTION(fr1.append_columns(new_names, new_cols);;, domain_error,
+                        [](const exception & ex) {return string(ex.what()).find("Must have equal (nonzero)") != string::npos;});
+  // Length mismatch (only 2 names)
+  new_names = {"new_channel_1", "new_channel_2"};
+  BOOST_CHECK_EXCEPTION(fr1.append_columns(new_names, new_cols);;, domain_error,
+                        [](const exception & ex) {return string(ex.what()).find("Must have equal (nonzero)") != string::npos;});
+  // Duplicates an existing channel
+  new_names = {"new_channel_1", "new_channel_2", "PE-A"};
+  BOOST_CHECK_EXCEPTION(fr1.append_columns(new_names, new_cols);;, domain_error,
+                        [](const exception & ex) {return string(ex.what()).find("already contains") != string::npos;});
+  // Duplicates within the new channels
+  new_names = {"new_channel_1", "new_channel_2", "new_channel_2"};
+  BOOST_CHECK_EXCEPTION(fr1.append_columns(new_names, new_cols);;, domain_error,
+                        [](const exception & ex) {return string(ex.what()).find("Duplicate new channel names detected") != string::npos;});
+  // Empty channel name
+  new_names = {"new_channel_1", "", "new_channel_2"};
+  BOOST_CHECK_EXCEPTION(fr1.append_columns(new_names, new_cols);;, domain_error,
+                        [](const exception & ex) {return string(ex.what()).find("must be non-empty strings") != string::npos;});
+  
+  new_names = {"new_channel_1", "new_channel_2", "new_channel_3"};
+  EVENT_DATA_VEC shortened_columns = new_cols.rows(0,42);
+  // Columns too short
+  BOOST_CHECK_EXCEPTION(fr1.append_columns(new_names, shortened_columns);;, domain_error,
+                        [](const exception & ex) {return string(ex.what()).find("same number of rows") != string::npos;});
+  
+  //  This should succeed
+  fr1.append_columns(new_names, new_cols);
+  // Check dims
+  BOOST_CHECK_EQUAL(fr.n_cols() + new_names.size(), fr1.n_cols());
+  BOOST_CHECK_EQUAL(fr.n_rows(), fr1.n_rows());
+  vector<cytoParam> old_params = fr.get_params();
+  vector<cytoParam> new_params = fr1.get_params();
+  BOOST_CHECK_EQUAL(old_params.size() + new_names.size(), new_params.size());
+  // Spot check params
+  BOOST_CHECK_EQUAL(new_cols.col(1).min(), new_params[fr1.n_cols()-2].min);
+  BOOST_CHECK_EQUAL(new_cols.col(2).max(), new_params[fr1.n_cols()-1].max);
+  BOOST_CHECK_EQUAL(new_params[fr1.n_cols()-3].PnG, 1);
+  BOOST_CHECK_EQUAL(new_params[fr1.n_cols()-2].PnB, 32);
+  BOOST_CHECK_EQUAL(new_params[fr1.n_cols()-1].PnE[0], 0.0);
+  BOOST_CHECK_EQUAL(new_params[fr1.n_cols()-1].PnE[1], 0.0);
+  // Spot check keywords
+  BOOST_CHECK_EQUAL(fr1.get_keyword("$P" + to_string(fr1.n_cols()) + "N"), new_names[2]);
+  BOOST_CHECK_EQUAL(fr1.get_keyword("$P" + to_string(fr1.n_cols()-1) + "B"), "32");
+  BOOST_CHECK_EQUAL(fr1.get_keyword("$P" + to_string(fr1.n_cols()-2) + "E"), "0,0");
+  BOOST_CHECK_EQUAL(fr1.get_keyword("$P" + to_string(fr1.n_cols()) + "G"), "");
+  BOOST_CHECK_EQUAL(fr1.get_keyword("$P" + to_string(fr1.n_cols()-1) + "R"), to_string(new_params[fr1.n_cols()-2].max + 1));
+}
+
 BOOST_AUTO_TEST_CASE(shallow_copy)
 {
 	CytoFramePtr fr_orig = cf_disk->copy();//create a safe copy to test with by deep copying

@@ -362,6 +362,13 @@ public:
 		}
 		return 0;
 	}
+
+	/**
+	 * Add named columns to the data. This will also appropriately update some keywords and params.
+	 * Currently only implemented for MemCytoFrame
+	 */
+	virtual void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols)=0;
+
 	/**
 	 * get all the marker names
 	 * @return
