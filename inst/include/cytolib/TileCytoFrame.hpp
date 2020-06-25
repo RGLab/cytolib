@@ -586,6 +586,9 @@ public:
 	{
 		set_data(_data);
 	}
+	void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
+			throw(domain_error("append_columns not implemented for H5CytoFrame!"));
+		}
 };
 
 };
