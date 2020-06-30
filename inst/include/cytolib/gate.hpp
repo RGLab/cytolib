@@ -472,6 +472,21 @@ public:
 
 	//ellipsoidGate needs to shift its interpolated points
 	void shiftGate();
+	/*
+	 * overload ellipseGate::extend function
+	 * to skip extend logic (to avoid exception) since the gates no longer
+	 * seems to be truncated from the latest flowJo wsp
+	 * we may phase out the extend logic for other gates eventually
+	 *
+	 */
+	void extend(MemCytoFrame & fdata,float extend_val){
+		//do nothing
+		};
+
+	void extend(float extend_val, float extend_to){
+		//do nothing
+		};
+
 };
 
 /*
