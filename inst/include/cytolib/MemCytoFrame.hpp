@@ -63,13 +63,20 @@ public:
 	 */
 	MemCytoFrame(const string &filename, const FCS_READ_PARAM & config);
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const;
+	void convertToPb(pb::CytoFrame & fr_pb
+			, const string & h5_filename
+			, CytoFileOption h5_opt
+			, const CytoCtx & ctx = CytoCtx()) const;
 	unsigned n_rows() const;
 
 	void read_fcs();
 
 	void read_fcs_data();
 
+	FileFormat get_backend_type() const
+	{
+		return FileFormat::MEM;
+	};
 	/**
 	 * parse the data segment of FCS
 	 *
@@ -134,7 +141,19 @@ public:
 		return data_;
 	}
 
-	EVENT_DATA_VEC get_data(uvec col_idx) const;
+
+	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
+	{
+		if(is_col)
+			return data_.cols(idx);
+		else
+			return data_.rows(idx);
+	}
+	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
+	{
+		return data_.submat(row_idx, col_idx);
+	}
+
 	/**
 	 * copy setter
 	 * @param _data
@@ -161,7 +180,7 @@ public:
 	 * @return
 	 */
 	EVENT_DATA_TYPE * get_data_memptr(const string & colname, ColType type);
-	string get_h5_file_path() const{
+	string get_uri() const{
 		return "";
 	}
 

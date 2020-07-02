@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <queue>
 #include <cytolib/global.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 namespace cytolib
 {
@@ -257,10 +255,13 @@ namespace cytolib
 	MemCytoFrame::MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){
 			set_pheno_data("name", path_base_name(filename));
 		}
-	void MemCytoFrame::convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
+	void MemCytoFrame::convertToPb(pb::CytoFrame & fr_pb
+			, const string & h5_filename
+			, CytoFileOption h5_opt
+			, const CytoCtx & ctx) const
 	{
 		fr_pb.set_is_h5(false);
-		if(h5_opt != H5Option::skip)
+		if(h5_opt != CytoFileOption::skip)
 			write_h5(h5_filename);
 	}
 
@@ -1039,10 +1040,6 @@ namespace cytolib
 
 
 
-	EVENT_DATA_VEC MemCytoFrame::get_data(uvec col_idx) const
-	{
-		return data_.cols(col_idx);
-	}
 
 	void MemCytoFrame::append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
 		// Pre-checks

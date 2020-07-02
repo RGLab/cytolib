@@ -7,7 +7,7 @@ struct CSFixture {
 	CSFixture() {
 
 		file_paths = {"../flowWorkspace/wsTestSuite/curlyQuad/example1/A1001.001.fcs", "../flowWorkspace/wsTestSuite/curlyQuad/example1/A2002.001.fcs"};
-		cs = GatingSet(file_paths, config, false);
+		cs = GatingSet(file_paths, config, fmt);
 
 	};
 
@@ -15,6 +15,7 @@ struct CSFixture {
 
 	};
 	GatingSet cs;
+	FileFormat fmt = FileFormat::TILE;
 	vector<string> file_paths;
 	FCS_READ_PARAM config;
 };
@@ -38,7 +39,7 @@ BOOST_AUTO_TEST_CASE(test) {
 BOOST_AUTO_TEST_CASE(constructor) {
 	file_paths[1] = file_paths[0];
 
-	BOOST_CHECK_EXCEPTION(GatingSet(file_paths, config, false, "");, domain_error,
+	BOOST_CHECK_EXCEPTION(GatingSet(file_paths, config, fmt, "");, domain_error,
 			[](const exception & ex) {return string(ex.what()).find("already exists") != string::npos;});
 }
 BOOST_AUTO_TEST_CASE(copy) {

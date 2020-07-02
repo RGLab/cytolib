@@ -21,15 +21,14 @@ using namespace arma;
 #include <H5Cpp.h>
 using namespace H5;
 
-
 namespace cytolib
 {
 enum class RangeType {instrument, data};
 enum class FrameType {FCS, H5};
-enum class H5Option {copy, move, skip, link, symlink};
+enum class CytoFileOption {copy, move, skip, link, symlink};
 enum DataTypeLocation {MEM, H5};
-typedef unordered_map<string, string> PDATA;
 
+typedef unordered_map<string, string> PDATA;
 
 const H5std_string  DATASET_NAME( "data");
 
@@ -106,7 +105,10 @@ public:
 		}
 
 
-	virtual void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const = 0;
+	virtual void convertToPb(pb::CytoFrame & fr_pb
+			, const string & cf_filename
+			, CytoFileOption h5_opt
+			, const CytoCtx & ctx = CytoCtx()) const = 0;
 
 	virtual void set_readonly(bool flag){
 	}
@@ -136,6 +138,18 @@ public:
 	CompType get_h5_datatype_params(DataTypeLocation storage_type) const;
 	CompType get_h5_datatype_keys() const;
 	virtual void write_h5_params(H5File file) const;
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
+				, const CytoCtx ctx = CytoCtx()) const
+		{
+
+			if(format == FileFormat::H5)
+				write_h5(filename);
+			else
+				write_tile(filename, ctx);
+
+		}
+
+
 	/**
 	 * Convert string to cstr in params for writing to h5
 	 * @return
@@ -163,15 +177,22 @@ public:
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
+	void write_tile(const string & uri, const CytoCtx & cytoctx = CytoCtx()) const;
+	void write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
+	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const CytoCtx & cytoctx, bool is_new = false) const;
+	void write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
+	void write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
+	void write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
 	/**
 	 * get the data of entire event matrix
 	 * @return
 	 */
 	virtual EVENT_DATA_VEC get_data() const=0;
-	virtual EVENT_DATA_VEC get_data(uvec col_idx) const=0;
+	virtual EVENT_DATA_VEC get_data(uvec idx, bool is_col) const=0;
+	virtual EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const=0;
 	virtual EVENT_DATA_VEC get_data(vector<string>cols, ColType col_type) const
 	{
-		return get_data(get_col_idx(cols, col_type));
+		return get_data(get_col_idx(cols, col_type), true);
 	}
 
 	virtual void set_data(const EVENT_DATA_VEC &)=0;
@@ -397,12 +418,12 @@ public:
 	 */
 	EVENT_DATA_TYPE get_time_step(const string time_channel) const;
 
-	virtual CytoFramePtr copy(const string & h5_filename = "", bool overwrite = false) const=0;
-	virtual CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "", bool overwrite = false) const=0;
-	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "", bool overwrite = false) const=0;
+	virtual CytoFramePtr copy(const string & cf_filename = "", bool overwrite = false) const=0;
+	virtual CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & cf_filename = "", bool overwrite = false) const=0;
+	virtual CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & cf_filename = "", bool overwrite = false) const=0;
+	virtual FileFormat get_backend_type() const=0;
 	
-	
-	virtual string get_h5_file_path() const=0;
+	virtual string get_uri() const=0;
 	virtual void flush_meta(){};
 	virtual void load_meta(){};
 

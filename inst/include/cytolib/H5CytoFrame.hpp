@@ -11,8 +11,6 @@
 #define INST_INCLUDE_CYTOLIB_H5CYTOFRAME_HPP_
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/global.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 namespace cytolib
 {
@@ -31,6 +29,7 @@ protected:
 	bool is_dirty_params;
 	bool is_dirty_keys;
 	bool is_dirty_pdata;
+	FileAccPropList access_plist_;//used to custom fapl, especially for s3 backend
 	EVENT_DATA_VEC read_data(uvec col_idx) const;
 	int h5_flags() const{
 		if(get_readonly())
@@ -50,6 +49,9 @@ public:
 	bool get_readonly() const{
 		return readonly_ ;
 	}
+	FileFormat get_backend_type() const{
+			return FileFormat::H5;
+		};
 	H5CytoFrame(const H5CytoFrame & frm):CytoFrame(frm)
 	{
 		filename_ = frm.filename_;
@@ -57,6 +59,7 @@ public:
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
 		readonly_ = frm.readonly_;
+		access_plist_ = frm.access_plist_;
 		memcpy(dims, frm.dims, sizeof(dims));
 
 	}
@@ -69,6 +72,7 @@ public:
 //		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(filename_, frm.filename_);
 		swap(dims, frm.dims);
+		swap(access_plist_, frm.access_plist_);
 
 		swap(readonly_, frm.readonly_);
 		swap(is_dirty_params, frm.is_dirty_params);
@@ -83,6 +87,7 @@ public:
 		is_dirty_keys = frm.is_dirty_keys;
 		is_dirty_pdata = frm.is_dirty_pdata;
 		readonly_ = frm.readonly_;
+		access_plist_ = frm.access_plist_;
 		memcpy(dims, frm.dims, sizeof(dims));
 		return *this;
 	}
@@ -95,6 +100,7 @@ public:
 		swap(is_dirty_keys, frm.is_dirty_keys);
 		swap(is_dirty_pdata, frm.is_dirty_pdata);
 		swap(readonly_, frm.readonly_);
+		swap(access_plist_, frm.access_plist_);
 		return *this;
 	}
 
@@ -168,18 +174,42 @@ public:
 	 * @param h5_filename
 	 */
 	H5CytoFrame(const string & fcs_filename, FCS_READ_PARAM & config, const string & h5_filename
-			, bool readonly = false);
+			, bool readonly = false):filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	{
+		MemCytoFrame fr(fcs_filename, config);
+		fr.read_fcs();
+		fr.write_h5(h5_filename);
+		*this = H5CytoFrame(h5_filename, readonly);
+	}
 	/**
 	 * constructor from the H5
 	 * @param _filename H5 file path
 	 */
-	H5CytoFrame(const string & h5_filename, bool readonly = true);
+	H5CytoFrame(const string & h5_filename, bool readonly = true, bool init = true):CytoFrame(),filename_(h5_filename), readonly_(readonly), is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false)
+	{
+		access_plist_ = FileAccPropList::DEFAULT;
+		if(init)//optionally delay load for the s3 derived cytoframe which needs to reset fapl before load
+			init_load();
+	}
+	void init_load(){
+		//always use the same flag and keep lock at cf level to avoid h5 open error caused conflicting h5 flags among cf objects that points to the same h5
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
+		load_meta();
+
+
+		//open dataset for event data
+
+		auto dataset = file.openDataSet(DATASET_NAME);
+		auto dataspace = dataset.getSpace();
+		dataspace.getSimpleExtentDims(dims);
+
+	}
 	/**
 	 * abandon the changes to the meta data in cache by reloading them from disk
 	 */
 	void load_meta();;;
 
-	string get_h5_file_path() const{
+	string get_uri() const{
 		return filename_;
 	}
 	void check_write_permission(){
@@ -188,10 +218,13 @@ public:
 
 	}
 
-	void convertToPb(pb::CytoFrame & fr_pb, const string & h5_filename, H5Option h5_opt) const
+	void convertToPb(pb::CytoFrame & fr_pb
+			, const string & h5_filename
+			, CytoFileOption h5_opt
+			, const CytoCtx & ctx = CytoCtx()) const
 	{
 			fr_pb.set_is_h5(true);
-			if(h5_opt != H5Option::skip)
+			if(h5_opt != CytoFileOption::skip)
 			{
 				auto h5path = fs::path(h5_filename);
 				auto dest = h5path.parent_path();
@@ -202,27 +235,27 @@ public:
 				{
 					switch(h5_opt)
 					{
-					case H5Option::copy:
+					case CytoFileOption::copy:
 						{
 							if(fs::exists(h5path))
 								fs::remove(h5path);
 							fs::copy(filename_, h5_filename);
 							break;
 						}
-					case H5Option::move:
+					case CytoFileOption::move:
 						{
 							if(fs::exists(h5path))
 								fs::remove(h5path);
 							fs::rename(filename_, h5_filename);
 							break;
 						}
-					case H5Option::link:
+					case CytoFileOption::link:
 						{
 							throw(logic_error("'link' option for H5CytoFrame is no longer supported!"));
 							fs::create_hard_link(filename_, h5_filename);
 							break;
 						}
-					case H5Option::symlink:
+					case CytoFileOption::symlink:
 						{
 							if(fs::exists(h5path))
 								fs::remove(h5path);
@@ -242,15 +275,29 @@ public:
 	 */
 
 
-	EVENT_DATA_VEC get_data() const;
+	EVENT_DATA_VEC get_data() const
+	{
+		unsigned n = n_cols();
+		uvec col_idx(n);
+		for(unsigned i = 0; i < n; i++)
+			col_idx[i] = i;
+		return read_data(col_idx);
+	}
 	/**
 	 * Partial IO
 	 * @param col_idx
 	 * @return
 	 */
-	EVENT_DATA_VEC get_data(uvec col_idx) const
+	EVENT_DATA_VEC get_data(uvec idx, bool is_col) const
 	{
-		return read_data(col_idx);
+		if(is_col)
+			return read_data(idx);
+		else
+			return get_data().rows(idx);
+	}
+	EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const
+	{
+		return read_data(col_idx).rows(row_idx);
 	}
 	/*
 	 * protect the h5 from being overwritten accidentally

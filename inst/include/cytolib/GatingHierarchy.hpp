@@ -19,6 +19,8 @@
 #include <algorithm>
 #include "MemCytoFrame.hpp"
 #include "CytoFrameView.hpp"
+#include "TileCytoFrame.hpp"
+#include "H5CytoFrame.hpp"
 using namespace std;
 
 namespace cytolib
@@ -68,7 +70,8 @@ struct OurVertexPropertyWriterR {
 class GatingHierarchy;
 typedef shared_ptr<GatingHierarchy> GatingHierarchyPtr;
 
-
+CytoFramePtr load_cytoframe(const string & uri, bool readonly = true
+			, CytoCtx ctxptr = CytoCtx());
 /**
  ** \class GatingHierarchy
  **
@@ -149,13 +152,52 @@ public:
 	/**
 	 *
 	 * @param gh_pb
-	 * @param h5_filename
+	 * @param uri
 	 * @param h5_opt
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, H5Option h5_opt, bool is_skip_data = false);
-	GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data
-			, bool readonly = true);
+	void convertToPb(pb::GatingHierarchy & gh_pb, string uri, CytoFileOption h5_opt
+			, bool is_skip_data = false
+			, const CytoCtx & ctx = CytoCtx());
+	GatingHierarchy(CytoCtx ctx, pb::GatingHierarchy & pb_gh, string uri, bool is_skip_data
+			, bool readonly = true){
+			const pb::populationTree & tree_pb =  pb_gh.tree();
+			int nNodes = tree_pb.node_size();
+
+			tree = populationTree(nNodes);
+			for(int i = 0; i < nNodes; i++){
+				const pb::treeNodes & node_pb = tree_pb.node(i);
+				const pb::nodeProperties & np_pb = node_pb.node();
+
+				VertexID curChildID = i;
+				tree[curChildID] = nodeProperties(np_pb);
+
+				if(node_pb.has_parent()){
+					VertexID parentID = node_pb.parent();
+					boost::add_edge(parentID,curChildID,tree);
+				}
+
+			}
+			//restore comp
+			comp = compensation(pb_gh.comp());
+			//restore trans flag
+			for(int i = 0; i < pb_gh.transflag_size(); i++){
+				transFlag.push_back(PARAM(pb_gh.transflag(i)));
+			}
+			//restore trans local
+			trans = trans_local(pb_gh.trans());
+
+			//restore fr
+			if(!is_skip_data)
+			{
+				CytoFramePtr ptr = load_cytoframe(uri, readonly, ctx);
+				pb::CytoFrame fr = *pb_gh.mutable_frame();
+				if(!fr.is_h5())
+					ptr.reset(new MemCytoFrame(*ptr));
+				frame_ = CytoFrameView(ptr);
+			}
+		}
+
 	//load legacy pb
 	GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, TransPtr> & trans_tbl);
 	/**
@@ -475,7 +517,7 @@ public:
 	populationTree & getTree(){return tree;};
 
 
-	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & h5_filename) const;
+	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & uri) const;
 	/*
 	 * It is mainly used by Rcpp API addTrans to propagate global trans map to each sample
 	 * EDIT: But now also used by clone methods

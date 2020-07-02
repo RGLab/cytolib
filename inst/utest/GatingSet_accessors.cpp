@@ -2,14 +2,14 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <cytolib/GatingSet.hpp>
 #include <experimental/filesystem>
+#include <regex>
 
 #include "fixture.hpp"
 using namespace cytolib;
 struct GSFixture {
 	GSFixture() {
-
 		path = "../flowWorkspace/output/NHLBI/gs/gs";
-		gs = GatingSet(path,false,true,{},true);
+		gs = GatingSet(path,false,true,{},false);
 
 	};
 
@@ -21,6 +21,41 @@ struct GSFixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(GatingSet_test,GSFixture)
+#ifdef HAVE_TILEDB
+
+BOOST_AUTO_TEST_CASE(s3_gs)
+{
+
+
+	CytoCtx ctx(string(std::getenv("AWS_ACCESS_KEY_ID"))
+				, string(std::getenv("AWS_SECRET_ACCESS_KEY"))
+				, "us-west-1"
+				);
+	auto remote = "s3://mike-h5/test";
+
+		//convert h5 to tile
+	auto gs1 = gs.copy();
+	auto gh = gs1.begin()->second;
+	auto cfv = gh->get_cytoframe_view();
+	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "") + ".tile";
+
+	cfv.write_to_disk(tmp, FileFormat::TILE, ctx);
+	gh->set_cytoframe_view(CytoFramePtr(new TileCytoFrame(tmp)));
+	gs1.serialize_pb(remote, CytoFileOption::copy, false, ctx);
+//	tiledb::VFS vfs(*ctx);
+//	for(auto p : vfs.ls(remote))
+//	{
+//		cout << p << endl;
+//	}
+	auto gs2 = GatingSet(remote,false,true,{},false, ctx);
+
+	auto cf = gs2.begin()->second->get_cytoframe_view();
+	auto ch = cf.get_channels();
+	BOOST_CHECK_EQUAL(ch.size(), 12);
+//
+
+}
+#endif
 BOOST_AUTO_TEST_CASE(remove_node)
 {
 	auto gs1 = gs.copy();
@@ -63,7 +98,7 @@ BOOST_AUTO_TEST_CASE(quadgate) {
 					gh->getNodeProperty(gh->getNodeID("D")).getCounts());
 	//test pb
 	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs1.serialize_pb(tmp, H5Option::copy);
+	gs1.serialize_pb(tmp, CytoFileOption::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.begin()->second;
 	gh->gating(cf, 0, true, true);
@@ -92,7 +127,7 @@ BOOST_AUTO_TEST_CASE(serialize) {
 	//archive
 //	string tmp = "/tmp/gsEGnOlP";
 	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs1.serialize_pb(tmp, H5Option::copy);
+	gs1.serialize_pb(tmp, CytoFileOption::copy);
 	//load it back
 	GatingSet gs2(tmp,false,true,{},true);
 	auto cf2 = gs2.begin()->second->get_cytoframe_view_ref();
@@ -101,7 +136,7 @@ BOOST_AUTO_TEST_CASE(serialize) {
 
 	//save gs and see if readonly flag changes
 	tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs2.serialize_pb(tmp, H5Option::copy);
+	gs2.serialize_pb(tmp, CytoFileOption::copy);
 	BOOST_CHECK_EQUAL(cf2.get_readonly(), true);
 
 
@@ -150,7 +185,7 @@ BOOST_AUTO_TEST_CASE(copy) {
 	BOOST_CHECK_EXCEPTION(fv1.flush_meta(), domain_error,
 				[](const domain_error & ex) {return string(ex.what()).find("read-only") != string::npos;});
 
-	BOOST_CHECK_NE(fv.get_h5_file_path(), fv1.get_h5_file_path());
+	BOOST_CHECK_NE(fv.get_uri(), fv1.get_uri());
 	BOOST_CHECK_CLOSE(fv.get_data()[1], fv1.get_data()[1], 1e-6);
 	BOOST_CHECK_CLOSE(fv.get_data()[7e4], fv1.get_data()[7e4], 1e-6);
 }
@@ -171,7 +206,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 	//save legacy to new format
 	string tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
 	bool is_skip_data = true;
-	gs1.serialize_pb(tmp, H5Option::skip, is_skip_data);
+	gs1.serialize_pb(tmp, CytoFileOption::skip, is_skip_data);
 	gs1 = GatingSet(tmp, is_skip_data);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();
@@ -180,7 +215,7 @@ BOOST_AUTO_TEST_CASE(legacy_gs) {
 
 	//save new to new format
 	tmp = generate_unique_dir(fs::temp_directory_path().c_str(), "gs");
-	gs.serialize_pb(tmp, H5Option::copy);
+	gs.serialize_pb(tmp, CytoFileOption::copy);
 	gs1 = GatingSet(tmp);
 	gh = gs1.getGatingHierarchy(samples[0]);
 	vid = gh->getVertices();

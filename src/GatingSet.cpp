@@ -4,8 +4,6 @@
 #include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/cytolibConfig.h>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 
 namespace cytolib
@@ -16,107 +14,307 @@ namespace cytolib
 			throw(range_error("Empty GatingSet!"));
 		return begin()->second;
 	}
+	GatingSet::GatingSet(string path, bool is_skip_data
+			, bool readonly
+			, vector<string> select_samples
+			, bool print_lib_ver
+			, CytoCtx ctx):ctx_(ctx)
+	{
+
+		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
+		fs::path gs_pb_file;
+		unordered_set<string> cf_samples;
+		unordered_set<string> pb_samples;
+		FileFormat fmt;
+		bool is_first_sample = true;
+		//search for h5
+		CytoVFS vfs(ctx);
+		for(auto & e : vfs.ls(path))
+		{
+			fs::path p(e);
+			string ext = p.extension().string();
+			string fn = p.stem().string();
+			if(ext == ".h5"||ext == ".tile")
+			{
+				//init fmt for the first sample file
+				if(is_first_sample)
+				{
+					if(ext == ".h5")
+						fmt = FileFormat::H5;
+					else
+						fmt = FileFormat::TILE;
+					is_first_sample = false;
+				}
+				else
+				{
+					//consistency check
+					if((fmt == FileFormat::H5&&ext==".tile")||(fmt == FileFormat::TILE&&ext==".h5"))
+						throw(domain_error(errmsg + "Multiple file formats found!"));
+				}
+
+
+				cf_samples.insert(fn);
+			}
+			else if(ext == ".pb")
+			{
+				pb_samples.insert(fn);
+
+			}
+			else if(ext == ".gs")
+			{
+				if(gs_pb_file.empty())
+					gs_pb_file = p;
+				else
+					throw(domain_error(errmsg + "Multiple .gs files found for the same gs object!"));
+			}
+			else
+				throw(domain_error(errmsg + "File not recognized: " + p.string()));
+		}
+
+		bool is_legacy = false;
+		if(gs_pb_file.empty())
+		{
+			if(pb_samples.size()==1)
+			{
+				auto id = *(pb_samples.begin());//check if pb file seems like a guid of a legacy gs
+				if(cf_samples.find(id)==cf_samples.end())
+				{
+					is_legacy = true;
+				}
+				else
+				  throw(domain_error(errmsg + "No .gs file found!"));
+			}
+			else
+			  throw(domain_error(errmsg + "No .gs file found!"));
+		}
+
+		if(is_legacy)
+		{
+			cout << path + " seems to be the legacy archive and it is recommended to convert to the new format by saving it to the new folder!" << endl;
+			deserialize_legacy(path, is_skip_data, readonly, select_samples, print_lib_ver);
+		}
+		else
+		{
+
+			for(auto sn : cf_samples)
+			{
+				if(pb_samples.find(sn)==pb_samples.end())
+					  throw(domain_error(errmsg + "No .pb file matched for sample " + sn));
+			}
+
+			for(auto sn : pb_samples)
+			{
+				if(cf_samples.find(sn)==cf_samples.end())
+					  throw(domain_error(errmsg + "No cytoframe file matched for sample " + sn + ".pb"));
+			}
+
+			GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+
+			auto buf = vfs.read_buf(gs_pb_file.string());
+			 pb::GatingSet pbGS;
+			 //read entire file into buffer since message-lite doesn't support iostream
+
+
+
+			 google::protobuf::io::ArrayInputStream raw_input(buf.data(), buf.size());
+			 //read gs message
+			 bool success = readDelimitedFrom(raw_input, pbGS);
+
+			if (!success) {
+				throw(domain_error("Failed to parse GatingSet."));
+			}
+			if(print_lib_ver)
+			{
+				PRINT("The GatingSet was archived by:\n");
+				PRINT("cytolib: ");
+				string cv = pbGS.cytolib_verion();
+				if(cv=="")
+					cv = "unknown";
+				PRINT(cv);
+				PRINT("\n");
+				PRINT("protobuf: ");
+				string pv = pbGS.pb_verion();
+				if(pv=="")
+					pv = "unknown";
+				PRINT(pv);
+				PRINT("\n");
+				PRINT("HDF5: ");
+				string hv = pbGS.h5_verion();
+				if(hv=="")
+					hv = "unknown";
+				PRINT(hv);
+				PRINT("\n");
+
+			}
+			uid_ = pbGS.guid();
+
+			auto nSelect = select_samples.size();
+			auto nTotal = pbGS.samplename_size();
+			unordered_map<string,bool> sn_hash;
+
+			//prescan select and update hash
+			if(nSelect>0)
+			{
+				for(int i = 0; i < nTotal; i++){
+					string sn = pbGS.samplename(i);
+					sn_hash[sn] = false;
+				}
+				for(unsigned i = 0; i < nSelect; i++)
+				{
+					auto sel = select_samples[i];
+					auto it = sn_hash.find(sel);
+					if(it == sn_hash.end())
+						throw(domain_error("sample selection is out of boundary: " + sel));
+					it->second = true;
+
+				}
+			}
+			//read gating hierarchy messages
+			for(int i = 0; i < nTotal; i++){
+				string sn = pbGS.samplename(i);
+
+				//conditional add gh
+				if(nSelect==0||sn_hash.find(sn)->second)
+				{
+					if(is_remote_path(path))
+						PRINT("loading GatingHierarchy: " + sn + " \n");
+					string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
+
+					pb::GatingHierarchy gh_pb;
+					auto buf = vfs.read_buf(gh_pb_file);
+
+					 google::protobuf::io::ArrayInputStream raw_input(buf.data(), buf.size());
+					 //read gs message
+					 bool success = readDelimitedFrom(raw_input, gh_pb);
+
+					if (!success) {
+						throw(domain_error("Failed to parse GatingHierarchy " + sn));
+					}
+
+					pb::CytoFrame fr = *gh_pb.mutable_frame();
+
+					string uri;
+					auto cf_ext = "." + fmt_to_str(fmt);
+					uri = (fs::path(path) / (sn + cf_ext)).string();
+					add_GatingHierarchy(GatingHierarchyPtr(new GatingHierarchy(ctx_, gh_pb, uri, is_skip_data, readonly)), sn);
+
+				}
+			}
+
+
+			//reorder view based on select
+			if(nSelect>0)
+			{
+				uid_ = generate_uid();
+				sample_names_ = select_samples;
+			}
+		}
+
+	}
 
 	/**
 	 * separate filename from dir to avoid to deal with path parsing in c++
 	 * @param path the dir of filename
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void GatingSet::serialize_pb(string path, H5Option h5_opt, bool is_skip_data)
+	void GatingSet::serialize_pb(string path
+			, CytoFileOption cf_opt
+			, bool is_skip_data
+			, const CytoCtx & ctx)
 	{
 		/*
 		 * validity check for path
 		 */
-		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
-		if(fs::exists(path))
+		if(is_remote_path(path))
 		{
-			if(!fs::is_empty(fs::path(path)))
+			if(begin()->second->get_cytoframe_view_ref().get_backend_type()!=FileFormat::TILE)
+				throw(logic_error("Only tiledb backend supports saving to remote path!"));
+		}
+
+		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
+		CytoVFS vfs(ctx);
+		if(vfs.is_dir(path))
+		{
+			auto files = vfs.ls(path);
+			if(files.size()>0)
 			{
-//				if(is_overwrite)
-//				{
-//					fs::remove_all(path);
-//					fs::create_directory(path);
-//				}
-//				else
-//				{
-					fs::path gs_pb_file;
-					unordered_set<string> h5_samples;
-					unordered_set<string> pb_samples;
-					for(auto & e : fs::directory_iterator(path))
+				fs::path gs_pb_file;
+				unordered_set<string> cf_samples;
+				unordered_set<string> pb_samples;
+				for(auto & e : files)
+				{
+					fs::path p(e);
+					string ext = p.extension().string();
+					if(ext == ".gs")
 					{
-						fs::path p = e;
-						string ext = p.extension().string();
-						if(ext == ".gs")
+						string fn = p.stem().string();
+						if(fn == uid_)
 						{
-							string fn = p.stem().string();
-							if(fn == uid_)
-							{
-								if(gs_pb_file.empty())
-									gs_pb_file = p;
-								else
-									throw(domain_error(errmsg + "Multiple .gs files found for the same gs object!"));
-							}
+							if(gs_pb_file.empty())
+								gs_pb_file = p;
 							else
-							{
-								  throw(domain_error(errmsg + "gs file not matched to GatingSet uid: " + p.string()));
-
-							}
-
-						}
-						else if(ext == ".pb"||ext == ".h5")
-						{
-							string sample_uid = p.stem().string();
-							if(find(sample_uid) == end())
-							  throw(domain_error(errmsg + "file not matched to any sample in GatingSet: " + p.string()));
-							else
-							{
-								if(ext == ".pb")
-									pb_samples.insert(p.stem().string());
-								else
-									h5_samples.insert(p.stem().string());
-							}
-
+								throw(domain_error(errmsg + "Multiple .gs files found for the same gs object!"));
 						}
 						else
-						  throw(domain_error(errmsg + "File not recognized: " + p.string()));
-
-					}
-
-					if(gs_pb_file.empty())
-					{
-						if(pb_samples.size()>0)
 						{
-							throw(domain_error(errmsg + "gs file missing"));
-						}
-					}
+							  throw(domain_error(errmsg + "gs file not matched to GatingSet uid: " + p.string()));
 
-					for(const auto & it : ghs_)
-					{
-						auto sn = it.first;
-						if(h5_samples.find(sn) == h5_samples.end())
-							throw(domain_error(errmsg + "h5 file missing for sample: " + sn));
-						/*
-						 * when no pb present, treat it as valid dest folder where h5 were pre-written
-						 * e.g. when save_gs with cdf = skip
-						 */
-						if(pb_samples.size()>0)
-						{
-							if(pb_samples.find(sn) == pb_samples.end())
-								throw(domain_error(errmsg + "pb file missing for sample: " + sn));
 						}
+
 					}
-//				}
+					else if(ext == ".tile"||ext == ".h5"||ext == ".pb")
+					{
+						string sample_uid = p.stem().string();
+						if(find(sample_uid) == end())
+						  throw(domain_error(errmsg + "file not matched to any sample in GatingSet: " + p.string()));
+						else
+						{
+							if(ext == ".pb")
+								pb_samples.insert(p.stem().string());
+							else
+								cf_samples.insert(p.stem().string());
+						}
+
+					}
+					else
+					  throw(domain_error(errmsg + "File not recognized: " + p.string()));
+
+				}
+
+				if(gs_pb_file.empty())
+				{
+					if(pb_samples.size()>0)
+					{
+						throw(domain_error(errmsg + "gs file missing"));
+					}
+				}
+
+				for(const auto & it : ghs_)
+				{
+					auto sn = it.first;
+					if(cf_samples.find(sn) == cf_samples.end())
+						throw(domain_error(errmsg + "cytoframe file missing for sample: " + sn));
+					/*
+					 * when no pb present, treat it as valid dest folder where h5 were pre-written
+					 * e.g. when save_gs with cdf = skip
+					 */
+					if(pb_samples.size()>0)
+					{
+						if(pb_samples.find(sn) == pb_samples.end())
+							throw(domain_error(errmsg + "pb file missing for sample: " + sn));
+					}
+				}
 			}
 		}
 		else
-			fs::create_directory(path);
+			vfs.create_dir(path);
 
 		// Verify that the version of the library that we linked against is
 		// compatible with the version of the headers we compiled against.
 		GOOGLE_PROTOBUF_VERIFY_VERSION;
-		//init the output stream for gs
-		string filename = (fs::path(path) / uid_).string() + ".gs";
-		ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
+
+//		ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
 		string buf;
 		google::protobuf::io::StringOutputStream raw_output(&buf);
 
@@ -146,23 +344,26 @@ namespace cytolib
 			google::protobuf::ShutdownProtobufLibrary();
 			throw(domain_error("Failed to write GatingSet."));
 		}
-		output.write(&buf[0], buf.size());
+		//init the output stream for gs
+		string gs_pb_file = (fs::path(path) / uid_).string() + ".gs";
 
+		vfs.write_buf(gs_pb_file, buf);
 		//write each gh as a separate message to stream due to the pb message size limit
 		//we now go one step further to save each message to individual file
 		//due to the single string buffer used by lite-message won't be enough to hold the all samples for large dataset
 		for(auto & sn : sample_names)
 		{
-			string h5_filename = (fs::path(path) / sn).string() + ".h5";
-			//init the output stream for gs
-			string filename = (fs::path(path) / sn).string() + ".pb";
-			ofstream output(filename.c_str(), ios::out | ios::trunc | ios::binary);
+			auto gh = getGatingHierarchy(sn);
+			auto src_uri = gh->get_cytoframe_view_ref().get_uri();
+			if(is_remote_path(path)||is_remote_path(src_uri))
+				PRINT("saving GatingHierarchy: " + sn + " \n");
+			string cf_filename = (fs::path(path) / sn).string();
 			string buf;
 			google::protobuf::io::StringOutputStream raw_output(&buf);
 
 
 			pb::GatingHierarchy pb_gh;
-			getGatingHierarchy(sn)->convertToPb(pb_gh, h5_filename, h5_opt, is_skip_data);
+			gh->convertToPb(pb_gh, cf_filename, cf_opt, is_skip_data, ctx);
 
 
 			bool success = writeDelimitedTo(pb_gh, raw_output);
@@ -171,7 +372,12 @@ namespace cytolib
 				google::protobuf::ShutdownProtobufLibrary();
 				throw(domain_error("Failed to write GatingHierarchy."));
 			}
-			output.write(&buf[0], buf.size());
+			//init the output stream for gs
+			string gh_pb_file = (fs::path(path) / sn).string() + ".pb";
+
+
+			vfs.write_buf(gh_pb_file, buf);
+
 
 		}
 
@@ -306,18 +512,18 @@ namespace cytolib
 	/*
 	 * up to caller to free the memory
 	 */
-	GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data, const string & new_h5_dir) const{
+	GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data, const string & new_cf_dir) const{
 		GatingSet gs;
-		fs::path h5_dir;
+		fs::path cf_dir;
 		if(is_copy_data)
-			h5_dir = gs.generate_h5_folder(fs::path(new_h5_dir).string());
+			cf_dir = gs.generate_cytoframe_folder(fs::path(new_cf_dir).string());
 		for(const string & sn : get_sample_uids())
 		{
 			GatingHierarchyPtr gh = getGatingHierarchy(sn);
 
 			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\n... copying GatingHierarchy: "+sn+"... \n");
-			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, (h5_dir/sn).string()), sn, is_copy_data);
+			gs.add_GatingHierarchy(gh->copy(is_copy_data, is_realize_data, (cf_dir/sn).string()), sn, is_copy_data);
 
 		}
 
@@ -338,8 +544,8 @@ namespace cytolib
 				PRINT("\n... start cloning GatingHierarchy for: "+sn+"... \n");
 			auto gh = gh_template.copy(false, false, "");
 			auto cfv = cs.get_cytoframe_view(sn);
-			string h5_filename = cfv.get_h5_file_path();
-			if(h5_filename=="")
+			string cf_filename = cfv.get_uri();
+			if(cf_filename=="")
 				throw(logic_error("in-memory version of cs is not supported!"));
 			if(execute)
 			{
@@ -425,15 +631,7 @@ namespace cytolib
 		}
 		return gs;
 	}
-	string GatingSet::generate_h5_folder(string h5_dir) const
-	{
-		h5_dir = (fs::path(h5_dir) / uid_).string();
-		if(fs::exists(h5_dir))
-			throw(domain_error(h5_dir + " already exists!"));
-		if(!fs::create_directories(h5_dir))
-			throw(domain_error("Failed to create directory: " + h5_dir));
-		return h5_dir;
-	}
+
 	/**
 	 * Retrieve the GatingHierarchy object from GatingSet by sample name.
 	 *
@@ -549,48 +747,6 @@ namespace cytolib
 		ghs_[sample_uid]->set_cytoframe_view(res);
 	}
 
-	/**
-	 * Constructor from FCS files
-	 * @param file_paths
-	 * @param config
-	 * @param is_h5
-	 * @param h5_dir
-	 * @param is_add_root whether add root node. When false, gs is used as cytoset without gating tree
-	 */
-	GatingSet::GatingSet(const vector<string> & file_paths, const FCS_READ_PARAM & config, bool is_h5, string h5_dir):GatingSet()
-	{
-		vector<pair<string,string>> map(file_paths.size());
-		transform(file_paths.begin(), file_paths.end(), map.begin(), [](string i){return make_pair(path_base_name(i), i);});
-		add_fcs(map, config, is_h5, h5_dir);
-	}
-
-	void GatingSet::add_fcs(const vector<pair<string,string>> & sample_uid_vs_file_path
-			, const FCS_READ_PARAM & config, bool is_h5, string h5_dir, bool readonly)
-	{
-
-		fs::path h5_path;
-		if(is_h5)
-			h5_path = generate_h5_folder(h5_dir);
-		for(const auto & it : sample_uid_vs_file_path)
-		{
-
-
-			CytoFramePtr fr_ptr(new MemCytoFrame(it.second,config));
-			//set pdata
-			fr_ptr->set_pheno_data("name", path_base_name(it.second));
-
-			dynamic_cast<MemCytoFrame&>(*fr_ptr).read_fcs();
-			if(is_h5)
-			{
-				string h5_filename = (h5_path/it.first).string() + ".h5";
-				fr_ptr->write_h5(h5_filename);
-				fr_ptr.reset(new H5CytoFrame(h5_filename, readonly));
-			}
-
-			add_cytoframe_view(it.first, CytoFrameView(fr_ptr));
-
-		}
-	}
 
 	/**
 	 * Update sample id

@@ -1,0 +1,26 @@
+# Copyright 2019 Fred Hutchinson Cancer Research Center
+# See the included LICENSE file for details on the licence that is granted to the user of this software.
+#  GNUMakefile
+ 
+# Just a snippet to stop executing under other make(1) commands
+# that won't understand these lines
+ifneq (,)
+This makefile requires GNU Make.
+endif
+
+	
+CXX_STD = CXX17
+PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
+
+
+#needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
+RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")')
+FSLIB = -lstdc++fs
+
+PKG_LIBS = $(FSLIB) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
+
+HAVE_TILEDB=@HAVE_TILEDB@
+ifeq ($(HAVE_TILEDB),yes)
+PKG_CPPFLAGS += -DHAVE_TILEDB @TILEDB_INCLUDE@  
+PKG_LIBS += @TILEDB_LIBS@
+endif

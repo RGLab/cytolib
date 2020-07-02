@@ -9,15 +9,14 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
+
+#include <regex>
 
 namespace cytolib
 {
 	bool my_throw_on_error = true;
 	unsigned short g_loglevel = 0;
 	vector<string> spillover_keys = {"SPILL", "spillover", "$SPILLOVER"};
-
 	void PRINT(string a){
 	#ifdef ROUT
 	 Rprintf(a.c_str());
@@ -33,6 +32,35 @@ namespace cytolib
 	 cout << a;
 	#endif
 
+	}
+	string s3_to_http(string uri)
+	{
+		boost::replace_first(uri, "s3://", "");
+		vector <string> tokens;
+		boost::split(tokens, uri, boost::is_any_of("/"));
+		if(tokens.size()==0)
+			throw(domain_error("invalid s3 path: " + uri));
+
+		uri = "https://" + tokens[0] + ".s3.amazonaws.com";
+		for(int i = 1; i < tokens.size(); i++)
+		{
+			uri += "/" + tokens[i];
+		}
+		return uri;
+	}
+	bool is_remote_path(const string & path)
+	{
+		return regex_search(path, regex("^((https)|(s3))(://)(.*)"));
+	}
+	FileFormat uri_backend_type(const string & path, const CytoVFS & vfs)
+	{
+//		if(regex_search(path, regex("(\\.tile)$")))
+		if(vfs.is_dir(path))
+			return FileFormat::TILE;
+		else// if(regex_search(path, regex("(\\.h5)$")))
+			return FileFormat::H5;
+//		else
+//			throw(domain_error("unknown backend type: " + path));
 	}
 	string fs_tmp_path()
 	{
@@ -122,7 +150,12 @@ namespace cytolib
 		boost::split(time_vec, s, boost::is_any_of(":"));
 		if(time_vec.size() != 3)
 			throw(domain_error("expect time string in 'HH:MM:SS' format!"));
-		tm t;
+
+		time_t rawtime;
+		time(&rawtime);
+		struct tm * timeinfo = localtime (&rawtime);//The returned value points to an internal object
+		//init time member to avoid random values for day,month,year
+		tm t = *timeinfo;
 		t.tm_hour = boost::lexical_cast<int>(time_vec[0]);
 		t.tm_min = boost::lexical_cast<int>(time_vec[1]);
 		t.tm_sec = boost::lexical_cast<int>(time_vec[2]);

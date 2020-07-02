@@ -1,18 +1,44 @@
 // Copyright 2019 Fred Hutchinson Cancer Research Center
 // See the included LICENSE file for details on the licence that is granted to the user of this software.
 #include <cytolib/GatingHierarchy.hpp>
-#include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/global.hpp>
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/breadth_first_search.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 namespace cytolib
 {
+	CytoFramePtr load_cytoframe(const string & uri, bool readonly, CytoCtx ctx)
+	{
+		 CytoFramePtr ptr;
 
+		CytoVFS vfs(ctx);
+		 auto fmt = uri_backend_type(uri, vfs);
+		 bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
+		if(!is_exist)
+		 throw(domain_error("cytoframe file missing for sample: " + uri));
+		if(fmt == FileFormat::H5&&is_remote_path(uri))
+		{
+
+			 throw(domain_error("H5cytoframe doesn't support remote loading: " + uri));
+
+		}
+		else
+		{
+
+			if(fmt == FileFormat::H5)
+				ptr.reset(new H5CytoFrame(uri, readonly));
+			else
+	#ifdef HAVE_TILEDB
+				ptr.reset(new TileCytoFrame(uri, readonly, true, ctx));
+	#else
+			throw(domain_error("cytolib is not built with tiledb support!"));
+	#endif
+
+		}
+		return ptr;
+	}
 	/**
 	 * setter for channels (dedicated fro Rcpp API and  it won't throw on the unmatched old channel name)
 	 * @param chnl_map
@@ -257,11 +283,15 @@ namespace cytolib
 	/**
 	 *
 	 * @param gh_pb
-	 * @param h5_filename
+	 * @param cf_filename
 	 * @param h5_opt
 	 * @param is_skip_data whether to skip writing cytoframe data to pb. It is typically remain as default unless for debug purpose (e.g. re-writing gs that is loaded from legacy pb archive without actual data associated)
 	 */
-	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb, string h5_filename, H5Option h5_opt, bool is_skip_data){
+	void GatingHierarchy::convertToPb(pb::GatingHierarchy & gh_pb
+			, string cf_filename
+			, CytoFileOption h5_opt
+			, bool is_skip_data
+			, const CytoCtx & ctx){
 		pb::populationTree * ptree = gh_pb.mutable_tree();
 		/*
 		 * cp tree
@@ -300,57 +330,18 @@ namespace cytolib
 			frame_.set_readonly(false);//temporary unlock it
 			frame_.flush_meta();
 			frame_.set_readonly(flag);//restore the lock
-
-			frame_.convertToPb(*fr_pb, h5_filename, h5_opt);
-		}
-
-
-	}
-
-	GatingHierarchy::GatingHierarchy(pb::GatingHierarchy & pb_gh, string h5_filename, bool is_skip_data, bool readonly){
-		const pb::populationTree & tree_pb =  pb_gh.tree();
-		int nNodes = tree_pb.node_size();
-
-		tree = populationTree(nNodes);
-		for(int i = 0; i < nNodes; i++){
-			const pb::treeNodes & node_pb = tree_pb.node(i);
-			const pb::nodeProperties & np_pb = node_pb.node();
-
-			VertexID curChildID = i;
-			tree[curChildID] = nodeProperties(np_pb);
-
-			if(node_pb.has_parent()){
-				VertexID parentID = node_pb.parent();
-				boost::add_edge(parentID,curChildID,tree);
-			}
-
-		}
-		//restore comp
-		comp = compensation(pb_gh.comp());
-		//restore trans flag
-		for(int i = 0; i < pb_gh.transflag_size(); i++){
-			transFlag.push_back(PARAM(pb_gh.transflag(i)));
-		}
-		//restore trans local
-		trans = trans_local(pb_gh.trans());
-
-		//restore fr
-		if(!is_skip_data)
-		{
-			CytoFramePtr ptr;
-
-			if(fs::exists(h5_filename))
-			{
-			 ptr.reset(new H5CytoFrame(h5_filename, readonly));
-			 pb::CytoFrame fr = *pb_gh.mutable_frame();
-			 if(!fr.is_h5())
-				 ptr.reset(new MemCytoFrame(*ptr));
-			 frame_ = CytoFrameView(ptr);
-			}
+			string ext;
+			if(frame_.get_backend_type() == FileFormat::TILE)
+				ext = ".tile";
 			else
-			 throw(domain_error("H5 file missing for sample: " + h5_filename));
+				ext = ".h5";
+
+			frame_.convertToPb(*fr_pb, cf_filename + ext, h5_opt, ctx);
 		}
+
+
 	}
+
 
 	//load legacy pb
 	GatingHierarchy::GatingHierarchy(pb::GatingHierarchy & pb_gh, map<intptr_t, TransPtr> & trans_tbl){
@@ -696,8 +687,6 @@ namespace cytolib
 					else
 						throw(domain_error(e.what()));
 				}
-
-
 			}
 		}
 
@@ -1574,7 +1563,7 @@ namespace cytolib
 	}
 
 
-	GatingHierarchyPtr  GatingHierarchy::copy(bool is_copy_data, bool is_realize_data, const string & h5_filename) const{
+	GatingHierarchyPtr  GatingHierarchy::copy(bool is_copy_data, bool is_realize_data, const string & cf_filename) const{
 
 		GatingHierarchyPtr res(new GatingHierarchy());
 
@@ -1583,10 +1572,18 @@ namespace cytolib
 		res->transFlag = transFlag;
 		res->trans = trans.copy();
 		if(is_copy_data)
-			if(is_realize_data)
-				res->frame_ = frame_.copy_realized(h5_filename);
+		{
+			string ext;
+			if(frame_.get_backend_type() == FileFormat::TILE)
+				ext = ".tile";
 			else
-				res->frame_ = frame_.copy(h5_filename);
+				ext = ".h5";
+
+			if(is_realize_data)
+				res->frame_ = frame_.copy_realized(cf_filename + ext);
+			else
+				res->frame_ = frame_.copy(cf_filename + ext);
+		}
 		else
 			res->frame_ = frame_;
 		return res;

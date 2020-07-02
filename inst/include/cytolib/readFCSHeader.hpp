@@ -46,6 +46,7 @@ class vec_kw_constainer{
 public:
  typedef KW_PAIR::iterator iterator;
  typedef KW_PAIR::const_iterator const_iterator;
+ void clear(){kw.clear();}
  void resize(size_t n){kw.resize(n);}
  size_t size() const{return kw.size();}
  const KW_PAIR & getPairs() const{return kw;}
