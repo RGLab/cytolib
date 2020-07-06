@@ -30,7 +30,9 @@ PKG_CPPFLAGS += -DHAVE_TILEDB @TILEDB_INCLUDE@
 PKG_LIBS += @TILEDB_LIBS@
 endif
 
-$(OBJECTS): ${boost_fs_objs}
+all: $(SHLIB) 
+
+$(SHLIB): ${boost_fs_objs}
 
 $(boost_fs_objs): ${boost_sys_objs}
 

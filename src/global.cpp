@@ -84,6 +84,26 @@ namespace cytolib
 
 		return generate_unique_filename(dir, prefix, "");
 	}
+	//unfortunately boost::fs doesn't have native support for recursive copy
+	void recursive_copy(const fs::path &src, const fs::path &dst)
+	{
+	  if (fs::exists(dst)){
+	    throw std::runtime_error(dst.generic_string() + " exists");
+	  }
+
+	  if (fs::is_directory(src)) {
+	    fs::create_directories(dst);
+	    for (fs::directory_entry& item : fs::directory_iterator(src)) {
+	      recursive_copy(item.path(), dst/item.path().filename());
+	    }
+	  }
+	  else if (fs::is_regular_file(src)) {
+	    fs::copy(src, dst);
+	  }
+	  else {
+	    throw std::runtime_error(dst.generic_string() + " not dir or file");
+	  }
+	}
 	/**
 	 * Generate time stamp as string
 	 * @return
