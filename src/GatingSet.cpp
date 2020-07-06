@@ -111,7 +111,7 @@ namespace cytolib
 			GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 
-			auto buf = vfs.read_buf(gs_pb_file.string());
+			auto buf = vfs.read_buf(gs_pb_file);
 			 pb::GatingSet pbGS;
 			 //read entire file into buffer since message-lite doesn't support iostream
 
