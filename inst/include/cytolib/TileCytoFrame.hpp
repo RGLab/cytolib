@@ -12,6 +12,7 @@
 
 #ifdef HAVE_TILEDB
 #include <tiledb/tiledb>
+
 namespace cytolib
 {
 /**
@@ -526,7 +527,7 @@ public:
 			new_uri = generate_unique_filename(fs::temp_directory_path().string(), "", ".tile");
 			fs::remove(new_uri);
 		}
-		fs::copy(uri_, new_uri, fs::copy_options::recursive);
+		recursive_copy(uri_, new_uri);
 		CytoFramePtr ptr(new TileCytoFrame(new_uri, false, true, ctx_));
 		//copy cached meta
 		ptr->set_params(get_params());

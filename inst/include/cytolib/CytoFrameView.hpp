@@ -12,6 +12,9 @@
 #include "MemCytoFrame.hpp"
 #include "H5CytoFrame.hpp"
 #include "TileCytoFrame.hpp"
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 namespace cytolib
 {
 class CytoFrameView{
