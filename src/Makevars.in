@@ -9,13 +9,18 @@ This makefile requires GNU Make.
 endif
 
 	
-CXX_STD = CXX17
+CXX_STD = CXX11
+boost_sys_src=${wildcard boost/libs/system/src/*.cpp}
+boost_sys_objs=${boost_sys_src:.cpp=.o}
+boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
+boost_fs_objs=${boost_fs_src:.cpp=.o}
+
 PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
 
 
 #needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
 RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")')
-FSLIB = -lstdc++fs
+FSLIB = ${boost_fs_objs} ${boost_sys_objs}
 
 PKG_LIBS = $(FSLIB) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
 
@@ -24,3 +29,12 @@ ifeq ($(HAVE_TILEDB),yes)
 PKG_CPPFLAGS += -DHAVE_TILEDB @TILEDB_INCLUDE@  
 PKG_LIBS += @TILEDB_LIBS@
 endif
+
+$(OBJECTS): ${boost_fs_objs}
+
+$(boost_fs_objs): ${boost_sys_objs}
+
+
+clean:
+	rm -f $(OBJECTS) ${boost_fs_objs} ${boost_sys_objs}
+ 
