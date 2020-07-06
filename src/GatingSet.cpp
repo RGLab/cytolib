@@ -4,6 +4,8 @@
 #include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/cytolibConfig.h>
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 
 namespace cytolib
@@ -111,7 +113,7 @@ namespace cytolib
 			GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 
-			auto buf = vfs.read_buf(gs_pb_file);
+			auto buf = vfs.read_buf(gs_pb_file.string());
 			 pb::GatingSet pbGS;
 			 //read entire file into buffer since message-lite doesn't support iostream
 

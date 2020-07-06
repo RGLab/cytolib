@@ -12,8 +12,8 @@
 #include <string>
 #include <vector>
 using namespace std;
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem::v1;
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 namespace cytolib
 {
