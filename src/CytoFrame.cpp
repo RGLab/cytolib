@@ -444,6 +444,8 @@ namespace cytolib
 
 			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
 			schema.set_domain(domain);
+			schema.add_attribute(tiledb::Attribute::create<char>(ctx, "channel"));
+			schema.add_attribute(tiledb::Attribute::create<char>(ctx, "marker"));
 			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
 			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
 			tiledb::Array::create(array_uri, schema);
@@ -454,59 +456,44 @@ namespace cytolib
 			tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
 			tiledb::Query query(ctx, array);
 			query.set_layout(TILEDB_GLOBAL_ORDER);
+
 			vector<float> min_vec(nch);
 			for(int i = 0; i < nch; i++)
 				min_vec[i] = params[i].min;
 			query.set_buffer("min", min_vec);
+
 			vector<float> max_vec(nch);
 			for(int i = 0; i < nch; i++)
 				max_vec[i] = params[i].max;
 			query.set_buffer("max", max_vec);
-	//		vector<char> ch_vec;
-	//		vector<uint64_t> off(nch, 0);
-	//		//need this to preserve the channel order
-	//		for(int i = 0; i < nch; i++)
-	//		{
-	//			auto nchar = params[i].channel.size();
-	//			if(i > 0)
-	//				off[i] = off[i-1] + params[i-1].channel.size();
-	//			ch_vec.resize(ch_vec.size() + nchar);
-	//			memcpy(&ch_vec[off[i]], &params[i].channel[0], nchar * sizeof(char));
-	//		}
-	//		query.set_buffer("channel", off, ch_vec);
+
+			vector<char> ch_vec;
+			vector<uint64_t> off(nch, 0);
+			for(int i = 0; i < nch; i++)
+			{
+				auto nchar = params[i].channel.size();
+				if(i > 0)
+					off[i] = off[i-1] + params[i-1].channel.size();
+				ch_vec.resize(ch_vec.size() + nchar);
+				memcpy(&ch_vec[off[i]], &params[i].channel[0], nchar * sizeof(char));
+			}
+			query.set_buffer("channel", off, ch_vec);
+
+			vector<char> marker_vec;
+			vector<uint64_t> moff(nch, 0);
+			//need this to preserve the channel order
+			for(int i = 0; i < nch; i++)
+			{
+				auto nchar = params[i].marker.size();
+				if(i > 0)
+					moff[i] = moff[i-1] + params[i-1].marker.size();
+				marker_vec.resize(marker_vec.size() + nchar);
+				memcpy(&marker_vec[off[i]], &params[i].marker[0], nchar * sizeof(char));
+			}
+			query.set_buffer("marker", moff, marker_vec);
 			query.submit();
 			query.finalize();
 
-			//attach marker as meta since val-length writing to arry attr is not feasible
-			//due to empty markers do not meet the strict ascending buffer offset requirement
-			array.close();
-			array.open(TILEDB_READ);
-			delete_tile_meta(array);
-			for(auto it : params)
-			{
-				array.put_metadata(it.channel, TILEDB_CHAR, it.marker.size(), it.marker.c_str());
-			}
-
-			//hack to preserve channel order
-			array_uri = (fs::path(uri) / "channel_idx").string();
-			if(!vfs.is_dir(array_uri))
-			{
-				tiledb::Domain domain(ctx);
-				//dummy array
-				domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cidx", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
-				tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-				schema.set_domain(domain);
-				schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
-		//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
-
-				tiledb::Array::create(array_uri, schema);
-			}
-			tiledb::Array array1(ctx, array_uri, TILEDB_READ);
-			delete_tile_meta(array1);
-
-			for(int i = 0; i < nch; i++)
-				array1.put_metadata(params[i].channel, TILEDB_INT32, 1, &i);
-			//TODO:switch to TILEDB_STRING_UTF16
 		}
 	}
 #else
