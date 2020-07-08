@@ -71,7 +71,7 @@ namespace cytolib
 /**
 	 * forward the apis to tiledb::VFS
 	 */
-	vector<string> CytoVFS::ls(string p)
+	vector<string> CytoVFS::ls(string p) const
 	{
 		auto & vfs = *(static_pointer_cast<tiledb::VFS>(vfsptr_));
 		return vfs.ls(p);
@@ -80,7 +80,7 @@ namespace cytolib
 		auto & vfs = *(static_pointer_cast<tiledb::VFS>(vfsptr_));
 		return vfs.is_dir(p);
 	}
-	bool CytoVFS::is_file(string p){
+	bool CytoVFS::is_file(string p) const{
 		auto & vfs = *(static_pointer_cast<tiledb::VFS>(vfsptr_));
 		return vfs.is_file(p);
 	}
@@ -138,7 +138,7 @@ namespace cytolib
 		 return buf;
 	}
 
-	vector<string> CytoVFS::ls(string p)
+	vector<string> CytoVFS::ls(string p) const
 		{
 
 			vector<string>res;
@@ -147,7 +147,7 @@ namespace cytolib
 			return res;
 		}
 	bool CytoVFS::is_dir(string p) const{return fs::is_directory(p);}
-	bool CytoVFS::is_file(string p){return !fs::is_directory(p)&&fs::exists(p);}
+	bool CytoVFS::is_file(string p) const{return !fs::is_directory(p)&&fs::exists(p);}
 	void CytoVFS::remove_dir(string p){fs::remove_all(p);}
 	void CytoVFS::create_dir(string p){ fs::create_directory(p);}
 	void CytoVFS::move_dir(string p, string p1){fs::rename(p, p1);}

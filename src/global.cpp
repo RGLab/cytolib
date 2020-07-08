@@ -57,7 +57,23 @@ namespace cytolib
 	{
 //		if(regex_search(path, regex("(\\.tile)$")))
 		if(vfs.is_dir(path))
-			return FileFormat::TILE;
+		{
+			auto subdirs = vfs.ls(path);
+			for(auto & e: subdirs)
+			{
+				e = fs::path(e).stem().string();
+			}
+			bool has_keywords = find(subdirs.begin(), subdirs.end(), "keywords") != subdirs.end();
+			bool has_mat = find(subdirs.begin(), subdirs.end(), "mat") != subdirs.end();
+			bool has_params = find(subdirs.begin(), subdirs.end(), "params") != subdirs.end();
+			bool has_pdata = find(subdirs.begin(), subdirs.end(), "pdata") != subdirs.end();
+			if(has_keywords&&has_mat&&has_params&&has_pdata)
+				return FileFormat::TILE;
+			else
+				throw(domain_error("invalid cytoframe path: " + path));
+
+
+		}
 		else// if(regex_search(path, regex("(\\.h5)$")))
 			return FileFormat::H5;
 //		else

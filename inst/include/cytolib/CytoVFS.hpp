@@ -54,9 +54,9 @@ namespace cytolib
 		CytoVFS(CytoCtx ctx);
 		void write_buf(const string & file, const string & buf);
 		vector<char> read_buf(const string & file);
-		vector<string> ls(string p);
+		vector<string> ls (string p) const;
 		bool is_dir(string p) const;
-		bool is_file(string p);
+		bool is_file(string p) const;
 		void remove_dir(string p);
 		void create_dir(string p);
 		void move_dir(string p, string p1);
