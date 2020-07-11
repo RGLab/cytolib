@@ -537,7 +537,7 @@ namespace cytolib
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet::GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, bool execute):GatingSet(){
+	GatingSet::GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, bool execute, string comp_source):GatingSet(){
 		auto samples = cs.get_sample_uids();
 		for(const string & sn : samples)
 		{
@@ -556,7 +556,23 @@ namespace cytolib
 				MemCytoFrame fr = MemCytoFrame(*(cfv.get_cytoframe_ptr()));
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... compensate: "+sn+"... \n");
-				gh->compensate(fr);
+				if(comp_source == "template"){
+					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+						PRINT("\n... using compensation from template... \n");
+					gh->compensate(fr);
+				}else if(comp_source == "sample"){
+					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+						PRINT("\n... using compensation from sample... \n");
+					gh->set_compensation(fr.get_compensation(), false);
+					gh->compensate(fr);
+
+				}else{
+					if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+						PRINT("\n... skipping compensation... \n");
+					gh->set_compensation(compensation(), false);
+
+				}
+
 				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 					PRINT("\n... transform_data: "+sn+"... \n");
 				// fr.scale_time_channel();

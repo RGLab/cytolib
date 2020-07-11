@@ -102,6 +102,7 @@ public:
 			{
 				string val = keys_[key];
 				comp = compensation(val);
+				comp.cid = "1";
 			}
 			return comp;
 		}
