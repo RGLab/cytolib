@@ -237,7 +237,7 @@ public:
 	 * compensation and transformation,more options can be allowed in future like providing different
 	 * comp and trans
 	 */
-	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, bool execute = true, string comp_source = "template");
+	GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, bool execute = true, string comp_source = "sample");
 	/**
 	 * assign the flow data from the source gs
 	 * @param gs typically it is a root-only GatingSet that only carries cytoFrames
