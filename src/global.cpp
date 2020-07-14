@@ -53,6 +53,11 @@ namespace cytolib
 	{
 		return regex_search(path, regex("^((https)|(s3))(://)(.*)"));
 	}
+	void check_sample_guid(const string & sample_guid)
+	{
+		if(regex_search(sample_guid, regex("(/|\\\\)")))
+			throw(domain_error("invalid sample_guid (containing '/' or '\\\\' character): " + sample_guid));
+	}
 	FileFormat uri_backend_type(const string & path, const CytoVFS & vfs)
 	{
 //		if(regex_search(path, regex("(\\.tile)$")))

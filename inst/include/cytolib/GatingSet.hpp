@@ -294,6 +294,7 @@ public:
 	 */
 	GatingHierarchyPtr add_GatingHierarchy(GatingHierarchyPtr gh, string sample_uid, bool validity_check = true)
 	{
+			check_sample_guid(sample_uid);
 			if(ghs_.find(sample_uid)!=ghs_.end())
 				throw(domain_error("Can't add new sample since it already exists for: " + sample_uid));
 			if(validity_check)

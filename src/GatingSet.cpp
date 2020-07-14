@@ -772,6 +772,7 @@ namespace cytolib
 	 * @param _new
 	 */
 	void GatingSet::set_sample_uid(const string & _old, const string & _new){
+		check_sample_guid(_new);
 		if(_old.compare(_new) != 0)
 		{
 			auto it = find(_new);

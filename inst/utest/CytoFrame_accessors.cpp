@@ -21,7 +21,6 @@ struct CFFixture{
 		fr.write_to_disk(tmp, file_format);
 		cf_disk = load_cytoframe(tmp);
 
-
 	};
 
 	~CFFixture(){
