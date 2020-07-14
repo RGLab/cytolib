@@ -125,7 +125,7 @@ public:
 	{
 			get_cytoframe_ptr()->compensate(comp);
 	}
-	compensation get_compensation(const string & key = "SPILL")
+	compensation get_compensation(const string & key = "$SPILLOVER")
 	{
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
