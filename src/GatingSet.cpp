@@ -539,17 +539,6 @@ namespace cytolib
 	 */
 	GatingSet::GatingSet(const GatingHierarchy & gh_template,const GatingSet & cs, bool execute, string comp_source):GatingSet(){
 		auto samples = cs.get_sample_uids();
-
-		// compensation pre-check for case of compensation by sample
-		if(comp_source == "sample"){
-			if(g_loglevel>=GATING_HIERARCHY_LEVEL)
-				PRINT("\n... Pre-checking for presence of compensation matrices for individual samples... \n");
-			for(const string & sn : samples){
-				auto cfv = cs.get_cytoframe_view(sn);
-				if(cfv.get_compensation().cid != "1")
-					throw(domain_error("No compensation matrix found for sample: " + sn));
-			}
-		}
 		for(const string & sn : samples)
 		{
 

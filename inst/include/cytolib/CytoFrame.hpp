@@ -17,7 +17,6 @@ using namespace arma;
 #include <boost/lexical_cast.hpp>
 #include <cytolib/global.hpp>
 #include <unordered_map>
-#include <algorithm>
 
 #include <H5Cpp.h>
 using namespace H5;
@@ -108,10 +107,6 @@ public:
 				comp.cid = "1";
 			}else{
 				vector<string> search_keys = {"$SPILLOVER", "SPILL", "spillover"};
-				// avoid re-checking the failed key
-				vector<string>::iterator key_iter = find(search_keys.begin(), search_keys.end(), key);
-				if(key_iter != search_keys.end())
-					search_keys.erase(key_iter);
 				for (auto search_key : search_keys){
 					if(keys_.find(search_key) != keys_.end()){
 						if(g_loglevel>=GATING_HIERARCHY_LEVEL)
