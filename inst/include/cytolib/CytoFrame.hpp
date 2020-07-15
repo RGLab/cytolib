@@ -94,14 +94,31 @@ public:
 	CytoFrame(CytoFrame && frm);
 
 
-	compensation get_compensation(const string & key = "SPILL")
+	compensation get_compensation(const string & key = "$SPILLOVER")
 		{
 			compensation comp;
 
 			if(keys_.find(key)!=keys_.end())
 			{
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("\n... spillover matrix found using specified key: "+ key +"... \n");
 				string val = keys_[key];
 				comp = compensation(val);
+				comp.cid = "1";
+			}else{
+				vector<string> search_keys = {"$SPILLOVER", "SPILL", "spillover"};
+				for (auto search_key : search_keys){
+					if(keys_.find(search_key) != keys_.end()){
+						if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+							PRINT("\n... spillover matrix found using search key: "+ search_key +"... \n");
+						string val = keys_[search_key];
+						comp = compensation(val);
+						comp.cid = "1";
+						break;
+					}
+				}
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+					PRINT("\n... No spillover matrix found... \n");
 			}
 			return comp;
 		}

@@ -27,6 +27,7 @@ public:
 	CytoFrameView(){};
 	CytoFrameView(CytoFramePtr ptr):ptr_(ptr){};
 	CytoFramePtr get_cytoframe_ptr() const;
+
 	bool is_row_indexed() const{return is_row_indexed_;};
 	bool is_col_indexed() const{return is_col_indexed_;};
 	bool is_empty() const{return (is_row_indexed_ && row_idx_.is_empty()) || (is_col_indexed_ && col_idx_.is_empty());};
@@ -124,7 +125,7 @@ public:
 	{
 			get_cytoframe_ptr()->compensate(comp);
 	}
-	compensation get_compensation(const string & key = "SPILL")
+	compensation get_compensation(const string & key = "$SPILLOVER")
 	{
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
@@ -245,17 +246,30 @@ public:
 	 * Realize the delayed subsetting (i.e. cols() and rows()) operations to the underlying data
 	 * and clear the view
 	 */
-	CytoFrameView copy_realized(const string & cf_filename = "", bool overwrite = false) const
+	CytoFramePtr realize(CytoFramePtr ptr, const string & cf_filename = "", bool overwrite = false) const
 	{
 		if(is_row_indexed_ && is_col_indexed_){
-			return get_cytoframe_ptr()->copy(row_idx_, col_idx_, cf_filename, overwrite);
+			return ptr->copy(row_idx_, col_idx_, cf_filename, overwrite);
 		}else if(is_row_indexed_){
-			return get_cytoframe_ptr()->copy(row_idx_, true, cf_filename, overwrite);
+			return ptr->copy(row_idx_, true, cf_filename, overwrite);
 		}else if(is_col_indexed_){
-			return get_cytoframe_ptr()->copy(col_idx_, false, cf_filename, overwrite);
+			return ptr->copy(col_idx_, false, cf_filename, overwrite);
 		}else{
-			return get_cytoframe_ptr()->copy(cf_filename, overwrite);
+			return ptr->copy(cf_filename, overwrite);
 		}
+	}
+	CytoFrameView copy_realized(const string & cf_filename = "", bool overwrite = false) const
+	{
+		return CytoFrameView(realize(get_cytoframe_ptr(), cf_filename, overwrite));
+	}
+	/*
+	 * this API exists to bypass potential writing the on-disk cf
+	 */
+	shared_ptr<MemCytoFrame> get_realized_memcytoframe() const{
+
+		shared_ptr<MemCytoFrame> ptr(new MemCytoFrame(*get_cytoframe_ptr()));
+		auto res = realize(ptr);
+		return dynamic_pointer_cast<MemCytoFrame>(res);
 	}
 	void set_data(const EVENT_DATA_VEC & data_in);
 	EVENT_DATA_VEC get_data() const;

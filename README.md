@@ -95,6 +95,9 @@ $ cd build
 # run cmake to configure the package for your system
 $ cmake ..
 
+# to link against the tiledb that is installed at custom location
+# e.g. `cmake -DCMAKE_PREFIX_PATH=</path/to/TileDB>`
+
 # to select different compiler other than the default
 # e.g. `cmake -DCMAKE_CXX_COMPILER=clang++` 
 

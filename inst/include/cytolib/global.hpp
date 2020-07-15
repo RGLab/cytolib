@@ -39,7 +39,7 @@ namespace cytolib
 	}
 	FileFormat uri_backend_type(const string & path, const CytoVFS & vfs);
 	string s3_to_http(string uri);
-
+	void check_sample_guid(const string & sample_guid);
 	bool is_remote_path(const string &);
 
 	#define GATING_SET_LEVEL 1
