@@ -343,8 +343,8 @@ namespace cytolib
 			throw(domain_error("Don't know how to deal with $DATATYPE"));
 
 		auto it_mode = keys_.find("$MODE");
-		if(it_mode!=keys_.end()&&*it_mode != "L")
-			throw(domain_error("Don't know how to deal with $MODE " + *it_mode));
+		if(it_mode!=keys_.end()&&it_mode->second != "L")
+			throw(domain_error("Don't know how to deal with $MODE " + it_mode->second));
 
 
 		fcsPnGtransform = keys_.find("flowCore_fcsPnGtransform")!= keys_.end() && keys_["flowCore_fcsPnGtransform"] == "linearize-with-PnG-scaling";
