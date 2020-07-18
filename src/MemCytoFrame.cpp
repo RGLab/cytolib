@@ -663,32 +663,33 @@ namespace cytolib
 	//				# so that it is only done when specifically asked for so that read.FCS remains backwards
 	//				# compatible with previous versions.
 
-
-				if(isTransformation)
+				if(header_.FCSversion<3.2||(header_.FCSversion>=3.2&&dattype == "I"))
 				{
-
-
-				  if(param.PnE[0] > 0)
-				  {
-					 outElement = pow(10,outElement/param.max * param.PnE[0]) * param.PnE[1];
-				  }
-				  else if (fcsPnGtransform && param.PnG != 1) {
-					  outElement = outElement / param.PnG;
-				  }
-				}
-				if(scale)
-				{
-					if(param.PnE[0] > 0)
+					if(isTransformation)
 					{
-						outElement = decade*((outElement-1)/(param.max-1));
-					}
-					else
-					{
-						outElement = decade*((outElement)/(param.max));
-					}
-				}
-				realMin = realMin > outElement?outElement:realMin;
 
+
+					  if(param.PnE[0] > 0)
+					  {
+						 outElement = pow(10,outElement/param.max * param.PnE[0]) * param.PnE[1];
+					  }
+					  else if (fcsPnGtransform && param.PnG != 1) {
+						  outElement = outElement / param.PnG;
+					  }
+					}
+					if(scale)
+					{
+						if(param.PnE[0] > 0)
+						{
+							outElement = decade*((outElement-1)/(param.max-1));
+						}
+						else
+						{
+							outElement = decade*((outElement)/(param.max));
+						}
+					}
+					realMin = realMin > outElement?outElement:realMin;
+				}
 		    }
 
 			if(keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom")
