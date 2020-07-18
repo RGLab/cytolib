@@ -342,9 +342,9 @@ namespace cytolib
 		if(dattype!="I"&&dattype!="F"&&dattype!="D")
 			throw(domain_error("Don't know how to deal with $DATATYPE"));
 
-
-		if(keys_["$MODE"] != "L")
-			throw(domain_error("Don't know how to deal with $MODE " + keys_["$MODE"]));
+		auto it_mode = keys_.find("$MODE");
+		if(it_mode!=keys_.end()&&*it_mode != "L")
+			throw(domain_error("Don't know how to deal with $MODE " + *it_mode));
 
 
 		fcsPnGtransform = keys_.find("flowCore_fcsPnGtransform")!= keys_.end() && keys_["flowCore_fcsPnGtransform"] == "linearize-with-PnG-scaling";

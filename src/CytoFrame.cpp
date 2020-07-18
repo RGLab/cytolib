@@ -769,8 +769,17 @@ namespace cytolib
 				ts = boost::lexical_cast<EVENT_DATA_TYPE>(it_time->second);
 		else
 		{
-		  auto it_btime = keys_.find("$BTIM");
-		  auto it_etime = keys_.find("$ETIM");
+			//search FCS3.2 kw first
+			auto it_btime = keys_.find("$BEGINDATETIME");
+			auto it_etime = keys_.find("$ENDDATETIME");
+			if(it_btime == keys_.end() || it_etime == keys_.end())
+			{
+				//fall back to old kw
+				it_btime = keys_.find("$BTIM");
+				it_etime = keys_.find("$ETIM");
+			}
+
+
 		  if(it_btime == keys_.end() || it_etime == keys_.end())
 			  ts = 1;
 		  else
