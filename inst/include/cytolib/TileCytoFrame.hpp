@@ -575,11 +575,24 @@ public:
 	{
 		check_write_permission();
 
+		// write_tile_data() will resize if necessary but it involves a delete and re-write
 		write_tile_data(uri_, _data, ctx_);
 
 		auto & array = get_mat_array_ref();
-		if(array.is_open())
-			array.reopen();
+
+		if((dims[0] != _data.n_rows) || (dims[1] != _data.n_cols)){
+			// If an array re-size was necessary, close() followed by open()
+			// seems necessary
+			array.close();
+			array.open(TILEDB_READ);
+			// And the dimensions need to be updated
+			dims[0] = _data.n_rows;
+			dims[1] = _data.n_cols;
+		}else{
+			// Otherwise, it is a little more efficient to use reopen()
+			if(array.is_open())
+				array.reopen();
+		}
 
 	}
 
@@ -587,9 +600,13 @@ public:
 	{
 		set_data(_data);
 	}
-	void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
-			throw(domain_error("append_columns not implemented for H5CytoFrame!"));
-		}
+
+	void append_data_columns(const EVENT_DATA_VEC & new_cols)
+	{
+		EVENT_DATA_VEC this_data = get_data();
+		this_data.insert_cols(this_data.n_cols, new_cols);
+		set_data(this_data);
+	}
 };
 
 };

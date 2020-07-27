@@ -243,6 +243,11 @@ namespace cytolib
 		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 		check_write_permission();
 		hsize_t dims_data[2] = {_data.n_cols, _data.n_rows};
+
+		// For the case that the data matrix has been re-sized
+		dims[0] = _data.n_cols;
+		dims[1] = _data.n_rows;
+
 		auto dataset = file.openDataSet(DATASET_NAME);
 
 		dataset.extend(dims_data);
