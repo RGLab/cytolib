@@ -141,8 +141,11 @@ public:
 		return res;
 	}
 
-	void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
-		throw(domain_error("append_columns not implemented for H5CytoFrame!"));
+	void append_data_columns(const EVENT_DATA_VEC & new_cols)
+	{
+		EVENT_DATA_VEC this_data = get_data();
+		this_data.insert_cols(this_data.n_cols, new_cols);
+		set_data(this_data);
 	}
 
 	void set_marker(const string & channelname, const string & markername)

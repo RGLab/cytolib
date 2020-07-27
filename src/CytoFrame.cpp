@@ -112,7 +112,93 @@ namespace cytolib
 
 	}
 
+	void CytoFrame::append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
+		// Pre-checks
 
+		// Size checks
+		if( new_colnames.size() <= 0 | (new_colnames.size() != new_cols.n_cols))
+			throw(domain_error("Must have equal (nonzero) number of new column names and columns."));
+		if( new_cols.n_rows != n_rows())
+			throw(domain_error("New columns must have same number of rows as existing columns."));
+
+		// Check validity of new channel names
+
+		// Check if new channel names duplicate any existing channels
+		vector<string> existing_channels = get_channels();
+		for(auto & name : new_colnames){
+			if(name.empty())
+				throw(domain_error("Channel names must be non-empty strings"));
+			if(get_col_idx(name, ColType::channel) != -1)
+				throw(domain_error("CytoFrame already contains this channel: " + name));
+		}
+		// Check for duplicates within the new colnames
+		vector<string> check_names(new_colnames.size());
+		std::copy(new_colnames.begin(), new_colnames.end(), check_names.begin());
+		std::sort(check_names.begin(), check_names.end());
+		if(std::unique(check_names.begin(), check_names.end()) != check_names.end())
+			throw(domain_error("Duplicate new channel names detected. New channel names must be unique."));
+
+		unsigned num_toadd = new_cols.n_cols;
+
+		// arma::min/max for column ranges
+		rowvec new_mins = min(new_cols, 0);
+		rowvec new_maxs = max(new_cols, 0);
+
+		// If ALL are good, go ahead and add them
+
+		// By the logic of CytoframeView::get_original_col_ids
+		// we should assume we assign the new indices starting right after n_cols
+		vector<unsigned> new_idx(num_toadd);
+		for(unsigned i = 0, j = n_cols()+1; i < num_toadd; i++, j++)
+			new_idx[i] = j;
+
+		// Add new columns to end of data matrix in backend-dependent manner
+		append_data_columns(new_cols);
+
+		// Add the new columns to the params with empty marker names
+		vector<cytoParam> updated_params = get_params();
+		for(unsigned i = 0; i < num_toadd; i++){
+			cytoParam to_add;
+			to_add.channel = new_colnames[i];
+			to_add.marker = "";
+			to_add.min = new_mins(i);
+			to_add.max = new_maxs(i);
+			to_add.PnG = 1;
+			to_add.PnE[0] = to_add.PnE[1] = 0.0;
+			to_add.PnB = 32;
+			updated_params.push_back(to_add);
+		}
+		set_params(updated_params);
+
+		// Update keywords
+
+		// Some logic adapted from MemCytoFrame::read_fcs_header
+		KEY_WORDS::iterator it;
+		for(unsigned i = 0; i < num_toadd; i++){
+			string pid = to_string(new_idx[i]);
+			string range_str;
+
+			// Defaults that will be set through logic of old cf_append_cols
+			set_keyword("$P" + pid + "B", "32");
+			set_keyword("$P" + pid + "E", "0,0");
+			// PnG key not set to match old behavior
+
+			// Bump by 1, following logic of flowCore#187 and flowCore@654f0c3
+			set_keyword("$P" + pid + "R", boost::lexical_cast<string>((long long)ceil(new_maxs(i)) + 1));
+
+
+			if( keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom"){
+				set_keyword("flowCore_$P" + pid + "Rmin", boost::lexical_cast<string>(new_mins(i)));
+				set_keyword("flowCore_$P" + pid + "Rmax", boost::lexical_cast<string>(new_maxs(i)));
+			}
+
+			set_keyword("$P" + pid + "N", new_colnames[i]);
+		}
+
+		// Force backend-dependent metadata writes now
+		flush_meta();
+
+	}
 
 //	void writeFCS(const string & filename);
 
@@ -310,10 +396,23 @@ namespace cytolib
 	{
 		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
 
-		int nEvents = n_rows();
-		int nch = n_cols();
+		int nEvents = _data.n_rows;
+		int nch = _data.n_cols;
 		auto array_uri = (fs::path(uri) / "mat").string();
 		tiledb::VFS vfs(ctx);
+
+		// Check if data matrix dimensions have changed. tiledb does not currently support re-sizing
+		// dimensions, so this requires a re-write
+		if(!is_new && vfs.is_dir(array_uri)){
+			tiledb::Array array(ctx, array_uri, TILEDB_READ);
+			int array_nevents = array.non_empty_domain<int>("cell").second;
+			int array_nch = array.non_empty_domain<int>("channel").second;
+			if((array_nevents != nEvents) || (array_nch != nch)){
+				vfs.remove_dir(array_uri);
+				is_new = true;
+			}
+		}
+
 		if(is_new)
 		{
 			if(vfs.is_dir(array_uri))
@@ -434,6 +533,18 @@ namespace cytolib
 
 		int nch = n_cols();
 		tiledb::VFS vfs(ctx);
+
+		// Check if data matrix dimensions have changed. tiledb does not currently support re-sizing
+		// dimensions, so this requires a re-write
+		if(!is_new && vfs.is_dir(array_uri)){
+			tiledb::Array array(ctx, array_uri, TILEDB_READ);
+			int array_nparam = array.non_empty_domain<int>("params").second;
+			if(array_nparam != nch){
+				vfs.remove_dir(array_uri);
+				is_new = true;
+			}
+		}
+
 		if(is_new)
 		{
 			if(vfs.is_dir(array_uri))
