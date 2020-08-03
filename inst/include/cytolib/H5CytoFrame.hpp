@@ -386,6 +386,19 @@ public:
 		check_write_permission();
 		set_data(_data);
 	}
+
+//	vector<string> get_rownames() const
+//	{
+
+//		return read_data(col_idx);
+
+//	}
+//	void set_rownames(const vector<string> & data_in)
+//	{
+//		if(n_rows()!=data_in.size())
+//			throw(domain_error("the input rownames size is different from the matrix size!"));
+
+//	}
 };
 
 };

@@ -206,6 +206,12 @@ public:
 	 * get the data of entire event matrix
 	 * @return
 	 */
+	virtual vector<string> get_rownames() const{
+		throw(domain_error("not supported yet!"));
+	}
+	virtual void set_rownames(const vector<string> & data_in){
+		throw(domain_error("not supported yet!"));
+	}
 	virtual EVENT_DATA_VEC get_data() const=0;
 	virtual EVENT_DATA_VEC get_data(uvec idx, bool is_col) const=0;
 	virtual EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const=0;

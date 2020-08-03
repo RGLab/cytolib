@@ -56,6 +56,51 @@ public:
 	FileFormat get_backend_type()  const{
 		return get_cytoframe_ptr()->get_backend_type();
 	};
+	vector<string> get_rownames() const{
+			vector<string> orig = get_cytoframe_ptr()->get_rownames();
+			unsigned n = row_idx_.size();
+			if(!is_row_indexed_)
+				return orig;
+			else if(n == 0)
+				return vector<string>();
+			else
+			{
+				vector<string> res(n);
+				for(unsigned i = 0; i < n; i++)
+					res[i] = orig[row_idx_[i]];
+				return res;
+			}
+		}
+	void set_rownames(const vector<string> & data_in){
+			auto n = data_in.size();
+			if(n_rows()==0){
+				// Setting empty to empty is an allowed no-op, but not setting empty to non-empty
+				if(n==0){
+					throw(domain_error("Cannot assign non-empty input data to empty CytoFrameView!"));
+				}
+			}else{
+				//fetch the original view of data
+				auto data_orig = get_cytoframe_ptr()->get_rownames();
+				//update it
+
+				if(n_rows()!=n)
+					throw(domain_error("The length of the input rownames is different from the cytoframeview!"));
+				else
+				{
+					if(is_row_indexed_)
+					{
+						for(unsigned i = 0; i < n; i++)
+							data_orig[row_idx_[i]] = data_in[i];
+					}
+					else
+						data_orig = data_in;
+				}
+
+
+				//write back to ptr_
+				get_cytoframe_ptr()->set_rownames(data_orig);
+			}
+		}
 	vector<string> get_channels() const;
 	vector<string> get_markers() const;
 	void set_channels(const CHANNEL_MAP & chnl_map){get_cytoframe_ptr()->set_channels(chnl_map);}
