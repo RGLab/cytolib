@@ -142,6 +142,7 @@ public:
 			throw(domain_error("the input rownames size is different from the matrix size!"));
 		rownames_ = data_in;
 	}
+	void del_rownames(){rownames_.clear();}
 	EVENT_DATA_VEC get_data() const
 	{
 		return data_;

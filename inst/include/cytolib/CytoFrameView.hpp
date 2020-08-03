@@ -61,7 +61,7 @@ public:
 			unsigned n = row_idx_.size();
 			if(!is_row_indexed_)
 				return orig;
-			else if(n == 0)
+			else if(n == 0||orig.size()==0)
 				return vector<string>();
 			else
 			{
@@ -71,6 +71,13 @@ public:
 				return res;
 			}
 		}
+
+	void del_rownames(){
+		if(is_row_indexed_)
+			throw(domain_error("Cannot delete the rownames from a subsetted CytoFrameView!"));
+
+		get_cytoframe_ptr()->del_rownames();
+	}
 	void set_rownames(const vector<string> & data_in){
 			auto n = data_in.size();
 			if(n_rows()==0){
@@ -89,6 +96,9 @@ public:
 				{
 					if(is_row_indexed_)
 					{
+						if(data_orig.size()==0)
+							data_orig.resize(n_rows());
+
 						for(unsigned i = 0; i < n; i++)
 							data_orig[row_idx_[i]] = data_in[i];
 					}
