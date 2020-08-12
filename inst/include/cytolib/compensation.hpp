@@ -48,7 +48,7 @@ public:
 		int n = boost::lexical_cast<int>(valVec[0]);
 		// Pre-check size of valVec -- this is strictly imposed by the FCS spec
 		if(valVec.size() != 1+n+n*n){
-			PRINT("SPILLOVER keyword value is of improper size for number of spillover channels!\n");
+			PRINT("$SPILLOVER keyword value is of improper size for number of spillover channels!\n");
 			// This is just a simple check. If something other than . was used as decimal
 			// separator but used consistently, the size should be 1+n+2*(n*n)
 			if(valVec.size() == 1+n+2*n*n){
@@ -61,9 +61,9 @@ public:
 					valVec_fixed[i] = valVec[j] + "." + valVec[j+1];
 
 				valVec = std::move(valVec_fixed);
-				PRINT("SPILLOVER size discrepancy was resolved by assuming non-standard decimal delimiter.\n");
+				PRINT("$SPILLOVER size discrepancy was resolved by assuming non-standard decimal separator.\n");
 			}else
-				throw(domain_error("SPILLOVER size discrepancy could not be resolved!\n"));
+				throw(domain_error("$SPILLOVER size discrepancy could not be resolved!\n"));
 
 		}
 		unordered_map<string, queue<int>> chnls;
