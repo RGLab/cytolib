@@ -184,7 +184,7 @@ public:
 		return "";
 	}
 
-	void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols);
+	void append_data_columns(const EVENT_DATA_VEC & new_cols);
 
 };
 
