@@ -46,6 +46,26 @@ public:
 		vector<string> valVec;
 		boost::split(valVec, val, boost::is_any_of(","));
 		int n = boost::lexical_cast<int>(valVec[0]);
+		// Pre-check size of valVec -- this is strictly imposed by the FCS spec
+		if(valVec.size() != 1+n+n*n){
+			PRINT("SPILLOVER keyword value is of improper size for number of spillover channels!\n");
+			// This is just a simple check. If something other than . was used as decimal
+			// separator but used consistently, the size should be 1+n+2*(n*n)
+			if(valVec.size() == 1+n+2*n*n){
+				vector<string> valVec_fixed(1+n+n*n);
+				// Copy over number of markers and marker names
+				for(int i = 0; i < 1+n; i++)
+					valVec_fixed[i] = valVec[i];
+				// For the actual values, collapse them down by adjacent values, assuming prior improper split
+				for(int i = 1+n, j = 1+n; i < valVec_fixed.size(); i++, j+=2)
+					valVec_fixed[i] = valVec[j] + "." + valVec[j+1];
+
+				valVec = std::move(valVec_fixed);
+				PRINT("SPILLOVER size discrepancy was resolved by assuming non-standard decimal delimiter.\n");
+			}else
+				throw(domain_error("SPILLOVER size discrepancy could not be resolved!\n"));
+
+		}
 		unordered_map<string, queue<int>> chnls;
 		if(n > 0)
 		{
@@ -84,6 +104,8 @@ public:
 					}
 				}
 			}
+			// This is not safe without the size pre-checks. Additionally, vector[] will not even
+			// yield an out_of_range exception so it just results in an ugly segfault if size is off
 			for(unsigned i = n + 1; i < valVec.size(); i++)//param name
 			{
 				//Removing any formatting padding from spillover matrix entries
