@@ -522,12 +522,12 @@ public:
 	populationTree & getTree(){return tree;};
 
 	/*
-	 * Retrieve a represetnation of the tree as a vector of directed edges
+	 * Retrieve a representation of the tree as a vector of directed edges represented as pairs of VertexIDs
 	 * and a vector of VertexIDs of the leaf nodes (aka "tips").
 	 *
-	 * @param u Node ID of root
+	 * @param start Node ID of starting node to allow sub-graph extraction
 	 */
-	phylo getPhylo();
+	phylo getPhylo(VertexID start);
 
 
 	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & uri) const;

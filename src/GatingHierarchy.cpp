@@ -899,20 +899,34 @@ namespace cytolib
 	class phylo_visitor : public boost::default_dfs_visitor
 	{
 	public:
-		phylo_visitor(phylo& p) : phylo_tree(p){}
+		phylo_visitor(phylo& p, VertexID start) : phylo_tree(p), starting_node(start), backtracking(false){}
 		phylo & phylo_tree;
+		VertexID starting_node;
+		bool backtracking;
 		template < typename Vertex, typename Graph >
-		void discover_vertex(Vertex u, const Graph & g) const
+		void discover_vertex(Vertex u, const Graph & g)
 		{
-			// Only add if it's a leaf
-			if(boost::out_degree(u, g) == 0)
+			// Only add if it's a leaf under the starting_node
+			if(!backtracking && boost::out_degree(u, g) == 0)
 				phylo_tree.leaf_nodes.push_back(u);
 		}
 		template < typename Edge, typename Graph >
-		void tree_edge(Edge e, const Graph & g) const
+		void tree_edge(Edge e, const Graph & g)
 		{
-		  std::pair<VertexID, VertexID> this_edge(boost::source(e, g), boost::target(e, g));
-			phylo_tree.edges.push_back(this_edge);
+			// Only add an edge if it's out of the starting_node or its descendants
+			if(!backtracking){
+				std::pair<VertexID, VertexID> this_edge(boost::source(e, g), boost::target(e, g));
+				phylo_tree.edges.push_back(this_edge);
+			}
+		}
+		template < typename Vertex, typename Graph >
+		void finish_vertex(Vertex u, const Graph & g)
+		{
+			// Once the subgraph under starting_node is fully searched, stop keeping track
+			// This restricts output to the original starting_node and its descendants
+			if(u == starting_node){
+				backtracking = true;
+			}
 		}
 	};
 
@@ -1559,10 +1573,15 @@ namespace cytolib
 
 	}
 
-	phylo GatingHierarchy::getPhylo(){
+	phylo GatingHierarchy::getPhylo(VertexID start){
 		phylo out_phylo;
-		phylo_visitor vis(out_phylo);
-		boost::depth_first_search(tree, boost::visitor(vis));
+		phylo_visitor vis(out_phylo, start);
+		// Have to construct the default ColorMap to be able to supply
+		// starting node due to depth_first_search arg order
+		auto indexmap = boost::get(boost::vertex_index, tree);
+		auto colormap = boost::make_vector_property_map<boost::default_color_type>(indexmap);
+
+		boost::depth_first_search(tree, vis, colormap, start);
 		return out_phylo;
 	}
 
