@@ -1581,7 +1581,11 @@ namespace cytolib
 		auto indexmap = boost::get(boost::vertex_index, tree);
 		auto colormap = boost::make_vector_property_map<boost::default_color_type>(indexmap);
 
+		// Get the edges and leaves
 		boost::depth_first_search(tree, vis, colormap, start);
+		// Append full paths for leaf names
+		for(auto leaf : out_phylo.leaf_nodes)
+			out_phylo.leaf_names.push_back(getNodePath(leaf,true));
 		return out_phylo;
 	}
 

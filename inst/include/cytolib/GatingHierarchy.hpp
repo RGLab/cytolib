@@ -46,6 +46,7 @@ typedef vector<NODEID> NODEID_vec;
 struct phylo{
 	VertexID_edge_vec edges;
 	VertexID_vec leaf_nodes; // aka "tips"
+	vector<string> leaf_names;
 };
 
 
