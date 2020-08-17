@@ -6,6 +6,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/depth_first_search.hpp>
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
@@ -895,6 +896,26 @@ namespace cytolib
 
 		};
 
+	class phylo_visitor : public boost::default_dfs_visitor
+	{
+	public:
+		phylo_visitor(phylo& p) : phylo_tree(p){}
+		phylo & phylo_tree;
+		template < typename Vertex, typename Graph >
+		void discover_vertex(Vertex u, const Graph & g) const
+		{
+			// Only add if it's a leaf
+			if(boost::out_degree(u, g) == 0)
+				phylo_tree.leaf_nodes.push_back(u);
+		}
+		template < typename Edge, typename Graph >
+		void tree_edge(Edge e, const Graph & g) const
+		{
+		  std::pair<VertexID, VertexID> this_edge(boost::source(e, g), boost::target(e, g));
+			phylo_tree.edges.push_back(this_edge);
+		}
+	};
+
 	/**
 	 * retrieve all the node IDs
 	 *
@@ -1536,6 +1557,13 @@ namespace cytolib
 
 		return(curNodeID);
 
+	}
+
+	phylo GatingHierarchy::getPhylo(){
+		phylo out_phylo;
+		phylo_visitor vis(out_phylo);
+		boost::depth_first_search(tree, boost::visitor(vis));
+		return out_phylo;
 	}
 
 	/*

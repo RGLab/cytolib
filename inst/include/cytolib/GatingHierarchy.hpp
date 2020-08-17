@@ -37,11 +37,16 @@ typedef unsigned int NODEID;
 
 typedef map<string,VertexID> VertexID_map;
 typedef vector<VertexID> VertexID_vec;
+typedef vector<pair<VertexID,VertexID>> VertexID_edge_vec; //represents edges as <start, end> pairs
 typedef vector<string> StringVec;
 typedef vector<EVENT_DATA_TYPE> DoubleVec;
 typedef vector<bool> BoolVec;
 typedef vector<NODEID> NODEID_vec;
 
+struct phylo{
+	VertexID_edge_vec edges;
+	VertexID_vec leaf_nodes; // aka "tips"
+};
 
 
 struct OurVertexPropertyWriterR {
@@ -515,6 +520,14 @@ public:
 	 */
 	nodeProperties & getNodeProperty(VertexID u);
 	populationTree & getTree(){return tree;};
+
+	/*
+	 * Retrieve a represetnation of the tree as a vector of directed edges
+	 * and a vector of VertexIDs of the leaf nodes (aka "tips").
+	 *
+	 * @param u Node ID of root
+	 */
+	phylo getPhylo();
 
 
 	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & uri) const;
