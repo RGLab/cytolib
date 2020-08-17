@@ -116,7 +116,7 @@ namespace cytolib
 		// Pre-checks
 
 		// Size checks
-		if( new_colnames.size() <= 0 | (new_colnames.size() != new_cols.n_cols))
+		if((new_colnames.size() <= 0) || (new_colnames.size() != new_cols.n_cols))
 			throw(domain_error("Must have equal (nonzero) number of new column names and columns."));
 		if( new_cols.n_rows != n_rows())
 			throw(domain_error("New columns must have same number of rows as existing columns."));
