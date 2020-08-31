@@ -206,13 +206,17 @@ public:
 	 * get the data of entire event matrix
 	 * @return
 	 */
+	//TODO: implement these for disk-based cytoframes
 	virtual vector<string> get_rownames() const{
-		throw(domain_error("not supported yet!"));
+//		throw(domain_error("not supported yet!"));
+		return vector<string>();
 	}
 	virtual void set_rownames(const vector<string> & data_in){
-		throw(domain_error("not supported yet!"));
+//		throw(domain_error("not supported yet!"));
 	}
-	virtual void del_rownames(){throw(domain_error("not supported yet!"));}
+	virtual void del_rownames(){
+//		throw(domain_error("not supported yet!"));
+	}
 	virtual EVENT_DATA_VEC get_data() const=0;
 	virtual EVENT_DATA_VEC get_data(uvec idx, bool is_col) const=0;
 	virtual EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const=0;
