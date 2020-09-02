@@ -436,8 +436,8 @@ namespace cytolib
 	  		nSelected = which_lines[0];
 	  		which_lines.resize(nSelected);
 	  		std::default_random_engine generator(config.seed);
-	  		std::uniform_int_distribution<long> distribution(0, nrow - 1);
-	  		for(unsigned long i = 0; i < nSelected; i++)
+	  		std::uniform_int_distribution<int64_t> distribution(0, nrow - 1);
+	  		for(uint64_t i = 0; i < nSelected; i++)
 	  		{
 	  			which_lines[i] = distribution(generator);
 	  		}
@@ -458,7 +458,7 @@ namespace cytolib
 	  		auto nRowSizeBytes = nRowSize/8;
 	  		for(auto i : which_lines)
 	  		{
-	  			long pos =  header_.datastart + i * nRowSizeBytes;
+	  			int64_t pos =  header_.datastart + i * nRowSizeBytes;
 	  			if(pos > header_.dataend || pos < header_.datastart)
 	  				throw(domain_error("the index of which.lines exceeds the data boundary: " + to_string(i)));
 	  			in.seekg(pos);
@@ -471,8 +471,8 @@ namespace cytolib
 	  		//load entire data section with one disk IO
 
 			in.read(bufPtr, nBytes); //load the bytes from file
-			unsigned long events_read = (in.gcount() * 8 / nRowSize);
-			unsigned long events_expected = boost::lexical_cast<unsigned long>(keys_["$TOT"]);
+			uint64_t events_read = (in.gcount() * 8 / nRowSize);
+			uint64_t events_expected = boost::lexical_cast<uint64_t>(keys_["$TOT"]);
 			if(events_read != events_expected)//can't use nBytes derived from FCS header as the check point since it may have extra bytes than needed
 			{
 				throw(domain_error("file " + filename_+ " seems to be corrupted. \n The actual number of cells in data section ("
@@ -834,13 +834,13 @@ namespace cytolib
 		//##for DATA segment exceeding 99,999,999 byte.
 		 if(header_.FCSversion >= 3)
 		 {
-			 unsigned long datastart_h = header_.datastart - header_.additional;
-			 unsigned long dataend_h = header_.dataend - header_.additional;
+			 uint64_t datastart_h = header_.datastart - header_.additional;
+			 uint64_t dataend_h = header_.dataend - header_.additional;
 
 		//
 		//   # Let's not be too strick here as unfortunatelly, some files exported from FlowJo
 		//   # are missing the $BEGINDATA and $ENDDATA keywords and we still need to read those
-		   unsigned long datastart, dataend;
+		   uint64_t datastart, dataend;
 		   if(keys_.find("$BEGINDATA")==keys_.end())
 		   {
 		     if (datastart_h != 0)

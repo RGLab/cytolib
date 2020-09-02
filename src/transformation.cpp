@@ -173,16 +173,16 @@ namespace cytolib
 	EVENT_DATA_TYPE xLo = 0;
 	EVENT_DATA_TYPE xHi = b;
 	EVENT_DATA_TYPE d = (xLo + xHi) / 2;
-	EVENT_DATA_TYPE dX = abs((long) (xLo - xHi));
+	EVENT_DATA_TYPE dX = abs((int64_t) (xLo - xHi));
 	EVENT_DATA_TYPE dXLast = dX;
 	EVENT_DATA_TYPE fB = -2 * log(b) + w * b;
 	EVENT_DATA_TYPE f = 2. * log(d) + w * b + fB;
 	EVENT_DATA_TYPE dF = 2 / d + w;
 	if (w == 0) return b;
-	for (long i = 0; i < 100; i++)
+	for (int64_t i = 0; i < 100; i++)
 	{
 		if (((d - xHi) * dF - f) * ((d - xLo) * dF - f) >= 0 ||
-				abs((long) (2 * f)) > abs((long) (dXLast * dF)))
+				abs((int64_t) (2 * f)) > abs((int64_t) (dXLast * dF)))
 		{
 			dX = (xHi - xLo) / 2;
 			d = xLo + dX;
@@ -197,7 +197,7 @@ namespace cytolib
 			if (d == t)
 				return d;
 		}
-		if (abs((long) dX) < 1.0e-12)
+		if (abs((int64_t) dX) < 1.0e-12)
 			return d;
 		dXLast = dX;
 		f = 2 * log(d) + w * d + fB;
