@@ -149,9 +149,9 @@ namespace cytolib
 		}else{
 			// In the absence of data, set the new maxima/minima to +/- infinity to match fr_append_cols
 			new_mins = arma::Row<EVENT_DATA_TYPE>(new_cols.n_cols);
-			new_mins.fill(-arma::math::inf());
+			new_mins.fill(-arma::datum::inf);
 			new_maxs = arma::Row<EVENT_DATA_TYPE>(new_cols.n_cols);
-			new_maxs.fill(arma::math::inf());
+			new_maxs.fill(arma::datum::inf);
 		}
 
 		// If ALL are good, go ahead and add them
