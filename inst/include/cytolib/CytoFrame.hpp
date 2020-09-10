@@ -190,6 +190,34 @@ public:
 	}
 	virtual void write_h5_keys(H5File file) const;
 	virtual void write_h5_pheno_data(H5File file) const;
+	virtual void write_h5_rownames(H5File file, vector<string> rn) const
+	{
+		StrType str_type(H5::PredType::C_S1, H5T_VARIABLE);	//define variable-length string data type		hsize_t nSize = pheno_data_.size();
+		auto nSize = rn.size();
+		if(nSize > 0)
+		{
+
+			if(nSize!=n_rows())
+				throw runtime_error("rowname size is not consistent with data size!");
+
+			DataSet ds;
+			auto dsname = "rownames";
+			if(file.exists(dsname))
+				ds = file.openDataSet(dsname);
+			else
+			{
+				hsize_t     str_dimsf[1] {nSize};
+				H5::DataSpace   dataspace(1, str_dimsf);
+				ds = file.createDataSet(dsname, str_type, dataspace);
+			}
+			 // HDF5 only understands vector of char* :-(
+			std::vector<const char*> rn_c_str;
+			for (unsigned ii = 0; ii < rn.size(); ++ii)
+				rn_c_str.push_back(rn[ii].c_str());
+			ds.write(rn_c_str.data(), str_type );
+		}
+	}
+
 	/**
 	 * save the CytoFrame as HDF5 format
 	 *

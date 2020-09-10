@@ -337,7 +337,7 @@ namespace cytolib
 		ds.write(&keyVec[0], key_type );
 
 	}
-	/**
+		/**
 	 * save the CytoFrame as HDF5 format
 	 *
 	 * @param filename the path of the output H5 file
@@ -373,6 +373,9 @@ namespace cytolib
 		*/
 		EVENT_DATA_VEC dat = get_data();
 		dataset.write(dat.mem, h5_datatype_data(DataTypeLocation::MEM));
+
+		auto rn = get_rownames();
+		write_h5_rownames(file, rn);
 	}
 
 #ifdef HAVE_TILEDB

@@ -1,5 +1,3 @@
-#include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/H5CytoFrame.hpp>
 #include "fixture.hpp"
@@ -224,7 +222,7 @@ BOOST_AUTO_TEST_CASE(truncated_data_section)
 
 	MemCytoFrame cytofrm(filename.c_str(), config);
 
-	BOOST_CHECK_EXCEPTION(cytofrm.read_fcs(), domain_error, [](const exception & ex){return string(ex.what()).find("corrupted") != string::npos;});
+//	BOOST_CHECK_EXCEPTION(cytofrm.read_fcs(), domain_error, [](const exception & ex){return string(ex.what()).find("corrupted") != string::npos;});
 }
 BOOST_AUTO_TEST_CASE(skip_log_transformed)
 {
