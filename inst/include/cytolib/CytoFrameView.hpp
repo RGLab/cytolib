@@ -110,15 +110,12 @@ public:
 	// Realize the view to the underlying cytoframe (if necessary) and then append extra columns.
 	// Realizing the view is necessary for unambiguous Pn indices for the added columns.
 	void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
-		CytoFramePtr ptr;
 		if(is_row_indexed() || is_col_indexed()){
-			// Realize to the original file
-			ptr = realize(get_cytoframe_ptr(), get_uri(), true);
+			// Realize to the original file and reset the view
+			ptr_ = realize(ptr_, get_uri(), true);
 			reset_view();
-		}else{
-			ptr = get_cytoframe_ptr();
 		}
-		ptr->append_columns(new_colnames, new_cols);
+		ptr_->append_columns(new_colnames, new_cols);
 	}
 
 	string get_marker(const string & channel)
