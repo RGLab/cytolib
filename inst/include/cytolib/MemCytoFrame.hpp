@@ -54,6 +54,7 @@ public:
 	MemCytoFrame(const CytoFrame & frm):CytoFrame(frm)
 	{
 		data_ = frm.get_data();
+		rownames_ = frm.get_rownames();
 	}
 	/**
 	 * Constructor from the FCS file
@@ -127,7 +128,17 @@ public:
 	 */
 	void realize_(uvec row_idx, uvec col_idx);
 	void realize_(uvec idx, bool is_row_indexed);
-
+	void subset_rownames(uvec row_idx)
+	{
+		if(rownames_.size() > 0)
+		{
+			auto n = row_idx.size();
+			vector<string> tmp(n);
+			for(unsigned i = 0; i < n; i++)
+				tmp[i] = rownames_[row_idx[i]];
+			rownames_ = tmp;
+		}
+	}
 	/**
  * Caller will receive a copy of data
  * @return

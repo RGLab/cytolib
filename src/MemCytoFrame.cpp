@@ -211,47 +211,34 @@ namespace cytolib
 		config_ = frm.config_;
 		header_ = frm.header_;
 		data_ = frm.data_;
-
-	}
-	MemCytoFrame::MemCytoFrame(MemCytoFrame && frm):CytoFrame(frm)
-	{
-//		swap(pheno_data_, frm.pheno_data_);
-//		swap(keys_, frm.keys_);
-//		swap(params, frm.params);
-//		swap(channel_vs_idx, frm.channel_vs_idx);
-//		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(filename_, frm.filename_);
-		swap(config_, frm.config_);
-		swap(header_, frm.header_);
-		swap(data_, frm.data_);
+		rownames_ = frm.rownames_;
 	}
 	MemCytoFrame & MemCytoFrame::operator=(const MemCytoFrame & frm)
 	{
 		CytoFrame::operator=(frm);
-//		pheno_data_ = frm.pheno_data_;
-//		keys_ = frm.keys_;
-//		params = frm.params;
-//		channel_vs_idx = frm.channel_vs_idx;
-//		marker_vs_idx = frm.marker_vs_idx;
 		filename_ = frm.filename_;
 		config_ = frm.config_;
 		header_ = frm.header_;
 		data_ = frm.data_;
+		rownames_ = frm.rownames_;
 		return *this;
 	}
-	MemCytoFrame & MemCytoFrame::operator=(MemCytoFrame && frm)
+	MemCytoFrame::MemCytoFrame(MemCytoFrame && frm):CytoFrame(frm)
 	{
-		CytoFrame::operator=(frm);
-
-//		swap(pheno_data_, frm.pheno_data_);
-//		swap(keys_, frm.keys_);
-//		swap(params, frm.params);
-//		swap(channel_vs_idx, frm.channel_vs_idx);
-//		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(filename_, frm.filename_);
 		swap(config_, frm.config_);
 		swap(header_, frm.header_);
 		swap(data_, frm.data_);
+		swap(rownames_, frm.rownames_);	}
+
+	MemCytoFrame & MemCytoFrame::operator=(MemCytoFrame && frm)
+	{
+		CytoFrame::operator=(frm);
+		swap(filename_, frm.filename_);
+		swap(config_, frm.config_);
+		swap(header_, frm.header_);
+		swap(data_, frm.data_);
+		swap(rownames_, frm.rownames_);
 		return *this;
 	}
 	MemCytoFrame::MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){
@@ -1028,6 +1015,7 @@ namespace cytolib
 	void MemCytoFrame::realize_(uvec row_idx, uvec col_idx)
 	{
 		data_ = data_.rows(row_idx);
+		subset_rownames(row_idx);
 		data_ = data_.cols(col_idx);
 		subset_parameters(col_idx);
 	}
@@ -1035,7 +1023,10 @@ namespace cytolib
 	void MemCytoFrame::realize_(uvec idx, bool is_row_indexed)
 	{
 		if(is_row_indexed)
+		{
 			data_ = data_.rows(idx);
+			subset_rownames(idx);
+		}
 		else{
 			data_ = data_.cols(idx);
 			subset_parameters(idx);

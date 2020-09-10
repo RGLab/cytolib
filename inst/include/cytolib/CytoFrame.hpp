@@ -33,6 +33,7 @@ enum DataTypeLocation {MEM, H5};
 typedef unordered_map<string, string> PDATA;
 
 const H5std_string  DATASET_NAME( "data");
+const H5std_string  DATASET_ROWNAME( "rownames");
 
 /*
  * simple vector version of keyword type
@@ -201,7 +202,7 @@ public:
 				throw runtime_error("rowname size is not consistent with data size!");
 
 			DataSet ds;
-			auto dsname = "rownames";
+			auto dsname = DATASET_ROWNAME;
 			if(file.exists(dsname))
 				ds = file.openDataSet(dsname);
 			else
@@ -215,6 +216,8 @@ public:
 			for (unsigned ii = 0; ii < rn.size(); ++ii)
 				rn_c_str.push_back(rn[ii].c_str());
 			ds.write(rn_c_str.data(), str_type );
+			ds.flush(H5F_SCOPE_LOCAL);
+
 		}
 	}
 

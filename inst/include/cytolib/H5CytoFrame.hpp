@@ -159,7 +159,7 @@ public:
 	{
 		vector<string> rownames;
 		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
-		auto dsname = "rownames";
+		auto dsname = DATASET_ROWNAME;
 		if(file.exists(dsname))
 		{
 			auto dataset = file.openDataSet(dsname);
@@ -192,7 +192,9 @@ public:
 	void del_rownames(){
 		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
 		check_write_permission();
-		file.unlink("rownames");
+
+		if(file.exists(DATASET_ROWNAME))
+			file.unlink(DATASET_ROWNAME);
 	}
 	void set_marker(const string & channelname, const string & markername)
 	{

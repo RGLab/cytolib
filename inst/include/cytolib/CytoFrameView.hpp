@@ -97,7 +97,7 @@ public:
 					if(is_row_indexed_)
 					{
 						if(data_orig.size()==0)
-							data_orig.resize(n_rows());
+							data_orig.resize(get_cytoframe_ptr()->n_rows());
 
 						for(unsigned i = 0; i < n; i++)
 							data_orig[row_idx_[i]] = data_in[i];

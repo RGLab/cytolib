@@ -364,6 +364,25 @@ BOOST_AUTO_TEST_CASE(subset_by_cols)
 
 	BOOST_CHECK_EQUAL(cf->n_cols(), sub_channels.size());
 }
+BOOST_AUTO_TEST_CASE(rownames)
+{
+	auto cf1 = cf_disk->copy();
+
+
+	CytoFrameView cr_new (cf1);
+	vector<unsigned> row_idx = {1,3,7};
+	cr_new.rows_(row_idx);
+	vector<string> rn = {"c1", "c2", "c3"};
+	cr_new.set_rownames(rn);
+	BOOST_CHECK_EQUAL(cr_new.get_rownames()[1], rn[1]);
+
+	auto cf2 = cr_new.copy_realized();
+	cf2.del_rownames();
+	BOOST_CHECK_EQUAL(cf2.get_rownames().size(), 0);
+	cf2.set_rownames(rn);
+	BOOST_CHECK_EQUAL(cf2.get_rownames()[1], rn[1]);
+
+}
 BOOST_AUTO_TEST_CASE(subset_by_rows)
 {
 	unsigned nEvent = fr.n_rows();
