@@ -340,7 +340,7 @@ public:
 	string get_uri() const{
 		return uri_;
 	}
-	void check_write_permission(){
+	void check_write_permission() const{
 		if(readonly_)
 			throw(domain_error("Can't write to the read-only TileCytoFrame object!"));
 
@@ -511,16 +511,22 @@ public:
 	 * protect the h5 from being overwritten accidentally
 	 * which will make the original cf object invalid
 	 */
-	void copy_overwrite_check(const string & dest) const
+	void copy_overwrite_check(const string & dest, bool overwrite) const
 	{
-		if(fs::equivalent(fs::path(uri_), fs::path(dest)))
-			throw(domain_error("Copying TileCytoFrame to itself is not supported! "+ dest));
+		// Check if trying to write to same file
+		if(fs::equivalent(fs::path(uri_), fs::path(dest))){
+			// First check if that is even allowed by this CytoFrame
+			check_write_permission();
+			// Then make sure it has been explicitly approved by the caller
+			if(!overwrite)
+				throw(domain_error("Copying TileCytoFrame to itself is not supported! "+ dest));
+		}
 	}
 
 	CytoFramePtr copy(const string & uri = "", bool overwrite = false) const
 	{
-		if(!overwrite)
-			copy_overwrite_check(uri);
+		copy_overwrite_check(uri, overwrite);
+
 		string new_uri = uri;
 		if(new_uri == "")
 		{
@@ -537,9 +543,8 @@ public:
 	}
 	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & uri = "", bool overwrite = false) const
 	{
+		copy_overwrite_check(uri, overwrite);
 
-		if(!overwrite)
-			copy_overwrite_check(uri);
 		string new_uri = uri;
 		if(new_uri == "")
 		{
@@ -553,9 +558,8 @@ public:
 
 	CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & uri = "", bool overwrite = false) const
 	{
+		copy_overwrite_check(uri, overwrite);
 
-		if(!overwrite)
-			copy_overwrite_check(uri);
 		string new_uri = uri;
 		if(new_uri == "")
 		{
