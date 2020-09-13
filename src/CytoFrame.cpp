@@ -634,6 +634,56 @@ namespace cytolib
 			//TODO:switch to TILEDB_STRING_UTF16
 		}
 	}
+	void CytoFrame::write_tile_rownames(const string & uri,  vector<string> rn, const CytoCtx & cytoctx) const
+		{
+			int ncell = rn.size();
+			if(ncell > 0)
+			{
+
+				if(ncell!=n_rows())
+					throw runtime_error("rowname size is not consistent with data size!");
+
+				auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
+
+				auto array_uri = (fs::path(uri) / "rownames").string();
+				tiledb::VFS vfs(ctx);
+
+				if(vfs.is_dir(array_uri))
+					vfs.remove_dir(array_uri);
+				tiledb::Domain domain(ctx);
+				domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, ncell}, ncell)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
+				tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
+				schema.set_domain(domain);
+				schema.add_attribute(tiledb::Attribute::create<uint64_t>(ctx, "str_size"));
+				schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
+
+				tiledb::Array::create(array_uri, schema);
+				tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
+				tiledb::Query query(ctx, array);
+				query.set_layout(TILEDB_GLOBAL_ORDER);
+
+				string buf;
+				vector<uint64_t> str_size(ncell, 0);
+				//need this to preserve the channel order
+				for(int i = 0; i < ncell; i++)
+				{
+					str_size[i] = rn[i].size();
+					if(str_size[i]>0)
+					{
+						buf += rn[i];
+					}
+
+				}
+
+				array.put_metadata("rownames", TILEDB_CHAR, buf.size(), buf.c_str());
+
+				query.set_buffer("str_size", str_size);
+				query.submit();
+				query.finalize();
+			}
+		}
+
+
 #else
 	void CytoFrame::write_tile(const string & uri, const CytoCtx & cytoctx) const
 	{
@@ -661,6 +711,11 @@ namespace cytolib
 	{
 			throw(domain_error("cytolib is not built with tiledb support!"));
 		}
+	void write_tile_rownames(const string & uri,  vector<string> rn, const CytoCtx & cytoctx) const
+	{
+	throw(domain_error("cytolib is not built with tiledb support!"));
+	}
+
 
 
 #endif

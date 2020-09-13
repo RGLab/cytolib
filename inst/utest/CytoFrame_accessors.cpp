@@ -25,8 +25,8 @@ struct CFFixture{
 
 	};
 	MemCytoFrame fr;
-//	FileFormat file_format = FileFormat::TILE;
-	FileFormat file_format = FileFormat::H5;
+	FileFormat file_format = FileFormat::TILE;
+//	FileFormat file_format = FileFormat::H5;
 //	unique_ptr<H5CytoFrame> cf_disk;
 	CytoFramePtr cf_disk;
    string file_path;

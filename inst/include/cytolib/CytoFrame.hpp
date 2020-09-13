@@ -233,21 +233,15 @@ public:
 	void write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
 	void write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
 	void write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
+	void write_tile_rownames(const string & uri,  vector<string> rn, const CytoCtx & cytoctx) const;
 	/**
 	 * get the data of entire event matrix
 	 * @return
 	 */
 	//TODO: implement these for disk-based cytoframes
-	virtual vector<string> get_rownames() const{
-//		throw(domain_error("not supported yet!"));
-		return vector<string>();
-	}
-	virtual void set_rownames(const vector<string> & data_in){
-//		throw(domain_error("not supported yet!"));
-	}
-	virtual void del_rownames(){
-//		throw(domain_error("not supported yet!"));
-	}
+	virtual vector<string> get_rownames() const=0;
+	virtual void set_rownames(const vector<string> & data_in)=0;
+	virtual void del_rownames()=0;
 	virtual EVENT_DATA_VEC get_data() const=0;
 	virtual EVENT_DATA_VEC get_data(uvec idx, bool is_col) const=0;
 	virtual EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const=0;

@@ -138,6 +138,81 @@ public:
 			is_dirty_keys = true;
 
 	}
+	vector<string> get_rownames() const
+	{
+		vector<string> rownames;
+		auto array_uri = (fs::path(uri_) / "rownames").string();
+		auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
+		tiledb::VFS vfs(*ctxptr_);
+
+		if(vfs.is_dir(array_uri))
+		{
+			auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
+			tiledb::Array array(*ctxptr_, array_uri, TILEDB_READ);
+			auto nrow = n_rows();
+			const std::vector<int> subarray = {1, nrow};
+
+			tiledb::Query query(*ctxptr_, array);
+			query.set_subarray(subarray);
+			query.set_layout(TILEDB_GLOBAL_ORDER);
+			//read buf
+
+			vector<uint64_t> str_sizes(nrow);
+			query.set_buffer("str_size", str_sizes);
+
+			query.submit();
+			query.finalize();
+
+			//read string
+			string buf;
+			uint32_t v_num;
+			tiledb_datatype_t v_type;
+			const void* v;
+			array.get_metadata("rownames", &v_type, &v_num, &v);
+			if(v)
+			{
+				buf = string(static_cast<const char *>(v));
+				buf.resize(v_num);
+			}
+			else
+				throw(domain_error("empty rownames buffer!"));
+
+			//restore strings from buf
+			rownames.resize(nrow);
+			int start = 0;
+			for (size_t i = 0; i < nrow; ++i)
+			{
+				if(start > buf.size())
+					throw(domain_error("str_size exceeds the rownames buffer size!"));
+				if(str_sizes[i]>0)
+				{
+				  rownames[i]= std::string(&buf[start], str_sizes[i]);
+				  start += str_sizes[i];
+				}
+				else
+				  rownames[i] = "";
+			}
+
+		}
+		return rownames;
+	}
+	void set_rownames(const vector<string> & rn)
+	{
+		check_write_permission();
+
+		write_tile_rownames(uri_, rn, ctx_);
+	}
+	void del_rownames(){
+		check_write_permission();
+
+		auto ctxptr_ = static_pointer_cast<tiledb::Context>(ctx_.get_ctxptr());
+		tiledb::VFS vfs(*ctxptr_);
+
+		auto array_uri = (fs::path(uri_) / "rownames").string();
+		if(vfs.is_dir(array_uri))
+			vfs.remove_dir(array_uri);
+
+	}
 	void set_pheno_data(const string & name, const string & value){
 		CytoFrame::set_pheno_data(name, value);
 		is_dirty_pdata = true;
