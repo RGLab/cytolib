@@ -928,15 +928,16 @@ namespace cytolib
 			string pid = to_string(i);
 			string range_str = "flowCore_$P" + pid + "Rmax";
 			it = keys_.find(range_str);
-			if( it==keys_.end() ){
+			if( !(it == keys_.end())){
+				params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second) + 1;
+			}else{
 				range_str = "$P" + pid + "R";
 				it = keys_.find(range_str);
+				if(it==keys_.end())
+					throw(domain_error(range_str + " not contained in Text section!"));
+				else
+					params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
 			}
-			if(it==keys_.end())
-				throw(domain_error(range_str + " not contained in Text section!"));
-			else
-				params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
-
 
 			params[i-1].PnB = stoi(keys_["$P" + pid + "B"]);
 
