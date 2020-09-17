@@ -926,12 +926,12 @@ namespace cytolib
 		for(int i = 1; i <= nrpar; i++)
 		{
 			string pid = to_string(i);
-			string range_str = "flowCore_$P" + pid + "Rmax";
-			it = keys_.find(range_str);
-			if( it==keys_.end() ){
+			string range_str;
+			if( keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom")
+				range_str = "flowCore_$P" + pid + "Rmax";
+			else
 				range_str = "$P" + pid + "R";
-				it = keys_.find(range_str);
-			}
+			it = keys_.find(range_str);
 			if(it==keys_.end())
 				throw(domain_error(range_str + " not contained in Text section!"));
 			else
