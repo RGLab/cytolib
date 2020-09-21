@@ -173,7 +173,7 @@ namespace cytolib
 				curTrans->transforming(&param_range.second, 1);
 			}
 
-
+			cytoframe.set_keyword("transformation", "custom");
 			cytoframe.set_range(curChannel, ColType::channel, param_range);
 
 		}

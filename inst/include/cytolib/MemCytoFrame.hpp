@@ -10,6 +10,7 @@
 #ifndef INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_MEMCYTOFRAME_HPP_
 #include "CytoFrame.hpp"
+#include "trans_group.hpp"
 #include "readFCSdata.hpp"
 
 namespace cytolib
@@ -186,6 +187,7 @@ public:
 
 	void append_data_columns(const EVENT_DATA_VEC & new_cols);
 
+	void transform_data(const trans_local & trans);
 };
 
 
