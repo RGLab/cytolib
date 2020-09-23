@@ -116,7 +116,7 @@ namespace cytolib
 		// Pre-checks
 
 		// Size checks
-		if( new_colnames.size() <= 0 | (new_colnames.size() != new_cols.n_cols))
+		if((new_colnames.size() <= 0) || (new_colnames.size() != new_cols.n_cols))
 			throw(domain_error("Must have equal (nonzero) number of new column names and columns."));
 		if( new_cols.n_rows != n_rows())
 			throw(domain_error("New columns must have same number of rows as existing columns."));
@@ -141,8 +141,18 @@ namespace cytolib
 		unsigned num_toadd = new_cols.n_cols;
 
 		// arma::min/max for column ranges
-		rowvec new_mins = min(new_cols, 0);
-		rowvec new_maxs = max(new_cols, 0);
+		arma::Row<EVENT_DATA_TYPE> new_mins;
+		arma::Row<EVENT_DATA_TYPE> new_maxs;
+		if(new_cols.n_rows > 0){
+			new_mins = arma::min(new_cols, 0);
+			new_maxs = arma::max(new_cols, 0);
+		}else{
+			// In the absence of data, set the new maxima/minima to +/- infinity to match fr_append_cols
+			new_mins = arma::Row<EVENT_DATA_TYPE>(new_cols.n_cols);
+			new_mins.fill(-arma::datum::inf);
+			new_maxs = arma::Row<EVENT_DATA_TYPE>(new_cols.n_cols);
+			new_maxs.fill(arma::datum::inf);
+		}
 
 		// If ALL are good, go ahead and add them
 
@@ -184,7 +194,8 @@ namespace cytolib
 			// PnG key not set to match old behavior
 
 			// Bump by 1, following logic of flowCore#187 and flowCore@654f0c3
-			set_keyword("$P" + pid + "R", boost::lexical_cast<string>((long long)ceil(new_maxs(i)) + 1));
+			if(std::isfinite(new_maxs(i)))
+				set_keyword("$P" + pid + "R", boost::lexical_cast<string>((long long)ceil(new_maxs(i)) + 1));
 
 
 			if( keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom"){

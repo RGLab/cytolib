@@ -45,7 +45,7 @@ public:
 
 		vector<string> valVec;
 		boost::split(valVec, val, boost::is_any_of(","));
-		int n = boost::lexical_cast<int>(valVec[0]);
+		int n = boost::lexical_cast<unsigned int>(valVec[0]);
 		// Pre-check size of valVec -- this is strictly imposed by the FCS spec
 		if(valVec.size() != 1+n+n*n){
 			PRINT("$SPILLOVER keyword value is of improper size for number of spillover channels!\n");

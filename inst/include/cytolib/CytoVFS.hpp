@@ -11,6 +11,7 @@
 #define INST_INCLUDE_CYTOLIB_CytoVFS_HPP_
 #include <string>
 #include <vector>
+#include <memory>
 using namespace std;
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
