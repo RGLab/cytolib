@@ -1573,7 +1573,7 @@ namespace cytolib
 
 	}
 
-	phylo GatingHierarchy::getPhylo(VertexID start){
+	phylo GatingHierarchy::getPhylo(VertexID start, bool fullPath){
 		phylo out_phylo;
 		phylo_visitor vis(out_phylo, start);
 		// Have to construct the default ColorMap to be able to supply
@@ -1585,7 +1585,7 @@ namespace cytolib
 		boost::depth_first_search(tree, vis, colormap, start);
 		// Append full paths for leaf names
 		for(auto leaf : out_phylo.leaf_nodes)
-			out_phylo.leaf_names.push_back(getNodePath(leaf,true));
+			out_phylo.leaf_names.push_back(getNodePath(leaf, fullPath));
 		return out_phylo;
 	}
 

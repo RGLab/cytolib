@@ -528,7 +528,7 @@ public:
 	 *
 	 * @param start Node ID of starting node to allow sub-graph extraction
 	 */
-	phylo getPhylo(VertexID start);
+	phylo getPhylo(VertexID start, bool fullPath = true);
 
 
 	GatingHierarchyPtr  copy(bool is_copy_data, bool is_realize_data, const string & uri) const;
