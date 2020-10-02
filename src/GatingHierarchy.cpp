@@ -906,9 +906,13 @@ namespace cytolib
 		template < typename Vertex, typename Graph >
 		void discover_vertex(Vertex u, const Graph & g)
 		{
-			// Only add if it's a leaf under the starting_node
-			if(!backtracking && boost::out_degree(u, g) == 0)
+			// Only add to phylo node record if it's under the starting node
+			if(!backtracking){
+			    if(boost::out_degree(u,g) == 0)
 				phylo_tree.leaf_nodes.push_back(u);
+			    else
+				phylo_tree.internal_nodes.push_back(u);
+			}
 		}
 		template < typename Edge, typename Graph >
 		void tree_edge(Edge e, const Graph & g)
@@ -1586,6 +1590,9 @@ namespace cytolib
 		// Append full paths for leaf names
 		for(auto leaf : out_phylo.leaf_nodes)
 			out_phylo.leaf_names.push_back(getNodePath(leaf, fullPath));
+		// Append full paths for internal node names
+		for(auto node : out_phylo.internal_nodes)
+			out_phylo.internal_names.push_back(getNodePath(node, fullPath));
 		return out_phylo;
 	}
 

@@ -47,6 +47,8 @@ struct phylo{
 	VertexID_edge_vec edges;
 	VertexID_vec leaf_nodes; // aka "tips"
 	vector<string> leaf_names;
+	VertexID_vec internal_nodes; // all non-leaf nodes
+	vector<string> internal_names;
 };
 
 
