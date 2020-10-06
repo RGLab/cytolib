@@ -937,6 +937,9 @@ namespace cytolib
 			else
 				params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
 
+			if(range_str == "flowCore_$P" + pid + "Rmax")
+				params[i-1].max += 1;
+
 
 			params[i-1].PnB = stoi(keys_["$P" + pid + "B"]);
 
@@ -1061,6 +1064,45 @@ namespace cytolib
 		return data_.colptr(idx);
 	}
 
+	void MemCytoFrame::transform_data(const trans_local & trans) {
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("start transforming cytoframe data \n");
+		if(n_rows()==0)
+			throw(domain_error("data is not loaded yet!"));
+
+		vector<string> channels=get_channels();
+		int nEvents = n_rows();
+		/*
+		 * transforming each marker
+		 */
+		for(vector<string>::iterator it1=channels.begin();it1!=channels.end();it1++)
+		{
+
+			string curChannel=*it1;
+			auto param_range = get_range(curChannel, ColType::channel, RangeType::instrument);
+			TransPtr curTrans=trans.getTran(curChannel);
+
+			if(curTrans)
+			{
+				if(curTrans->gateOnly())
+					continue;
+
+				EVENT_DATA_TYPE * x = get_data_memptr(curChannel, ColType::channel);
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				{
+					string type;
+					curTrans->getType(type);
+					PRINT("transforming "+curChannel+" with func:"+type+"\n");
+				}
+				curTrans->transforming(x,nEvents);
+				curTrans->transforming(&param_range.first, 1);
+				curTrans->transforming(&param_range.second, 1);
+			}
+
+			set_keyword("transformation", "custom");
+			set_range(curChannel, ColType::channel, param_range);
+		}
+	}
 };
 
 
