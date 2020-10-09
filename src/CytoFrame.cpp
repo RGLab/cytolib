@@ -61,18 +61,32 @@ namespace cytolib
 		swap(channel_vs_idx, frm.channel_vs_idx);
 	}
 
-
+	/*
+	 * Compnesation by solving system using QR decomp
+	 * (handles both traditional and spectral compensation):
+	 *
+	 * Events are rows, so we are solving A = X*B where
+	 * X is k events by m labels ("actual" values)
+	 * A is k events by n detectors (observed values)
+	 * B is m labels by n detectors
+	 * n >= m (n == m in traditional compensation, n > m in spectral compensation)
+	 *
+	 * The transpositions in the solution are due to the nature
+	 * of the QR decomposition (needs more rows than columns)
+	 *
+	 * The solution:
+	 * t(B) == Q*R (B has no QR decomp but t(B) does)
+	 * A == X*B <-> t(B)t(X) == t(A)
+	 * Q*R*t(X) == t(A) (subtitution)
+	 * t(Q)*Q*R*t(X) == t(Q)*t(A)
+	 * R*t(X) == t(Q)*t(A) (Q orthogonal)
+	 * that can now be solved efficiently for t(X) by back substitution, then transposed for X
+	 */
 	void CytoFrame::compensate(const compensation & comp)
 	{
 
 		int nMarker = comp.marker.size();
 		EVENT_DATA_VEC dat = get_data();
-		arma::mat A(dat.memptr(), n_rows(), n_cols(), false, true);//point to the original data
-//		A.rows(1,3).print("\ndata");
-		mat B = comp.get_spillover_mat();
-//		B.print("comp");
-		B = inv(B);
-//		B.print("comp inverse");
 		uvec indices(nMarker);
 		for(int i = 0; i < nMarker; i++)
 		{
@@ -82,10 +96,22 @@ namespace cytolib
 
 			indices[i] = id;
 		}
-//		uvec rind={1,2};
-//		A.submat(rind,indices).print("data ");
-		A.cols(indices) = A.cols(indices) * B;
-//		A.submat(rind,indices).print("data comp");
+		arma::mat A(dat.memptr(), n_rows(), n_cols(), false, true);//point to the original data
+		// Try to avoid extra memory burden from copies by performing all of these transpositions in-place
+		inplace_trans(A);
+		mat B = comp.get_spillover_mat();
+		inplace_trans(B);
+		mat Q;
+		mat R;
+		qr_econ(Q, R, B);
+		inplace_trans(Q);
+		// Assign to rows representing t(X)
+		// Note: trimatu to tell Armadillo that R is upper-triangular
+		// so it goes straight to back-substitution
+		A.rows(indices) = solve(trimatu(R), Q*A.rows(indices));
+		// Need to transpose A back to proper orientation
+		// (which also takes care of transposing t(X) back to X)
+		inplace_trans(A);
 		set_data(dat);
 	}
 

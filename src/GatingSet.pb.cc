@@ -8895,7 +8895,8 @@ COMP::COMP(const COMP& from)
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
       marker_(from.marker_),
-      spillover_(from.spillover_) {
+      spillover_(from.spillover_),
+      detector_(from.detector_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   cid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_cid()) {
@@ -8959,6 +8960,7 @@ void COMP::Clear() {
 
   marker_.Clear();
   spillover_.Clear();
+  detector_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -9051,6 +9053,18 @@ const char* COMP::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inter
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
+      // repeated string detector = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(_internal_add_detector(), ptr, ctx);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<66>(ptr));
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -9121,6 +9135,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(7, this->_internal_spillover(i), target);
   }
 
+  // repeated string detector = 8;
+  for (int i = 0, n = this->_internal_detector_size(); i < n; i++) {
+    const auto& s = this->_internal_detector(i);
+    target = stream->WriteString(8, s, target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = stream->WriteRaw(_internal_metadata_.unknown_fields().data(),
         static_cast<int>(_internal_metadata_.unknown_fields().size()), target);
@@ -9152,6 +9172,14 @@ size_t COMP::ByteSizeLong() const {
     total_size += 1 *
                   ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_spillover_size());
     total_size += data_size;
+  }
+
+  // repeated string detector = 8;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(detector_.size());
+  for (int i = 0, n = detector_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      detector_.Get(i));
   }
 
   cached_has_bits = _has_bits_[0];
@@ -9215,6 +9243,7 @@ void COMP::MergeFrom(const COMP& from) {
 
   marker_.MergeFrom(from.marker_);
   spillover_.MergeFrom(from.spillover_);
+  detector_.MergeFrom(from.detector_);
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -9257,6 +9286,7 @@ void COMP::InternalSwap(COMP* other) {
   swap(_has_bits_[0], other->_has_bits_[0]);
   marker_.InternalSwap(&other->marker_);
   spillover_.InternalSwap(&other->spillover_);
+  detector_.InternalSwap(&other->detector_);
   cid_.Swap(&other->cid_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   prefix_.Swap(&other->prefix_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),

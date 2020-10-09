@@ -26,15 +26,23 @@ public:
 	string suffix;
 	string name;
 	string comment;// store "Acquisition-defined" when the spillOver matrix is not supplied and cid==-1
-	vector<string> marker;
+	vector<string> marker;	// Markers are the "target" measurement channels
+	vector<string> detector; // Detectors are all measured channels -- # detectors >= # markers
 	vector<double> spillOver;
 	compensation(){};
 	/**
-	 * constructor from the existing spillover matrix
+	 * Older constructor from the existing square spillover matrix
 	 * @spillover arma:mat representing a col-major matrix
-	 * @_markers string vector
+	 * @_markers string vector, also used to fill detectors
 	 */
 	compensation(mat spillMat, vector<string> _markers);
+	/**
+	 * Newer constructor from the existing spillover matrix
+	 * @spillover arma:mat representing a col-major matrix
+	 * @_markers string vector
+	 * @_detectors string vector
+	 */
+	compensation(mat spillMat, vector<string> _markers, vector<string> _detectors);
 	/**
 	 * construct spillover matrix from string value of FCS keyword
 	 * @param val
@@ -71,10 +79,12 @@ public:
 		{
 			spillOver.resize(n*n);
 			marker.resize(n);
+			detector.resize(n);
 			bool isDuplicate = false;
 			for(int i = 0; i < n; i++)//param name
 			{
 				marker[i] = valVec[i+1];
+				detector[i] = valVec[i+1];
 
 				// Keep track of where this marker has appeared
 				auto found = chnls.find(marker[i]);
@@ -100,6 +110,7 @@ public:
 							dup_idx = chnl.second.front();
 							chnl.second.pop();
 							marker[dup_idx] = marker[dup_idx] + "-" + std::to_string(suffix++);
+							detector[dup_idx] = detector[dup_idx] + "-" + std::to_string(suffix++);
 						}
 					}
 				}

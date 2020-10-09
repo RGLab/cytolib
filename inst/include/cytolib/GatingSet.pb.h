@@ -5145,6 +5145,7 @@ class COMP :
   enum : int {
     kMarkerFieldNumber = 6,
     kSpillOverFieldNumber = 7,
+    kDetectorFieldNumber = 8,
     kCidFieldNumber = 1,
     kPrefixFieldNumber = 2,
     kSuffixFieldNumber = 3,
@@ -5196,6 +5197,30 @@ class COMP :
       spillover() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_spillover();
+
+  // repeated string detector = 8;
+  int detector_size() const;
+  private:
+  int _internal_detector_size() const;
+  public:
+  void clear_detector();
+  const std::string& detector(int index) const;
+  std::string* mutable_detector(int index);
+  void set_detector(int index, const std::string& value);
+  void set_detector(int index, std::string&& value);
+  void set_detector(int index, const char* value);
+  void set_detector(int index, const char* value, size_t size);
+  std::string* add_detector();
+  void add_detector(const std::string& value);
+  void add_detector(std::string&& value);
+  void add_detector(const char* value);
+  void add_detector(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& detector() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_detector();
+  private:
+  const std::string& _internal_detector(int index) const;
+  std::string* _internal_add_detector();
+  public:
 
   // optional string cid = 1;
   bool has_cid() const;
@@ -5306,6 +5331,7 @@ class COMP :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> marker_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > spillover_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> detector_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr prefix_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr suffix_;
@@ -11162,6 +11188,80 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
 COMP::mutable_spillover() {
   // @@protoc_insertion_point(field_mutable_list:pb.COMP.spillOver)
   return _internal_mutable_spillover();
+}
+
+// repeated string detector = 8;
+inline int COMP::_internal_detector_size() const {
+  return detector_.size();
+}
+inline int COMP::detector_size() const {
+  return _internal_detector_size();
+}
+inline void COMP::clear_detector() {
+  detector_.Clear();
+}
+inline std::string* COMP::add_detector() {
+  // @@protoc_insertion_point(field_add_mutable:pb.COMP.detector)
+  return _internal_add_detector();
+}
+inline const std::string& COMP::_internal_detector(int index) const {
+  return detector_.Get(index);
+}
+inline const std::string& COMP::detector(int index) const {
+  // @@protoc_insertion_point(field_get:pb.COMP.detector)
+  return _internal_detector(index);
+}
+inline std::string* COMP::mutable_detector(int index) {
+  // @@protoc_insertion_point(field_mutable:pb.COMP.detector)
+  return detector_.Mutable(index);
+}
+inline void COMP::set_detector(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:pb.COMP.detector)
+  detector_.Mutable(index)->assign(value);
+}
+inline void COMP::set_detector(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:pb.COMP.detector)
+  detector_.Mutable(index)->assign(std::move(value));
+}
+inline void COMP::set_detector(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  detector_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:pb.COMP.detector)
+}
+inline void COMP::set_detector(int index, const char* value, size_t size) {
+  detector_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:pb.COMP.detector)
+}
+inline std::string* COMP::_internal_add_detector() {
+  return detector_.Add();
+}
+inline void COMP::add_detector(const std::string& value) {
+  detector_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:pb.COMP.detector)
+}
+inline void COMP::add_detector(std::string&& value) {
+  detector_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:pb.COMP.detector)
+}
+inline void COMP::add_detector(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  detector_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:pb.COMP.detector)
+}
+inline void COMP::add_detector(const char* value, size_t size) {
+  detector_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:pb.COMP.detector)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+COMP::detector() const {
+  // @@protoc_insertion_point(field_list:pb.COMP.detector)
+  return detector_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+COMP::mutable_detector() {
+  // @@protoc_insertion_point(field_mutable_list:pb.COMP.detector)
+  return &detector_;
 }
 
 // -------------------------------------------------------------------

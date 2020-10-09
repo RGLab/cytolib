@@ -214,6 +214,7 @@ message COMP{
 	optional string comment = 5;
 	repeated string marker = 6;
 	repeated float spillOver = 7;
+	repeated string detector = 8;
 }
 message PARAM{
 		optional string param = 1;
