@@ -93,7 +93,7 @@ namespace cytolib
 			// Older pb files assume detectors == markers
 			for(int i = 0; i < comp_pb.marker_size(); i++){
 				marker.push_back(comp_pb.marker(i));
-				detector.push_back(comp_pb.detector(i));
+				detector.push_back(comp_pb.marker(i));
 			}
 		}
 
