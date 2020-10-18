@@ -186,6 +186,12 @@ public:
 		get_cytoframe_ptr()->set_keywords(keys);
 	}
 
+	void rename_keyword(const string & old_key, const string & new_key){
+		get_cytoframe_ptr()->rename_keyword(old_key, new_key);
+	}
+	void remove_keyword(const string & key){
+		get_cytoframe_ptr()->remove_keyword(key);
+	}
 	void set_range(const string & colname, ColType ctype, pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range){
 		get_cytoframe_ptr()->set_range(colname, ctype, new_range);
 	}
