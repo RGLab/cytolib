@@ -74,6 +74,13 @@ public:
  pair <string, string> & operator [](const int & n){
 	 return kw[n];
  }
+ void erase(const string & key){
+	 iterator it = find(key);
+     if(it!=end())
+     	kw.erase(it);
+     else
+     	throw(domain_error("keyword not found: " + key));
+ };
 };
 
 
