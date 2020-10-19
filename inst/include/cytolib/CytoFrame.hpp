@@ -246,6 +246,31 @@ public:
 	}
 
 	/**
+	 * Change the key of a single key-value pair
+	 * @param old_key old keyword name
+	 * @param new_key new keyword name
+	 */
+	virtual void rename_keyword(const string & old_key, const string & new_key)
+	{
+		KW_PAIR::iterator it = keys_.find(old_key);
+        if(it!=keys_.end())
+        	it->first = new_key;
+        else
+        	throw(domain_error("keyword not found: " + old_key));
+	}
+
+	/**
+	 *	Remove a single key-value pair.
+	 *	KW_PAIR is vector based, so this is not particularly efficient
+	 *	as later elements will need to be relocated, but it is faster
+	 *	than completely reconstructing the KW_PAIR object.
+	 *	@param key keyword to be removed
+	 */
+	virtual void remove_keyword(const string & key){
+		keys_.erase(key);
+	}
+
+	/**
 	 * get the number of columns(or parameters)
 	 *
 	 * @return

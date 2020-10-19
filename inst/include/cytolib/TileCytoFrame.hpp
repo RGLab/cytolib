@@ -104,6 +104,14 @@ public:
 		is_dirty_keys = true;
 
 	}
+	void rename_keyword(const string & old_key, const string & new_key){
+		CytoFrame::rename_keyword(old_key, new_key);
+		is_dirty_keys = true;
+	}
+	void remove_keyword(const string & key){
+		CytoFrame::remove_keyword(key);
+		is_dirty_keys = true;
+	}
 	void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true)
 	{
 		CytoFrame::set_channel(oldname, newname, is_update_keywords);
