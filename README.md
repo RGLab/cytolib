@@ -1,4 +1,4 @@
-# C++ library for the computational cytometry
+# C++ library for computational cytometry
 
 # License
 Copyright 2019, Fred Hutchinson Cancer Research Center
