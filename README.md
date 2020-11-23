@@ -28,7 +28,7 @@ Download source
 
 ```
 git clone https://github.com/TileDB-Inc/TileDB --depth=1 --branch=dev --single-branch
-cd TiledB
+cd TileDB
 mkdir build
 cd build
 ```
