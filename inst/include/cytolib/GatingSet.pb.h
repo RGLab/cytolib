@@ -194,12 +194,10 @@ PROTOBUF_NAMESPACE_CLOSE
 namespace pb {
 
 enum QUADRANT : int {
-  Q1 = 0,
-  Q2 = 1,
-  Q3 = 2,
-  Q4 = 3,
-  QUADRANT_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
-  QUADRANT_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+  Q1 = 1,
+  Q2 = 2,
+  Q3 = 3,
+  Q4 = 4
 };
 bool QUADRANT_IsValid(int value);
 constexpr QUADRANT QUADRANT_MIN = Q1;
@@ -221,17 +219,15 @@ inline bool QUADRANT_Parse(
     QUADRANT_descriptor(), name, value);
 }
 enum GATE_TYPE : int {
-  POLYGON_GATE = 0,
-  RANGE_GATE = 1,
-  BOOL_GATE = 2,
-  ELLIPSE_GATE = 3,
-  RECT_GATE = 4,
-  LOGICAL_GATE = 5,
-  ELLIPSOID_GATE = 6,
-  CLUSTER_GATE = 7,
-  QUAD_GATE = 8,
-  GATE_TYPE_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
-  GATE_TYPE_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+  POLYGON_GATE = 1,
+  RANGE_GATE = 2,
+  BOOL_GATE = 3,
+  ELLIPSE_GATE = 4,
+  RECT_GATE = 5,
+  LOGICAL_GATE = 6,
+  ELLIPSOID_GATE = 7,
+  CLUSTER_GATE = 8,
+  QUAD_GATE = 9
 };
 bool GATE_TYPE_IsValid(int value);
 constexpr GATE_TYPE GATE_TYPE_MIN = POLYGON_GATE;
@@ -255,9 +251,7 @@ inline bool GATE_TYPE_Parse(
 enum ind_type : int {
   BOOL = 0,
   INT = 1,
-  ROOT = 2,
-  ind_type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
-  ind_type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+  ROOT = 2
 };
 bool ind_type_IsValid(int value);
 constexpr ind_type ind_type_MIN = BOOL;
@@ -287,9 +281,7 @@ enum TRANS_TYPE : int {
   PB_BIEXP = 5,
   PB_LOGICLE = 6,
   PB_LOGGML2 = 7,
-  PB_SCALE = 8,
-  TRANS_TYPE_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
-  TRANS_TYPE_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+  PB_SCALE = 8
 };
 bool TRANS_TYPE_IsValid(int value);
 constexpr TRANS_TYPE TRANS_TYPE_MIN = PB_CALTBL;
@@ -335,6 +327,13 @@ class paramRange PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -429,7 +428,11 @@ class paramRange PROTOBUF_FINAL :
     kMinFieldNumber = 2,
     kMaxFieldNumber = 3,
   };
-  // string name = 1;
+  // required string name = 1;
+  bool has_name() const;
+  private:
+  bool _internal_has_name() const;
+  public:
   void clear_name();
   const std::string& name() const;
   void set_name(const std::string& value);
@@ -445,7 +448,11 @@ class paramRange PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // float min = 2;
+  // required float min = 2;
+  bool has_min() const;
+  private:
+  bool _internal_has_min() const;
+  public:
   void clear_min();
   float min() const;
   void set_min(float value);
@@ -454,7 +461,11 @@ class paramRange PROTOBUF_FINAL :
   void _internal_set_min(float value);
   public:
 
-  // float max = 3;
+  // required float max = 3;
+  bool has_max() const;
+  private:
+  bool _internal_has_max() const;
+  public:
   void clear_max();
   float max() const;
   void set_max(float value);
@@ -467,13 +478,17 @@ class paramRange PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   float min_;
   float max_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -501,6 +516,13 @@ class rangeGate PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -593,7 +615,7 @@ class rangeGate PROTOBUF_FINAL :
   enum : int {
     kParamFieldNumber = 1,
   };
-  // .pb.paramRange param = 1;
+  // required .pb.paramRange param = 1;
   bool has_param() const;
   private:
   bool _internal_has_param() const;
@@ -618,8 +640,9 @@ class rangeGate PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::pb::paramRange* param_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::pb::paramRange* param_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -647,6 +670,13 @@ class paramPoly PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -821,6 +851,13 @@ class polygonGate PROTOBUF_FINAL :
     return *this;
   }
 
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  }
+
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
     return GetDescriptor();
   }
@@ -912,7 +949,7 @@ class polygonGate PROTOBUF_FINAL :
     kParamFieldNumber = 1,
     kQgFieldNumber = 2,
   };
-  // .pb.paramPoly param = 1;
+  // required .pb.paramPoly param = 1;
   bool has_param() const;
   private:
   bool _internal_has_param() const;
@@ -930,7 +967,7 @@ class polygonGate PROTOBUF_FINAL :
       ::pb::paramPoly* param);
   ::pb::paramPoly* unsafe_arena_release_param();
 
-  // .pb.quadGate qg = 2;
+  // optional .pb.quadGate qg = 2;
   bool has_qg() const;
   private:
   bool _internal_has_qg() const;
@@ -955,9 +992,10 @@ class polygonGate PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::pb::paramPoly* param_;
   ::pb::quadGate* qg_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -985,6 +1023,13 @@ class coordinate PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -1078,7 +1123,11 @@ class coordinate PROTOBUF_FINAL :
     kXFieldNumber = 1,
     kYFieldNumber = 2,
   };
-  // float x = 1;
+  // required float x = 1;
+  bool has_x() const;
+  private:
+  bool _internal_has_x() const;
+  public:
   void clear_x();
   float x() const;
   void set_x(float value);
@@ -1087,7 +1136,11 @@ class coordinate PROTOBUF_FINAL :
   void _internal_set_x(float value);
   public:
 
-  // float y = 2;
+  // required float y = 2;
+  bool has_y() const;
+  private:
+  bool _internal_has_y() const;
+  public:
   void clear_y();
   float y() const;
   void set_y(float value);
@@ -1100,12 +1153,16 @@ class coordinate PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float x_;
   float y_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1133,6 +1190,13 @@ class ellipseGate PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -1264,7 +1328,7 @@ class ellipseGate PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::coordinate >&
       antipodal_vertices() const;
 
-  // .pb.coordinate mu = 1;
+  // required .pb.coordinate mu = 1;
   bool has_mu() const;
   private:
   bool _internal_has_mu() const;
@@ -1282,7 +1346,11 @@ class ellipseGate PROTOBUF_FINAL :
       ::pb::coordinate* mu);
   ::pb::coordinate* unsafe_arena_release_mu();
 
-  // float dist = 4;
+  // optional float dist = 4;
+  bool has_dist() const;
+  private:
+  bool _internal_has_dist() const;
+  public:
   void clear_dist();
   float dist() const;
   void set_dist(float value);
@@ -1298,11 +1366,12 @@ class ellipseGate PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::coordinate > cov_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::coordinate > antipodal_vertices_;
   ::pb::coordinate* mu_;
   float dist_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1330,6 +1399,13 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -1448,7 +1524,11 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
   std::string* _internal_add_path();
   public:
 
-  // uint32 op = 2;
+  // required uint32 op = 2;
+  bool has_op() const;
+  private:
+  bool _internal_has_op() const;
+  public:
   void clear_op();
   ::PROTOBUF_NAMESPACE_ID::uint32 op() const;
   void set_op(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -1457,7 +1537,11 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
   void _internal_set_op(::PROTOBUF_NAMESPACE_ID::uint32 value);
   public:
 
-  // bool isNot = 3;
+  // required bool isNot = 3;
+  bool has_isnot() const;
+  private:
+  bool _internal_has_isnot() const;
+  public:
   void clear_isnot();
   bool isnot() const;
   void set_isnot(bool value);
@@ -1470,13 +1554,17 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> path_;
   ::PROTOBUF_NAMESPACE_ID::uint32 op_;
   bool isnot_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1504,6 +1592,13 @@ class boolGate PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -1652,6 +1747,13 @@ class clusterGate PROTOBUF_FINAL :
     return *this;
   }
 
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  }
+
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
     return GetDescriptor();
   }
@@ -1742,7 +1844,11 @@ class clusterGate PROTOBUF_FINAL :
   enum : int {
     kClusterMethodFieldNumber = 1,
   };
-  // string cluster_method = 1;
+  // required string cluster_method = 1;
+  bool has_cluster_method() const;
+  private:
+  bool _internal_has_cluster_method() const;
+  public:
   void clear_cluster_method();
   const std::string& cluster_method() const;
   void set_cluster_method(const std::string& value);
@@ -1765,8 +1871,9 @@ class clusterGate PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cluster_method_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cluster_method_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1794,6 +1901,13 @@ class quadGate PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -1887,7 +2001,11 @@ class quadGate PROTOBUF_FINAL :
     kUidFieldNumber = 1,
     kQuadrantFieldNumber = 3,
   };
-  // string uid = 1;
+  // required string uid = 1;
+  bool has_uid() const;
+  private:
+  bool _internal_has_uid() const;
+  public:
   void clear_uid();
   const std::string& uid() const;
   void set_uid(const std::string& value);
@@ -1903,7 +2021,11 @@ class quadGate PROTOBUF_FINAL :
   std::string* _internal_mutable_uid();
   public:
 
-  // .pb.QUADRANT quadrant = 3;
+  // required .pb.QUADRANT quadrant = 3;
+  bool has_quadrant() const;
+  private:
+  bool _internal_has_quadrant() const;
+  public:
   void clear_quadrant();
   ::pb::QUADRANT quadrant() const;
   void set_quadrant(::pb::QUADRANT value);
@@ -1916,12 +2038,16 @@ class quadGate PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr uid_;
   int quadrant_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1949,6 +2075,13 @@ class gate PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -2049,7 +2182,7 @@ class gate PROTOBUF_FINAL :
     kIsGainedFieldNumber = 3,
     kTypeFieldNumber = 4,
   };
-  // .pb.rangeGate rg = 5;
+  // optional .pb.rangeGate rg = 5;
   bool has_rg() const;
   private:
   bool _internal_has_rg() const;
@@ -2067,7 +2200,7 @@ class gate PROTOBUF_FINAL :
       ::pb::rangeGate* rg);
   ::pb::rangeGate* unsafe_arena_release_rg();
 
-  // .pb.polygonGate pg = 6;
+  // optional .pb.polygonGate pg = 6;
   bool has_pg() const;
   private:
   bool _internal_has_pg() const;
@@ -2085,7 +2218,7 @@ class gate PROTOBUF_FINAL :
       ::pb::polygonGate* pg);
   ::pb::polygonGate* unsafe_arena_release_pg();
 
-  // .pb.ellipseGate eg = 7;
+  // optional .pb.ellipseGate eg = 7;
   bool has_eg() const;
   private:
   bool _internal_has_eg() const;
@@ -2103,7 +2236,7 @@ class gate PROTOBUF_FINAL :
       ::pb::ellipseGate* eg);
   ::pb::ellipseGate* unsafe_arena_release_eg();
 
-  // .pb.boolGate bg = 8;
+  // optional .pb.boolGate bg = 8;
   bool has_bg() const;
   private:
   bool _internal_has_bg() const;
@@ -2121,7 +2254,7 @@ class gate PROTOBUF_FINAL :
       ::pb::boolGate* bg);
   ::pb::boolGate* unsafe_arena_release_bg();
 
-  // .pb.clusterGate cg = 9;
+  // optional .pb.clusterGate cg = 9;
   bool has_cg() const;
   private:
   bool _internal_has_cg() const;
@@ -2139,7 +2272,11 @@ class gate PROTOBUF_FINAL :
       ::pb::clusterGate* cg);
   ::pb::clusterGate* unsafe_arena_release_cg();
 
-  // bool neg = 1;
+  // required bool neg = 1;
+  bool has_neg() const;
+  private:
+  bool _internal_has_neg() const;
+  public:
   void clear_neg();
   bool neg() const;
   void set_neg(bool value);
@@ -2148,7 +2285,11 @@ class gate PROTOBUF_FINAL :
   void _internal_set_neg(bool value);
   public:
 
-  // bool isTransformed = 2;
+  // required bool isTransformed = 2;
+  bool has_istransformed() const;
+  private:
+  bool _internal_has_istransformed() const;
+  public:
   void clear_istransformed();
   bool istransformed() const;
   void set_istransformed(bool value);
@@ -2157,7 +2298,11 @@ class gate PROTOBUF_FINAL :
   void _internal_set_istransformed(bool value);
   public:
 
-  // bool isGained = 3;
+  // required bool isGained = 3;
+  bool has_isgained() const;
+  private:
+  bool _internal_has_isgained() const;
+  public:
   void clear_isgained();
   bool isgained() const;
   void set_isgained(bool value);
@@ -2166,7 +2311,11 @@ class gate PROTOBUF_FINAL :
   void _internal_set_isgained(bool value);
   public:
 
-  // .pb.GATE_TYPE type = 4;
+  // required .pb.GATE_TYPE type = 4;
+  bool has_type() const;
+  private:
+  bool _internal_has_type() const;
+  public:
   void clear_type();
   ::pb::GATE_TYPE type() const;
   void set_type(::pb::GATE_TYPE value);
@@ -2179,9 +2328,14 @@ class gate PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::pb::rangeGate* rg_;
   ::pb::polygonGate* pg_;
   ::pb::ellipseGate* eg_;
@@ -2191,7 +2345,6 @@ class gate PROTOBUF_FINAL :
   bool istransformed_;
   bool isgained_;
   int type_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -2219,6 +2372,13 @@ class POPSTATS PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -2312,7 +2472,11 @@ class POPSTATS PROTOBUF_FINAL :
     kStatTypeFieldNumber = 1,
     kStatValFieldNumber = 2,
   };
-  // string statType = 1;
+  // required string statType = 1;
+  bool has_stattype() const;
+  private:
+  bool _internal_has_stattype() const;
+  public:
   void clear_stattype();
   const std::string& stattype() const;
   void set_stattype(const std::string& value);
@@ -2328,7 +2492,11 @@ class POPSTATS PROTOBUF_FINAL :
   std::string* _internal_mutable_stattype();
   public:
 
-  // float statVal = 2;
+  // required float statVal = 2;
+  bool has_statval() const;
+  private:
+  bool _internal_has_statval() const;
+  public:
   void clear_statval();
   float statval() const;
   void set_statval(float value);
@@ -2341,12 +2509,16 @@ class POPSTATS PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr stattype_;
   float statval_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -2374,6 +2546,13 @@ class calibrationTable PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -2583,7 +2762,11 @@ class calibrationTable PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_d();
 
-  // string caltype = 7;
+  // optional string caltype = 7;
+  bool has_caltype() const;
+  private:
+  bool _internal_has_caltype() const;
+  public:
   void clear_caltype();
   const std::string& caltype() const;
   void set_caltype(const std::string& value);
@@ -2599,7 +2782,11 @@ class calibrationTable PROTOBUF_FINAL :
   std::string* _internal_mutable_caltype();
   public:
 
-  // uint32 spline_method = 6;
+  // optional uint32 spline_method = 6;
+  bool has_spline_method() const;
+  private:
+  bool _internal_has_spline_method() const;
+  public:
   void clear_spline_method();
   ::PROTOBUF_NAMESPACE_ID::uint32 spline_method() const;
   void set_spline_method(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -2608,7 +2795,11 @@ class calibrationTable PROTOBUF_FINAL :
   void _internal_set_spline_method(::PROTOBUF_NAMESPACE_ID::uint32 value);
   public:
 
-  // bool flag = 8;
+  // optional bool flag = 8;
+  bool has_flag() const;
+  private:
+  bool _internal_has_flag() const;
+  public:
   void clear_flag();
   bool flag() const;
   void set_flag(bool value);
@@ -2624,6 +2815,8 @@ class calibrationTable PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > x_;
   mutable std::atomic<int> _x_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > y_;
@@ -2637,7 +2830,6 @@ class calibrationTable PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr caltype_;
   ::PROTOBUF_NAMESPACE_ID::uint32 spline_method_;
   bool flag_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -2665,6 +2857,13 @@ class biexpTrans PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -2761,7 +2960,11 @@ class biexpTrans PROTOBUF_FINAL :
     kWidthBasisFieldNumber = 4,
     kMaxValueFieldNumber = 5,
   };
-  // uint32 channelRange = 1;
+  // optional uint32 channelRange = 1;
+  bool has_channelrange() const;
+  private:
+  bool _internal_has_channelrange() const;
+  public:
   void clear_channelrange();
   ::PROTOBUF_NAMESPACE_ID::uint32 channelrange() const;
   void set_channelrange(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -2770,7 +2973,11 @@ class biexpTrans PROTOBUF_FINAL :
   void _internal_set_channelrange(::PROTOBUF_NAMESPACE_ID::uint32 value);
   public:
 
-  // float pos = 2;
+  // optional float pos = 2;
+  bool has_pos() const;
+  private:
+  bool _internal_has_pos() const;
+  public:
   void clear_pos();
   float pos() const;
   void set_pos(float value);
@@ -2779,7 +2986,11 @@ class biexpTrans PROTOBUF_FINAL :
   void _internal_set_pos(float value);
   public:
 
-  // float neg = 3;
+  // optional float neg = 3;
+  bool has_neg() const;
+  private:
+  bool _internal_has_neg() const;
+  public:
   void clear_neg();
   float neg() const;
   void set_neg(float value);
@@ -2788,7 +2999,11 @@ class biexpTrans PROTOBUF_FINAL :
   void _internal_set_neg(float value);
   public:
 
-  // float widthBasis = 4;
+  // optional float widthBasis = 4;
+  bool has_widthbasis() const;
+  private:
+  bool _internal_has_widthbasis() const;
+  public:
   void clear_widthbasis();
   float widthbasis() const;
   void set_widthbasis(float value);
@@ -2797,7 +3012,11 @@ class biexpTrans PROTOBUF_FINAL :
   void _internal_set_widthbasis(float value);
   public:
 
-  // float maxValue = 5;
+  // optional float maxValue = 5;
+  bool has_maxvalue() const;
+  private:
+  bool _internal_has_maxvalue() const;
+  public:
   void clear_maxvalue();
   float maxvalue() const;
   void set_maxvalue(float value);
@@ -2813,12 +3032,13 @@ class biexpTrans PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 channelrange_;
   float pos_;
   float neg_;
   float widthbasis_;
   float maxvalue_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -2846,6 +3066,13 @@ class fasinhTrans PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -2942,7 +3169,11 @@ class fasinhTrans PROTOBUF_FINAL :
     kAFieldNumber = 4,
     kMFieldNumber = 5,
   };
-  // float length = 1;
+  // optional float length = 1;
+  bool has_length() const;
+  private:
+  bool _internal_has_length() const;
+  public:
   void clear_length();
   float length() const;
   void set_length(float value);
@@ -2951,7 +3182,11 @@ class fasinhTrans PROTOBUF_FINAL :
   void _internal_set_length(float value);
   public:
 
-  // float maxRange = 2;
+  // optional float maxRange = 2;
+  bool has_maxrange() const;
+  private:
+  bool _internal_has_maxrange() const;
+  public:
   void clear_maxrange();
   float maxrange() const;
   void set_maxrange(float value);
@@ -2960,7 +3195,11 @@ class fasinhTrans PROTOBUF_FINAL :
   void _internal_set_maxrange(float value);
   public:
 
-  // float T = 3;
+  // optional float T = 3;
+  bool has_t() const;
+  private:
+  bool _internal_has_t() const;
+  public:
   void clear_t();
   float t() const;
   void set_t(float value);
@@ -2969,7 +3208,11 @@ class fasinhTrans PROTOBUF_FINAL :
   void _internal_set_t(float value);
   public:
 
-  // float A = 4;
+  // optional float A = 4;
+  bool has_a() const;
+  private:
+  bool _internal_has_a() const;
+  public:
   void clear_a();
   float a() const;
   void set_a(float value);
@@ -2978,7 +3221,11 @@ class fasinhTrans PROTOBUF_FINAL :
   void _internal_set_a(float value);
   public:
 
-  // float M = 5;
+  // optional float M = 5;
+  bool has_m() const;
+  private:
+  bool _internal_has_m() const;
+  public:
   void clear_m();
   float m() const;
   void set_m(float value);
@@ -2994,12 +3241,13 @@ class fasinhTrans PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float length_;
   float maxrange_;
   float t_;
   float a_;
   float m_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3027,6 +3275,13 @@ class scaleTrans PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -3121,7 +3376,11 @@ class scaleTrans PROTOBUF_FINAL :
     kTScaleFieldNumber = 2,
     kRScaleFieldNumber = 3,
   };
-  // float scale_factor = 1;
+  // optional float scale_factor = 1;
+  bool has_scale_factor() const;
+  private:
+  bool _internal_has_scale_factor() const;
+  public:
   void clear_scale_factor();
   float scale_factor() const;
   void set_scale_factor(float value);
@@ -3130,7 +3389,11 @@ class scaleTrans PROTOBUF_FINAL :
   void _internal_set_scale_factor(float value);
   public:
 
-  // float t_scale = 2;
+  // optional float t_scale = 2;
+  bool has_t_scale() const;
+  private:
+  bool _internal_has_t_scale() const;
+  public:
   void clear_t_scale();
   float t_scale() const;
   void set_t_scale(float value);
@@ -3139,7 +3402,11 @@ class scaleTrans PROTOBUF_FINAL :
   void _internal_set_t_scale(float value);
   public:
 
-  // float r_scale = 3;
+  // optional float r_scale = 3;
+  bool has_r_scale() const;
+  private:
+  bool _internal_has_r_scale() const;
+  public:
   void clear_r_scale();
   float r_scale() const;
   void set_r_scale(float value);
@@ -3155,10 +3422,11 @@ class scaleTrans PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float scale_factor_;
   float t_scale_;
   float r_scale_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3186,6 +3454,13 @@ class flinTrans PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -3279,7 +3554,11 @@ class flinTrans PROTOBUF_FINAL :
     kMinFieldNumber = 1,
     kMaxFieldNumber = 2,
   };
-  // float min = 1;
+  // optional float min = 1;
+  bool has_min() const;
+  private:
+  bool _internal_has_min() const;
+  public:
   void clear_min();
   float min() const;
   void set_min(float value);
@@ -3288,7 +3567,11 @@ class flinTrans PROTOBUF_FINAL :
   void _internal_set_min(float value);
   public:
 
-  // float max = 2;
+  // optional float max = 2;
+  bool has_max() const;
+  private:
+  bool _internal_has_max() const;
+  public:
   void clear_max();
   float max() const;
   void set_max(float value);
@@ -3304,9 +3587,10 @@ class flinTrans PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float min_;
   float max_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3334,6 +3618,13 @@ class logTrans PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -3429,7 +3720,11 @@ class logTrans PROTOBUF_FINAL :
     kTFieldNumber = 3,
     kScaleFieldNumber = 4,
   };
-  // float offset = 1;
+  // optional float offset = 1;
+  bool has_offset() const;
+  private:
+  bool _internal_has_offset() const;
+  public:
   void clear_offset();
   float offset() const;
   void set_offset(float value);
@@ -3438,7 +3733,11 @@ class logTrans PROTOBUF_FINAL :
   void _internal_set_offset(float value);
   public:
 
-  // float decade = 2;
+  // optional float decade = 2;
+  bool has_decade() const;
+  private:
+  bool _internal_has_decade() const;
+  public:
   void clear_decade();
   float decade() const;
   void set_decade(float value);
@@ -3447,7 +3746,11 @@ class logTrans PROTOBUF_FINAL :
   void _internal_set_decade(float value);
   public:
 
-  // float T = 3;
+  // optional float T = 3;
+  bool has_t() const;
+  private:
+  bool _internal_has_t() const;
+  public:
   void clear_t();
   float t() const;
   void set_t(float value);
@@ -3456,7 +3759,11 @@ class logTrans PROTOBUF_FINAL :
   void _internal_set_t(float value);
   public:
 
-  // float scale = 4;
+  // optional float scale = 4;
+  bool has_scale() const;
+  private:
+  bool _internal_has_scale() const;
+  public:
   void clear_scale();
   float scale() const;
   void set_scale(float value);
@@ -3472,11 +3779,12 @@ class logTrans PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float offset_;
   float decade_;
   float t_;
   float scale_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3504,6 +3812,13 @@ class logGML2Trans PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -3597,7 +3912,11 @@ class logGML2Trans PROTOBUF_FINAL :
     kTFieldNumber = 1,
     kMFieldNumber = 2,
   };
-  // float T = 1;
+  // optional float T = 1;
+  bool has_t() const;
+  private:
+  bool _internal_has_t() const;
+  public:
   void clear_t();
   float t() const;
   void set_t(float value);
@@ -3606,7 +3925,11 @@ class logGML2Trans PROTOBUF_FINAL :
   void _internal_set_t(float value);
   public:
 
-  // float M = 2;
+  // optional float M = 2;
+  bool has_m() const;
+  private:
+  bool _internal_has_m() const;
+  public:
   void clear_m();
   float m() const;
   void set_m(float value);
@@ -3622,9 +3945,10 @@ class logGML2Trans PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float t_;
   float m_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3652,6 +3976,13 @@ class logicleTrans PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -3750,7 +4081,11 @@ class logicleTrans PROTOBUF_FINAL :
     kIsGml2FieldNumber = 6,
     kIsInverseFieldNumber = 7,
   };
-  // float T = 1;
+  // optional float T = 1;
+  bool has_t() const;
+  private:
+  bool _internal_has_t() const;
+  public:
   void clear_t();
   float t() const;
   void set_t(float value);
@@ -3759,7 +4094,11 @@ class logicleTrans PROTOBUF_FINAL :
   void _internal_set_t(float value);
   public:
 
-  // float W = 2;
+  // optional float W = 2;
+  bool has_w() const;
+  private:
+  bool _internal_has_w() const;
+  public:
   void clear_w();
   float w() const;
   void set_w(float value);
@@ -3768,7 +4107,11 @@ class logicleTrans PROTOBUF_FINAL :
   void _internal_set_w(float value);
   public:
 
-  // float M = 3;
+  // optional float M = 3;
+  bool has_m() const;
+  private:
+  bool _internal_has_m() const;
+  public:
   void clear_m();
   float m() const;
   void set_m(float value);
@@ -3777,7 +4120,11 @@ class logicleTrans PROTOBUF_FINAL :
   void _internal_set_m(float value);
   public:
 
-  // float A = 4;
+  // optional float A = 4;
+  bool has_a() const;
+  private:
+  bool _internal_has_a() const;
+  public:
   void clear_a();
   float a() const;
   void set_a(float value);
@@ -3786,7 +4133,11 @@ class logicleTrans PROTOBUF_FINAL :
   void _internal_set_a(float value);
   public:
 
-  // float bins = 5;
+  // optional float bins = 5;
+  bool has_bins() const;
+  private:
+  bool _internal_has_bins() const;
+  public:
   void clear_bins();
   float bins() const;
   void set_bins(float value);
@@ -3795,7 +4146,11 @@ class logicleTrans PROTOBUF_FINAL :
   void _internal_set_bins(float value);
   public:
 
-  // bool isGml2 = 6;
+  // optional bool isGml2 = 6;
+  bool has_isgml2() const;
+  private:
+  bool _internal_has_isgml2() const;
+  public:
   void clear_isgml2();
   bool isgml2() const;
   void set_isgml2(bool value);
@@ -3804,7 +4159,11 @@ class logicleTrans PROTOBUF_FINAL :
   void _internal_set_isgml2(bool value);
   public:
 
-  // bool isInverse = 7;
+  // optional bool isInverse = 7;
+  bool has_isinverse() const;
+  private:
+  bool _internal_has_isinverse() const;
+  public:
   void clear_isinverse();
   bool isinverse() const;
   void set_isinverse(bool value);
@@ -3820,6 +4179,8 @@ class logicleTrans PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   float t_;
   float w_;
   float m_;
@@ -3827,7 +4188,6 @@ class logicleTrans PROTOBUF_FINAL :
   float bins_;
   bool isgml2_;
   bool isinverse_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -3855,6 +4215,13 @@ class transformation PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -3960,7 +4327,11 @@ class transformation PROTOBUF_FINAL :
     kIsComputedFieldNumber = 6,
     kTypeFieldNumber = 12,
   };
-  // string name = 4;
+  // optional string name = 4;
+  bool has_name() const;
+  private:
+  bool _internal_has_name() const;
+  public:
   void clear_name();
   const std::string& name() const;
   void set_name(const std::string& value);
@@ -3976,7 +4347,11 @@ class transformation PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // string channel = 5;
+  // optional string channel = 5;
+  bool has_channel() const;
+  private:
+  bool _internal_has_channel() const;
+  public:
   void clear_channel();
   const std::string& channel() const;
   void set_channel(const std::string& value);
@@ -3992,7 +4367,7 @@ class transformation PROTOBUF_FINAL :
   std::string* _internal_mutable_channel();
   public:
 
-  // .pb.calibrationTable calTbl = 1;
+  // optional .pb.calibrationTable calTbl = 1;
   bool has_caltbl() const;
   private:
   bool _internal_has_caltbl() const;
@@ -4010,7 +4385,7 @@ class transformation PROTOBUF_FINAL :
       ::pb::calibrationTable* caltbl);
   ::pb::calibrationTable* unsafe_arena_release_caltbl();
 
-  // .pb.biexpTrans bt = 7;
+  // optional .pb.biexpTrans bt = 7;
   bool has_bt() const;
   private:
   bool _internal_has_bt() const;
@@ -4028,7 +4403,7 @@ class transformation PROTOBUF_FINAL :
       ::pb::biexpTrans* bt);
   ::pb::biexpTrans* unsafe_arena_release_bt();
 
-  // .pb.logTrans lt = 8;
+  // optional .pb.logTrans lt = 8;
   bool has_lt() const;
   private:
   bool _internal_has_lt() const;
@@ -4046,7 +4421,7 @@ class transformation PROTOBUF_FINAL :
       ::pb::logTrans* lt);
   ::pb::logTrans* unsafe_arena_release_lt();
 
-  // .pb.flinTrans flt = 9;
+  // optional .pb.flinTrans flt = 9;
   bool has_flt() const;
   private:
   bool _internal_has_flt() const;
@@ -4064,7 +4439,7 @@ class transformation PROTOBUF_FINAL :
       ::pb::flinTrans* flt);
   ::pb::flinTrans* unsafe_arena_release_flt();
 
-  // .pb.scaleTrans st = 10;
+  // optional .pb.scaleTrans st = 10;
   bool has_st() const;
   private:
   bool _internal_has_st() const;
@@ -4082,7 +4457,7 @@ class transformation PROTOBUF_FINAL :
       ::pb::scaleTrans* st);
   ::pb::scaleTrans* unsafe_arena_release_st();
 
-  // .pb.fasinhTrans ft = 11;
+  // optional .pb.fasinhTrans ft = 11;
   bool has_ft() const;
   private:
   bool _internal_has_ft() const;
@@ -4100,7 +4475,7 @@ class transformation PROTOBUF_FINAL :
       ::pb::fasinhTrans* ft);
   ::pb::fasinhTrans* unsafe_arena_release_ft();
 
-  // .pb.logicleTrans lgt = 13;
+  // optional .pb.logicleTrans lgt = 13;
   bool has_lgt() const;
   private:
   bool _internal_has_lgt() const;
@@ -4118,7 +4493,7 @@ class transformation PROTOBUF_FINAL :
       ::pb::logicleTrans* lgt);
   ::pb::logicleTrans* unsafe_arena_release_lgt();
 
-  // .pb.logGML2Trans lgml2t = 14;
+  // optional .pb.logGML2Trans lgml2t = 14;
   bool has_lgml2t() const;
   private:
   bool _internal_has_lgml2t() const;
@@ -4136,7 +4511,11 @@ class transformation PROTOBUF_FINAL :
       ::pb::logGML2Trans* lgml2t);
   ::pb::logGML2Trans* unsafe_arena_release_lgml2t();
 
-  // .pb.TRANS_TYPE trans_type = 3;
+  // optional .pb.TRANS_TYPE trans_type = 3;
+  bool has_trans_type() const;
+  private:
+  bool _internal_has_trans_type() const;
+  public:
   void clear_trans_type();
   ::pb::TRANS_TYPE trans_type() const;
   void set_trans_type(::pb::TRANS_TYPE value);
@@ -4145,7 +4524,11 @@ class transformation PROTOBUF_FINAL :
   void _internal_set_trans_type(::pb::TRANS_TYPE value);
   public:
 
-  // bool isGateOnly = 2;
+  // optional bool isGateOnly = 2;
+  bool has_isgateonly() const;
+  private:
+  bool _internal_has_isgateonly() const;
+  public:
   void clear_isgateonly();
   bool isgateonly() const;
   void set_isgateonly(bool value);
@@ -4154,7 +4537,11 @@ class transformation PROTOBUF_FINAL :
   void _internal_set_isgateonly(bool value);
   public:
 
-  // bool isComputed = 6;
+  // optional bool isComputed = 6;
+  bool has_iscomputed() const;
+  private:
+  bool _internal_has_iscomputed() const;
+  public:
   void clear_iscomputed();
   bool iscomputed() const;
   void set_iscomputed(bool value);
@@ -4163,7 +4550,11 @@ class transformation PROTOBUF_FINAL :
   void _internal_set_iscomputed(bool value);
   public:
 
-  // uint32 type = 12;
+  // optional uint32 type = 12;
+  bool has_type() const;
+  private:
+  bool _internal_has_type() const;
+  public:
   void clear_type();
   ::PROTOBUF_NAMESPACE_ID::uint32 type() const;
   void set_type(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -4179,6 +4570,8 @@ class transformation PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr channel_;
   ::pb::calibrationTable* caltbl_;
@@ -4193,7 +4586,6 @@ class transformation PROTOBUF_FINAL :
   bool isgateonly_;
   bool iscomputed_;
   ::PROTOBUF_NAMESPACE_ID::uint32 type_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -4221,6 +4613,13 @@ class trans_pair PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -4315,7 +4714,11 @@ class trans_pair PROTOBUF_FINAL :
     kTransFieldNumber = 3,
     kTransAddressFieldNumber = 2,
   };
-  // string name = 1;
+  // required string name = 1;
+  bool has_name() const;
+  private:
+  bool _internal_has_name() const;
+  public:
   void clear_name();
   const std::string& name() const;
   void set_name(const std::string& value);
@@ -4331,7 +4734,7 @@ class trans_pair PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // .pb.transformation trans = 3;
+  // optional .pb.transformation trans = 3;
   bool has_trans() const;
   private:
   bool _internal_has_trans() const;
@@ -4349,7 +4752,11 @@ class trans_pair PROTOBUF_FINAL :
       ::pb::transformation* trans);
   ::pb::transformation* unsafe_arena_release_trans();
 
-  // uint64 trans_address = 2;
+  // optional uint64 trans_address = 2;
+  bool has_trans_address() const;
+  private:
+  bool _internal_has_trans_address() const;
+  public:
   void clear_trans_address();
   ::PROTOBUF_NAMESPACE_ID::uint64 trans_address() const;
   void set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value);
@@ -4365,10 +4772,11 @@ class trans_pair PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::pb::transformation* trans_;
   ::PROTOBUF_NAMESPACE_ID::uint64 trans_address_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -4396,6 +4804,13 @@ class trans_local PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -4530,7 +4945,11 @@ class trans_local PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint32 >*
       mutable_sampleids();
 
-  // string groupName = 2;
+  // optional string groupName = 2;
+  bool has_groupname() const;
+  private:
+  bool _internal_has_groupname() const;
+  public:
   void clear_groupname();
   const std::string& groupname() const;
   void set_groupname(const std::string& value);
@@ -4553,11 +4972,12 @@ class trans_local PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::trans_pair > tp_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint32 > sampleids_;
   mutable std::atomic<int> _sampleids_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr groupname_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -4585,6 +5005,13 @@ class POPINDICES PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -4702,7 +5129,11 @@ class POPINDICES PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint32 >*
       mutable_iind();
 
-  // bytes bInd = 4;
+  // optional bytes bInd = 4;
+  bool has_bind() const;
+  private:
+  bool _internal_has_bind() const;
+  public:
   void clear_bind();
   const std::string& bind() const;
   void set_bind(const std::string& value);
@@ -4718,7 +5149,11 @@ class POPINDICES PROTOBUF_FINAL :
   std::string* _internal_mutable_bind();
   public:
 
-  // uint32 nEvents = 1;
+  // required uint32 nEvents = 1;
+  bool has_nevents() const;
+  private:
+  bool _internal_has_nevents() const;
+  public:
   void clear_nevents();
   ::PROTOBUF_NAMESPACE_ID::uint32 nevents() const;
   void set_nevents(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -4727,7 +5162,11 @@ class POPINDICES PROTOBUF_FINAL :
   void _internal_set_nevents(::PROTOBUF_NAMESPACE_ID::uint32 value);
   public:
 
-  // .pb.ind_type indtype = 2;
+  // required .pb.ind_type indtype = 2;
+  bool has_indtype() const;
+  private:
+  bool _internal_has_indtype() const;
+  public:
   void clear_indtype();
   ::pb::ind_type indtype() const;
   void set_indtype(::pb::ind_type value);
@@ -4740,15 +5179,19 @@ class POPINDICES PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint32 > iind_;
   mutable std::atomic<int> _iind_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr bind_;
   ::PROTOBUF_NAMESPACE_ID::uint32 nevents_;
   int indtype_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -4776,6 +5219,13 @@ class nodeProperties PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -4909,7 +5359,11 @@ class nodeProperties PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::POPSTATS >&
       fcstats() const;
 
-  // string thisName = 1;
+  // required string thisName = 1;
+  bool has_thisname() const;
+  private:
+  bool _internal_has_thisname() const;
+  public:
   void clear_thisname();
   const std::string& thisname() const;
   void set_thisname(const std::string& value);
@@ -4925,7 +5379,7 @@ class nodeProperties PROTOBUF_FINAL :
   std::string* _internal_mutable_thisname();
   public:
 
-  // .pb.POPINDICES indices = 5;
+  // optional .pb.POPINDICES indices = 5;
   bool has_indices() const;
   private:
   bool _internal_has_indices() const;
@@ -4943,7 +5397,7 @@ class nodeProperties PROTOBUF_FINAL :
       ::pb::POPINDICES* indices);
   ::pb::POPINDICES* unsafe_arena_release_indices();
 
-  // .pb.gate thisGate = 6;
+  // optional .pb.gate thisGate = 6;
   bool has_thisgate() const;
   private:
   bool _internal_has_thisgate() const;
@@ -4961,7 +5415,11 @@ class nodeProperties PROTOBUF_FINAL :
       ::pb::gate* thisgate);
   ::pb::gate* unsafe_arena_release_thisgate();
 
-  // bool hidden = 4;
+  // required bool hidden = 4;
+  bool has_hidden() const;
+  private:
+  bool _internal_has_hidden() const;
+  public:
   void clear_hidden();
   bool hidden() const;
   void set_hidden(bool value);
@@ -4974,16 +5432,20 @@ class nodeProperties PROTOBUF_FINAL :
  private:
   class _Internal;
 
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
+
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::POPSTATS > fjstats_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::POPSTATS > fcstats_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr thisname_;
   ::pb::POPINDICES* indices_;
   ::pb::gate* thisgate_;
   bool hidden_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -5011,6 +5473,13 @@ class treeNodes PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -5104,7 +5573,7 @@ class treeNodes PROTOBUF_FINAL :
     kNodeFieldNumber = 1,
     kParentFieldNumber = 2,
   };
-  // .pb.nodeProperties node = 1;
+  // required .pb.nodeProperties node = 1;
   bool has_node() const;
   private:
   bool _internal_has_node() const;
@@ -5122,7 +5591,11 @@ class treeNodes PROTOBUF_FINAL :
       ::pb::nodeProperties* node);
   ::pb::nodeProperties* unsafe_arena_release_node();
 
-  // uint32 parent = 2;
+  // optional uint32 parent = 2;
+  bool has_parent() const;
+  private:
+  bool _internal_has_parent() const;
+  public:
   void clear_parent();
   ::PROTOBUF_NAMESPACE_ID::uint32 parent() const;
   void set_parent(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -5138,9 +5611,10 @@ class treeNodes PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::pb::nodeProperties* node_;
   ::PROTOBUF_NAMESPACE_ID::uint32 parent_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -5168,6 +5642,13 @@ class populationTree PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -5316,6 +5797,13 @@ class COMP PROTOBUF_FINAL :
     return *this;
   }
 
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  }
+
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
     return GetDescriptor();
   }
@@ -5458,7 +5946,11 @@ class COMP PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_spillover();
 
-  // string cid = 1;
+  // optional string cid = 1;
+  bool has_cid() const;
+  private:
+  bool _internal_has_cid() const;
+  public:
   void clear_cid();
   const std::string& cid() const;
   void set_cid(const std::string& value);
@@ -5474,7 +5966,11 @@ class COMP PROTOBUF_FINAL :
   std::string* _internal_mutable_cid();
   public:
 
-  // string prefix = 2;
+  // optional string prefix = 2;
+  bool has_prefix() const;
+  private:
+  bool _internal_has_prefix() const;
+  public:
   void clear_prefix();
   const std::string& prefix() const;
   void set_prefix(const std::string& value);
@@ -5490,7 +5986,11 @@ class COMP PROTOBUF_FINAL :
   std::string* _internal_mutable_prefix();
   public:
 
-  // string suffix = 3;
+  // optional string suffix = 3;
+  bool has_suffix() const;
+  private:
+  bool _internal_has_suffix() const;
+  public:
   void clear_suffix();
   const std::string& suffix() const;
   void set_suffix(const std::string& value);
@@ -5506,7 +6006,11 @@ class COMP PROTOBUF_FINAL :
   std::string* _internal_mutable_suffix();
   public:
 
-  // string name = 4;
+  // optional string name = 4;
+  bool has_name() const;
+  private:
+  bool _internal_has_name() const;
+  public:
   void clear_name();
   const std::string& name() const;
   void set_name(const std::string& value);
@@ -5522,7 +6026,11 @@ class COMP PROTOBUF_FINAL :
   std::string* _internal_mutable_name();
   public:
 
-  // string comment = 5;
+  // optional string comment = 5;
+  bool has_comment() const;
+  private:
+  bool _internal_has_comment() const;
+  public:
   void clear_comment();
   const std::string& comment() const;
   void set_comment(const std::string& value);
@@ -5545,15 +6053,15 @@ class COMP PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> marker_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > spillover_;
-  mutable std::atomic<int> _spillover_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr prefix_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr suffix_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr comment_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -5581,6 +6089,13 @@ class PARAM PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -5677,7 +6192,11 @@ class PARAM PROTOBUF_FINAL :
     kHighValueFieldNumber = 4,
     kCalibrationIndexFieldNumber = 5,
   };
-  // string param = 1;
+  // optional string param = 1;
+  bool has_param() const;
+  private:
+  bool _internal_has_param() const;
+  public:
   void clear_param();
   const std::string& param() const;
   void set_param(const std::string& value);
@@ -5693,7 +6212,11 @@ class PARAM PROTOBUF_FINAL :
   std::string* _internal_mutable_param();
   public:
 
-  // bool log = 2;
+  // optional bool log = 2;
+  bool has_log() const;
+  private:
+  bool _internal_has_log() const;
+  public:
   void clear_log();
   bool log() const;
   void set_log(bool value);
@@ -5702,7 +6225,11 @@ class PARAM PROTOBUF_FINAL :
   void _internal_set_log(bool value);
   public:
 
-  // uint32 range = 3;
+  // optional uint32 range = 3;
+  bool has_range() const;
+  private:
+  bool _internal_has_range() const;
+  public:
   void clear_range();
   ::PROTOBUF_NAMESPACE_ID::uint32 range() const;
   void set_range(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -5711,7 +6238,11 @@ class PARAM PROTOBUF_FINAL :
   void _internal_set_range(::PROTOBUF_NAMESPACE_ID::uint32 value);
   public:
 
-  // uint32 highValue = 4;
+  // optional uint32 highValue = 4;
+  bool has_highvalue() const;
+  private:
+  bool _internal_has_highvalue() const;
+  public:
   void clear_highvalue();
   ::PROTOBUF_NAMESPACE_ID::uint32 highvalue() const;
   void set_highvalue(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -5720,7 +6251,11 @@ class PARAM PROTOBUF_FINAL :
   void _internal_set_highvalue(::PROTOBUF_NAMESPACE_ID::uint32 value);
   public:
 
-  // uint32 calibrationIndex = 5;
+  // optional uint32 calibrationIndex = 5;
+  bool has_calibrationindex() const;
+  private:
+  bool _internal_has_calibrationindex() const;
+  public:
   void clear_calibrationindex();
   ::PROTOBUF_NAMESPACE_ID::uint32 calibrationindex() const;
   void set_calibrationindex(::PROTOBUF_NAMESPACE_ID::uint32 value);
@@ -5736,12 +6271,13 @@ class PARAM PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr param_;
   bool log_;
   ::PROTOBUF_NAMESPACE_ID::uint32 range_;
   ::PROTOBUF_NAMESPACE_ID::uint32 highvalue_;
   ::PROTOBUF_NAMESPACE_ID::uint32 calibrationindex_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -5769,6 +6305,13 @@ class GatingHierarchy PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -5884,7 +6427,7 @@ class GatingHierarchy PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::PARAM >&
       transflag() const;
 
-  // .pb.COMP comp = 1;
+  // optional .pb.COMP comp = 1;
   bool has_comp() const;
   private:
   bool _internal_has_comp() const;
@@ -5902,7 +6445,7 @@ class GatingHierarchy PROTOBUF_FINAL :
       ::pb::COMP* comp);
   ::pb::COMP* unsafe_arena_release_comp();
 
-  // .pb.populationTree tree = 2;
+  // required .pb.populationTree tree = 2;
   bool has_tree() const;
   private:
   bool _internal_has_tree() const;
@@ -5920,7 +6463,7 @@ class GatingHierarchy PROTOBUF_FINAL :
       ::pb::populationTree* tree);
   ::pb::populationTree* unsafe_arena_release_tree();
 
-  // .pb.trans_local trans = 5;
+  // optional .pb.trans_local trans = 5;
   bool has_trans() const;
   private:
   bool _internal_has_trans() const;
@@ -5938,7 +6481,7 @@ class GatingHierarchy PROTOBUF_FINAL :
       ::pb::trans_local* trans);
   ::pb::trans_local* unsafe_arena_release_trans();
 
-  // .pb.CytoFrame frame = 6;
+  // optional .pb.CytoFrame frame = 6;
   bool has_frame() const;
   private:
   bool _internal_has_frame() const;
@@ -5956,7 +6499,11 @@ class GatingHierarchy PROTOBUF_FINAL :
       ::pb::CytoFrame* frame);
   ::pb::CytoFrame* unsafe_arena_release_frame();
 
-  // bool isLoaded = 3;
+  // optional bool isLoaded = 3;
+  bool has_isloaded() const;
+  private:
+  bool _internal_has_isloaded() const;
+  public:
   void clear_isloaded();
   bool isloaded() const;
   void set_isloaded(bool value);
@@ -5972,13 +6519,14 @@ class GatingHierarchy PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::PARAM > transflag_;
   ::pb::COMP* comp_;
   ::pb::populationTree* tree_;
   ::pb::trans_local* trans_;
   ::pb::CytoFrame* frame_;
   bool isloaded_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -6006,6 +6554,13 @@ class CytoFrame PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -6098,7 +6653,11 @@ class CytoFrame PROTOBUF_FINAL :
   enum : int {
     kIsH5FieldNumber = 1,
   };
-  // bool is_h5 = 1;
+  // required bool is_h5 = 1;
+  bool has_is_h5() const;
+  private:
+  bool _internal_has_is_h5() const;
+  public:
   void clear_is_h5();
   bool is_h5() const;
   void set_is_h5(bool value);
@@ -6114,8 +6673,9 @@ class CytoFrame PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  bool is_h5_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  bool is_h5_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -6143,6 +6703,13 @@ class TRANS_TBL PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -6236,7 +6803,7 @@ class TRANS_TBL PROTOBUF_FINAL :
     kTransFieldNumber = 2,
     kTransAddressFieldNumber = 1,
   };
-  // .pb.transformation trans = 2;
+  // optional .pb.transformation trans = 2;
   bool has_trans() const;
   private:
   bool _internal_has_trans() const;
@@ -6254,7 +6821,11 @@ class TRANS_TBL PROTOBUF_FINAL :
       ::pb::transformation* trans);
   ::pb::transformation* unsafe_arena_release_trans();
 
-  // uint64 trans_address = 1;
+  // optional uint64 trans_address = 1;
+  bool has_trans_address() const;
+  private:
+  bool _internal_has_trans_address() const;
+  public:
   void clear_trans_address();
   ::PROTOBUF_NAMESPACE_ID::uint64 trans_address() const;
   void set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value);
@@ -6270,9 +6841,10 @@ class TRANS_TBL PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::pb::transformation* trans_;
   ::PROTOBUF_NAMESPACE_ID::uint64 trans_address_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // -------------------------------------------------------------------
@@ -6300,6 +6872,13 @@ class GatingSet PROTOBUF_FINAL :
       CopyFrom(from);
     }
     return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
   }
 
   static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
@@ -6460,7 +7039,11 @@ class GatingSet PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::trans_local >&
       gtrans() const;
 
-  // string guid = 6;
+  // optional string guid = 6;
+  bool has_guid() const;
+  private:
+  bool _internal_has_guid() const;
+  public:
   void clear_guid();
   const std::string& guid() const;
   void set_guid(const std::string& value);
@@ -6476,7 +7059,11 @@ class GatingSet PROTOBUF_FINAL :
   std::string* _internal_mutable_guid();
   public:
 
-  // string cytolib_verion = 7;
+  // optional string cytolib_verion = 7;
+  bool has_cytolib_verion() const;
+  private:
+  bool _internal_has_cytolib_verion() const;
+  public:
   void clear_cytolib_verion();
   const std::string& cytolib_verion() const;
   void set_cytolib_verion(const std::string& value);
@@ -6492,7 +7079,11 @@ class GatingSet PROTOBUF_FINAL :
   std::string* _internal_mutable_cytolib_verion();
   public:
 
-  // string pb_verion = 8;
+  // optional string pb_verion = 8;
+  bool has_pb_verion() const;
+  private:
+  bool _internal_has_pb_verion() const;
+  public:
   void clear_pb_verion();
   const std::string& pb_verion() const;
   void set_pb_verion(const std::string& value);
@@ -6508,7 +7099,11 @@ class GatingSet PROTOBUF_FINAL :
   std::string* _internal_mutable_pb_verion();
   public:
 
-  // string h5_verion = 9;
+  // optional string h5_verion = 9;
+  bool has_h5_verion() const;
+  private:
+  bool _internal_has_h5_verion() const;
+  public:
   void clear_h5_verion();
   const std::string& h5_verion() const;
   void set_h5_verion(const std::string& value);
@@ -6524,7 +7119,11 @@ class GatingSet PROTOBUF_FINAL :
   std::string* _internal_mutable_h5_verion();
   public:
 
-  // uint64 globalBiExpTrans = 3;
+  // optional uint64 globalBiExpTrans = 3;
+  bool has_globalbiexptrans() const;
+  private:
+  bool _internal_has_globalbiexptrans() const;
+  public:
   void clear_globalbiexptrans();
   ::PROTOBUF_NAMESPACE_ID::uint64 globalbiexptrans() const;
   void set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 value);
@@ -6533,7 +7132,11 @@ class GatingSet PROTOBUF_FINAL :
   void _internal_set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 value);
   public:
 
-  // uint64 globalLinTrans = 4;
+  // optional uint64 globalLinTrans = 4;
+  bool has_globallintrans() const;
+  private:
+  bool _internal_has_globallintrans() const;
+  public:
   void clear_globallintrans();
   ::PROTOBUF_NAMESPACE_ID::uint64 globallintrans() const;
   void set_globallintrans(::PROTOBUF_NAMESPACE_ID::uint64 value);
@@ -6549,6 +7152,8 @@ class GatingSet PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> samplename_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::TRANS_TBL > trans_tbl_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::pb::trans_local > gtrans_;
@@ -6558,7 +7163,6 @@ class GatingSet PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr h5_verion_;
   ::PROTOBUF_NAMESPACE_ID::uint64 globalbiexptrans_;
   ::PROTOBUF_NAMESPACE_ID::uint64 globallintrans_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_GatingSet_2eproto;
 };
 // ===================================================================
@@ -6572,9 +7176,17 @@ class GatingSet PROTOBUF_FINAL :
 #endif  // __GNUC__
 // paramRange
 
-// string name = 1;
+// required string name = 1;
+inline bool paramRange::_internal_has_name() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool paramRange::has_name() const {
+  return _internal_has_name();
+}
 inline void paramRange::clear_name() {
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& paramRange::name() const {
   // @@protoc_insertion_point(field_get:pb.paramRange.name)
@@ -6592,51 +7204,63 @@ inline const std::string& paramRange::_internal_name() const {
   return name_.Get();
 }
 inline void paramRange::_internal_set_name(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void paramRange::set_name(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.paramRange.name)
 }
 inline void paramRange::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.paramRange.name)
 }
 inline void paramRange::set_name(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.paramRange.name)
 }
 inline std::string* paramRange::_internal_mutable_name() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* paramRange::release_name() {
   // @@protoc_insertion_point(field_release:pb.paramRange.name)
-  return name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_name()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return name_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void paramRange::set_allocated_name(std::string* name) {
   if (name != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.paramRange.name)
 }
 
-// float min = 2;
+// required float min = 2;
+inline bool paramRange::_internal_has_min() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool paramRange::has_min() const {
+  return _internal_has_min();
+}
 inline void paramRange::clear_min() {
   min_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float paramRange::_internal_min() const {
   return min_;
@@ -6646,7 +7270,7 @@ inline float paramRange::min() const {
   return _internal_min();
 }
 inline void paramRange::_internal_set_min(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   min_ = value;
 }
 inline void paramRange::set_min(float value) {
@@ -6654,9 +7278,17 @@ inline void paramRange::set_min(float value) {
   // @@protoc_insertion_point(field_set:pb.paramRange.min)
 }
 
-// float max = 3;
+// required float max = 3;
+inline bool paramRange::_internal_has_max() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool paramRange::has_max() const {
+  return _internal_has_max();
+}
 inline void paramRange::clear_max() {
   max_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline float paramRange::_internal_max() const {
   return max_;
@@ -6666,7 +7298,7 @@ inline float paramRange::max() const {
   return _internal_max();
 }
 inline void paramRange::_internal_set_max(float value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   max_ = value;
 }
 inline void paramRange::set_max(float value) {
@@ -6678,18 +7310,18 @@ inline void paramRange::set_max(float value) {
 
 // rangeGate
 
-// .pb.paramRange param = 1;
+// required .pb.paramRange param = 1;
 inline bool rangeGate::_internal_has_param() const {
-  return this != internal_default_instance() && param_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || param_ != nullptr);
+  return value;
 }
 inline bool rangeGate::has_param() const {
   return _internal_has_param();
 }
 inline void rangeGate::clear_param() {
-  if (GetArena() == nullptr && param_ != nullptr) {
-    delete param_;
-  }
-  param_ = nullptr;
+  if (param_ != nullptr) param_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const ::pb::paramRange& rangeGate::_internal_param() const {
   const ::pb::paramRange* p = param_;
@@ -6707,14 +7339,14 @@ inline void rangeGate::unsafe_arena_set_allocated_param(
   }
   param_ = param;
   if (param) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.rangeGate.param)
 }
 inline ::pb::paramRange* rangeGate::release_param() {
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::paramRange* temp = param_;
   param_ = nullptr;
   if (GetArena() != nullptr) {
@@ -6724,13 +7356,13 @@ inline ::pb::paramRange* rangeGate::release_param() {
 }
 inline ::pb::paramRange* rangeGate::unsafe_arena_release_param() {
   // @@protoc_insertion_point(field_release:pb.rangeGate.param)
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::paramRange* temp = param_;
   param_ = nullptr;
   return temp;
 }
 inline ::pb::paramRange* rangeGate::_internal_mutable_param() {
-  
+  _has_bits_[0] |= 0x00000001u;
   if (param_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::paramRange>(GetArena());
     param_ = p;
@@ -6753,9 +7385,9 @@ inline void rangeGate::set_allocated_param(::pb::paramRange* param) {
       param = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, param, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   param_ = param;
   // @@protoc_insertion_point(field_set_allocated:pb.rangeGate.param)
@@ -6882,18 +7514,18 @@ paramPoly::vertices() const {
 
 // polygonGate
 
-// .pb.paramPoly param = 1;
+// required .pb.paramPoly param = 1;
 inline bool polygonGate::_internal_has_param() const {
-  return this != internal_default_instance() && param_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || param_ != nullptr);
+  return value;
 }
 inline bool polygonGate::has_param() const {
   return _internal_has_param();
 }
 inline void polygonGate::clear_param() {
-  if (GetArena() == nullptr && param_ != nullptr) {
-    delete param_;
-  }
-  param_ = nullptr;
+  if (param_ != nullptr) param_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const ::pb::paramPoly& polygonGate::_internal_param() const {
   const ::pb::paramPoly* p = param_;
@@ -6911,14 +7543,14 @@ inline void polygonGate::unsafe_arena_set_allocated_param(
   }
   param_ = param;
   if (param) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.polygonGate.param)
 }
 inline ::pb::paramPoly* polygonGate::release_param() {
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::paramPoly* temp = param_;
   param_ = nullptr;
   if (GetArena() != nullptr) {
@@ -6928,13 +7560,13 @@ inline ::pb::paramPoly* polygonGate::release_param() {
 }
 inline ::pb::paramPoly* polygonGate::unsafe_arena_release_param() {
   // @@protoc_insertion_point(field_release:pb.polygonGate.param)
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::paramPoly* temp = param_;
   param_ = nullptr;
   return temp;
 }
 inline ::pb::paramPoly* polygonGate::_internal_mutable_param() {
-  
+  _has_bits_[0] |= 0x00000001u;
   if (param_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::paramPoly>(GetArena());
     param_ = p;
@@ -6957,26 +7589,26 @@ inline void polygonGate::set_allocated_param(::pb::paramPoly* param) {
       param = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, param, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   param_ = param;
   // @@protoc_insertion_point(field_set_allocated:pb.polygonGate.param)
 }
 
-// .pb.quadGate qg = 2;
+// optional .pb.quadGate qg = 2;
 inline bool polygonGate::_internal_has_qg() const {
-  return this != internal_default_instance() && qg_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  PROTOBUF_ASSUME(!value || qg_ != nullptr);
+  return value;
 }
 inline bool polygonGate::has_qg() const {
   return _internal_has_qg();
 }
 inline void polygonGate::clear_qg() {
-  if (GetArena() == nullptr && qg_ != nullptr) {
-    delete qg_;
-  }
-  qg_ = nullptr;
+  if (qg_ != nullptr) qg_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const ::pb::quadGate& polygonGate::_internal_qg() const {
   const ::pb::quadGate* p = qg_;
@@ -6994,14 +7626,14 @@ inline void polygonGate::unsafe_arena_set_allocated_qg(
   }
   qg_ = qg;
   if (qg) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.polygonGate.qg)
 }
 inline ::pb::quadGate* polygonGate::release_qg() {
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::quadGate* temp = qg_;
   qg_ = nullptr;
   if (GetArena() != nullptr) {
@@ -7011,13 +7643,13 @@ inline ::pb::quadGate* polygonGate::release_qg() {
 }
 inline ::pb::quadGate* polygonGate::unsafe_arena_release_qg() {
   // @@protoc_insertion_point(field_release:pb.polygonGate.qg)
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::quadGate* temp = qg_;
   qg_ = nullptr;
   return temp;
 }
 inline ::pb::quadGate* polygonGate::_internal_mutable_qg() {
-  
+  _has_bits_[0] |= 0x00000002u;
   if (qg_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::quadGate>(GetArena());
     qg_ = p;
@@ -7040,9 +7672,9 @@ inline void polygonGate::set_allocated_qg(::pb::quadGate* qg) {
       qg = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, qg, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   qg_ = qg;
   // @@protoc_insertion_point(field_set_allocated:pb.polygonGate.qg)
@@ -7052,9 +7684,17 @@ inline void polygonGate::set_allocated_qg(::pb::quadGate* qg) {
 
 // coordinate
 
-// float x = 1;
+// required float x = 1;
+inline bool coordinate::_internal_has_x() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool coordinate::has_x() const {
+  return _internal_has_x();
+}
 inline void coordinate::clear_x() {
   x_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline float coordinate::_internal_x() const {
   return x_;
@@ -7064,7 +7704,7 @@ inline float coordinate::x() const {
   return _internal_x();
 }
 inline void coordinate::_internal_set_x(float value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   x_ = value;
 }
 inline void coordinate::set_x(float value) {
@@ -7072,9 +7712,17 @@ inline void coordinate::set_x(float value) {
   // @@protoc_insertion_point(field_set:pb.coordinate.x)
 }
 
-// float y = 2;
+// required float y = 2;
+inline bool coordinate::_internal_has_y() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool coordinate::has_y() const {
+  return _internal_has_y();
+}
 inline void coordinate::clear_y() {
   y_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float coordinate::_internal_y() const {
   return y_;
@@ -7084,7 +7732,7 @@ inline float coordinate::y() const {
   return _internal_y();
 }
 inline void coordinate::_internal_set_y(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   y_ = value;
 }
 inline void coordinate::set_y(float value) {
@@ -7096,18 +7744,18 @@ inline void coordinate::set_y(float value) {
 
 // ellipseGate
 
-// .pb.coordinate mu = 1;
+// required .pb.coordinate mu = 1;
 inline bool ellipseGate::_internal_has_mu() const {
-  return this != internal_default_instance() && mu_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || mu_ != nullptr);
+  return value;
 }
 inline bool ellipseGate::has_mu() const {
   return _internal_has_mu();
 }
 inline void ellipseGate::clear_mu() {
-  if (GetArena() == nullptr && mu_ != nullptr) {
-    delete mu_;
-  }
-  mu_ = nullptr;
+  if (mu_ != nullptr) mu_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const ::pb::coordinate& ellipseGate::_internal_mu() const {
   const ::pb::coordinate* p = mu_;
@@ -7125,14 +7773,14 @@ inline void ellipseGate::unsafe_arena_set_allocated_mu(
   }
   mu_ = mu;
   if (mu) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.ellipseGate.mu)
 }
 inline ::pb::coordinate* ellipseGate::release_mu() {
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::coordinate* temp = mu_;
   mu_ = nullptr;
   if (GetArena() != nullptr) {
@@ -7142,13 +7790,13 @@ inline ::pb::coordinate* ellipseGate::release_mu() {
 }
 inline ::pb::coordinate* ellipseGate::unsafe_arena_release_mu() {
   // @@protoc_insertion_point(field_release:pb.ellipseGate.mu)
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::coordinate* temp = mu_;
   mu_ = nullptr;
   return temp;
 }
 inline ::pb::coordinate* ellipseGate::_internal_mutable_mu() {
-  
+  _has_bits_[0] |= 0x00000001u;
   if (mu_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::coordinate>(GetArena());
     mu_ = p;
@@ -7171,9 +7819,9 @@ inline void ellipseGate::set_allocated_mu(::pb::coordinate* mu) {
       mu = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, mu, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   mu_ = mu;
   // @@protoc_insertion_point(field_set_allocated:pb.ellipseGate.mu)
@@ -7257,9 +7905,17 @@ ellipseGate::antipodal_vertices() const {
   return antipodal_vertices_;
 }
 
-// float dist = 4;
+// optional float dist = 4;
+inline bool ellipseGate::_internal_has_dist() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool ellipseGate::has_dist() const {
+  return _internal_has_dist();
+}
 inline void ellipseGate::clear_dist() {
   dist_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float ellipseGate::_internal_dist() const {
   return dist_;
@@ -7269,7 +7925,7 @@ inline float ellipseGate::dist() const {
   return _internal_dist();
 }
 inline void ellipseGate::_internal_set_dist(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   dist_ = value;
 }
 inline void ellipseGate::set_dist(float value) {
@@ -7355,9 +8011,17 @@ BOOL_GATE_OP::mutable_path() {
   return &path_;
 }
 
-// uint32 op = 2;
+// required uint32 op = 2;
+inline bool BOOL_GATE_OP::_internal_has_op() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool BOOL_GATE_OP::has_op() const {
+  return _internal_has_op();
+}
 inline void BOOL_GATE_OP::clear_op() {
   op_ = 0u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 BOOL_GATE_OP::_internal_op() const {
   return op_;
@@ -7367,7 +8031,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 BOOL_GATE_OP::op() const {
   return _internal_op();
 }
 inline void BOOL_GATE_OP::_internal_set_op(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   op_ = value;
 }
 inline void BOOL_GATE_OP::set_op(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -7375,9 +8039,17 @@ inline void BOOL_GATE_OP::set_op(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   // @@protoc_insertion_point(field_set:pb.BOOL_GATE_OP.op)
 }
 
-// bool isNot = 3;
+// required bool isNot = 3;
+inline bool BOOL_GATE_OP::_internal_has_isnot() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool BOOL_GATE_OP::has_isnot() const {
+  return _internal_has_isnot();
+}
 inline void BOOL_GATE_OP::clear_isnot() {
   isnot_ = false;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline bool BOOL_GATE_OP::_internal_isnot() const {
   return isnot_;
@@ -7387,7 +8059,7 @@ inline bool BOOL_GATE_OP::isnot() const {
   return _internal_isnot();
 }
 inline void BOOL_GATE_OP::_internal_set_isnot(bool value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   isnot_ = value;
 }
 inline void BOOL_GATE_OP::set_isnot(bool value) {
@@ -7442,9 +8114,17 @@ boolGate::boolopspec() const {
 
 // clusterGate
 
-// string cluster_method = 1;
+// required string cluster_method = 1;
+inline bool clusterGate::_internal_has_cluster_method() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool clusterGate::has_cluster_method() const {
+  return _internal_has_cluster_method();
+}
 inline void clusterGate::clear_cluster_method() {
   cluster_method_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& clusterGate::cluster_method() const {
   // @@protoc_insertion_point(field_get:pb.clusterGate.cluster_method)
@@ -7462,42 +8142,46 @@ inline const std::string& clusterGate::_internal_cluster_method() const {
   return cluster_method_.Get();
 }
 inline void clusterGate::_internal_set_cluster_method(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   cluster_method_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void clusterGate::set_cluster_method(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   cluster_method_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.clusterGate.cluster_method)
 }
 inline void clusterGate::set_cluster_method(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   cluster_method_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.clusterGate.cluster_method)
 }
 inline void clusterGate::set_cluster_method(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   cluster_method_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.clusterGate.cluster_method)
 }
 inline std::string* clusterGate::_internal_mutable_cluster_method() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return cluster_method_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* clusterGate::release_cluster_method() {
   // @@protoc_insertion_point(field_release:pb.clusterGate.cluster_method)
-  return cluster_method_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_cluster_method()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return cluster_method_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void clusterGate::set_allocated_cluster_method(std::string* cluster_method) {
   if (cluster_method != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   cluster_method_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), cluster_method,
       GetArena());
@@ -7508,9 +8192,17 @@ inline void clusterGate::set_allocated_cluster_method(std::string* cluster_metho
 
 // quadGate
 
-// string uid = 1;
+// required string uid = 1;
+inline bool quadGate::_internal_has_uid() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool quadGate::has_uid() const {
+  return _internal_has_uid();
+}
 inline void quadGate::clear_uid() {
   uid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& quadGate::uid() const {
   // @@protoc_insertion_point(field_get:pb.quadGate.uid)
@@ -7528,51 +8220,63 @@ inline const std::string& quadGate::_internal_uid() const {
   return uid_.Get();
 }
 inline void quadGate::_internal_set_uid(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   uid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void quadGate::set_uid(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   uid_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.quadGate.uid)
 }
 inline void quadGate::set_uid(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   uid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.quadGate.uid)
 }
 inline void quadGate::set_uid(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   uid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.quadGate.uid)
 }
 inline std::string* quadGate::_internal_mutable_uid() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return uid_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* quadGate::release_uid() {
   // @@protoc_insertion_point(field_release:pb.quadGate.uid)
-  return uid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_uid()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return uid_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void quadGate::set_allocated_uid(std::string* uid) {
   if (uid != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   uid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), uid,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.quadGate.uid)
 }
 
-// .pb.QUADRANT quadrant = 3;
+// required .pb.QUADRANT quadrant = 3;
+inline bool quadGate::_internal_has_quadrant() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool quadGate::has_quadrant() const {
+  return _internal_has_quadrant();
+}
 inline void quadGate::clear_quadrant() {
-  quadrant_ = 0;
+  quadrant_ = 1;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline ::pb::QUADRANT quadGate::_internal_quadrant() const {
   return static_cast< ::pb::QUADRANT >(quadrant_);
@@ -7582,7 +8286,8 @@ inline ::pb::QUADRANT quadGate::quadrant() const {
   return _internal_quadrant();
 }
 inline void quadGate::_internal_set_quadrant(::pb::QUADRANT value) {
-  
+  assert(::pb::QUADRANT_IsValid(value));
+  _has_bits_[0] |= 0x00000002u;
   quadrant_ = value;
 }
 inline void quadGate::set_quadrant(::pb::QUADRANT value) {
@@ -7594,9 +8299,17 @@ inline void quadGate::set_quadrant(::pb::QUADRANT value) {
 
 // gate
 
-// bool neg = 1;
+// required bool neg = 1;
+inline bool gate::_internal_has_neg() const {
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  return value;
+}
+inline bool gate::has_neg() const {
+  return _internal_has_neg();
+}
 inline void gate::clear_neg() {
   neg_ = false;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline bool gate::_internal_neg() const {
   return neg_;
@@ -7606,7 +8319,7 @@ inline bool gate::neg() const {
   return _internal_neg();
 }
 inline void gate::_internal_set_neg(bool value) {
-  
+  _has_bits_[0] |= 0x00000020u;
   neg_ = value;
 }
 inline void gate::set_neg(bool value) {
@@ -7614,9 +8327,17 @@ inline void gate::set_neg(bool value) {
   // @@protoc_insertion_point(field_set:pb.gate.neg)
 }
 
-// bool isTransformed = 2;
+// required bool isTransformed = 2;
+inline bool gate::_internal_has_istransformed() const {
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  return value;
+}
+inline bool gate::has_istransformed() const {
+  return _internal_has_istransformed();
+}
 inline void gate::clear_istransformed() {
   istransformed_ = false;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline bool gate::_internal_istransformed() const {
   return istransformed_;
@@ -7626,7 +8347,7 @@ inline bool gate::istransformed() const {
   return _internal_istransformed();
 }
 inline void gate::_internal_set_istransformed(bool value) {
-  
+  _has_bits_[0] |= 0x00000040u;
   istransformed_ = value;
 }
 inline void gate::set_istransformed(bool value) {
@@ -7634,9 +8355,17 @@ inline void gate::set_istransformed(bool value) {
   // @@protoc_insertion_point(field_set:pb.gate.isTransformed)
 }
 
-// bool isGained = 3;
+// required bool isGained = 3;
+inline bool gate::_internal_has_isgained() const {
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  return value;
+}
+inline bool gate::has_isgained() const {
+  return _internal_has_isgained();
+}
 inline void gate::clear_isgained() {
   isgained_ = false;
+  _has_bits_[0] &= ~0x00000080u;
 }
 inline bool gate::_internal_isgained() const {
   return isgained_;
@@ -7646,7 +8375,7 @@ inline bool gate::isgained() const {
   return _internal_isgained();
 }
 inline void gate::_internal_set_isgained(bool value) {
-  
+  _has_bits_[0] |= 0x00000080u;
   isgained_ = value;
 }
 inline void gate::set_isgained(bool value) {
@@ -7654,9 +8383,17 @@ inline void gate::set_isgained(bool value) {
   // @@protoc_insertion_point(field_set:pb.gate.isGained)
 }
 
-// .pb.GATE_TYPE type = 4;
+// required .pb.GATE_TYPE type = 4;
+inline bool gate::_internal_has_type() const {
+  bool value = (_has_bits_[0] & 0x00000100u) != 0;
+  return value;
+}
+inline bool gate::has_type() const {
+  return _internal_has_type();
+}
 inline void gate::clear_type() {
-  type_ = 0;
+  type_ = 1;
+  _has_bits_[0] &= ~0x00000100u;
 }
 inline ::pb::GATE_TYPE gate::_internal_type() const {
   return static_cast< ::pb::GATE_TYPE >(type_);
@@ -7666,7 +8403,8 @@ inline ::pb::GATE_TYPE gate::type() const {
   return _internal_type();
 }
 inline void gate::_internal_set_type(::pb::GATE_TYPE value) {
-  
+  assert(::pb::GATE_TYPE_IsValid(value));
+  _has_bits_[0] |= 0x00000100u;
   type_ = value;
 }
 inline void gate::set_type(::pb::GATE_TYPE value) {
@@ -7674,18 +8412,18 @@ inline void gate::set_type(::pb::GATE_TYPE value) {
   // @@protoc_insertion_point(field_set:pb.gate.type)
 }
 
-// .pb.rangeGate rg = 5;
+// optional .pb.rangeGate rg = 5;
 inline bool gate::_internal_has_rg() const {
-  return this != internal_default_instance() && rg_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || rg_ != nullptr);
+  return value;
 }
 inline bool gate::has_rg() const {
   return _internal_has_rg();
 }
 inline void gate::clear_rg() {
-  if (GetArena() == nullptr && rg_ != nullptr) {
-    delete rg_;
-  }
-  rg_ = nullptr;
+  if (rg_ != nullptr) rg_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const ::pb::rangeGate& gate::_internal_rg() const {
   const ::pb::rangeGate* p = rg_;
@@ -7703,14 +8441,14 @@ inline void gate::unsafe_arena_set_allocated_rg(
   }
   rg_ = rg;
   if (rg) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.gate.rg)
 }
 inline ::pb::rangeGate* gate::release_rg() {
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::rangeGate* temp = rg_;
   rg_ = nullptr;
   if (GetArena() != nullptr) {
@@ -7720,13 +8458,13 @@ inline ::pb::rangeGate* gate::release_rg() {
 }
 inline ::pb::rangeGate* gate::unsafe_arena_release_rg() {
   // @@protoc_insertion_point(field_release:pb.gate.rg)
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::rangeGate* temp = rg_;
   rg_ = nullptr;
   return temp;
 }
 inline ::pb::rangeGate* gate::_internal_mutable_rg() {
-  
+  _has_bits_[0] |= 0x00000001u;
   if (rg_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::rangeGate>(GetArena());
     rg_ = p;
@@ -7749,26 +8487,26 @@ inline void gate::set_allocated_rg(::pb::rangeGate* rg) {
       rg = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, rg, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   rg_ = rg;
   // @@protoc_insertion_point(field_set_allocated:pb.gate.rg)
 }
 
-// .pb.polygonGate pg = 6;
+// optional .pb.polygonGate pg = 6;
 inline bool gate::_internal_has_pg() const {
-  return this != internal_default_instance() && pg_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  PROTOBUF_ASSUME(!value || pg_ != nullptr);
+  return value;
 }
 inline bool gate::has_pg() const {
   return _internal_has_pg();
 }
 inline void gate::clear_pg() {
-  if (GetArena() == nullptr && pg_ != nullptr) {
-    delete pg_;
-  }
-  pg_ = nullptr;
+  if (pg_ != nullptr) pg_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const ::pb::polygonGate& gate::_internal_pg() const {
   const ::pb::polygonGate* p = pg_;
@@ -7786,14 +8524,14 @@ inline void gate::unsafe_arena_set_allocated_pg(
   }
   pg_ = pg;
   if (pg) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.gate.pg)
 }
 inline ::pb::polygonGate* gate::release_pg() {
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::polygonGate* temp = pg_;
   pg_ = nullptr;
   if (GetArena() != nullptr) {
@@ -7803,13 +8541,13 @@ inline ::pb::polygonGate* gate::release_pg() {
 }
 inline ::pb::polygonGate* gate::unsafe_arena_release_pg() {
   // @@protoc_insertion_point(field_release:pb.gate.pg)
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::polygonGate* temp = pg_;
   pg_ = nullptr;
   return temp;
 }
 inline ::pb::polygonGate* gate::_internal_mutable_pg() {
-  
+  _has_bits_[0] |= 0x00000002u;
   if (pg_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::polygonGate>(GetArena());
     pg_ = p;
@@ -7832,26 +8570,26 @@ inline void gate::set_allocated_pg(::pb::polygonGate* pg) {
       pg = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, pg, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   pg_ = pg;
   // @@protoc_insertion_point(field_set_allocated:pb.gate.pg)
 }
 
-// .pb.ellipseGate eg = 7;
+// optional .pb.ellipseGate eg = 7;
 inline bool gate::_internal_has_eg() const {
-  return this != internal_default_instance() && eg_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  PROTOBUF_ASSUME(!value || eg_ != nullptr);
+  return value;
 }
 inline bool gate::has_eg() const {
   return _internal_has_eg();
 }
 inline void gate::clear_eg() {
-  if (GetArena() == nullptr && eg_ != nullptr) {
-    delete eg_;
-  }
-  eg_ = nullptr;
+  if (eg_ != nullptr) eg_->Clear();
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline const ::pb::ellipseGate& gate::_internal_eg() const {
   const ::pb::ellipseGate* p = eg_;
@@ -7869,14 +8607,14 @@ inline void gate::unsafe_arena_set_allocated_eg(
   }
   eg_ = eg;
   if (eg) {
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.gate.eg)
 }
 inline ::pb::ellipseGate* gate::release_eg() {
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::ellipseGate* temp = eg_;
   eg_ = nullptr;
   if (GetArena() != nullptr) {
@@ -7886,13 +8624,13 @@ inline ::pb::ellipseGate* gate::release_eg() {
 }
 inline ::pb::ellipseGate* gate::unsafe_arena_release_eg() {
   // @@protoc_insertion_point(field_release:pb.gate.eg)
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::ellipseGate* temp = eg_;
   eg_ = nullptr;
   return temp;
 }
 inline ::pb::ellipseGate* gate::_internal_mutable_eg() {
-  
+  _has_bits_[0] |= 0x00000004u;
   if (eg_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::ellipseGate>(GetArena());
     eg_ = p;
@@ -7915,26 +8653,26 @@ inline void gate::set_allocated_eg(::pb::ellipseGate* eg) {
       eg = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, eg, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   eg_ = eg;
   // @@protoc_insertion_point(field_set_allocated:pb.gate.eg)
 }
 
-// .pb.boolGate bg = 8;
+// optional .pb.boolGate bg = 8;
 inline bool gate::_internal_has_bg() const {
-  return this != internal_default_instance() && bg_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  PROTOBUF_ASSUME(!value || bg_ != nullptr);
+  return value;
 }
 inline bool gate::has_bg() const {
   return _internal_has_bg();
 }
 inline void gate::clear_bg() {
-  if (GetArena() == nullptr && bg_ != nullptr) {
-    delete bg_;
-  }
-  bg_ = nullptr;
+  if (bg_ != nullptr) bg_->Clear();
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline const ::pb::boolGate& gate::_internal_bg() const {
   const ::pb::boolGate* p = bg_;
@@ -7952,14 +8690,14 @@ inline void gate::unsafe_arena_set_allocated_bg(
   }
   bg_ = bg;
   if (bg) {
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.gate.bg)
 }
 inline ::pb::boolGate* gate::release_bg() {
-  
+  _has_bits_[0] &= ~0x00000008u;
   ::pb::boolGate* temp = bg_;
   bg_ = nullptr;
   if (GetArena() != nullptr) {
@@ -7969,13 +8707,13 @@ inline ::pb::boolGate* gate::release_bg() {
 }
 inline ::pb::boolGate* gate::unsafe_arena_release_bg() {
   // @@protoc_insertion_point(field_release:pb.gate.bg)
-  
+  _has_bits_[0] &= ~0x00000008u;
   ::pb::boolGate* temp = bg_;
   bg_ = nullptr;
   return temp;
 }
 inline ::pb::boolGate* gate::_internal_mutable_bg() {
-  
+  _has_bits_[0] |= 0x00000008u;
   if (bg_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::boolGate>(GetArena());
     bg_ = p;
@@ -7998,26 +8736,26 @@ inline void gate::set_allocated_bg(::pb::boolGate* bg) {
       bg = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, bg, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   bg_ = bg;
   // @@protoc_insertion_point(field_set_allocated:pb.gate.bg)
 }
 
-// .pb.clusterGate cg = 9;
+// optional .pb.clusterGate cg = 9;
 inline bool gate::_internal_has_cg() const {
-  return this != internal_default_instance() && cg_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  PROTOBUF_ASSUME(!value || cg_ != nullptr);
+  return value;
 }
 inline bool gate::has_cg() const {
   return _internal_has_cg();
 }
 inline void gate::clear_cg() {
-  if (GetArena() == nullptr && cg_ != nullptr) {
-    delete cg_;
-  }
-  cg_ = nullptr;
+  if (cg_ != nullptr) cg_->Clear();
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline const ::pb::clusterGate& gate::_internal_cg() const {
   const ::pb::clusterGate* p = cg_;
@@ -8035,14 +8773,14 @@ inline void gate::unsafe_arena_set_allocated_cg(
   }
   cg_ = cg;
   if (cg) {
-    
+    _has_bits_[0] |= 0x00000010u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000010u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.gate.cg)
 }
 inline ::pb::clusterGate* gate::release_cg() {
-  
+  _has_bits_[0] &= ~0x00000010u;
   ::pb::clusterGate* temp = cg_;
   cg_ = nullptr;
   if (GetArena() != nullptr) {
@@ -8052,13 +8790,13 @@ inline ::pb::clusterGate* gate::release_cg() {
 }
 inline ::pb::clusterGate* gate::unsafe_arena_release_cg() {
   // @@protoc_insertion_point(field_release:pb.gate.cg)
-  
+  _has_bits_[0] &= ~0x00000010u;
   ::pb::clusterGate* temp = cg_;
   cg_ = nullptr;
   return temp;
 }
 inline ::pb::clusterGate* gate::_internal_mutable_cg() {
-  
+  _has_bits_[0] |= 0x00000010u;
   if (cg_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::clusterGate>(GetArena());
     cg_ = p;
@@ -8081,9 +8819,9 @@ inline void gate::set_allocated_cg(::pb::clusterGate* cg) {
       cg = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, cg, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000010u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000010u;
   }
   cg_ = cg;
   // @@protoc_insertion_point(field_set_allocated:pb.gate.cg)
@@ -8093,9 +8831,17 @@ inline void gate::set_allocated_cg(::pb::clusterGate* cg) {
 
 // POPSTATS
 
-// string statType = 1;
+// required string statType = 1;
+inline bool POPSTATS::_internal_has_stattype() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool POPSTATS::has_stattype() const {
+  return _internal_has_stattype();
+}
 inline void POPSTATS::clear_stattype() {
   stattype_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& POPSTATS::stattype() const {
   // @@protoc_insertion_point(field_get:pb.POPSTATS.statType)
@@ -8113,51 +8859,63 @@ inline const std::string& POPSTATS::_internal_stattype() const {
   return stattype_.Get();
 }
 inline void POPSTATS::_internal_set_stattype(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   stattype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void POPSTATS::set_stattype(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   stattype_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.POPSTATS.statType)
 }
 inline void POPSTATS::set_stattype(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   stattype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.POPSTATS.statType)
 }
 inline void POPSTATS::set_stattype(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   stattype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.POPSTATS.statType)
 }
 inline std::string* POPSTATS::_internal_mutable_stattype() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return stattype_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* POPSTATS::release_stattype() {
   // @@protoc_insertion_point(field_release:pb.POPSTATS.statType)
-  return stattype_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_stattype()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return stattype_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void POPSTATS::set_allocated_stattype(std::string* stattype) {
   if (stattype != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   stattype_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), stattype,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.POPSTATS.statType)
 }
 
-// float statVal = 2;
+// required float statVal = 2;
+inline bool POPSTATS::_internal_has_statval() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool POPSTATS::has_statval() const {
+  return _internal_has_statval();
+}
 inline void POPSTATS::clear_statval() {
   statval_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float POPSTATS::_internal_statval() const {
   return statval_;
@@ -8167,7 +8925,7 @@ inline float POPSTATS::statval() const {
   return _internal_statval();
 }
 inline void POPSTATS::_internal_set_statval(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   statval_ = value;
 }
 inline void POPSTATS::set_statval(float value) {
@@ -8414,9 +9172,17 @@ calibrationTable::mutable_d() {
   return _internal_mutable_d();
 }
 
-// uint32 spline_method = 6;
+// optional uint32 spline_method = 6;
+inline bool calibrationTable::_internal_has_spline_method() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool calibrationTable::has_spline_method() const {
+  return _internal_has_spline_method();
+}
 inline void calibrationTable::clear_spline_method() {
   spline_method_ = 0u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 calibrationTable::_internal_spline_method() const {
   return spline_method_;
@@ -8426,7 +9192,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 calibrationTable::spline_method() const {
   return _internal_spline_method();
 }
 inline void calibrationTable::_internal_set_spline_method(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   spline_method_ = value;
 }
 inline void calibrationTable::set_spline_method(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -8434,9 +9200,17 @@ inline void calibrationTable::set_spline_method(::PROTOBUF_NAMESPACE_ID::uint32 
   // @@protoc_insertion_point(field_set:pb.calibrationTable.spline_method)
 }
 
-// string caltype = 7;
+// optional string caltype = 7;
+inline bool calibrationTable::_internal_has_caltype() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool calibrationTable::has_caltype() const {
+  return _internal_has_caltype();
+}
 inline void calibrationTable::clear_caltype() {
   caltype_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& calibrationTable::caltype() const {
   // @@protoc_insertion_point(field_get:pb.calibrationTable.caltype)
@@ -8454,51 +9228,63 @@ inline const std::string& calibrationTable::_internal_caltype() const {
   return caltype_.Get();
 }
 inline void calibrationTable::_internal_set_caltype(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   caltype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void calibrationTable::set_caltype(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   caltype_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.calibrationTable.caltype)
 }
 inline void calibrationTable::set_caltype(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   caltype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.calibrationTable.caltype)
 }
 inline void calibrationTable::set_caltype(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   caltype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.calibrationTable.caltype)
 }
 inline std::string* calibrationTable::_internal_mutable_caltype() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return caltype_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* calibrationTable::release_caltype() {
   // @@protoc_insertion_point(field_release:pb.calibrationTable.caltype)
-  return caltype_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_caltype()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return caltype_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void calibrationTable::set_allocated_caltype(std::string* caltype) {
   if (caltype != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   caltype_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), caltype,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.calibrationTable.caltype)
 }
 
-// bool flag = 8;
+// optional bool flag = 8;
+inline bool calibrationTable::_internal_has_flag() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool calibrationTable::has_flag() const {
+  return _internal_has_flag();
+}
 inline void calibrationTable::clear_flag() {
   flag_ = false;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline bool calibrationTable::_internal_flag() const {
   return flag_;
@@ -8508,7 +9294,7 @@ inline bool calibrationTable::flag() const {
   return _internal_flag();
 }
 inline void calibrationTable::_internal_set_flag(bool value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   flag_ = value;
 }
 inline void calibrationTable::set_flag(bool value) {
@@ -8520,9 +9306,17 @@ inline void calibrationTable::set_flag(bool value) {
 
 // biexpTrans
 
-// uint32 channelRange = 1;
+// optional uint32 channelRange = 1;
+inline bool biexpTrans::_internal_has_channelrange() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool biexpTrans::has_channelrange() const {
+  return _internal_has_channelrange();
+}
 inline void biexpTrans::clear_channelrange() {
   channelrange_ = 0u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 biexpTrans::_internal_channelrange() const {
   return channelrange_;
@@ -8532,7 +9326,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 biexpTrans::channelrange() const {
   return _internal_channelrange();
 }
 inline void biexpTrans::_internal_set_channelrange(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   channelrange_ = value;
 }
 inline void biexpTrans::set_channelrange(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -8540,9 +9334,17 @@ inline void biexpTrans::set_channelrange(::PROTOBUF_NAMESPACE_ID::uint32 value) 
   // @@protoc_insertion_point(field_set:pb.biexpTrans.channelRange)
 }
 
-// float pos = 2;
+// optional float pos = 2;
+inline bool biexpTrans::_internal_has_pos() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool biexpTrans::has_pos() const {
+  return _internal_has_pos();
+}
 inline void biexpTrans::clear_pos() {
   pos_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float biexpTrans::_internal_pos() const {
   return pos_;
@@ -8552,7 +9354,7 @@ inline float biexpTrans::pos() const {
   return _internal_pos();
 }
 inline void biexpTrans::_internal_set_pos(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   pos_ = value;
 }
 inline void biexpTrans::set_pos(float value) {
@@ -8560,9 +9362,17 @@ inline void biexpTrans::set_pos(float value) {
   // @@protoc_insertion_point(field_set:pb.biexpTrans.pos)
 }
 
-// float neg = 3;
+// optional float neg = 3;
+inline bool biexpTrans::_internal_has_neg() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool biexpTrans::has_neg() const {
+  return _internal_has_neg();
+}
 inline void biexpTrans::clear_neg() {
   neg_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline float biexpTrans::_internal_neg() const {
   return neg_;
@@ -8572,7 +9382,7 @@ inline float biexpTrans::neg() const {
   return _internal_neg();
 }
 inline void biexpTrans::_internal_set_neg(float value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   neg_ = value;
 }
 inline void biexpTrans::set_neg(float value) {
@@ -8580,9 +9390,17 @@ inline void biexpTrans::set_neg(float value) {
   // @@protoc_insertion_point(field_set:pb.biexpTrans.neg)
 }
 
-// float widthBasis = 4;
+// optional float widthBasis = 4;
+inline bool biexpTrans::_internal_has_widthbasis() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool biexpTrans::has_widthbasis() const {
+  return _internal_has_widthbasis();
+}
 inline void biexpTrans::clear_widthbasis() {
   widthbasis_ = 0;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline float biexpTrans::_internal_widthbasis() const {
   return widthbasis_;
@@ -8592,7 +9410,7 @@ inline float biexpTrans::widthbasis() const {
   return _internal_widthbasis();
 }
 inline void biexpTrans::_internal_set_widthbasis(float value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   widthbasis_ = value;
 }
 inline void biexpTrans::set_widthbasis(float value) {
@@ -8600,9 +9418,17 @@ inline void biexpTrans::set_widthbasis(float value) {
   // @@protoc_insertion_point(field_set:pb.biexpTrans.widthBasis)
 }
 
-// float maxValue = 5;
+// optional float maxValue = 5;
+inline bool biexpTrans::_internal_has_maxvalue() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool biexpTrans::has_maxvalue() const {
+  return _internal_has_maxvalue();
+}
 inline void biexpTrans::clear_maxvalue() {
   maxvalue_ = 0;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline float biexpTrans::_internal_maxvalue() const {
   return maxvalue_;
@@ -8612,7 +9438,7 @@ inline float biexpTrans::maxvalue() const {
   return _internal_maxvalue();
 }
 inline void biexpTrans::_internal_set_maxvalue(float value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   maxvalue_ = value;
 }
 inline void biexpTrans::set_maxvalue(float value) {
@@ -8624,9 +9450,17 @@ inline void biexpTrans::set_maxvalue(float value) {
 
 // fasinhTrans
 
-// float length = 1;
+// optional float length = 1;
+inline bool fasinhTrans::_internal_has_length() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool fasinhTrans::has_length() const {
+  return _internal_has_length();
+}
 inline void fasinhTrans::clear_length() {
   length_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline float fasinhTrans::_internal_length() const {
   return length_;
@@ -8636,7 +9470,7 @@ inline float fasinhTrans::length() const {
   return _internal_length();
 }
 inline void fasinhTrans::_internal_set_length(float value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   length_ = value;
 }
 inline void fasinhTrans::set_length(float value) {
@@ -8644,9 +9478,17 @@ inline void fasinhTrans::set_length(float value) {
   // @@protoc_insertion_point(field_set:pb.fasinhTrans.length)
 }
 
-// float maxRange = 2;
+// optional float maxRange = 2;
+inline bool fasinhTrans::_internal_has_maxrange() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool fasinhTrans::has_maxrange() const {
+  return _internal_has_maxrange();
+}
 inline void fasinhTrans::clear_maxrange() {
   maxrange_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float fasinhTrans::_internal_maxrange() const {
   return maxrange_;
@@ -8656,7 +9498,7 @@ inline float fasinhTrans::maxrange() const {
   return _internal_maxrange();
 }
 inline void fasinhTrans::_internal_set_maxrange(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   maxrange_ = value;
 }
 inline void fasinhTrans::set_maxrange(float value) {
@@ -8664,9 +9506,17 @@ inline void fasinhTrans::set_maxrange(float value) {
   // @@protoc_insertion_point(field_set:pb.fasinhTrans.maxRange)
 }
 
-// float T = 3;
+// optional float T = 3;
+inline bool fasinhTrans::_internal_has_t() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool fasinhTrans::has_t() const {
+  return _internal_has_t();
+}
 inline void fasinhTrans::clear_t() {
   t_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline float fasinhTrans::_internal_t() const {
   return t_;
@@ -8676,7 +9526,7 @@ inline float fasinhTrans::t() const {
   return _internal_t();
 }
 inline void fasinhTrans::_internal_set_t(float value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   t_ = value;
 }
 inline void fasinhTrans::set_t(float value) {
@@ -8684,9 +9534,17 @@ inline void fasinhTrans::set_t(float value) {
   // @@protoc_insertion_point(field_set:pb.fasinhTrans.T)
 }
 
-// float A = 4;
+// optional float A = 4;
+inline bool fasinhTrans::_internal_has_a() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool fasinhTrans::has_a() const {
+  return _internal_has_a();
+}
 inline void fasinhTrans::clear_a() {
   a_ = 0;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline float fasinhTrans::_internal_a() const {
   return a_;
@@ -8696,7 +9554,7 @@ inline float fasinhTrans::a() const {
   return _internal_a();
 }
 inline void fasinhTrans::_internal_set_a(float value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   a_ = value;
 }
 inline void fasinhTrans::set_a(float value) {
@@ -8704,9 +9562,17 @@ inline void fasinhTrans::set_a(float value) {
   // @@protoc_insertion_point(field_set:pb.fasinhTrans.A)
 }
 
-// float M = 5;
+// optional float M = 5;
+inline bool fasinhTrans::_internal_has_m() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool fasinhTrans::has_m() const {
+  return _internal_has_m();
+}
 inline void fasinhTrans::clear_m() {
   m_ = 0;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline float fasinhTrans::_internal_m() const {
   return m_;
@@ -8716,7 +9582,7 @@ inline float fasinhTrans::m() const {
   return _internal_m();
 }
 inline void fasinhTrans::_internal_set_m(float value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   m_ = value;
 }
 inline void fasinhTrans::set_m(float value) {
@@ -8728,9 +9594,17 @@ inline void fasinhTrans::set_m(float value) {
 
 // scaleTrans
 
-// float scale_factor = 1;
+// optional float scale_factor = 1;
+inline bool scaleTrans::_internal_has_scale_factor() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool scaleTrans::has_scale_factor() const {
+  return _internal_has_scale_factor();
+}
 inline void scaleTrans::clear_scale_factor() {
   scale_factor_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline float scaleTrans::_internal_scale_factor() const {
   return scale_factor_;
@@ -8740,7 +9614,7 @@ inline float scaleTrans::scale_factor() const {
   return _internal_scale_factor();
 }
 inline void scaleTrans::_internal_set_scale_factor(float value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   scale_factor_ = value;
 }
 inline void scaleTrans::set_scale_factor(float value) {
@@ -8748,9 +9622,17 @@ inline void scaleTrans::set_scale_factor(float value) {
   // @@protoc_insertion_point(field_set:pb.scaleTrans.scale_factor)
 }
 
-// float t_scale = 2;
+// optional float t_scale = 2;
+inline bool scaleTrans::_internal_has_t_scale() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool scaleTrans::has_t_scale() const {
+  return _internal_has_t_scale();
+}
 inline void scaleTrans::clear_t_scale() {
   t_scale_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float scaleTrans::_internal_t_scale() const {
   return t_scale_;
@@ -8760,7 +9642,7 @@ inline float scaleTrans::t_scale() const {
   return _internal_t_scale();
 }
 inline void scaleTrans::_internal_set_t_scale(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   t_scale_ = value;
 }
 inline void scaleTrans::set_t_scale(float value) {
@@ -8768,9 +9650,17 @@ inline void scaleTrans::set_t_scale(float value) {
   // @@protoc_insertion_point(field_set:pb.scaleTrans.t_scale)
 }
 
-// float r_scale = 3;
+// optional float r_scale = 3;
+inline bool scaleTrans::_internal_has_r_scale() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool scaleTrans::has_r_scale() const {
+  return _internal_has_r_scale();
+}
 inline void scaleTrans::clear_r_scale() {
   r_scale_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline float scaleTrans::_internal_r_scale() const {
   return r_scale_;
@@ -8780,7 +9670,7 @@ inline float scaleTrans::r_scale() const {
   return _internal_r_scale();
 }
 inline void scaleTrans::_internal_set_r_scale(float value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   r_scale_ = value;
 }
 inline void scaleTrans::set_r_scale(float value) {
@@ -8792,9 +9682,17 @@ inline void scaleTrans::set_r_scale(float value) {
 
 // flinTrans
 
-// float min = 1;
+// optional float min = 1;
+inline bool flinTrans::_internal_has_min() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool flinTrans::has_min() const {
+  return _internal_has_min();
+}
 inline void flinTrans::clear_min() {
   min_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline float flinTrans::_internal_min() const {
   return min_;
@@ -8804,7 +9702,7 @@ inline float flinTrans::min() const {
   return _internal_min();
 }
 inline void flinTrans::_internal_set_min(float value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   min_ = value;
 }
 inline void flinTrans::set_min(float value) {
@@ -8812,9 +9710,17 @@ inline void flinTrans::set_min(float value) {
   // @@protoc_insertion_point(field_set:pb.flinTrans.min)
 }
 
-// float max = 2;
+// optional float max = 2;
+inline bool flinTrans::_internal_has_max() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool flinTrans::has_max() const {
+  return _internal_has_max();
+}
 inline void flinTrans::clear_max() {
   max_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float flinTrans::_internal_max() const {
   return max_;
@@ -8824,7 +9730,7 @@ inline float flinTrans::max() const {
   return _internal_max();
 }
 inline void flinTrans::_internal_set_max(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   max_ = value;
 }
 inline void flinTrans::set_max(float value) {
@@ -8836,9 +9742,17 @@ inline void flinTrans::set_max(float value) {
 
 // logTrans
 
-// float offset = 1;
+// optional float offset = 1;
+inline bool logTrans::_internal_has_offset() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool logTrans::has_offset() const {
+  return _internal_has_offset();
+}
 inline void logTrans::clear_offset() {
   offset_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline float logTrans::_internal_offset() const {
   return offset_;
@@ -8848,7 +9762,7 @@ inline float logTrans::offset() const {
   return _internal_offset();
 }
 inline void logTrans::_internal_set_offset(float value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   offset_ = value;
 }
 inline void logTrans::set_offset(float value) {
@@ -8856,9 +9770,17 @@ inline void logTrans::set_offset(float value) {
   // @@protoc_insertion_point(field_set:pb.logTrans.offset)
 }
 
-// float decade = 2;
+// optional float decade = 2;
+inline bool logTrans::_internal_has_decade() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool logTrans::has_decade() const {
+  return _internal_has_decade();
+}
 inline void logTrans::clear_decade() {
   decade_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float logTrans::_internal_decade() const {
   return decade_;
@@ -8868,7 +9790,7 @@ inline float logTrans::decade() const {
   return _internal_decade();
 }
 inline void logTrans::_internal_set_decade(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   decade_ = value;
 }
 inline void logTrans::set_decade(float value) {
@@ -8876,9 +9798,17 @@ inline void logTrans::set_decade(float value) {
   // @@protoc_insertion_point(field_set:pb.logTrans.decade)
 }
 
-// float T = 3;
+// optional float T = 3;
+inline bool logTrans::_internal_has_t() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool logTrans::has_t() const {
+  return _internal_has_t();
+}
 inline void logTrans::clear_t() {
   t_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline float logTrans::_internal_t() const {
   return t_;
@@ -8888,7 +9818,7 @@ inline float logTrans::t() const {
   return _internal_t();
 }
 inline void logTrans::_internal_set_t(float value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   t_ = value;
 }
 inline void logTrans::set_t(float value) {
@@ -8896,9 +9826,17 @@ inline void logTrans::set_t(float value) {
   // @@protoc_insertion_point(field_set:pb.logTrans.T)
 }
 
-// float scale = 4;
+// optional float scale = 4;
+inline bool logTrans::_internal_has_scale() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool logTrans::has_scale() const {
+  return _internal_has_scale();
+}
 inline void logTrans::clear_scale() {
   scale_ = 0;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline float logTrans::_internal_scale() const {
   return scale_;
@@ -8908,7 +9846,7 @@ inline float logTrans::scale() const {
   return _internal_scale();
 }
 inline void logTrans::_internal_set_scale(float value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   scale_ = value;
 }
 inline void logTrans::set_scale(float value) {
@@ -8920,9 +9858,17 @@ inline void logTrans::set_scale(float value) {
 
 // logGML2Trans
 
-// float T = 1;
+// optional float T = 1;
+inline bool logGML2Trans::_internal_has_t() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool logGML2Trans::has_t() const {
+  return _internal_has_t();
+}
 inline void logGML2Trans::clear_t() {
   t_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline float logGML2Trans::_internal_t() const {
   return t_;
@@ -8932,7 +9878,7 @@ inline float logGML2Trans::t() const {
   return _internal_t();
 }
 inline void logGML2Trans::_internal_set_t(float value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   t_ = value;
 }
 inline void logGML2Trans::set_t(float value) {
@@ -8940,9 +9886,17 @@ inline void logGML2Trans::set_t(float value) {
   // @@protoc_insertion_point(field_set:pb.logGML2Trans.T)
 }
 
-// float M = 2;
+// optional float M = 2;
+inline bool logGML2Trans::_internal_has_m() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool logGML2Trans::has_m() const {
+  return _internal_has_m();
+}
 inline void logGML2Trans::clear_m() {
   m_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float logGML2Trans::_internal_m() const {
   return m_;
@@ -8952,7 +9906,7 @@ inline float logGML2Trans::m() const {
   return _internal_m();
 }
 inline void logGML2Trans::_internal_set_m(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   m_ = value;
 }
 inline void logGML2Trans::set_m(float value) {
@@ -8964,9 +9918,17 @@ inline void logGML2Trans::set_m(float value) {
 
 // logicleTrans
 
-// float T = 1;
+// optional float T = 1;
+inline bool logicleTrans::_internal_has_t() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool logicleTrans::has_t() const {
+  return _internal_has_t();
+}
 inline void logicleTrans::clear_t() {
   t_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline float logicleTrans::_internal_t() const {
   return t_;
@@ -8976,7 +9938,7 @@ inline float logicleTrans::t() const {
   return _internal_t();
 }
 inline void logicleTrans::_internal_set_t(float value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   t_ = value;
 }
 inline void logicleTrans::set_t(float value) {
@@ -8984,9 +9946,17 @@ inline void logicleTrans::set_t(float value) {
   // @@protoc_insertion_point(field_set:pb.logicleTrans.T)
 }
 
-// float W = 2;
+// optional float W = 2;
+inline bool logicleTrans::_internal_has_w() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool logicleTrans::has_w() const {
+  return _internal_has_w();
+}
 inline void logicleTrans::clear_w() {
   w_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float logicleTrans::_internal_w() const {
   return w_;
@@ -8996,7 +9966,7 @@ inline float logicleTrans::w() const {
   return _internal_w();
 }
 inline void logicleTrans::_internal_set_w(float value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   w_ = value;
 }
 inline void logicleTrans::set_w(float value) {
@@ -9004,9 +9974,17 @@ inline void logicleTrans::set_w(float value) {
   // @@protoc_insertion_point(field_set:pb.logicleTrans.W)
 }
 
-// float M = 3;
+// optional float M = 3;
+inline bool logicleTrans::_internal_has_m() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool logicleTrans::has_m() const {
+  return _internal_has_m();
+}
 inline void logicleTrans::clear_m() {
   m_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline float logicleTrans::_internal_m() const {
   return m_;
@@ -9016,7 +9994,7 @@ inline float logicleTrans::m() const {
   return _internal_m();
 }
 inline void logicleTrans::_internal_set_m(float value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   m_ = value;
 }
 inline void logicleTrans::set_m(float value) {
@@ -9024,9 +10002,17 @@ inline void logicleTrans::set_m(float value) {
   // @@protoc_insertion_point(field_set:pb.logicleTrans.M)
 }
 
-// float A = 4;
+// optional float A = 4;
+inline bool logicleTrans::_internal_has_a() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool logicleTrans::has_a() const {
+  return _internal_has_a();
+}
 inline void logicleTrans::clear_a() {
   a_ = 0;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline float logicleTrans::_internal_a() const {
   return a_;
@@ -9036,7 +10022,7 @@ inline float logicleTrans::a() const {
   return _internal_a();
 }
 inline void logicleTrans::_internal_set_a(float value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   a_ = value;
 }
 inline void logicleTrans::set_a(float value) {
@@ -9044,9 +10030,17 @@ inline void logicleTrans::set_a(float value) {
   // @@protoc_insertion_point(field_set:pb.logicleTrans.A)
 }
 
-// float bins = 5;
+// optional float bins = 5;
+inline bool logicleTrans::_internal_has_bins() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool logicleTrans::has_bins() const {
+  return _internal_has_bins();
+}
 inline void logicleTrans::clear_bins() {
   bins_ = 0;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline float logicleTrans::_internal_bins() const {
   return bins_;
@@ -9056,7 +10050,7 @@ inline float logicleTrans::bins() const {
   return _internal_bins();
 }
 inline void logicleTrans::_internal_set_bins(float value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   bins_ = value;
 }
 inline void logicleTrans::set_bins(float value) {
@@ -9064,9 +10058,17 @@ inline void logicleTrans::set_bins(float value) {
   // @@protoc_insertion_point(field_set:pb.logicleTrans.bins)
 }
 
-// bool isGml2 = 6;
+// optional bool isGml2 = 6;
+inline bool logicleTrans::_internal_has_isgml2() const {
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  return value;
+}
+inline bool logicleTrans::has_isgml2() const {
+  return _internal_has_isgml2();
+}
 inline void logicleTrans::clear_isgml2() {
   isgml2_ = false;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline bool logicleTrans::_internal_isgml2() const {
   return isgml2_;
@@ -9076,7 +10078,7 @@ inline bool logicleTrans::isgml2() const {
   return _internal_isgml2();
 }
 inline void logicleTrans::_internal_set_isgml2(bool value) {
-  
+  _has_bits_[0] |= 0x00000020u;
   isgml2_ = value;
 }
 inline void logicleTrans::set_isgml2(bool value) {
@@ -9084,9 +10086,17 @@ inline void logicleTrans::set_isgml2(bool value) {
   // @@protoc_insertion_point(field_set:pb.logicleTrans.isGml2)
 }
 
-// bool isInverse = 7;
+// optional bool isInverse = 7;
+inline bool logicleTrans::_internal_has_isinverse() const {
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  return value;
+}
+inline bool logicleTrans::has_isinverse() const {
+  return _internal_has_isinverse();
+}
 inline void logicleTrans::clear_isinverse() {
   isinverse_ = false;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline bool logicleTrans::_internal_isinverse() const {
   return isinverse_;
@@ -9096,7 +10106,7 @@ inline bool logicleTrans::isinverse() const {
   return _internal_isinverse();
 }
 inline void logicleTrans::_internal_set_isinverse(bool value) {
-  
+  _has_bits_[0] |= 0x00000040u;
   isinverse_ = value;
 }
 inline void logicleTrans::set_isinverse(bool value) {
@@ -9108,18 +10118,18 @@ inline void logicleTrans::set_isinverse(bool value) {
 
 // transformation
 
-// .pb.calibrationTable calTbl = 1;
+// optional .pb.calibrationTable calTbl = 1;
 inline bool transformation::_internal_has_caltbl() const {
-  return this != internal_default_instance() && caltbl_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  PROTOBUF_ASSUME(!value || caltbl_ != nullptr);
+  return value;
 }
 inline bool transformation::has_caltbl() const {
   return _internal_has_caltbl();
 }
 inline void transformation::clear_caltbl() {
-  if (GetArena() == nullptr && caltbl_ != nullptr) {
-    delete caltbl_;
-  }
-  caltbl_ = nullptr;
+  if (caltbl_ != nullptr) caltbl_->Clear();
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline const ::pb::calibrationTable& transformation::_internal_caltbl() const {
   const ::pb::calibrationTable* p = caltbl_;
@@ -9137,14 +10147,14 @@ inline void transformation::unsafe_arena_set_allocated_caltbl(
   }
   caltbl_ = caltbl;
   if (caltbl) {
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.calTbl)
 }
 inline ::pb::calibrationTable* transformation::release_caltbl() {
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::calibrationTable* temp = caltbl_;
   caltbl_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9154,13 +10164,13 @@ inline ::pb::calibrationTable* transformation::release_caltbl() {
 }
 inline ::pb::calibrationTable* transformation::unsafe_arena_release_caltbl() {
   // @@protoc_insertion_point(field_release:pb.transformation.calTbl)
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::calibrationTable* temp = caltbl_;
   caltbl_ = nullptr;
   return temp;
 }
 inline ::pb::calibrationTable* transformation::_internal_mutable_caltbl() {
-  
+  _has_bits_[0] |= 0x00000004u;
   if (caltbl_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::calibrationTable>(GetArena());
     caltbl_ = p;
@@ -9183,17 +10193,25 @@ inline void transformation::set_allocated_caltbl(::pb::calibrationTable* caltbl)
       caltbl = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, caltbl, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   caltbl_ = caltbl;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.calTbl)
 }
 
-// bool isGateOnly = 2;
+// optional bool isGateOnly = 2;
+inline bool transformation::_internal_has_isgateonly() const {
+  bool value = (_has_bits_[0] & 0x00000800u) != 0;
+  return value;
+}
+inline bool transformation::has_isgateonly() const {
+  return _internal_has_isgateonly();
+}
 inline void transformation::clear_isgateonly() {
   isgateonly_ = false;
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline bool transformation::_internal_isgateonly() const {
   return isgateonly_;
@@ -9203,7 +10221,7 @@ inline bool transformation::isgateonly() const {
   return _internal_isgateonly();
 }
 inline void transformation::_internal_set_isgateonly(bool value) {
-  
+  _has_bits_[0] |= 0x00000800u;
   isgateonly_ = value;
 }
 inline void transformation::set_isgateonly(bool value) {
@@ -9211,9 +10229,17 @@ inline void transformation::set_isgateonly(bool value) {
   // @@protoc_insertion_point(field_set:pb.transformation.isGateOnly)
 }
 
-// string name = 4;
+// optional string name = 4;
+inline bool transformation::_internal_has_name() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool transformation::has_name() const {
+  return _internal_has_name();
+}
 inline void transformation::clear_name() {
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& transformation::name() const {
   // @@protoc_insertion_point(field_get:pb.transformation.name)
@@ -9231,51 +10257,63 @@ inline const std::string& transformation::_internal_name() const {
   return name_.Get();
 }
 inline void transformation::_internal_set_name(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void transformation::set_name(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.transformation.name)
 }
 inline void transformation::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.transformation.name)
 }
 inline void transformation::set_name(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.transformation.name)
 }
 inline std::string* transformation::_internal_mutable_name() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* transformation::release_name() {
   // @@protoc_insertion_point(field_release:pb.transformation.name)
-  return name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_name()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return name_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void transformation::set_allocated_name(std::string* name) {
   if (name != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.name)
 }
 
-// string channel = 5;
+// optional string channel = 5;
+inline bool transformation::_internal_has_channel() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool transformation::has_channel() const {
+  return _internal_has_channel();
+}
 inline void transformation::clear_channel() {
   channel_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& transformation::channel() const {
   // @@protoc_insertion_point(field_get:pb.transformation.channel)
@@ -9293,51 +10331,63 @@ inline const std::string& transformation::_internal_channel() const {
   return channel_.Get();
 }
 inline void transformation::_internal_set_channel(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   channel_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void transformation::set_channel(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   channel_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.transformation.channel)
 }
 inline void transformation::set_channel(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000002u;
   channel_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.transformation.channel)
 }
 inline void transformation::set_channel(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000002u;
   channel_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.transformation.channel)
 }
 inline std::string* transformation::_internal_mutable_channel() {
-  
+  _has_bits_[0] |= 0x00000002u;
   return channel_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* transformation::release_channel() {
   // @@protoc_insertion_point(field_release:pb.transformation.channel)
-  return channel_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_channel()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return channel_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void transformation::set_allocated_channel(std::string* channel) {
   if (channel != nullptr) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   channel_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), channel,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.channel)
 }
 
-// bool isComputed = 6;
+// optional bool isComputed = 6;
+inline bool transformation::_internal_has_iscomputed() const {
+  bool value = (_has_bits_[0] & 0x00001000u) != 0;
+  return value;
+}
+inline bool transformation::has_iscomputed() const {
+  return _internal_has_iscomputed();
+}
 inline void transformation::clear_iscomputed() {
   iscomputed_ = false;
+  _has_bits_[0] &= ~0x00001000u;
 }
 inline bool transformation::_internal_iscomputed() const {
   return iscomputed_;
@@ -9347,7 +10397,7 @@ inline bool transformation::iscomputed() const {
   return _internal_iscomputed();
 }
 inline void transformation::_internal_set_iscomputed(bool value) {
-  
+  _has_bits_[0] |= 0x00001000u;
   iscomputed_ = value;
 }
 inline void transformation::set_iscomputed(bool value) {
@@ -9355,9 +10405,17 @@ inline void transformation::set_iscomputed(bool value) {
   // @@protoc_insertion_point(field_set:pb.transformation.isComputed)
 }
 
-// uint32 type = 12;
+// optional uint32 type = 12;
+inline bool transformation::_internal_has_type() const {
+  bool value = (_has_bits_[0] & 0x00002000u) != 0;
+  return value;
+}
+inline bool transformation::has_type() const {
+  return _internal_has_type();
+}
 inline void transformation::clear_type() {
   type_ = 0u;
+  _has_bits_[0] &= ~0x00002000u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 transformation::_internal_type() const {
   return type_;
@@ -9367,7 +10425,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 transformation::type() const {
   return _internal_type();
 }
 inline void transformation::_internal_set_type(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00002000u;
   type_ = value;
 }
 inline void transformation::set_type(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -9375,9 +10433,17 @@ inline void transformation::set_type(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   // @@protoc_insertion_point(field_set:pb.transformation.type)
 }
 
-// .pb.TRANS_TYPE trans_type = 3;
+// optional .pb.TRANS_TYPE trans_type = 3;
+inline bool transformation::_internal_has_trans_type() const {
+  bool value = (_has_bits_[0] & 0x00000400u) != 0;
+  return value;
+}
+inline bool transformation::has_trans_type() const {
+  return _internal_has_trans_type();
+}
 inline void transformation::clear_trans_type() {
   trans_type_ = 0;
+  _has_bits_[0] &= ~0x00000400u;
 }
 inline ::pb::TRANS_TYPE transformation::_internal_trans_type() const {
   return static_cast< ::pb::TRANS_TYPE >(trans_type_);
@@ -9387,7 +10453,8 @@ inline ::pb::TRANS_TYPE transformation::trans_type() const {
   return _internal_trans_type();
 }
 inline void transformation::_internal_set_trans_type(::pb::TRANS_TYPE value) {
-  
+  assert(::pb::TRANS_TYPE_IsValid(value));
+  _has_bits_[0] |= 0x00000400u;
   trans_type_ = value;
 }
 inline void transformation::set_trans_type(::pb::TRANS_TYPE value) {
@@ -9395,18 +10462,18 @@ inline void transformation::set_trans_type(::pb::TRANS_TYPE value) {
   // @@protoc_insertion_point(field_set:pb.transformation.trans_type)
 }
 
-// .pb.biexpTrans bt = 7;
+// optional .pb.biexpTrans bt = 7;
 inline bool transformation::_internal_has_bt() const {
-  return this != internal_default_instance() && bt_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  PROTOBUF_ASSUME(!value || bt_ != nullptr);
+  return value;
 }
 inline bool transformation::has_bt() const {
   return _internal_has_bt();
 }
 inline void transformation::clear_bt() {
-  if (GetArena() == nullptr && bt_ != nullptr) {
-    delete bt_;
-  }
-  bt_ = nullptr;
+  if (bt_ != nullptr) bt_->Clear();
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline const ::pb::biexpTrans& transformation::_internal_bt() const {
   const ::pb::biexpTrans* p = bt_;
@@ -9424,14 +10491,14 @@ inline void transformation::unsafe_arena_set_allocated_bt(
   }
   bt_ = bt;
   if (bt) {
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.bt)
 }
 inline ::pb::biexpTrans* transformation::release_bt() {
-  
+  _has_bits_[0] &= ~0x00000008u;
   ::pb::biexpTrans* temp = bt_;
   bt_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9441,13 +10508,13 @@ inline ::pb::biexpTrans* transformation::release_bt() {
 }
 inline ::pb::biexpTrans* transformation::unsafe_arena_release_bt() {
   // @@protoc_insertion_point(field_release:pb.transformation.bt)
-  
+  _has_bits_[0] &= ~0x00000008u;
   ::pb::biexpTrans* temp = bt_;
   bt_ = nullptr;
   return temp;
 }
 inline ::pb::biexpTrans* transformation::_internal_mutable_bt() {
-  
+  _has_bits_[0] |= 0x00000008u;
   if (bt_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::biexpTrans>(GetArena());
     bt_ = p;
@@ -9470,26 +10537,26 @@ inline void transformation::set_allocated_bt(::pb::biexpTrans* bt) {
       bt = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, bt, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   bt_ = bt;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.bt)
 }
 
-// .pb.logTrans lt = 8;
+// optional .pb.logTrans lt = 8;
 inline bool transformation::_internal_has_lt() const {
-  return this != internal_default_instance() && lt_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  PROTOBUF_ASSUME(!value || lt_ != nullptr);
+  return value;
 }
 inline bool transformation::has_lt() const {
   return _internal_has_lt();
 }
 inline void transformation::clear_lt() {
-  if (GetArena() == nullptr && lt_ != nullptr) {
-    delete lt_;
-  }
-  lt_ = nullptr;
+  if (lt_ != nullptr) lt_->Clear();
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline const ::pb::logTrans& transformation::_internal_lt() const {
   const ::pb::logTrans* p = lt_;
@@ -9507,14 +10574,14 @@ inline void transformation::unsafe_arena_set_allocated_lt(
   }
   lt_ = lt;
   if (lt) {
-    
+    _has_bits_[0] |= 0x00000010u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000010u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.lt)
 }
 inline ::pb::logTrans* transformation::release_lt() {
-  
+  _has_bits_[0] &= ~0x00000010u;
   ::pb::logTrans* temp = lt_;
   lt_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9524,13 +10591,13 @@ inline ::pb::logTrans* transformation::release_lt() {
 }
 inline ::pb::logTrans* transformation::unsafe_arena_release_lt() {
   // @@protoc_insertion_point(field_release:pb.transformation.lt)
-  
+  _has_bits_[0] &= ~0x00000010u;
   ::pb::logTrans* temp = lt_;
   lt_ = nullptr;
   return temp;
 }
 inline ::pb::logTrans* transformation::_internal_mutable_lt() {
-  
+  _has_bits_[0] |= 0x00000010u;
   if (lt_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::logTrans>(GetArena());
     lt_ = p;
@@ -9553,26 +10620,26 @@ inline void transformation::set_allocated_lt(::pb::logTrans* lt) {
       lt = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, lt, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000010u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000010u;
   }
   lt_ = lt;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.lt)
 }
 
-// .pb.flinTrans flt = 9;
+// optional .pb.flinTrans flt = 9;
 inline bool transformation::_internal_has_flt() const {
-  return this != internal_default_instance() && flt_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  PROTOBUF_ASSUME(!value || flt_ != nullptr);
+  return value;
 }
 inline bool transformation::has_flt() const {
   return _internal_has_flt();
 }
 inline void transformation::clear_flt() {
-  if (GetArena() == nullptr && flt_ != nullptr) {
-    delete flt_;
-  }
-  flt_ = nullptr;
+  if (flt_ != nullptr) flt_->Clear();
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline const ::pb::flinTrans& transformation::_internal_flt() const {
   const ::pb::flinTrans* p = flt_;
@@ -9590,14 +10657,14 @@ inline void transformation::unsafe_arena_set_allocated_flt(
   }
   flt_ = flt;
   if (flt) {
-    
+    _has_bits_[0] |= 0x00000020u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000020u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.flt)
 }
 inline ::pb::flinTrans* transformation::release_flt() {
-  
+  _has_bits_[0] &= ~0x00000020u;
   ::pb::flinTrans* temp = flt_;
   flt_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9607,13 +10674,13 @@ inline ::pb::flinTrans* transformation::release_flt() {
 }
 inline ::pb::flinTrans* transformation::unsafe_arena_release_flt() {
   // @@protoc_insertion_point(field_release:pb.transformation.flt)
-  
+  _has_bits_[0] &= ~0x00000020u;
   ::pb::flinTrans* temp = flt_;
   flt_ = nullptr;
   return temp;
 }
 inline ::pb::flinTrans* transformation::_internal_mutable_flt() {
-  
+  _has_bits_[0] |= 0x00000020u;
   if (flt_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::flinTrans>(GetArena());
     flt_ = p;
@@ -9636,26 +10703,26 @@ inline void transformation::set_allocated_flt(::pb::flinTrans* flt) {
       flt = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, flt, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000020u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000020u;
   }
   flt_ = flt;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.flt)
 }
 
-// .pb.scaleTrans st = 10;
+// optional .pb.scaleTrans st = 10;
 inline bool transformation::_internal_has_st() const {
-  return this != internal_default_instance() && st_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  PROTOBUF_ASSUME(!value || st_ != nullptr);
+  return value;
 }
 inline bool transformation::has_st() const {
   return _internal_has_st();
 }
 inline void transformation::clear_st() {
-  if (GetArena() == nullptr && st_ != nullptr) {
-    delete st_;
-  }
-  st_ = nullptr;
+  if (st_ != nullptr) st_->Clear();
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline const ::pb::scaleTrans& transformation::_internal_st() const {
   const ::pb::scaleTrans* p = st_;
@@ -9673,14 +10740,14 @@ inline void transformation::unsafe_arena_set_allocated_st(
   }
   st_ = st;
   if (st) {
-    
+    _has_bits_[0] |= 0x00000040u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000040u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.st)
 }
 inline ::pb::scaleTrans* transformation::release_st() {
-  
+  _has_bits_[0] &= ~0x00000040u;
   ::pb::scaleTrans* temp = st_;
   st_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9690,13 +10757,13 @@ inline ::pb::scaleTrans* transformation::release_st() {
 }
 inline ::pb::scaleTrans* transformation::unsafe_arena_release_st() {
   // @@protoc_insertion_point(field_release:pb.transformation.st)
-  
+  _has_bits_[0] &= ~0x00000040u;
   ::pb::scaleTrans* temp = st_;
   st_ = nullptr;
   return temp;
 }
 inline ::pb::scaleTrans* transformation::_internal_mutable_st() {
-  
+  _has_bits_[0] |= 0x00000040u;
   if (st_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::scaleTrans>(GetArena());
     st_ = p;
@@ -9719,26 +10786,26 @@ inline void transformation::set_allocated_st(::pb::scaleTrans* st) {
       st = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, st, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000040u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000040u;
   }
   st_ = st;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.st)
 }
 
-// .pb.fasinhTrans ft = 11;
+// optional .pb.fasinhTrans ft = 11;
 inline bool transformation::_internal_has_ft() const {
-  return this != internal_default_instance() && ft_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  PROTOBUF_ASSUME(!value || ft_ != nullptr);
+  return value;
 }
 inline bool transformation::has_ft() const {
   return _internal_has_ft();
 }
 inline void transformation::clear_ft() {
-  if (GetArena() == nullptr && ft_ != nullptr) {
-    delete ft_;
-  }
-  ft_ = nullptr;
+  if (ft_ != nullptr) ft_->Clear();
+  _has_bits_[0] &= ~0x00000080u;
 }
 inline const ::pb::fasinhTrans& transformation::_internal_ft() const {
   const ::pb::fasinhTrans* p = ft_;
@@ -9756,14 +10823,14 @@ inline void transformation::unsafe_arena_set_allocated_ft(
   }
   ft_ = ft;
   if (ft) {
-    
+    _has_bits_[0] |= 0x00000080u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000080u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.ft)
 }
 inline ::pb::fasinhTrans* transformation::release_ft() {
-  
+  _has_bits_[0] &= ~0x00000080u;
   ::pb::fasinhTrans* temp = ft_;
   ft_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9773,13 +10840,13 @@ inline ::pb::fasinhTrans* transformation::release_ft() {
 }
 inline ::pb::fasinhTrans* transformation::unsafe_arena_release_ft() {
   // @@protoc_insertion_point(field_release:pb.transformation.ft)
-  
+  _has_bits_[0] &= ~0x00000080u;
   ::pb::fasinhTrans* temp = ft_;
   ft_ = nullptr;
   return temp;
 }
 inline ::pb::fasinhTrans* transformation::_internal_mutable_ft() {
-  
+  _has_bits_[0] |= 0x00000080u;
   if (ft_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::fasinhTrans>(GetArena());
     ft_ = p;
@@ -9802,26 +10869,26 @@ inline void transformation::set_allocated_ft(::pb::fasinhTrans* ft) {
       ft = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, ft, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000080u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000080u;
   }
   ft_ = ft;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.ft)
 }
 
-// .pb.logicleTrans lgt = 13;
+// optional .pb.logicleTrans lgt = 13;
 inline bool transformation::_internal_has_lgt() const {
-  return this != internal_default_instance() && lgt_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000100u) != 0;
+  PROTOBUF_ASSUME(!value || lgt_ != nullptr);
+  return value;
 }
 inline bool transformation::has_lgt() const {
   return _internal_has_lgt();
 }
 inline void transformation::clear_lgt() {
-  if (GetArena() == nullptr && lgt_ != nullptr) {
-    delete lgt_;
-  }
-  lgt_ = nullptr;
+  if (lgt_ != nullptr) lgt_->Clear();
+  _has_bits_[0] &= ~0x00000100u;
 }
 inline const ::pb::logicleTrans& transformation::_internal_lgt() const {
   const ::pb::logicleTrans* p = lgt_;
@@ -9839,14 +10906,14 @@ inline void transformation::unsafe_arena_set_allocated_lgt(
   }
   lgt_ = lgt;
   if (lgt) {
-    
+    _has_bits_[0] |= 0x00000100u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000100u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.lgt)
 }
 inline ::pb::logicleTrans* transformation::release_lgt() {
-  
+  _has_bits_[0] &= ~0x00000100u;
   ::pb::logicleTrans* temp = lgt_;
   lgt_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9856,13 +10923,13 @@ inline ::pb::logicleTrans* transformation::release_lgt() {
 }
 inline ::pb::logicleTrans* transformation::unsafe_arena_release_lgt() {
   // @@protoc_insertion_point(field_release:pb.transformation.lgt)
-  
+  _has_bits_[0] &= ~0x00000100u;
   ::pb::logicleTrans* temp = lgt_;
   lgt_ = nullptr;
   return temp;
 }
 inline ::pb::logicleTrans* transformation::_internal_mutable_lgt() {
-  
+  _has_bits_[0] |= 0x00000100u;
   if (lgt_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::logicleTrans>(GetArena());
     lgt_ = p;
@@ -9885,26 +10952,26 @@ inline void transformation::set_allocated_lgt(::pb::logicleTrans* lgt) {
       lgt = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, lgt, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000100u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000100u;
   }
   lgt_ = lgt;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.lgt)
 }
 
-// .pb.logGML2Trans lgml2t = 14;
+// optional .pb.logGML2Trans lgml2t = 14;
 inline bool transformation::_internal_has_lgml2t() const {
-  return this != internal_default_instance() && lgml2t_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000200u) != 0;
+  PROTOBUF_ASSUME(!value || lgml2t_ != nullptr);
+  return value;
 }
 inline bool transformation::has_lgml2t() const {
   return _internal_has_lgml2t();
 }
 inline void transformation::clear_lgml2t() {
-  if (GetArena() == nullptr && lgml2t_ != nullptr) {
-    delete lgml2t_;
-  }
-  lgml2t_ = nullptr;
+  if (lgml2t_ != nullptr) lgml2t_->Clear();
+  _has_bits_[0] &= ~0x00000200u;
 }
 inline const ::pb::logGML2Trans& transformation::_internal_lgml2t() const {
   const ::pb::logGML2Trans* p = lgml2t_;
@@ -9922,14 +10989,14 @@ inline void transformation::unsafe_arena_set_allocated_lgml2t(
   }
   lgml2t_ = lgml2t;
   if (lgml2t) {
-    
+    _has_bits_[0] |= 0x00000200u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000200u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.transformation.lgml2t)
 }
 inline ::pb::logGML2Trans* transformation::release_lgml2t() {
-  
+  _has_bits_[0] &= ~0x00000200u;
   ::pb::logGML2Trans* temp = lgml2t_;
   lgml2t_ = nullptr;
   if (GetArena() != nullptr) {
@@ -9939,13 +11006,13 @@ inline ::pb::logGML2Trans* transformation::release_lgml2t() {
 }
 inline ::pb::logGML2Trans* transformation::unsafe_arena_release_lgml2t() {
   // @@protoc_insertion_point(field_release:pb.transformation.lgml2t)
-  
+  _has_bits_[0] &= ~0x00000200u;
   ::pb::logGML2Trans* temp = lgml2t_;
   lgml2t_ = nullptr;
   return temp;
 }
 inline ::pb::logGML2Trans* transformation::_internal_mutable_lgml2t() {
-  
+  _has_bits_[0] |= 0x00000200u;
   if (lgml2t_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::logGML2Trans>(GetArena());
     lgml2t_ = p;
@@ -9968,9 +11035,9 @@ inline void transformation::set_allocated_lgml2t(::pb::logGML2Trans* lgml2t) {
       lgml2t = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, lgml2t, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000200u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000200u;
   }
   lgml2t_ = lgml2t;
   // @@protoc_insertion_point(field_set_allocated:pb.transformation.lgml2t)
@@ -9980,9 +11047,17 @@ inline void transformation::set_allocated_lgml2t(::pb::logGML2Trans* lgml2t) {
 
 // trans_pair
 
-// string name = 1;
+// required string name = 1;
+inline bool trans_pair::_internal_has_name() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool trans_pair::has_name() const {
+  return _internal_has_name();
+}
 inline void trans_pair::clear_name() {
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& trans_pair::name() const {
   // @@protoc_insertion_point(field_get:pb.trans_pair.name)
@@ -10000,51 +11075,63 @@ inline const std::string& trans_pair::_internal_name() const {
   return name_.Get();
 }
 inline void trans_pair::_internal_set_name(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void trans_pair::set_name(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.trans_pair.name)
 }
 inline void trans_pair::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.trans_pair.name)
 }
 inline void trans_pair::set_name(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.trans_pair.name)
 }
 inline std::string* trans_pair::_internal_mutable_name() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* trans_pair::release_name() {
   // @@protoc_insertion_point(field_release:pb.trans_pair.name)
-  return name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_name()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return name_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void trans_pair::set_allocated_name(std::string* name) {
   if (name != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.trans_pair.name)
 }
 
-// uint64 trans_address = 2;
+// optional uint64 trans_address = 2;
+inline bool trans_pair::_internal_has_trans_address() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool trans_pair::has_trans_address() const {
+  return _internal_has_trans_address();
+}
 inline void trans_pair::clear_trans_address() {
   trans_address_ = PROTOBUF_ULONGLONG(0);
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 trans_pair::_internal_trans_address() const {
   return trans_address_;
@@ -10054,7 +11141,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint64 trans_pair::trans_address() const {
   return _internal_trans_address();
 }
 inline void trans_pair::_internal_set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   trans_address_ = value;
 }
 inline void trans_pair::set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value) {
@@ -10062,18 +11149,18 @@ inline void trans_pair::set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value)
   // @@protoc_insertion_point(field_set:pb.trans_pair.trans_address)
 }
 
-// .pb.transformation trans = 3;
+// optional .pb.transformation trans = 3;
 inline bool trans_pair::_internal_has_trans() const {
-  return this != internal_default_instance() && trans_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  PROTOBUF_ASSUME(!value || trans_ != nullptr);
+  return value;
 }
 inline bool trans_pair::has_trans() const {
   return _internal_has_trans();
 }
 inline void trans_pair::clear_trans() {
-  if (GetArena() == nullptr && trans_ != nullptr) {
-    delete trans_;
-  }
-  trans_ = nullptr;
+  if (trans_ != nullptr) trans_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const ::pb::transformation& trans_pair::_internal_trans() const {
   const ::pb::transformation* p = trans_;
@@ -10091,14 +11178,14 @@ inline void trans_pair::unsafe_arena_set_allocated_trans(
   }
   trans_ = trans;
   if (trans) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.trans_pair.trans)
 }
 inline ::pb::transformation* trans_pair::release_trans() {
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::transformation* temp = trans_;
   trans_ = nullptr;
   if (GetArena() != nullptr) {
@@ -10108,13 +11195,13 @@ inline ::pb::transformation* trans_pair::release_trans() {
 }
 inline ::pb::transformation* trans_pair::unsafe_arena_release_trans() {
   // @@protoc_insertion_point(field_release:pb.trans_pair.trans)
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::transformation* temp = trans_;
   trans_ = nullptr;
   return temp;
 }
 inline ::pb::transformation* trans_pair::_internal_mutable_trans() {
-  
+  _has_bits_[0] |= 0x00000002u;
   if (trans_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::transformation>(GetArena());
     trans_ = p;
@@ -10137,9 +11224,9 @@ inline void trans_pair::set_allocated_trans(::pb::transformation* trans) {
       trans = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, trans, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   trans_ = trans;
   // @@protoc_insertion_point(field_set_allocated:pb.trans_pair.trans)
@@ -10188,9 +11275,17 @@ trans_local::tp() const {
   return tp_;
 }
 
-// string groupName = 2;
+// optional string groupName = 2;
+inline bool trans_local::_internal_has_groupname() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool trans_local::has_groupname() const {
+  return _internal_has_groupname();
+}
 inline void trans_local::clear_groupname() {
   groupname_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& trans_local::groupname() const {
   // @@protoc_insertion_point(field_get:pb.trans_local.groupName)
@@ -10208,42 +11303,46 @@ inline const std::string& trans_local::_internal_groupname() const {
   return groupname_.Get();
 }
 inline void trans_local::_internal_set_groupname(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   groupname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void trans_local::set_groupname(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   groupname_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.trans_local.groupName)
 }
 inline void trans_local::set_groupname(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   groupname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.trans_local.groupName)
 }
 inline void trans_local::set_groupname(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   groupname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.trans_local.groupName)
 }
 inline std::string* trans_local::_internal_mutable_groupname() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return groupname_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* trans_local::release_groupname() {
   // @@protoc_insertion_point(field_release:pb.trans_local.groupName)
-  return groupname_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_groupname()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return groupname_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void trans_local::set_allocated_groupname(std::string* groupname) {
   if (groupname != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   groupname_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), groupname,
       GetArena());
@@ -10301,9 +11400,17 @@ trans_local::mutable_sampleids() {
 
 // POPINDICES
 
-// uint32 nEvents = 1;
+// required uint32 nEvents = 1;
+inline bool POPINDICES::_internal_has_nevents() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool POPINDICES::has_nevents() const {
+  return _internal_has_nevents();
+}
 inline void POPINDICES::clear_nevents() {
   nevents_ = 0u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 POPINDICES::_internal_nevents() const {
   return nevents_;
@@ -10313,7 +11420,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 POPINDICES::nevents() const {
   return _internal_nevents();
 }
 inline void POPINDICES::_internal_set_nevents(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   nevents_ = value;
 }
 inline void POPINDICES::set_nevents(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -10321,9 +11428,17 @@ inline void POPINDICES::set_nevents(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   // @@protoc_insertion_point(field_set:pb.POPINDICES.nEvents)
 }
 
-// .pb.ind_type indtype = 2;
+// required .pb.ind_type indtype = 2;
+inline bool POPINDICES::_internal_has_indtype() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool POPINDICES::has_indtype() const {
+  return _internal_has_indtype();
+}
 inline void POPINDICES::clear_indtype() {
   indtype_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline ::pb::ind_type POPINDICES::_internal_indtype() const {
   return static_cast< ::pb::ind_type >(indtype_);
@@ -10333,7 +11448,8 @@ inline ::pb::ind_type POPINDICES::indtype() const {
   return _internal_indtype();
 }
 inline void POPINDICES::_internal_set_indtype(::pb::ind_type value) {
-  
+  assert(::pb::ind_type_IsValid(value));
+  _has_bits_[0] |= 0x00000004u;
   indtype_ = value;
 }
 inline void POPINDICES::set_indtype(::pb::ind_type value) {
@@ -10388,9 +11504,17 @@ POPINDICES::mutable_iind() {
   return _internal_mutable_iind();
 }
 
-// bytes bInd = 4;
+// optional bytes bInd = 4;
+inline bool POPINDICES::_internal_has_bind() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool POPINDICES::has_bind() const {
+  return _internal_has_bind();
+}
 inline void POPINDICES::clear_bind() {
   bind_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& POPINDICES::bind() const {
   // @@protoc_insertion_point(field_get:pb.POPINDICES.bInd)
@@ -10408,42 +11532,46 @@ inline const std::string& POPINDICES::_internal_bind() const {
   return bind_.Get();
 }
 inline void POPINDICES::_internal_set_bind(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   bind_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void POPINDICES::set_bind(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   bind_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.POPINDICES.bInd)
 }
 inline void POPINDICES::set_bind(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   bind_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.POPINDICES.bInd)
 }
 inline void POPINDICES::set_bind(const void* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   bind_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.POPINDICES.bInd)
 }
 inline std::string* POPINDICES::_internal_mutable_bind() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return bind_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* POPINDICES::release_bind() {
   // @@protoc_insertion_point(field_release:pb.POPINDICES.bInd)
-  return bind_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_bind()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return bind_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void POPINDICES::set_allocated_bind(std::string* bind) {
   if (bind != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   bind_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), bind,
       GetArena());
@@ -10454,9 +11582,17 @@ inline void POPINDICES::set_allocated_bind(std::string* bind) {
 
 // nodeProperties
 
-// string thisName = 1;
+// required string thisName = 1;
+inline bool nodeProperties::_internal_has_thisname() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool nodeProperties::has_thisname() const {
+  return _internal_has_thisname();
+}
 inline void nodeProperties::clear_thisname() {
   thisname_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& nodeProperties::thisname() const {
   // @@protoc_insertion_point(field_get:pb.nodeProperties.thisName)
@@ -10474,42 +11610,46 @@ inline const std::string& nodeProperties::_internal_thisname() const {
   return thisname_.Get();
 }
 inline void nodeProperties::_internal_set_thisname(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   thisname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void nodeProperties::set_thisname(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   thisname_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.nodeProperties.thisName)
 }
 inline void nodeProperties::set_thisname(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   thisname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.nodeProperties.thisName)
 }
 inline void nodeProperties::set_thisname(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   thisname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.nodeProperties.thisName)
 }
 inline std::string* nodeProperties::_internal_mutable_thisname() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return thisname_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* nodeProperties::release_thisname() {
   // @@protoc_insertion_point(field_release:pb.nodeProperties.thisName)
-  return thisname_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_thisname()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return thisname_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void nodeProperties::set_allocated_thisname(std::string* thisname) {
   if (thisname != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   thisname_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), thisname,
       GetArena());
@@ -10594,9 +11734,17 @@ nodeProperties::fcstats() const {
   return fcstats_;
 }
 
-// bool hidden = 4;
+// required bool hidden = 4;
+inline bool nodeProperties::_internal_has_hidden() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool nodeProperties::has_hidden() const {
+  return _internal_has_hidden();
+}
 inline void nodeProperties::clear_hidden() {
   hidden_ = false;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline bool nodeProperties::_internal_hidden() const {
   return hidden_;
@@ -10606,7 +11754,7 @@ inline bool nodeProperties::hidden() const {
   return _internal_hidden();
 }
 inline void nodeProperties::_internal_set_hidden(bool value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   hidden_ = value;
 }
 inline void nodeProperties::set_hidden(bool value) {
@@ -10614,18 +11762,18 @@ inline void nodeProperties::set_hidden(bool value) {
   // @@protoc_insertion_point(field_set:pb.nodeProperties.hidden)
 }
 
-// .pb.POPINDICES indices = 5;
+// optional .pb.POPINDICES indices = 5;
 inline bool nodeProperties::_internal_has_indices() const {
-  return this != internal_default_instance() && indices_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  PROTOBUF_ASSUME(!value || indices_ != nullptr);
+  return value;
 }
 inline bool nodeProperties::has_indices() const {
   return _internal_has_indices();
 }
 inline void nodeProperties::clear_indices() {
-  if (GetArena() == nullptr && indices_ != nullptr) {
-    delete indices_;
-  }
-  indices_ = nullptr;
+  if (indices_ != nullptr) indices_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const ::pb::POPINDICES& nodeProperties::_internal_indices() const {
   const ::pb::POPINDICES* p = indices_;
@@ -10643,14 +11791,14 @@ inline void nodeProperties::unsafe_arena_set_allocated_indices(
   }
   indices_ = indices;
   if (indices) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.nodeProperties.indices)
 }
 inline ::pb::POPINDICES* nodeProperties::release_indices() {
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::POPINDICES* temp = indices_;
   indices_ = nullptr;
   if (GetArena() != nullptr) {
@@ -10660,13 +11808,13 @@ inline ::pb::POPINDICES* nodeProperties::release_indices() {
 }
 inline ::pb::POPINDICES* nodeProperties::unsafe_arena_release_indices() {
   // @@protoc_insertion_point(field_release:pb.nodeProperties.indices)
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::POPINDICES* temp = indices_;
   indices_ = nullptr;
   return temp;
 }
 inline ::pb::POPINDICES* nodeProperties::_internal_mutable_indices() {
-  
+  _has_bits_[0] |= 0x00000002u;
   if (indices_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::POPINDICES>(GetArena());
     indices_ = p;
@@ -10689,26 +11837,26 @@ inline void nodeProperties::set_allocated_indices(::pb::POPINDICES* indices) {
       indices = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, indices, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   indices_ = indices;
   // @@protoc_insertion_point(field_set_allocated:pb.nodeProperties.indices)
 }
 
-// .pb.gate thisGate = 6;
+// optional .pb.gate thisGate = 6;
 inline bool nodeProperties::_internal_has_thisgate() const {
-  return this != internal_default_instance() && thisgate_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  PROTOBUF_ASSUME(!value || thisgate_ != nullptr);
+  return value;
 }
 inline bool nodeProperties::has_thisgate() const {
   return _internal_has_thisgate();
 }
 inline void nodeProperties::clear_thisgate() {
-  if (GetArena() == nullptr && thisgate_ != nullptr) {
-    delete thisgate_;
-  }
-  thisgate_ = nullptr;
+  if (thisgate_ != nullptr) thisgate_->Clear();
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline const ::pb::gate& nodeProperties::_internal_thisgate() const {
   const ::pb::gate* p = thisgate_;
@@ -10726,14 +11874,14 @@ inline void nodeProperties::unsafe_arena_set_allocated_thisgate(
   }
   thisgate_ = thisgate;
   if (thisgate) {
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.nodeProperties.thisGate)
 }
 inline ::pb::gate* nodeProperties::release_thisgate() {
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::gate* temp = thisgate_;
   thisgate_ = nullptr;
   if (GetArena() != nullptr) {
@@ -10743,13 +11891,13 @@ inline ::pb::gate* nodeProperties::release_thisgate() {
 }
 inline ::pb::gate* nodeProperties::unsafe_arena_release_thisgate() {
   // @@protoc_insertion_point(field_release:pb.nodeProperties.thisGate)
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::gate* temp = thisgate_;
   thisgate_ = nullptr;
   return temp;
 }
 inline ::pb::gate* nodeProperties::_internal_mutable_thisgate() {
-  
+  _has_bits_[0] |= 0x00000004u;
   if (thisgate_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::gate>(GetArena());
     thisgate_ = p;
@@ -10772,9 +11920,9 @@ inline void nodeProperties::set_allocated_thisgate(::pb::gate* thisgate) {
       thisgate = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, thisgate, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   thisgate_ = thisgate;
   // @@protoc_insertion_point(field_set_allocated:pb.nodeProperties.thisGate)
@@ -10784,18 +11932,18 @@ inline void nodeProperties::set_allocated_thisgate(::pb::gate* thisgate) {
 
 // treeNodes
 
-// .pb.nodeProperties node = 1;
+// required .pb.nodeProperties node = 1;
 inline bool treeNodes::_internal_has_node() const {
-  return this != internal_default_instance() && node_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || node_ != nullptr);
+  return value;
 }
 inline bool treeNodes::has_node() const {
   return _internal_has_node();
 }
 inline void treeNodes::clear_node() {
-  if (GetArena() == nullptr && node_ != nullptr) {
-    delete node_;
-  }
-  node_ = nullptr;
+  if (node_ != nullptr) node_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const ::pb::nodeProperties& treeNodes::_internal_node() const {
   const ::pb::nodeProperties* p = node_;
@@ -10813,14 +11961,14 @@ inline void treeNodes::unsafe_arena_set_allocated_node(
   }
   node_ = node;
   if (node) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.treeNodes.node)
 }
 inline ::pb::nodeProperties* treeNodes::release_node() {
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::nodeProperties* temp = node_;
   node_ = nullptr;
   if (GetArena() != nullptr) {
@@ -10830,13 +11978,13 @@ inline ::pb::nodeProperties* treeNodes::release_node() {
 }
 inline ::pb::nodeProperties* treeNodes::unsafe_arena_release_node() {
   // @@protoc_insertion_point(field_release:pb.treeNodes.node)
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::nodeProperties* temp = node_;
   node_ = nullptr;
   return temp;
 }
 inline ::pb::nodeProperties* treeNodes::_internal_mutable_node() {
-  
+  _has_bits_[0] |= 0x00000001u;
   if (node_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::nodeProperties>(GetArena());
     node_ = p;
@@ -10859,17 +12007,25 @@ inline void treeNodes::set_allocated_node(::pb::nodeProperties* node) {
       node = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, node, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   node_ = node;
   // @@protoc_insertion_point(field_set_allocated:pb.treeNodes.node)
 }
 
-// uint32 parent = 2;
+// optional uint32 parent = 2;
+inline bool treeNodes::_internal_has_parent() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool treeNodes::has_parent() const {
+  return _internal_has_parent();
+}
 inline void treeNodes::clear_parent() {
   parent_ = 0u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 treeNodes::_internal_parent() const {
   return parent_;
@@ -10879,7 +12035,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 treeNodes::parent() const {
   return _internal_parent();
 }
 inline void treeNodes::_internal_set_parent(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   parent_ = value;
 }
 inline void treeNodes::set_parent(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -10934,9 +12090,17 @@ populationTree::node() const {
 
 // COMP
 
-// string cid = 1;
+// optional string cid = 1;
+inline bool COMP::_internal_has_cid() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool COMP::has_cid() const {
+  return _internal_has_cid();
+}
 inline void COMP::clear_cid() {
   cid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& COMP::cid() const {
   // @@protoc_insertion_point(field_get:pb.COMP.cid)
@@ -10954,51 +12118,63 @@ inline const std::string& COMP::_internal_cid() const {
   return cid_.Get();
 }
 inline void COMP::_internal_set_cid(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   cid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_cid(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   cid_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.cid)
 }
 inline void COMP::set_cid(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   cid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.cid)
 }
 inline void COMP::set_cid(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   cid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.cid)
 }
 inline std::string* COMP::_internal_mutable_cid() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return cid_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* COMP::release_cid() {
   // @@protoc_insertion_point(field_release:pb.COMP.cid)
-  return cid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_cid()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return cid_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void COMP::set_allocated_cid(std::string* cid) {
   if (cid != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   cid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), cid,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.COMP.cid)
 }
 
-// string prefix = 2;
+// optional string prefix = 2;
+inline bool COMP::_internal_has_prefix() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool COMP::has_prefix() const {
+  return _internal_has_prefix();
+}
 inline void COMP::clear_prefix() {
   prefix_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& COMP::prefix() const {
   // @@protoc_insertion_point(field_get:pb.COMP.prefix)
@@ -11016,51 +12192,63 @@ inline const std::string& COMP::_internal_prefix() const {
   return prefix_.Get();
 }
 inline void COMP::_internal_set_prefix(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   prefix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_prefix(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   prefix_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.prefix)
 }
 inline void COMP::set_prefix(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000002u;
   prefix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.prefix)
 }
 inline void COMP::set_prefix(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000002u;
   prefix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.prefix)
 }
 inline std::string* COMP::_internal_mutable_prefix() {
-  
+  _has_bits_[0] |= 0x00000002u;
   return prefix_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* COMP::release_prefix() {
   // @@protoc_insertion_point(field_release:pb.COMP.prefix)
-  return prefix_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_prefix()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return prefix_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void COMP::set_allocated_prefix(std::string* prefix) {
   if (prefix != nullptr) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   prefix_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), prefix,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.COMP.prefix)
 }
 
-// string suffix = 3;
+// optional string suffix = 3;
+inline bool COMP::_internal_has_suffix() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool COMP::has_suffix() const {
+  return _internal_has_suffix();
+}
 inline void COMP::clear_suffix() {
   suffix_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline const std::string& COMP::suffix() const {
   // @@protoc_insertion_point(field_get:pb.COMP.suffix)
@@ -11078,51 +12266,63 @@ inline const std::string& COMP::_internal_suffix() const {
   return suffix_.Get();
 }
 inline void COMP::_internal_set_suffix(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   suffix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_suffix(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   suffix_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.suffix)
 }
 inline void COMP::set_suffix(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000004u;
   suffix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.suffix)
 }
 inline void COMP::set_suffix(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000004u;
   suffix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.suffix)
 }
 inline std::string* COMP::_internal_mutable_suffix() {
-  
+  _has_bits_[0] |= 0x00000004u;
   return suffix_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* COMP::release_suffix() {
   // @@protoc_insertion_point(field_release:pb.COMP.suffix)
-  return suffix_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_suffix()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000004u;
+  return suffix_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void COMP::set_allocated_suffix(std::string* suffix) {
   if (suffix != nullptr) {
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   suffix_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), suffix,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.COMP.suffix)
 }
 
-// string name = 4;
+// optional string name = 4;
+inline bool COMP::_internal_has_name() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool COMP::has_name() const {
+  return _internal_has_name();
+}
 inline void COMP::clear_name() {
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline const std::string& COMP::name() const {
   // @@protoc_insertion_point(field_get:pb.COMP.name)
@@ -11140,51 +12340,63 @@ inline const std::string& COMP::_internal_name() const {
   return name_.Get();
 }
 inline void COMP::_internal_set_name(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_name(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.name)
 }
 inline void COMP::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000008u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.name)
 }
 inline void COMP::set_name(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000008u;
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.name)
 }
 inline std::string* COMP::_internal_mutable_name() {
-  
+  _has_bits_[0] |= 0x00000008u;
   return name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* COMP::release_name() {
   // @@protoc_insertion_point(field_release:pb.COMP.name)
-  return name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_name()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000008u;
+  return name_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void COMP::set_allocated_name(std::string* name) {
   if (name != nullptr) {
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.COMP.name)
 }
 
-// string comment = 5;
+// optional string comment = 5;
+inline bool COMP::_internal_has_comment() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool COMP::has_comment() const {
+  return _internal_has_comment();
+}
 inline void COMP::clear_comment() {
   comment_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline const std::string& COMP::comment() const {
   // @@protoc_insertion_point(field_get:pb.COMP.comment)
@@ -11202,42 +12414,46 @@ inline const std::string& COMP::_internal_comment() const {
   return comment_.Get();
 }
 inline void COMP::_internal_set_comment(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   comment_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_comment(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   comment_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.comment)
 }
 inline void COMP::set_comment(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000010u;
   comment_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.comment)
 }
 inline void COMP::set_comment(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000010u;
   comment_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.comment)
 }
 inline std::string* COMP::_internal_mutable_comment() {
-  
+  _has_bits_[0] |= 0x00000010u;
   return comment_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* COMP::release_comment() {
   // @@protoc_insertion_point(field_release:pb.COMP.comment)
-  return comment_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_comment()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000010u;
+  return comment_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void COMP::set_allocated_comment(std::string* comment) {
   if (comment != nullptr) {
-    
+    _has_bits_[0] |= 0x00000010u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000010u;
   }
   comment_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), comment,
       GetArena());
@@ -11369,9 +12585,17 @@ COMP::mutable_spillover() {
 
 // PARAM
 
-// string param = 1;
+// optional string param = 1;
+inline bool PARAM::_internal_has_param() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool PARAM::has_param() const {
+  return _internal_has_param();
+}
 inline void PARAM::clear_param() {
   param_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& PARAM::param() const {
   // @@protoc_insertion_point(field_get:pb.PARAM.param)
@@ -11389,51 +12613,63 @@ inline const std::string& PARAM::_internal_param() const {
   return param_.Get();
 }
 inline void PARAM::_internal_set_param(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   param_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void PARAM::set_param(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   param_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.PARAM.param)
 }
 inline void PARAM::set_param(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   param_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.PARAM.param)
 }
 inline void PARAM::set_param(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   param_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.PARAM.param)
 }
 inline std::string* PARAM::_internal_mutable_param() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return param_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* PARAM::release_param() {
   // @@protoc_insertion_point(field_release:pb.PARAM.param)
-  return param_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_param()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return param_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void PARAM::set_allocated_param(std::string* param) {
   if (param != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   param_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), param,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.PARAM.param)
 }
 
-// bool log = 2;
+// optional bool log = 2;
+inline bool PARAM::_internal_has_log() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool PARAM::has_log() const {
+  return _internal_has_log();
+}
 inline void PARAM::clear_log() {
   log_ = false;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline bool PARAM::_internal_log() const {
   return log_;
@@ -11443,7 +12679,7 @@ inline bool PARAM::log() const {
   return _internal_log();
 }
 inline void PARAM::_internal_set_log(bool value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   log_ = value;
 }
 inline void PARAM::set_log(bool value) {
@@ -11451,9 +12687,17 @@ inline void PARAM::set_log(bool value) {
   // @@protoc_insertion_point(field_set:pb.PARAM.log)
 }
 
-// uint32 range = 3;
+// optional uint32 range = 3;
+inline bool PARAM::_internal_has_range() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool PARAM::has_range() const {
+  return _internal_has_range();
+}
 inline void PARAM::clear_range() {
   range_ = 0u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 PARAM::_internal_range() const {
   return range_;
@@ -11463,7 +12707,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 PARAM::range() const {
   return _internal_range();
 }
 inline void PARAM::_internal_set_range(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   range_ = value;
 }
 inline void PARAM::set_range(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -11471,9 +12715,17 @@ inline void PARAM::set_range(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   // @@protoc_insertion_point(field_set:pb.PARAM.range)
 }
 
-// uint32 highValue = 4;
+// optional uint32 highValue = 4;
+inline bool PARAM::_internal_has_highvalue() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool PARAM::has_highvalue() const {
+  return _internal_has_highvalue();
+}
 inline void PARAM::clear_highvalue() {
   highvalue_ = 0u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 PARAM::_internal_highvalue() const {
   return highvalue_;
@@ -11483,7 +12735,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 PARAM::highvalue() const {
   return _internal_highvalue();
 }
 inline void PARAM::_internal_set_highvalue(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   highvalue_ = value;
 }
 inline void PARAM::set_highvalue(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -11491,9 +12743,17 @@ inline void PARAM::set_highvalue(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   // @@protoc_insertion_point(field_set:pb.PARAM.highValue)
 }
 
-// uint32 calibrationIndex = 5;
+// optional uint32 calibrationIndex = 5;
+inline bool PARAM::_internal_has_calibrationindex() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool PARAM::has_calibrationindex() const {
+  return _internal_has_calibrationindex();
+}
 inline void PARAM::clear_calibrationindex() {
   calibrationindex_ = 0u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 PARAM::_internal_calibrationindex() const {
   return calibrationindex_;
@@ -11503,7 +12763,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint32 PARAM::calibrationindex() const {
   return _internal_calibrationindex();
 }
 inline void PARAM::_internal_set_calibrationindex(::PROTOBUF_NAMESPACE_ID::uint32 value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   calibrationindex_ = value;
 }
 inline void PARAM::set_calibrationindex(::PROTOBUF_NAMESPACE_ID::uint32 value) {
@@ -11515,18 +12775,18 @@ inline void PARAM::set_calibrationindex(::PROTOBUF_NAMESPACE_ID::uint32 value) {
 
 // GatingHierarchy
 
-// .pb.populationTree tree = 2;
+// required .pb.populationTree tree = 2;
 inline bool GatingHierarchy::_internal_has_tree() const {
-  return this != internal_default_instance() && tree_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  PROTOBUF_ASSUME(!value || tree_ != nullptr);
+  return value;
 }
 inline bool GatingHierarchy::has_tree() const {
   return _internal_has_tree();
 }
 inline void GatingHierarchy::clear_tree() {
-  if (GetArena() == nullptr && tree_ != nullptr) {
-    delete tree_;
-  }
-  tree_ = nullptr;
+  if (tree_ != nullptr) tree_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const ::pb::populationTree& GatingHierarchy::_internal_tree() const {
   const ::pb::populationTree* p = tree_;
@@ -11544,14 +12804,14 @@ inline void GatingHierarchy::unsafe_arena_set_allocated_tree(
   }
   tree_ = tree;
   if (tree) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.GatingHierarchy.tree)
 }
 inline ::pb::populationTree* GatingHierarchy::release_tree() {
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::populationTree* temp = tree_;
   tree_ = nullptr;
   if (GetArena() != nullptr) {
@@ -11561,13 +12821,13 @@ inline ::pb::populationTree* GatingHierarchy::release_tree() {
 }
 inline ::pb::populationTree* GatingHierarchy::unsafe_arena_release_tree() {
   // @@protoc_insertion_point(field_release:pb.GatingHierarchy.tree)
-  
+  _has_bits_[0] &= ~0x00000002u;
   ::pb::populationTree* temp = tree_;
   tree_ = nullptr;
   return temp;
 }
 inline ::pb::populationTree* GatingHierarchy::_internal_mutable_tree() {
-  
+  _has_bits_[0] |= 0x00000002u;
   if (tree_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::populationTree>(GetArena());
     tree_ = p;
@@ -11590,26 +12850,26 @@ inline void GatingHierarchy::set_allocated_tree(::pb::populationTree* tree) {
       tree = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, tree, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   tree_ = tree;
   // @@protoc_insertion_point(field_set_allocated:pb.GatingHierarchy.tree)
 }
 
-// .pb.COMP comp = 1;
+// optional .pb.COMP comp = 1;
 inline bool GatingHierarchy::_internal_has_comp() const {
-  return this != internal_default_instance() && comp_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || comp_ != nullptr);
+  return value;
 }
 inline bool GatingHierarchy::has_comp() const {
   return _internal_has_comp();
 }
 inline void GatingHierarchy::clear_comp() {
-  if (GetArena() == nullptr && comp_ != nullptr) {
-    delete comp_;
-  }
-  comp_ = nullptr;
+  if (comp_ != nullptr) comp_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const ::pb::COMP& GatingHierarchy::_internal_comp() const {
   const ::pb::COMP* p = comp_;
@@ -11627,14 +12887,14 @@ inline void GatingHierarchy::unsafe_arena_set_allocated_comp(
   }
   comp_ = comp;
   if (comp) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.GatingHierarchy.comp)
 }
 inline ::pb::COMP* GatingHierarchy::release_comp() {
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::COMP* temp = comp_;
   comp_ = nullptr;
   if (GetArena() != nullptr) {
@@ -11644,13 +12904,13 @@ inline ::pb::COMP* GatingHierarchy::release_comp() {
 }
 inline ::pb::COMP* GatingHierarchy::unsafe_arena_release_comp() {
   // @@protoc_insertion_point(field_release:pb.GatingHierarchy.comp)
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::COMP* temp = comp_;
   comp_ = nullptr;
   return temp;
 }
 inline ::pb::COMP* GatingHierarchy::_internal_mutable_comp() {
-  
+  _has_bits_[0] |= 0x00000001u;
   if (comp_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::COMP>(GetArena());
     comp_ = p;
@@ -11673,17 +12933,25 @@ inline void GatingHierarchy::set_allocated_comp(::pb::COMP* comp) {
       comp = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, comp, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   comp_ = comp;
   // @@protoc_insertion_point(field_set_allocated:pb.GatingHierarchy.comp)
 }
 
-// bool isLoaded = 3;
+// optional bool isLoaded = 3;
+inline bool GatingHierarchy::_internal_has_isloaded() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool GatingHierarchy::has_isloaded() const {
+  return _internal_has_isloaded();
+}
 inline void GatingHierarchy::clear_isloaded() {
   isloaded_ = false;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline bool GatingHierarchy::_internal_isloaded() const {
   return isloaded_;
@@ -11693,7 +12961,7 @@ inline bool GatingHierarchy::isloaded() const {
   return _internal_isloaded();
 }
 inline void GatingHierarchy::_internal_set_isloaded(bool value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   isloaded_ = value;
 }
 inline void GatingHierarchy::set_isloaded(bool value) {
@@ -11740,18 +13008,18 @@ GatingHierarchy::transflag() const {
   return transflag_;
 }
 
-// .pb.trans_local trans = 5;
+// optional .pb.trans_local trans = 5;
 inline bool GatingHierarchy::_internal_has_trans() const {
-  return this != internal_default_instance() && trans_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  PROTOBUF_ASSUME(!value || trans_ != nullptr);
+  return value;
 }
 inline bool GatingHierarchy::has_trans() const {
   return _internal_has_trans();
 }
 inline void GatingHierarchy::clear_trans() {
-  if (GetArena() == nullptr && trans_ != nullptr) {
-    delete trans_;
-  }
-  trans_ = nullptr;
+  if (trans_ != nullptr) trans_->Clear();
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline const ::pb::trans_local& GatingHierarchy::_internal_trans() const {
   const ::pb::trans_local* p = trans_;
@@ -11769,14 +13037,14 @@ inline void GatingHierarchy::unsafe_arena_set_allocated_trans(
   }
   trans_ = trans;
   if (trans) {
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.GatingHierarchy.trans)
 }
 inline ::pb::trans_local* GatingHierarchy::release_trans() {
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::trans_local* temp = trans_;
   trans_ = nullptr;
   if (GetArena() != nullptr) {
@@ -11786,13 +13054,13 @@ inline ::pb::trans_local* GatingHierarchy::release_trans() {
 }
 inline ::pb::trans_local* GatingHierarchy::unsafe_arena_release_trans() {
   // @@protoc_insertion_point(field_release:pb.GatingHierarchy.trans)
-  
+  _has_bits_[0] &= ~0x00000004u;
   ::pb::trans_local* temp = trans_;
   trans_ = nullptr;
   return temp;
 }
 inline ::pb::trans_local* GatingHierarchy::_internal_mutable_trans() {
-  
+  _has_bits_[0] |= 0x00000004u;
   if (trans_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::trans_local>(GetArena());
     trans_ = p;
@@ -11815,26 +13083,26 @@ inline void GatingHierarchy::set_allocated_trans(::pb::trans_local* trans) {
       trans = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, trans, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   trans_ = trans;
   // @@protoc_insertion_point(field_set_allocated:pb.GatingHierarchy.trans)
 }
 
-// .pb.CytoFrame frame = 6;
+// optional .pb.CytoFrame frame = 6;
 inline bool GatingHierarchy::_internal_has_frame() const {
-  return this != internal_default_instance() && frame_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  PROTOBUF_ASSUME(!value || frame_ != nullptr);
+  return value;
 }
 inline bool GatingHierarchy::has_frame() const {
   return _internal_has_frame();
 }
 inline void GatingHierarchy::clear_frame() {
-  if (GetArena() == nullptr && frame_ != nullptr) {
-    delete frame_;
-  }
-  frame_ = nullptr;
+  if (frame_ != nullptr) frame_->Clear();
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline const ::pb::CytoFrame& GatingHierarchy::_internal_frame() const {
   const ::pb::CytoFrame* p = frame_;
@@ -11852,14 +13120,14 @@ inline void GatingHierarchy::unsafe_arena_set_allocated_frame(
   }
   frame_ = frame;
   if (frame) {
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.GatingHierarchy.frame)
 }
 inline ::pb::CytoFrame* GatingHierarchy::release_frame() {
-  
+  _has_bits_[0] &= ~0x00000008u;
   ::pb::CytoFrame* temp = frame_;
   frame_ = nullptr;
   if (GetArena() != nullptr) {
@@ -11869,13 +13137,13 @@ inline ::pb::CytoFrame* GatingHierarchy::release_frame() {
 }
 inline ::pb::CytoFrame* GatingHierarchy::unsafe_arena_release_frame() {
   // @@protoc_insertion_point(field_release:pb.GatingHierarchy.frame)
-  
+  _has_bits_[0] &= ~0x00000008u;
   ::pb::CytoFrame* temp = frame_;
   frame_ = nullptr;
   return temp;
 }
 inline ::pb::CytoFrame* GatingHierarchy::_internal_mutable_frame() {
-  
+  _has_bits_[0] |= 0x00000008u;
   if (frame_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::CytoFrame>(GetArena());
     frame_ = p;
@@ -11898,9 +13166,9 @@ inline void GatingHierarchy::set_allocated_frame(::pb::CytoFrame* frame) {
       frame = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, frame, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   frame_ = frame;
   // @@protoc_insertion_point(field_set_allocated:pb.GatingHierarchy.frame)
@@ -11910,9 +13178,17 @@ inline void GatingHierarchy::set_allocated_frame(::pb::CytoFrame* frame) {
 
 // CytoFrame
 
-// bool is_h5 = 1;
+// required bool is_h5 = 1;
+inline bool CytoFrame::_internal_has_is_h5() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool CytoFrame::has_is_h5() const {
+  return _internal_has_is_h5();
+}
 inline void CytoFrame::clear_is_h5() {
   is_h5_ = false;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline bool CytoFrame::_internal_is_h5() const {
   return is_h5_;
@@ -11922,7 +13198,7 @@ inline bool CytoFrame::is_h5() const {
   return _internal_is_h5();
 }
 inline void CytoFrame::_internal_set_is_h5(bool value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   is_h5_ = value;
 }
 inline void CytoFrame::set_is_h5(bool value) {
@@ -11934,9 +13210,17 @@ inline void CytoFrame::set_is_h5(bool value) {
 
 // TRANS_TBL
 
-// uint64 trans_address = 1;
+// optional uint64 trans_address = 1;
+inline bool TRANS_TBL::_internal_has_trans_address() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool TRANS_TBL::has_trans_address() const {
+  return _internal_has_trans_address();
+}
 inline void TRANS_TBL::clear_trans_address() {
   trans_address_ = PROTOBUF_ULONGLONG(0);
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 TRANS_TBL::_internal_trans_address() const {
   return trans_address_;
@@ -11946,7 +13230,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint64 TRANS_TBL::trans_address() const {
   return _internal_trans_address();
 }
 inline void TRANS_TBL::_internal_set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   trans_address_ = value;
 }
 inline void TRANS_TBL::set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value) {
@@ -11954,18 +13238,18 @@ inline void TRANS_TBL::set_trans_address(::PROTOBUF_NAMESPACE_ID::uint64 value) 
   // @@protoc_insertion_point(field_set:pb.TRANS_TBL.trans_address)
 }
 
-// .pb.transformation trans = 2;
+// optional .pb.transformation trans = 2;
 inline bool TRANS_TBL::_internal_has_trans() const {
-  return this != internal_default_instance() && trans_ != nullptr;
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || trans_ != nullptr);
+  return value;
 }
 inline bool TRANS_TBL::has_trans() const {
   return _internal_has_trans();
 }
 inline void TRANS_TBL::clear_trans() {
-  if (GetArena() == nullptr && trans_ != nullptr) {
-    delete trans_;
-  }
-  trans_ = nullptr;
+  if (trans_ != nullptr) trans_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const ::pb::transformation& TRANS_TBL::_internal_trans() const {
   const ::pb::transformation* p = trans_;
@@ -11983,14 +13267,14 @@ inline void TRANS_TBL::unsafe_arena_set_allocated_trans(
   }
   trans_ = trans;
   if (trans) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:pb.TRANS_TBL.trans)
 }
 inline ::pb::transformation* TRANS_TBL::release_trans() {
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::transformation* temp = trans_;
   trans_ = nullptr;
   if (GetArena() != nullptr) {
@@ -12000,13 +13284,13 @@ inline ::pb::transformation* TRANS_TBL::release_trans() {
 }
 inline ::pb::transformation* TRANS_TBL::unsafe_arena_release_trans() {
   // @@protoc_insertion_point(field_release:pb.TRANS_TBL.trans)
-  
+  _has_bits_[0] &= ~0x00000001u;
   ::pb::transformation* temp = trans_;
   trans_ = nullptr;
   return temp;
 }
 inline ::pb::transformation* TRANS_TBL::_internal_mutable_trans() {
-  
+  _has_bits_[0] |= 0x00000001u;
   if (trans_ == nullptr) {
     auto* p = CreateMaybeMessage<::pb::transformation>(GetArena());
     trans_ = p;
@@ -12029,9 +13313,9 @@ inline void TRANS_TBL::set_allocated_trans(::pb::transformation* trans) {
       trans = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, trans, submessage_arena);
     }
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   trans_ = trans;
   // @@protoc_insertion_point(field_set_allocated:pb.TRANS_TBL.trans)
@@ -12154,9 +13438,17 @@ GatingSet::mutable_samplename() {
   return &samplename_;
 }
 
-// uint64 globalBiExpTrans = 3;
+// optional uint64 globalBiExpTrans = 3;
+inline bool GatingSet::_internal_has_globalbiexptrans() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool GatingSet::has_globalbiexptrans() const {
+  return _internal_has_globalbiexptrans();
+}
 inline void GatingSet::clear_globalbiexptrans() {
   globalbiexptrans_ = PROTOBUF_ULONGLONG(0);
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::_internal_globalbiexptrans() const {
   return globalbiexptrans_;
@@ -12166,7 +13458,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::globalbiexptrans() const {
   return _internal_globalbiexptrans();
 }
 inline void GatingSet::_internal_set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  
+  _has_bits_[0] |= 0x00000010u;
   globalbiexptrans_ = value;
 }
 inline void GatingSet::set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
@@ -12174,9 +13466,17 @@ inline void GatingSet::set_globalbiexptrans(::PROTOBUF_NAMESPACE_ID::uint64 valu
   // @@protoc_insertion_point(field_set:pb.GatingSet.globalBiExpTrans)
 }
 
-// uint64 globalLinTrans = 4;
+// optional uint64 globalLinTrans = 4;
+inline bool GatingSet::_internal_has_globallintrans() const {
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  return value;
+}
+inline bool GatingSet::has_globallintrans() const {
+  return _internal_has_globallintrans();
+}
 inline void GatingSet::clear_globallintrans() {
   globallintrans_ = PROTOBUF_ULONGLONG(0);
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::_internal_globallintrans() const {
   return globallintrans_;
@@ -12186,7 +13486,7 @@ inline ::PROTOBUF_NAMESPACE_ID::uint64 GatingSet::globallintrans() const {
   return _internal_globallintrans();
 }
 inline void GatingSet::_internal_set_globallintrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  
+  _has_bits_[0] |= 0x00000020u;
   globallintrans_ = value;
 }
 inline void GatingSet::set_globallintrans(::PROTOBUF_NAMESPACE_ID::uint64 value) {
@@ -12233,9 +13533,17 @@ GatingSet::gtrans() const {
   return gtrans_;
 }
 
-// string guid = 6;
+// optional string guid = 6;
+inline bool GatingSet::_internal_has_guid() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool GatingSet::has_guid() const {
+  return _internal_has_guid();
+}
 inline void GatingSet::clear_guid() {
   guid_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline const std::string& GatingSet::guid() const {
   // @@protoc_insertion_point(field_get:pb.GatingSet.guid)
@@ -12253,51 +13561,63 @@ inline const std::string& GatingSet::_internal_guid() const {
   return guid_.Get();
 }
 inline void GatingSet::_internal_set_guid(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   guid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_guid(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000001u;
   guid_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.guid)
 }
 inline void GatingSet::set_guid(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000001u;
   guid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.guid)
 }
 inline void GatingSet::set_guid(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000001u;
   guid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.guid)
 }
 inline std::string* GatingSet::_internal_mutable_guid() {
-  
+  _has_bits_[0] |= 0x00000001u;
   return guid_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* GatingSet::release_guid() {
   // @@protoc_insertion_point(field_release:pb.GatingSet.guid)
-  return guid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_guid()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return guid_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void GatingSet::set_allocated_guid(std::string* guid) {
   if (guid != nullptr) {
-    
+    _has_bits_[0] |= 0x00000001u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000001u;
   }
   guid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), guid,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.GatingSet.guid)
 }
 
-// string cytolib_verion = 7;
+// optional string cytolib_verion = 7;
+inline bool GatingSet::_internal_has_cytolib_verion() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool GatingSet::has_cytolib_verion() const {
+  return _internal_has_cytolib_verion();
+}
 inline void GatingSet::clear_cytolib_verion() {
   cytolib_verion_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const std::string& GatingSet::cytolib_verion() const {
   // @@protoc_insertion_point(field_get:pb.GatingSet.cytolib_verion)
@@ -12315,51 +13635,63 @@ inline const std::string& GatingSet::_internal_cytolib_verion() const {
   return cytolib_verion_.Get();
 }
 inline void GatingSet::_internal_set_cytolib_verion(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   cytolib_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_cytolib_verion(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000002u;
   cytolib_verion_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.cytolib_verion)
 }
 inline void GatingSet::set_cytolib_verion(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000002u;
   cytolib_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.cytolib_verion)
 }
 inline void GatingSet::set_cytolib_verion(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000002u;
   cytolib_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.cytolib_verion)
 }
 inline std::string* GatingSet::_internal_mutable_cytolib_verion() {
-  
+  _has_bits_[0] |= 0x00000002u;
   return cytolib_verion_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* GatingSet::release_cytolib_verion() {
   // @@protoc_insertion_point(field_release:pb.GatingSet.cytolib_verion)
-  return cytolib_verion_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_cytolib_verion()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return cytolib_verion_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void GatingSet::set_allocated_cytolib_verion(std::string* cytolib_verion) {
   if (cytolib_verion != nullptr) {
-    
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000002u;
   }
   cytolib_verion_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), cytolib_verion,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.GatingSet.cytolib_verion)
 }
 
-// string pb_verion = 8;
+// optional string pb_verion = 8;
+inline bool GatingSet::_internal_has_pb_verion() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool GatingSet::has_pb_verion() const {
+  return _internal_has_pb_verion();
+}
 inline void GatingSet::clear_pb_verion() {
   pb_verion_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline const std::string& GatingSet::pb_verion() const {
   // @@protoc_insertion_point(field_get:pb.GatingSet.pb_verion)
@@ -12377,51 +13709,63 @@ inline const std::string& GatingSet::_internal_pb_verion() const {
   return pb_verion_.Get();
 }
 inline void GatingSet::_internal_set_pb_verion(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   pb_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_pb_verion(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000004u;
   pb_verion_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.pb_verion)
 }
 inline void GatingSet::set_pb_verion(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000004u;
   pb_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.pb_verion)
 }
 inline void GatingSet::set_pb_verion(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000004u;
   pb_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.pb_verion)
 }
 inline std::string* GatingSet::_internal_mutable_pb_verion() {
-  
+  _has_bits_[0] |= 0x00000004u;
   return pb_verion_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* GatingSet::release_pb_verion() {
   // @@protoc_insertion_point(field_release:pb.GatingSet.pb_verion)
-  return pb_verion_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_pb_verion()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000004u;
+  return pb_verion_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void GatingSet::set_allocated_pb_verion(std::string* pb_verion) {
   if (pb_verion != nullptr) {
-    
+    _has_bits_[0] |= 0x00000004u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000004u;
   }
   pb_verion_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), pb_verion,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:pb.GatingSet.pb_verion)
 }
 
-// string h5_verion = 9;
+// optional string h5_verion = 9;
+inline bool GatingSet::_internal_has_h5_verion() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool GatingSet::has_h5_verion() const {
+  return _internal_has_h5_verion();
+}
 inline void GatingSet::clear_h5_verion() {
   h5_verion_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline const std::string& GatingSet::h5_verion() const {
   // @@protoc_insertion_point(field_get:pb.GatingSet.h5_verion)
@@ -12439,42 +13783,46 @@ inline const std::string& GatingSet::_internal_h5_verion() const {
   return h5_verion_.Get();
 }
 inline void GatingSet::_internal_set_h5_verion(const std::string& value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   h5_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_h5_verion(std::string&& value) {
-  
+  _has_bits_[0] |= 0x00000008u;
   h5_verion_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.h5_verion)
 }
 inline void GatingSet::set_h5_verion(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
+  _has_bits_[0] |= 0x00000008u;
   h5_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.h5_verion)
 }
 inline void GatingSet::set_h5_verion(const char* value,
     size_t size) {
-  
+  _has_bits_[0] |= 0x00000008u;
   h5_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.h5_verion)
 }
 inline std::string* GatingSet::_internal_mutable_h5_verion() {
-  
+  _has_bits_[0] |= 0x00000008u;
   return h5_verion_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* GatingSet::release_h5_verion() {
   // @@protoc_insertion_point(field_release:pb.GatingSet.h5_verion)
-  return h5_verion_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  if (!_internal_has_h5_verion()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000008u;
+  return h5_verion_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void GatingSet::set_allocated_h5_verion(std::string* h5_verion) {
   if (h5_verion != nullptr) {
-    
+    _has_bits_[0] |= 0x00000008u;
   } else {
-    
+    _has_bits_[0] &= ~0x00000008u;
   }
   h5_verion_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), h5_verion,
       GetArena());
