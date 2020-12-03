@@ -27,10 +27,12 @@
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/inlined_string_field.h>
 #include <google/protobuf/metadata_lite.h>
-#include <google/protobuf/message_lite.h>
+#include <google/protobuf/generated_message_reflection.h>
+#include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/generated_enum_util.h>
+#include <google/protobuf/generated_enum_reflection.h>
+#include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_GatingSet_2eproto
@@ -52,6 +54,7 @@ struct TableStruct_GatingSet_2eproto {
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
+extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_GatingSet_2eproto;
 namespace pb {
 class BOOL_GATE_OP;
 class BOOL_GATE_OPDefaultTypeInternal;
@@ -203,16 +206,20 @@ constexpr QUADRANT QUADRANT_MIN = Q1;
 constexpr QUADRANT QUADRANT_MAX = Q4;
 constexpr int QUADRANT_ARRAYSIZE = QUADRANT_MAX + 1;
 
-const std::string& QUADRANT_Name(QUADRANT value);
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* QUADRANT_descriptor();
 template<typename T>
 inline const std::string& QUADRANT_Name(T enum_t_value) {
   static_assert(::std::is_same<T, QUADRANT>::value ||
     ::std::is_integral<T>::value,
     "Incorrect type passed to function QUADRANT_Name.");
-  return QUADRANT_Name(static_cast<QUADRANT>(enum_t_value));
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    QUADRANT_descriptor(), enum_t_value);
 }
-bool QUADRANT_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, QUADRANT* value);
+inline bool QUADRANT_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, QUADRANT* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<QUADRANT>(
+    QUADRANT_descriptor(), name, value);
+}
 enum GATE_TYPE : int {
   POLYGON_GATE = 0,
   RANGE_GATE = 1,
@@ -231,16 +238,20 @@ constexpr GATE_TYPE GATE_TYPE_MIN = POLYGON_GATE;
 constexpr GATE_TYPE GATE_TYPE_MAX = QUAD_GATE;
 constexpr int GATE_TYPE_ARRAYSIZE = GATE_TYPE_MAX + 1;
 
-const std::string& GATE_TYPE_Name(GATE_TYPE value);
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* GATE_TYPE_descriptor();
 template<typename T>
 inline const std::string& GATE_TYPE_Name(T enum_t_value) {
   static_assert(::std::is_same<T, GATE_TYPE>::value ||
     ::std::is_integral<T>::value,
     "Incorrect type passed to function GATE_TYPE_Name.");
-  return GATE_TYPE_Name(static_cast<GATE_TYPE>(enum_t_value));
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    GATE_TYPE_descriptor(), enum_t_value);
 }
-bool GATE_TYPE_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, GATE_TYPE* value);
+inline bool GATE_TYPE_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, GATE_TYPE* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<GATE_TYPE>(
+    GATE_TYPE_descriptor(), name, value);
+}
 enum ind_type : int {
   BOOL = 0,
   INT = 1,
@@ -253,16 +264,20 @@ constexpr ind_type ind_type_MIN = BOOL;
 constexpr ind_type ind_type_MAX = ROOT;
 constexpr int ind_type_ARRAYSIZE = ind_type_MAX + 1;
 
-const std::string& ind_type_Name(ind_type value);
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ind_type_descriptor();
 template<typename T>
 inline const std::string& ind_type_Name(T enum_t_value) {
   static_assert(::std::is_same<T, ind_type>::value ||
     ::std::is_integral<T>::value,
     "Incorrect type passed to function ind_type_Name.");
-  return ind_type_Name(static_cast<ind_type>(enum_t_value));
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    ind_type_descriptor(), enum_t_value);
 }
-bool ind_type_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ind_type* value);
+inline bool ind_type_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ind_type* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ind_type>(
+    ind_type_descriptor(), name, value);
+}
 enum TRANS_TYPE : int {
   PB_CALTBL = 0,
   PB_LOG = 1,
@@ -281,20 +296,24 @@ constexpr TRANS_TYPE TRANS_TYPE_MIN = PB_CALTBL;
 constexpr TRANS_TYPE TRANS_TYPE_MAX = PB_SCALE;
 constexpr int TRANS_TYPE_ARRAYSIZE = TRANS_TYPE_MAX + 1;
 
-const std::string& TRANS_TYPE_Name(TRANS_TYPE value);
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* TRANS_TYPE_descriptor();
 template<typename T>
 inline const std::string& TRANS_TYPE_Name(T enum_t_value) {
   static_assert(::std::is_same<T, TRANS_TYPE>::value ||
     ::std::is_integral<T>::value,
     "Incorrect type passed to function TRANS_TYPE_Name.");
-  return TRANS_TYPE_Name(static_cast<TRANS_TYPE>(enum_t_value));
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    TRANS_TYPE_descriptor(), enum_t_value);
 }
-bool TRANS_TYPE_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, TRANS_TYPE* value);
+inline bool TRANS_TYPE_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, TRANS_TYPE* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<TRANS_TYPE>(
+    TRANS_TYPE_descriptor(), name, value);
+}
 // ===================================================================
 
 class paramRange PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.paramRange) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.paramRange) */ {
  public:
   inline paramRange() : paramRange(nullptr) {}
   virtual ~paramRange();
@@ -318,6 +337,15 @@ class paramRange PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const paramRange& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -354,8 +382,8 @@ class paramRange PROTOBUF_FINAL :
   paramRange* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<paramRange>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const paramRange& from);
   void MergeFrom(const paramRange& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -365,13 +393,12 @@ class paramRange PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(paramRange* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -384,7 +411,14 @@ class paramRange PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -445,7 +479,7 @@ class paramRange PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class rangeGate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.rangeGate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.rangeGate) */ {
  public:
   inline rangeGate() : rangeGate(nullptr) {}
   virtual ~rangeGate();
@@ -469,6 +503,15 @@ class rangeGate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const rangeGate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -505,8 +548,8 @@ class rangeGate PROTOBUF_FINAL :
   rangeGate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<rangeGate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const rangeGate& from);
   void MergeFrom(const rangeGate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -516,13 +559,12 @@ class rangeGate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(rangeGate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -535,7 +577,14 @@ class rangeGate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -576,7 +625,7 @@ class rangeGate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class paramPoly PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.paramPoly) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.paramPoly) */ {
  public:
   inline paramPoly() : paramPoly(nullptr) {}
   virtual ~paramPoly();
@@ -600,6 +649,15 @@ class paramPoly PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const paramPoly& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -636,8 +694,8 @@ class paramPoly PROTOBUF_FINAL :
   paramPoly* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<paramPoly>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const paramPoly& from);
   void MergeFrom(const paramPoly& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -647,13 +705,12 @@ class paramPoly PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(paramPoly* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -666,7 +723,14 @@ class paramPoly PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -733,7 +797,7 @@ class paramPoly PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class polygonGate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.polygonGate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.polygonGate) */ {
  public:
   inline polygonGate() : polygonGate(nullptr) {}
   virtual ~polygonGate();
@@ -757,6 +821,15 @@ class polygonGate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const polygonGate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -793,8 +866,8 @@ class polygonGate PROTOBUF_FINAL :
   polygonGate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<polygonGate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const polygonGate& from);
   void MergeFrom(const polygonGate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -804,13 +877,12 @@ class polygonGate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(polygonGate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -823,7 +895,14 @@ class polygonGate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -884,7 +963,7 @@ class polygonGate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class coordinate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.coordinate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.coordinate) */ {
  public:
   inline coordinate() : coordinate(nullptr) {}
   virtual ~coordinate();
@@ -908,6 +987,15 @@ class coordinate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const coordinate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -944,8 +1032,8 @@ class coordinate PROTOBUF_FINAL :
   coordinate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<coordinate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const coordinate& from);
   void MergeFrom(const coordinate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -955,13 +1043,12 @@ class coordinate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(coordinate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -974,7 +1061,14 @@ class coordinate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -1017,7 +1111,7 @@ class coordinate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class ellipseGate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.ellipseGate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.ellipseGate) */ {
  public:
   inline ellipseGate() : ellipseGate(nullptr) {}
   virtual ~ellipseGate();
@@ -1041,6 +1135,15 @@ class ellipseGate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const ellipseGate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1077,8 +1180,8 @@ class ellipseGate PROTOBUF_FINAL :
   ellipseGate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<ellipseGate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const ellipseGate& from);
   void MergeFrom(const ellipseGate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -1088,13 +1191,12 @@ class ellipseGate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(ellipseGate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -1107,7 +1209,14 @@ class ellipseGate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -1199,7 +1308,7 @@ class ellipseGate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class BOOL_GATE_OP PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.BOOL_GATE_OP) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.BOOL_GATE_OP) */ {
  public:
   inline BOOL_GATE_OP() : BOOL_GATE_OP(nullptr) {}
   virtual ~BOOL_GATE_OP();
@@ -1223,6 +1332,15 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const BOOL_GATE_OP& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1259,8 +1377,8 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
   BOOL_GATE_OP* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<BOOL_GATE_OP>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const BOOL_GATE_OP& from);
   void MergeFrom(const BOOL_GATE_OP& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -1270,13 +1388,12 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(BOOL_GATE_OP* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -1289,7 +1406,14 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -1358,7 +1482,7 @@ class BOOL_GATE_OP PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class boolGate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.boolGate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.boolGate) */ {
  public:
   inline boolGate() : boolGate(nullptr) {}
   virtual ~boolGate();
@@ -1382,6 +1506,15 @@ class boolGate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const boolGate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1418,8 +1551,8 @@ class boolGate PROTOBUF_FINAL :
   boolGate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<boolGate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const boolGate& from);
   void MergeFrom(const boolGate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -1429,13 +1562,12 @@ class boolGate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(boolGate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -1448,7 +1580,14 @@ class boolGate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -1489,7 +1628,7 @@ class boolGate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class clusterGate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.clusterGate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.clusterGate) */ {
  public:
   inline clusterGate() : clusterGate(nullptr) {}
   virtual ~clusterGate();
@@ -1513,6 +1652,15 @@ class clusterGate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const clusterGate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1549,8 +1697,8 @@ class clusterGate PROTOBUF_FINAL :
   clusterGate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<clusterGate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const clusterGate& from);
   void MergeFrom(const clusterGate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -1560,13 +1708,12 @@ class clusterGate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(clusterGate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -1579,7 +1726,14 @@ class clusterGate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -1618,7 +1772,7 @@ class clusterGate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class quadGate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.quadGate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.quadGate) */ {
  public:
   inline quadGate() : quadGate(nullptr) {}
   virtual ~quadGate();
@@ -1642,6 +1796,15 @@ class quadGate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const quadGate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1678,8 +1841,8 @@ class quadGate PROTOBUF_FINAL :
   quadGate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<quadGate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const quadGate& from);
   void MergeFrom(const quadGate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -1689,13 +1852,12 @@ class quadGate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(quadGate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -1708,7 +1870,14 @@ class quadGate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -1758,7 +1927,7 @@ class quadGate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class gate PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.gate) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.gate) */ {
  public:
   inline gate() : gate(nullptr) {}
   virtual ~gate();
@@ -1782,6 +1951,15 @@ class gate PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const gate& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1818,8 +1996,8 @@ class gate PROTOBUF_FINAL :
   gate* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<gate>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const gate& from);
   void MergeFrom(const gate& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -1829,13 +2007,12 @@ class gate PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(gate* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -1848,7 +2025,14 @@ class gate PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -2013,7 +2197,7 @@ class gate PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class POPSTATS PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.POPSTATS) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.POPSTATS) */ {
  public:
   inline POPSTATS() : POPSTATS(nullptr) {}
   virtual ~POPSTATS();
@@ -2037,6 +2221,15 @@ class POPSTATS PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const POPSTATS& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -2073,8 +2266,8 @@ class POPSTATS PROTOBUF_FINAL :
   POPSTATS* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<POPSTATS>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const POPSTATS& from);
   void MergeFrom(const POPSTATS& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -2084,13 +2277,12 @@ class POPSTATS PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(POPSTATS* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -2103,7 +2295,14 @@ class POPSTATS PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -2153,7 +2352,7 @@ class POPSTATS PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class calibrationTable PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.calibrationTable) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.calibrationTable) */ {
  public:
   inline calibrationTable() : calibrationTable(nullptr) {}
   virtual ~calibrationTable();
@@ -2177,6 +2376,15 @@ class calibrationTable PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const calibrationTable& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -2213,8 +2421,8 @@ class calibrationTable PROTOBUF_FINAL :
   calibrationTable* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<calibrationTable>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const calibrationTable& from);
   void MergeFrom(const calibrationTable& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -2224,13 +2432,12 @@ class calibrationTable PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(calibrationTable* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -2243,7 +2450,14 @@ class calibrationTable PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -2429,7 +2643,7 @@ class calibrationTable PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class biexpTrans PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.biexpTrans) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.biexpTrans) */ {
  public:
   inline biexpTrans() : biexpTrans(nullptr) {}
   virtual ~biexpTrans();
@@ -2453,6 +2667,15 @@ class biexpTrans PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const biexpTrans& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -2489,8 +2712,8 @@ class biexpTrans PROTOBUF_FINAL :
   biexpTrans* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<biexpTrans>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const biexpTrans& from);
   void MergeFrom(const biexpTrans& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -2500,13 +2723,12 @@ class biexpTrans PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(biexpTrans* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -2519,7 +2741,14 @@ class biexpTrans PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -2595,7 +2824,7 @@ class biexpTrans PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class fasinhTrans PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.fasinhTrans) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.fasinhTrans) */ {
  public:
   inline fasinhTrans() : fasinhTrans(nullptr) {}
   virtual ~fasinhTrans();
@@ -2619,6 +2848,15 @@ class fasinhTrans PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const fasinhTrans& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -2655,8 +2893,8 @@ class fasinhTrans PROTOBUF_FINAL :
   fasinhTrans* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<fasinhTrans>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const fasinhTrans& from);
   void MergeFrom(const fasinhTrans& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -2666,13 +2904,12 @@ class fasinhTrans PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(fasinhTrans* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -2685,7 +2922,14 @@ class fasinhTrans PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -2761,7 +3005,7 @@ class fasinhTrans PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class scaleTrans PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.scaleTrans) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.scaleTrans) */ {
  public:
   inline scaleTrans() : scaleTrans(nullptr) {}
   virtual ~scaleTrans();
@@ -2785,6 +3029,15 @@ class scaleTrans PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const scaleTrans& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -2821,8 +3074,8 @@ class scaleTrans PROTOBUF_FINAL :
   scaleTrans* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<scaleTrans>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const scaleTrans& from);
   void MergeFrom(const scaleTrans& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -2832,13 +3085,12 @@ class scaleTrans PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(scaleTrans* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -2851,7 +3103,14 @@ class scaleTrans PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -2905,7 +3164,7 @@ class scaleTrans PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class flinTrans PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.flinTrans) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.flinTrans) */ {
  public:
   inline flinTrans() : flinTrans(nullptr) {}
   virtual ~flinTrans();
@@ -2929,6 +3188,15 @@ class flinTrans PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const flinTrans& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -2965,8 +3233,8 @@ class flinTrans PROTOBUF_FINAL :
   flinTrans* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<flinTrans>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const flinTrans& from);
   void MergeFrom(const flinTrans& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -2976,13 +3244,12 @@ class flinTrans PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(flinTrans* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -2995,7 +3262,14 @@ class flinTrans PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -3038,7 +3312,7 @@ class flinTrans PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class logTrans PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.logTrans) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.logTrans) */ {
  public:
   inline logTrans() : logTrans(nullptr) {}
   virtual ~logTrans();
@@ -3062,6 +3336,15 @@ class logTrans PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const logTrans& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -3098,8 +3381,8 @@ class logTrans PROTOBUF_FINAL :
   logTrans* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<logTrans>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const logTrans& from);
   void MergeFrom(const logTrans& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -3109,13 +3392,12 @@ class logTrans PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(logTrans* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -3128,7 +3410,14 @@ class logTrans PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -3193,7 +3482,7 @@ class logTrans PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class logGML2Trans PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.logGML2Trans) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.logGML2Trans) */ {
  public:
   inline logGML2Trans() : logGML2Trans(nullptr) {}
   virtual ~logGML2Trans();
@@ -3217,6 +3506,15 @@ class logGML2Trans PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const logGML2Trans& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -3253,8 +3551,8 @@ class logGML2Trans PROTOBUF_FINAL :
   logGML2Trans* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<logGML2Trans>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const logGML2Trans& from);
   void MergeFrom(const logGML2Trans& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -3264,13 +3562,12 @@ class logGML2Trans PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(logGML2Trans* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -3283,7 +3580,14 @@ class logGML2Trans PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -3326,7 +3630,7 @@ class logGML2Trans PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class logicleTrans PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.logicleTrans) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.logicleTrans) */ {
  public:
   inline logicleTrans() : logicleTrans(nullptr) {}
   virtual ~logicleTrans();
@@ -3350,6 +3654,15 @@ class logicleTrans PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const logicleTrans& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -3386,8 +3699,8 @@ class logicleTrans PROTOBUF_FINAL :
   logicleTrans* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<logicleTrans>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const logicleTrans& from);
   void MergeFrom(const logicleTrans& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -3397,13 +3710,12 @@ class logicleTrans PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(logicleTrans* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -3416,7 +3728,14 @@ class logicleTrans PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -3514,7 +3833,7 @@ class logicleTrans PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class transformation PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.transformation) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.transformation) */ {
  public:
   inline transformation() : transformation(nullptr) {}
   virtual ~transformation();
@@ -3538,6 +3857,15 @@ class transformation PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const transformation& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -3574,8 +3902,8 @@ class transformation PROTOBUF_FINAL :
   transformation* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<transformation>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const transformation& from);
   void MergeFrom(const transformation& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -3585,13 +3913,12 @@ class transformation PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(transformation* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -3604,7 +3931,14 @@ class transformation PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -3865,7 +4199,7 @@ class transformation PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class trans_pair PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.trans_pair) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.trans_pair) */ {
  public:
   inline trans_pair() : trans_pair(nullptr) {}
   virtual ~trans_pair();
@@ -3889,6 +4223,15 @@ class trans_pair PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const trans_pair& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -3925,8 +4268,8 @@ class trans_pair PROTOBUF_FINAL :
   trans_pair* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<trans_pair>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const trans_pair& from);
   void MergeFrom(const trans_pair& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -3936,13 +4279,12 @@ class trans_pair PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(trans_pair* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -3955,7 +4297,14 @@ class trans_pair PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -4025,7 +4374,7 @@ class trans_pair PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class trans_local PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.trans_local) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.trans_local) */ {
  public:
   inline trans_local() : trans_local(nullptr) {}
   virtual ~trans_local();
@@ -4049,6 +4398,15 @@ class trans_local PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const trans_local& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -4085,8 +4443,8 @@ class trans_local PROTOBUF_FINAL :
   trans_local* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<trans_local>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const trans_local& from);
   void MergeFrom(const trans_local& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -4096,13 +4454,12 @@ class trans_local PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(trans_local* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -4115,7 +4472,14 @@ class trans_local PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -4199,7 +4563,7 @@ class trans_local PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class POPINDICES PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.POPINDICES) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.POPINDICES) */ {
  public:
   inline POPINDICES() : POPINDICES(nullptr) {}
   virtual ~POPINDICES();
@@ -4223,6 +4587,15 @@ class POPINDICES PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const POPINDICES& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -4259,8 +4632,8 @@ class POPINDICES PROTOBUF_FINAL :
   POPINDICES* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<POPINDICES>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const POPINDICES& from);
   void MergeFrom(const POPINDICES& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -4270,13 +4643,12 @@ class POPINDICES PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(POPINDICES* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -4289,7 +4661,14 @@ class POPINDICES PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -4375,7 +4754,7 @@ class POPINDICES PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class nodeProperties PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.nodeProperties) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.nodeProperties) */ {
  public:
   inline nodeProperties() : nodeProperties(nullptr) {}
   virtual ~nodeProperties();
@@ -4399,6 +4778,15 @@ class nodeProperties PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const nodeProperties& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -4435,8 +4823,8 @@ class nodeProperties PROTOBUF_FINAL :
   nodeProperties* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<nodeProperties>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const nodeProperties& from);
   void MergeFrom(const nodeProperties& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -4446,13 +4834,12 @@ class nodeProperties PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(nodeProperties* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -4465,7 +4852,14 @@ class nodeProperties PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -4595,7 +4989,7 @@ class nodeProperties PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class treeNodes PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.treeNodes) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.treeNodes) */ {
  public:
   inline treeNodes() : treeNodes(nullptr) {}
   virtual ~treeNodes();
@@ -4619,6 +5013,15 @@ class treeNodes PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const treeNodes& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -4655,8 +5058,8 @@ class treeNodes PROTOBUF_FINAL :
   treeNodes* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<treeNodes>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const treeNodes& from);
   void MergeFrom(const treeNodes& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -4666,13 +5069,12 @@ class treeNodes PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(treeNodes* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -4685,7 +5087,14 @@ class treeNodes PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -4737,7 +5146,7 @@ class treeNodes PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class populationTree PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.populationTree) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.populationTree) */ {
  public:
   inline populationTree() : populationTree(nullptr) {}
   virtual ~populationTree();
@@ -4761,6 +5170,15 @@ class populationTree PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const populationTree& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -4797,8 +5215,8 @@ class populationTree PROTOBUF_FINAL :
   populationTree* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<populationTree>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const populationTree& from);
   void MergeFrom(const populationTree& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -4808,13 +5226,12 @@ class populationTree PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(populationTree* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -4827,7 +5244,14 @@ class populationTree PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -4868,7 +5292,7 @@ class populationTree PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class COMP PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.COMP) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.COMP) */ {
  public:
   inline COMP() : COMP(nullptr) {}
   virtual ~COMP();
@@ -4892,6 +5316,15 @@ class COMP PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const COMP& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -4928,8 +5361,8 @@ class COMP PROTOBUF_FINAL :
   COMP* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<COMP>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const COMP& from);
   void MergeFrom(const COMP& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -4939,13 +5372,12 @@ class COMP PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(COMP* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -4958,7 +5390,14 @@ class COMP PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -5120,7 +5559,7 @@ class COMP PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class PARAM PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.PARAM) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.PARAM) */ {
  public:
   inline PARAM() : PARAM(nullptr) {}
   virtual ~PARAM();
@@ -5144,6 +5583,15 @@ class PARAM PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const PARAM& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -5180,8 +5628,8 @@ class PARAM PROTOBUF_FINAL :
   PARAM* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<PARAM>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const PARAM& from);
   void MergeFrom(const PARAM& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -5191,13 +5639,12 @@ class PARAM PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(PARAM* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -5210,7 +5657,14 @@ class PARAM PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -5293,7 +5747,7 @@ class PARAM PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class GatingHierarchy PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.GatingHierarchy) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.GatingHierarchy) */ {
  public:
   inline GatingHierarchy() : GatingHierarchy(nullptr) {}
   virtual ~GatingHierarchy();
@@ -5317,6 +5771,15 @@ class GatingHierarchy PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const GatingHierarchy& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -5353,8 +5816,8 @@ class GatingHierarchy PROTOBUF_FINAL :
   GatingHierarchy* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<GatingHierarchy>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const GatingHierarchy& from);
   void MergeFrom(const GatingHierarchy& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -5364,13 +5827,12 @@ class GatingHierarchy PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(GatingHierarchy* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -5383,7 +5845,14 @@ class GatingHierarchy PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -5515,7 +5984,7 @@ class GatingHierarchy PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class CytoFrame PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.CytoFrame) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.CytoFrame) */ {
  public:
   inline CytoFrame() : CytoFrame(nullptr) {}
   virtual ~CytoFrame();
@@ -5539,6 +6008,15 @@ class CytoFrame PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const CytoFrame& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -5575,8 +6053,8 @@ class CytoFrame PROTOBUF_FINAL :
   CytoFrame* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<CytoFrame>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const CytoFrame& from);
   void MergeFrom(const CytoFrame& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -5586,13 +6064,12 @@ class CytoFrame PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(CytoFrame* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -5605,7 +6082,14 @@ class CytoFrame PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -5637,7 +6121,7 @@ class CytoFrame PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class TRANS_TBL PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.TRANS_TBL) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.TRANS_TBL) */ {
  public:
   inline TRANS_TBL() : TRANS_TBL(nullptr) {}
   virtual ~TRANS_TBL();
@@ -5661,6 +6145,15 @@ class TRANS_TBL PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const TRANS_TBL& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -5697,8 +6190,8 @@ class TRANS_TBL PROTOBUF_FINAL :
   TRANS_TBL* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<TRANS_TBL>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const TRANS_TBL& from);
   void MergeFrom(const TRANS_TBL& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -5708,13 +6201,12 @@ class TRANS_TBL PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(TRANS_TBL* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -5727,7 +6219,14 @@ class TRANS_TBL PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -5779,7 +6278,7 @@ class TRANS_TBL PROTOBUF_FINAL :
 // -------------------------------------------------------------------
 
 class GatingSet PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::MessageLite /* @@protoc_insertion_point(class_definition:pb.GatingSet) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:pb.GatingSet) */ {
  public:
   inline GatingSet() : GatingSet(nullptr) {}
   virtual ~GatingSet();
@@ -5803,6 +6302,15 @@ class GatingSet PROTOBUF_FINAL :
     return *this;
   }
 
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
   static const GatingSet& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -5839,8 +6347,8 @@ class GatingSet PROTOBUF_FINAL :
   GatingSet* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
     return CreateMaybeMessage<GatingSet>(arena);
   }
-  void CheckTypeAndMergeFrom(const ::PROTOBUF_NAMESPACE_ID::MessageLite& from)
-    final;
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void CopyFrom(const GatingSet& from);
   void MergeFrom(const GatingSet& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
@@ -5850,13 +6358,12 @@ class GatingSet PROTOBUF_FINAL :
   const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
       ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  void DiscardUnknownFields();
   int GetCachedSize() const final { return _cached_size_.Get(); }
 
   private:
   inline void SharedCtor();
   inline void SharedDtor();
-  void SetCachedSize(int size) const;
+  void SetCachedSize(int size) const final;
   void InternalSwap(GatingSet* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
@@ -5869,7 +6376,14 @@ class GatingSet PROTOBUF_FINAL :
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   public:
 
-  std::string GetTypeName() const final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_GatingSet_2eproto);
+    return ::descriptor_table_GatingSet_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
 
   // nested types ----------------------------------------------------
 
@@ -6079,25 +6593,25 @@ inline const std::string& paramRange::_internal_name() const {
 }
 inline void paramRange::_internal_set_name(const std::string& value) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void paramRange::set_name(std::string&& value) {
   
-  name_.SetLite(
+  name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.paramRange.name)
 }
 inline void paramRange::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.paramRange.name)
 }
 inline void paramRange::set_name(const char* value,
     size_t size) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.paramRange.name)
 }
@@ -6949,25 +7463,25 @@ inline const std::string& clusterGate::_internal_cluster_method() const {
 }
 inline void clusterGate::_internal_set_cluster_method(const std::string& value) {
   
-  cluster_method_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  cluster_method_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void clusterGate::set_cluster_method(std::string&& value) {
   
-  cluster_method_.SetLite(
+  cluster_method_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.clusterGate.cluster_method)
 }
 inline void clusterGate::set_cluster_method(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  cluster_method_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  cluster_method_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.clusterGate.cluster_method)
 }
 inline void clusterGate::set_cluster_method(const char* value,
     size_t size) {
   
-  cluster_method_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  cluster_method_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.clusterGate.cluster_method)
 }
@@ -7015,25 +7529,25 @@ inline const std::string& quadGate::_internal_uid() const {
 }
 inline void quadGate::_internal_set_uid(const std::string& value) {
   
-  uid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  uid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void quadGate::set_uid(std::string&& value) {
   
-  uid_.SetLite(
+  uid_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.quadGate.uid)
 }
 inline void quadGate::set_uid(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  uid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  uid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.quadGate.uid)
 }
 inline void quadGate::set_uid(const char* value,
     size_t size) {
   
-  uid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  uid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.quadGate.uid)
 }
@@ -7600,25 +8114,25 @@ inline const std::string& POPSTATS::_internal_stattype() const {
 }
 inline void POPSTATS::_internal_set_stattype(const std::string& value) {
   
-  stattype_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  stattype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void POPSTATS::set_stattype(std::string&& value) {
   
-  stattype_.SetLite(
+  stattype_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.POPSTATS.statType)
 }
 inline void POPSTATS::set_stattype(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  stattype_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  stattype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.POPSTATS.statType)
 }
 inline void POPSTATS::set_stattype(const char* value,
     size_t size) {
   
-  stattype_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  stattype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.POPSTATS.statType)
 }
@@ -7941,25 +8455,25 @@ inline const std::string& calibrationTable::_internal_caltype() const {
 }
 inline void calibrationTable::_internal_set_caltype(const std::string& value) {
   
-  caltype_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  caltype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void calibrationTable::set_caltype(std::string&& value) {
   
-  caltype_.SetLite(
+  caltype_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.calibrationTable.caltype)
 }
 inline void calibrationTable::set_caltype(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  caltype_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  caltype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.calibrationTable.caltype)
 }
 inline void calibrationTable::set_caltype(const char* value,
     size_t size) {
   
-  caltype_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  caltype_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.calibrationTable.caltype)
 }
@@ -8718,25 +9232,25 @@ inline const std::string& transformation::_internal_name() const {
 }
 inline void transformation::_internal_set_name(const std::string& value) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void transformation::set_name(std::string&& value) {
   
-  name_.SetLite(
+  name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.transformation.name)
 }
 inline void transformation::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.transformation.name)
 }
 inline void transformation::set_name(const char* value,
     size_t size) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.transformation.name)
 }
@@ -8780,25 +9294,25 @@ inline const std::string& transformation::_internal_channel() const {
 }
 inline void transformation::_internal_set_channel(const std::string& value) {
   
-  channel_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  channel_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void transformation::set_channel(std::string&& value) {
   
-  channel_.SetLite(
+  channel_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.transformation.channel)
 }
 inline void transformation::set_channel(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  channel_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  channel_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.transformation.channel)
 }
 inline void transformation::set_channel(const char* value,
     size_t size) {
   
-  channel_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  channel_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.transformation.channel)
 }
@@ -9487,25 +10001,25 @@ inline const std::string& trans_pair::_internal_name() const {
 }
 inline void trans_pair::_internal_set_name(const std::string& value) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void trans_pair::set_name(std::string&& value) {
   
-  name_.SetLite(
+  name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.trans_pair.name)
 }
 inline void trans_pair::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.trans_pair.name)
 }
 inline void trans_pair::set_name(const char* value,
     size_t size) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.trans_pair.name)
 }
@@ -9695,25 +10209,25 @@ inline const std::string& trans_local::_internal_groupname() const {
 }
 inline void trans_local::_internal_set_groupname(const std::string& value) {
   
-  groupname_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  groupname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void trans_local::set_groupname(std::string&& value) {
   
-  groupname_.SetLite(
+  groupname_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.trans_local.groupName)
 }
 inline void trans_local::set_groupname(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  groupname_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  groupname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.trans_local.groupName)
 }
 inline void trans_local::set_groupname(const char* value,
     size_t size) {
   
-  groupname_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  groupname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.trans_local.groupName)
 }
@@ -9895,25 +10409,25 @@ inline const std::string& POPINDICES::_internal_bind() const {
 }
 inline void POPINDICES::_internal_set_bind(const std::string& value) {
   
-  bind_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  bind_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void POPINDICES::set_bind(std::string&& value) {
   
-  bind_.SetLite(
+  bind_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.POPINDICES.bInd)
 }
 inline void POPINDICES::set_bind(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  bind_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  bind_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.POPINDICES.bInd)
 }
 inline void POPINDICES::set_bind(const void* value,
     size_t size) {
   
-  bind_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  bind_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.POPINDICES.bInd)
 }
@@ -9961,25 +10475,25 @@ inline const std::string& nodeProperties::_internal_thisname() const {
 }
 inline void nodeProperties::_internal_set_thisname(const std::string& value) {
   
-  thisname_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  thisname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void nodeProperties::set_thisname(std::string&& value) {
   
-  thisname_.SetLite(
+  thisname_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.nodeProperties.thisName)
 }
 inline void nodeProperties::set_thisname(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  thisname_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  thisname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.nodeProperties.thisName)
 }
 inline void nodeProperties::set_thisname(const char* value,
     size_t size) {
   
-  thisname_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  thisname_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.nodeProperties.thisName)
 }
@@ -10441,25 +10955,25 @@ inline const std::string& COMP::_internal_cid() const {
 }
 inline void COMP::_internal_set_cid(const std::string& value) {
   
-  cid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  cid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_cid(std::string&& value) {
   
-  cid_.SetLite(
+  cid_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.cid)
 }
 inline void COMP::set_cid(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  cid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  cid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.cid)
 }
 inline void COMP::set_cid(const char* value,
     size_t size) {
   
-  cid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  cid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.cid)
 }
@@ -10503,25 +11017,25 @@ inline const std::string& COMP::_internal_prefix() const {
 }
 inline void COMP::_internal_set_prefix(const std::string& value) {
   
-  prefix_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  prefix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_prefix(std::string&& value) {
   
-  prefix_.SetLite(
+  prefix_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.prefix)
 }
 inline void COMP::set_prefix(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  prefix_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  prefix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.prefix)
 }
 inline void COMP::set_prefix(const char* value,
     size_t size) {
   
-  prefix_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  prefix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.prefix)
 }
@@ -10565,25 +11079,25 @@ inline const std::string& COMP::_internal_suffix() const {
 }
 inline void COMP::_internal_set_suffix(const std::string& value) {
   
-  suffix_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  suffix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_suffix(std::string&& value) {
   
-  suffix_.SetLite(
+  suffix_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.suffix)
 }
 inline void COMP::set_suffix(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  suffix_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  suffix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.suffix)
 }
 inline void COMP::set_suffix(const char* value,
     size_t size) {
   
-  suffix_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  suffix_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.suffix)
 }
@@ -10627,25 +11141,25 @@ inline const std::string& COMP::_internal_name() const {
 }
 inline void COMP::_internal_set_name(const std::string& value) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_name(std::string&& value) {
   
-  name_.SetLite(
+  name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.name)
 }
 inline void COMP::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.name)
 }
 inline void COMP::set_name(const char* value,
     size_t size) {
   
-  name_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.name)
 }
@@ -10689,25 +11203,25 @@ inline const std::string& COMP::_internal_comment() const {
 }
 inline void COMP::_internal_set_comment(const std::string& value) {
   
-  comment_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  comment_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void COMP::set_comment(std::string&& value) {
   
-  comment_.SetLite(
+  comment_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.COMP.comment)
 }
 inline void COMP::set_comment(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  comment_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  comment_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.COMP.comment)
 }
 inline void COMP::set_comment(const char* value,
     size_t size) {
   
-  comment_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  comment_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.COMP.comment)
 }
@@ -10876,25 +11390,25 @@ inline const std::string& PARAM::_internal_param() const {
 }
 inline void PARAM::_internal_set_param(const std::string& value) {
   
-  param_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  param_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void PARAM::set_param(std::string&& value) {
   
-  param_.SetLite(
+  param_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.PARAM.param)
 }
 inline void PARAM::set_param(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  param_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  param_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.PARAM.param)
 }
 inline void PARAM::set_param(const char* value,
     size_t size) {
   
-  param_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  param_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.PARAM.param)
 }
@@ -11740,25 +12254,25 @@ inline const std::string& GatingSet::_internal_guid() const {
 }
 inline void GatingSet::_internal_set_guid(const std::string& value) {
   
-  guid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  guid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_guid(std::string&& value) {
   
-  guid_.SetLite(
+  guid_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.guid)
 }
 inline void GatingSet::set_guid(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  guid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  guid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.guid)
 }
 inline void GatingSet::set_guid(const char* value,
     size_t size) {
   
-  guid_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  guid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.guid)
 }
@@ -11802,25 +12316,25 @@ inline const std::string& GatingSet::_internal_cytolib_verion() const {
 }
 inline void GatingSet::_internal_set_cytolib_verion(const std::string& value) {
   
-  cytolib_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  cytolib_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_cytolib_verion(std::string&& value) {
   
-  cytolib_verion_.SetLite(
+  cytolib_verion_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.cytolib_verion)
 }
 inline void GatingSet::set_cytolib_verion(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  cytolib_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  cytolib_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.cytolib_verion)
 }
 inline void GatingSet::set_cytolib_verion(const char* value,
     size_t size) {
   
-  cytolib_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  cytolib_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.cytolib_verion)
 }
@@ -11864,25 +12378,25 @@ inline const std::string& GatingSet::_internal_pb_verion() const {
 }
 inline void GatingSet::_internal_set_pb_verion(const std::string& value) {
   
-  pb_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  pb_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_pb_verion(std::string&& value) {
   
-  pb_verion_.SetLite(
+  pb_verion_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.pb_verion)
 }
 inline void GatingSet::set_pb_verion(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  pb_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  pb_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.pb_verion)
 }
 inline void GatingSet::set_pb_verion(const char* value,
     size_t size) {
   
-  pb_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  pb_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.pb_verion)
 }
@@ -11926,25 +12440,25 @@ inline const std::string& GatingSet::_internal_h5_verion() const {
 }
 inline void GatingSet::_internal_set_h5_verion(const std::string& value) {
   
-  h5_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+  h5_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
 }
 inline void GatingSet::set_h5_verion(std::string&& value) {
   
-  h5_verion_.SetLite(
+  h5_verion_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
   // @@protoc_insertion_point(field_set_rvalue:pb.GatingSet.h5_verion)
 }
 inline void GatingSet::set_h5_verion(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  h5_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+  h5_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
   // @@protoc_insertion_point(field_set_char:pb.GatingSet.h5_verion)
 }
 inline void GatingSet::set_h5_verion(const char* value,
     size_t size) {
   
-  h5_verion_.SetLite(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+  h5_verion_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
   // @@protoc_insertion_point(field_set_pointer:pb.GatingSet.h5_verion)
 }
@@ -12042,9 +12556,25 @@ inline void GatingSet::set_allocated_h5_verion(std::string* h5_verion) {
 PROTOBUF_NAMESPACE_OPEN
 
 template <> struct is_proto_enum< ::pb::QUADRANT> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::pb::QUADRANT>() {
+  return ::pb::QUADRANT_descriptor();
+}
 template <> struct is_proto_enum< ::pb::GATE_TYPE> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::pb::GATE_TYPE>() {
+  return ::pb::GATE_TYPE_descriptor();
+}
 template <> struct is_proto_enum< ::pb::ind_type> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::pb::ind_type>() {
+  return ::pb::ind_type_descriptor();
+}
 template <> struct is_proto_enum< ::pb::TRANS_TYPE> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::pb::TRANS_TYPE>() {
+  return ::pb::TRANS_TYPE_descriptor();
+}
 
 PROTOBUF_NAMESPACE_CLOSE
 
