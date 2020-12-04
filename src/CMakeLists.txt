@@ -4,7 +4,7 @@
 file(GLOB SOURCES "*.cpp")
 include_directories(../inst/include)
 add_library(cytolib STATIC ${SOURCES} GatingSet.pb.cc)
-add_dependencies( cytolib h5libs pblibs)
+add_dependencies( cytolib h5libs)
 
 find_package(TileDB)
 

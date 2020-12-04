@@ -83,6 +83,7 @@ See **CytoML** package for the example of using `cytolib`.
 1. cmake
 2. g++ (>=4.9) or clang++(>= 7.0.1)
 3. libblas, liblapack, ZLIB, boost c++ library
+4. protobuf c++ library (>= 3.10)
 
 **Installation**
 
@@ -97,6 +98,9 @@ $ cd build
 
 # run cmake to configure the package for your system
 $ cmake ..
+
+# to link against the protobuf that is installed at custom location
+# e.g. `cmake -DCMAKE_PREFIX_PATH=</path/to/protobuf>`
 
 # to link against the tiledb that is installed at custom location
 # e.g. `cmake -DCMAKE_PREFIX_PATH=</path/to/TileDB>`

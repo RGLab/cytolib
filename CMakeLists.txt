@@ -13,7 +13,15 @@ project (cytolib)
     include(CheckIncludeFileCXX)
     include(CheckIncludeFiles)
     include(ExternalProject)
-    
+  
+  	find_package(Protobuf 1.33 REQUIRED)
+	
+	if(PROTOBUF_FOUND)
+#		set(LIBS ${PROTOBUF_LIBRARIES})
+		include_directories(${PROTOBUF_INCLUDE_DIRS})
+	endif()		
+	
+  	  
     file(COPY DESCRIPTION DESTINATION .)
     
     execute_process(COMMAND sed -n -e "s/^Version:[ '\\t']\\{1,\\}\\([^ '\\t']\\{1,\\}\\)[ '\\t']*$/\\1/p" DESCRIPTION 
