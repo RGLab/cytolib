@@ -711,7 +711,7 @@ namespace cytolib
 	{
 			throw(domain_error("cytolib is not built with tiledb support!"));
 		}
-	void write_tile_rownames(const string & uri,  vector<string> rn, const CytoCtx & cytoctx) const
+	void CytoFrame::write_tile_rownames(const string & uri,  vector<string> rn, const CytoCtx & cytoctx) const
 	{
 	throw(domain_error("cytolib is not built with tiledb support!"));
 	}
