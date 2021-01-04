@@ -20,34 +20,6 @@ See the included LICENSE file for details on the license granted to the user of 
 
 Otherwise, we may close your issue without responding.
 
-## Install tiledb (optional)
-When `tiledb` library is detected from the system, `cytolib` will try to build against it so that tiledb can be used as the alternative backend format. To build tiledb from source:  
-
-
-Download source
-
-```
-git clone https://github.com/TileDB-Inc/TileDB --depth=1 --branch=dev --single-branch
-cd TileDB
-mkdir build
-cd build
-```
-
-Install to the default system location (i.e. `/usr/local`)
-
-```
-../bootstrap --enable-s3
-make
-sudo make install-tiledb
-```
-
-Or install to the custom location (e.g. `/home/mypath`)
-
-```
-../bootstrap --prefix=/home/mypath --enable-s3
-make
-make install-tiledb
-```
 
 ## Installation cytolib as a R package
 The **cytolib** package can be installed from Github
@@ -55,16 +27,6 @@ The **cytolib** package can be installed from Github
 ```
     remotes::install_github("RGLab/cytolib")
 ```
-If the TileDB library is installed in a custom location,make sure its library path is added to the runtime path.i.e.
-
-
-	export LD_LIBRARY_PATH=/home/mypath/lib:$LD_LIBRARY_PATH
-
-
-and you also need to pass the explicit path:
-
-    remotes::install_github("RGLab/cytolib",
-        args="--configure-args='--with-tiledb=/home/mypath'")
 
 
 R packages wishing to use the libraries in `cytolib` need to:
@@ -101,9 +63,6 @@ $ cmake ..
 
 # to link against the protobuf that is installed at custom location
 # e.g. `cmake -DCMAKE_PREFIX_PATH=</path/to/protobuf>`
-
-# to link against the tiledb that is installed at custom location
-# e.g. `cmake -DCMAKE_PREFIX_PATH=</path/to/TileDB>`
 
 # to select different compiler other than the default
 # e.g. `cmake -DCMAKE_CXX_COMPILER=clang++` 

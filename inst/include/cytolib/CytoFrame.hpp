@@ -158,14 +158,11 @@ public:
 	CompType get_h5_datatype_params(DataTypeLocation storage_type) const;
 	CompType get_h5_datatype_keys() const;
 	virtual void write_h5_params(H5File file) const;
-	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::H5
 				, const CytoCtx ctx = CytoCtx()) const
 		{
 
-			if(format == FileFormat::H5)
 				write_h5(filename);
-			else
-				write_tile(filename, ctx);
 
 		}
 
@@ -227,13 +224,6 @@ public:
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
-	void write_tile(const string & uri, const CytoCtx & cytoctx = CytoCtx()) const;
-	void write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_rownames(const string & uri,  vector<string> rn, const CytoCtx & cytoctx) const;
 	/**
 	 * get the data of entire event matrix
 	 * @return

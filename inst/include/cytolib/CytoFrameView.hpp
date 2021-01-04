@@ -11,7 +11,6 @@
 #define INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #include "MemCytoFrame.hpp"
 #include "H5CytoFrame.hpp"
-#include "TileCytoFrame.hpp"
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
@@ -190,7 +189,7 @@ public:
 	{
 		return	get_cytoframe_ptr()->get_compensation(key);
 	}
-	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::H5
 			, const CytoCtx ctx = CytoCtx()) const
 	{
 		//create a mem-based cfv to avoid extra disk write IO from realization call

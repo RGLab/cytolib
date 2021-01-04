@@ -6,13 +6,6 @@ include_directories(../inst/include)
 add_library(cytolib STATIC ${SOURCES} GatingSet.pb.cc)
 add_dependencies( cytolib h5libs)
 
-find_package(TileDB)
-
-if(TILEDB_FOUND)
-add_definitions(-DHAVE_TILEDB)
-#include_directories(${TILEDB_LIB}/include)
-target_link_libraries(cytolib TileDB::tiledb_shared)
-endif()
 
 install(TARGETS cytolib DESTINATION cytolib/lib)
 
