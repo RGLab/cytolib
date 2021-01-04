@@ -19,7 +19,6 @@
 #include <algorithm>
 #include "MemCytoFrame.hpp"
 #include "CytoFrameView.hpp"
-#include "TileCytoFrame.hpp"
 #include "H5CytoFrame.hpp"
 using namespace std;
 

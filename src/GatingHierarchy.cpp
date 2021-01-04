@@ -17,11 +17,10 @@ namespace cytolib
 		 CytoFramePtr ptr;
 
 		CytoVFS vfs(ctx);
-		 auto fmt = uri_backend_type(uri, vfs);
-		 bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
+		 bool is_exist = vfs.is_file(uri);
 		if(!is_exist)
 		 throw(domain_error("cytoframe file missing for sample: " + uri));
-		if(fmt == FileFormat::H5&&is_remote_path(uri))
+		if(is_remote_path(uri))
 		{
 
 			 throw(domain_error("H5cytoframe doesn't support remote loading: " + uri));
@@ -30,14 +29,7 @@ namespace cytolib
 		else
 		{
 
-			if(fmt == FileFormat::H5)
 				ptr.reset(new H5CytoFrame(uri, readonly));
-			else
-	#ifdef HAVE_TILEDB
-				ptr.reset(new TileCytoFrame(uri, readonly, true, ctx));
-	#else
-			throw(domain_error("cytolib is not built with tiledb support!"));
-	#endif
 
 		}
 		return ptr;
@@ -333,11 +325,7 @@ namespace cytolib
 			frame_.set_readonly(false);//temporary unlock it
 			frame_.flush_meta();
 			frame_.set_readonly(flag);//restore the lock
-			string ext;
-			if(frame_.get_backend_type() == FileFormat::TILE)
-				ext = ".tile";
-			else
-				ext = ".h5";
+			string ext= ".h5";
 
 			frame_.convertToPb(*fr_pb, cf_filename + ext, h5_opt, ctx);
 		}
@@ -1633,11 +1621,7 @@ namespace cytolib
 		res->trans = trans.copy();
 		if(is_copy_data)
 		{
-			string ext;
-			if(frame_.get_backend_type() == FileFormat::TILE)
-				ext = ".tile";
-			else
-				ext = ".h5";
+			string ext= ".h5";
 
 			if(is_realize_data)
 				res->frame_ = frame_.copy_realized(cf_filename + ext);

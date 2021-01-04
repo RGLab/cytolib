@@ -24,11 +24,6 @@ FSLIB = ${boost_fs_objs} ${boost_sys_objs}
 
 PKG_LIBS = $(FSLIB) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
 
-HAVE_TILEDB=@HAVE_TILEDB@
-ifeq ($(HAVE_TILEDB),yes)
-PKG_CPPFLAGS += -DHAVE_TILEDB @TILEDB_INCLUDE@  
-PKG_LIBS += @TILEDB_LIBS@
-endif
 
 all: $(SHLIB) 
 

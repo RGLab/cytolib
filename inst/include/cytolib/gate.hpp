@@ -646,7 +646,7 @@ public:
 	quadGate(const pb::gate & gate_pb):polygonGate(gate_pb)
 	{
 
-		auto qg = gate_pb.pg().qg();
+		auto& qg = gate_pb.pg().qg();
 		uid_ = qg.uid();
 		quadrant = static_cast<cytolib::QUAD>(qg.quadrant());
 

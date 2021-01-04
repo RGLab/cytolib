@@ -10,6 +10,7 @@ namespace cytolib
 		else
 			throw(domain_error("Empty CytoFrameView!"));
 	}
+
 	vector<string> CytoFrameView::get_channels() const{
 		vector<string> orig = get_cytoframe_ptr()->get_channels();
 		unsigned n = col_idx_.size();
