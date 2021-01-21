@@ -10,6 +10,7 @@ namespace cytolib
 		else
 			throw(domain_error("Empty CytoFrameView!"));
 	}
+
 	vector<string> CytoFrameView::get_channels() const{
 		vector<string> orig = get_cytoframe_ptr()->get_channels();
 		unsigned n = col_idx_.size();
@@ -111,7 +112,7 @@ namespace cytolib
 			unsigned min_idx = row_idx.min();
 			if(max_idx >= n_rows() || min_idx < 0)
 				throw(domain_error("The size of the new row index ("
-						+ to_string(min_idx) + "," + to_string(min_idx)
+						+ to_string(min_idx) + "," + to_string(max_idx)
 						+ ") is not within the original mat size (0, " + to_string(n_rows()) + ")"
 						)
 					);

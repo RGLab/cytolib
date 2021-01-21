@@ -112,7 +112,104 @@ namespace cytolib
 
 	}
 
+	void CytoFrame::append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
+		// Pre-checks
 
+		// Size checks
+		if((new_colnames.size() <= 0) || (new_colnames.size() != new_cols.n_cols))
+			throw(domain_error("Must have equal (nonzero) number of new column names and columns."));
+		if( new_cols.n_rows != n_rows())
+			throw(domain_error("New columns must have same number of rows as existing columns."));
+
+		// Check validity of new channel names
+
+		// Check if new channel names duplicate any existing channels
+		vector<string> existing_channels = get_channels();
+		for(auto & name : new_colnames){
+			if(name.empty())
+				throw(domain_error("Channel names must be non-empty strings"));
+			if(get_col_idx(name, ColType::channel) != -1)
+				throw(domain_error("CytoFrame already contains this channel: " + name));
+		}
+		// Check for duplicates within the new colnames
+		vector<string> check_names(new_colnames.size());
+		std::copy(new_colnames.begin(), new_colnames.end(), check_names.begin());
+		std::sort(check_names.begin(), check_names.end());
+		if(std::unique(check_names.begin(), check_names.end()) != check_names.end())
+			throw(domain_error("Duplicate new channel names detected. New channel names must be unique."));
+
+		unsigned num_toadd = new_cols.n_cols;
+
+		// arma::min/max for column ranges
+		arma::Row<EVENT_DATA_TYPE> new_mins;
+		arma::Row<EVENT_DATA_TYPE> new_maxs;
+		if(new_cols.n_rows > 0){
+			new_mins = arma::min(new_cols, 0);
+			new_maxs = arma::max(new_cols, 0);
+		}else{
+			// In the absence of data, set the new maxima/minima to +/- infinity to match fr_append_cols
+			new_mins = arma::Row<EVENT_DATA_TYPE>(new_cols.n_cols);
+			new_mins.fill(-arma::datum::inf);
+			new_maxs = arma::Row<EVENT_DATA_TYPE>(new_cols.n_cols);
+			new_maxs.fill(arma::datum::inf);
+		}
+
+		// If ALL are good, go ahead and add them
+
+		// By the logic of CytoframeView::get_original_col_ids
+		// we should assume we assign the new indices starting right after n_cols
+		vector<unsigned> new_idx(num_toadd);
+		for(unsigned i = 0, j = n_cols()+1; i < num_toadd; i++, j++)
+			new_idx[i] = j;
+
+		// Add new columns to end of data matrix in backend-dependent manner
+		append_data_columns(new_cols);
+
+		// Add the new columns to the params with empty marker names
+		vector<cytoParam> updated_params = get_params();
+		for(unsigned i = 0; i < num_toadd; i++){
+			cytoParam to_add;
+			to_add.channel = new_colnames[i];
+			to_add.marker = "";
+			to_add.min = new_mins(i);
+			to_add.max = new_maxs(i);
+			to_add.PnG = 1;
+			to_add.PnE[0] = to_add.PnE[1] = 0.0;
+			to_add.PnB = 32;
+			updated_params.push_back(to_add);
+		}
+		set_params(updated_params);
+
+		// Update keywords
+
+		// Some logic adapted from MemCytoFrame::read_fcs_header
+		KEY_WORDS::iterator it;
+		for(unsigned i = 0; i < num_toadd; i++){
+			string pid = to_string(new_idx[i]);
+			string range_str;
+
+			// Defaults that will be set through logic of old cf_append_cols
+			set_keyword("$P" + pid + "B", "32");
+			set_keyword("$P" + pid + "E", "0,0");
+			// PnG key not set to match old behavior
+
+			// Bump by 1, following logic of flowCore#187 and flowCore@654f0c3
+			if(std::isfinite(new_maxs(i)))
+				set_keyword("$P" + pid + "R", boost::lexical_cast<string>((long long)ceil(new_maxs(i)) + 1));
+
+
+			if( keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom"){
+				set_keyword("flowCore_$P" + pid + "Rmin", boost::lexical_cast<string>(new_mins(i)));
+				set_keyword("flowCore_$P" + pid + "Rmax", boost::lexical_cast<string>(new_maxs(i)));
+			}
+
+			set_keyword("$P" + pid + "N", new_colnames[i]);
+		}
+
+		// Force backend-dependent metadata writes now
+		flush_meta();
+
+	}
 
 //	void writeFCS(const string & filename);
 
@@ -240,7 +337,7 @@ namespace cytolib
 		ds.write(&keyVec[0], key_type );
 
 	}
-	/**
+		/**
 	 * save the CytoFrame as HDF5 format
 	 *
 	 * @param filename the path of the output H5 file
@@ -276,270 +373,10 @@ namespace cytolib
 		*/
 		EVENT_DATA_VEC dat = get_data();
 		dataset.write(dat.mem, h5_datatype_data(DataTypeLocation::MEM));
+
+		auto rn = get_rownames();
+		write_h5_rownames(file, rn);
 	}
-
-#ifdef HAVE_TILEDB
-#include <tiledb/tiledb>
-	void CytoFrame::write_tile(const string & uri, const CytoCtx & cytoctx) const
-	{
-		CytoVFS vfs(cytoctx);
-//		CytoVFS::filebuf buf(vfs);
-
-		if(vfs.is_dir(uri))
-		{
-			PRINT("overwriting the existing folder " + uri + "!\n");
-			vfs.remove_dir(uri);
-		}
-
-		vfs.create_dir(uri);
-
-		write_tile_data(uri, cytoctx, true);
-
-		write_tile_pd(uri, cytoctx, true);
-
-		write_tile_params(uri, cytoctx, true);
-
-		write_tile_kw(uri, cytoctx, true);
-	}
-	void CytoFrame::write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new)  const
-	{
-		write_tile_data(uri, get_data(), cytoctx, is_new);
-	}
-	void CytoFrame::write_tile_data(const string & uri, const EVENT_DATA_VEC & _data
-			, const CytoCtx & cytoctx, bool is_new) const
-	{
-		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
-
-		int nEvents = n_rows();
-		int nch = n_cols();
-		auto array_uri = (fs::path(uri) / "mat").string();
-		tiledb::VFS vfs(ctx);
-		if(is_new)
-		{
-			if(vfs.is_dir(array_uri))
-				throw(domain_error("Can't  because it already exists!"));
-			tiledb::Domain domain(ctx);
-			//2k is to meet 64k minimal recommended tile size to fit into L1 cache
-			auto ncell = nEvents==0?1:nEvents;
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cell", {1, ncell}, ncell)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "channel", {1, nch==0?1:nch}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
-			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-			schema.set_domain(domain);
-			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "mat"));
-			schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
-
-			tiledb::Array::create(array_uri, schema);
-		}
-
-		if(nch * nEvents>0)
-		{
-			tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
-			tiledb::Query query(ctx, array);
-			query.set_layout(TILEDB_GLOBAL_ORDER);
-			//global order write require subarray to match the boundary
-//			std::vector<int> subarray = {1, nEvents, 1, nch};
-//			query.set_subarray(subarray);
-			//convert to float
-			vector<float> buf(_data.mem, _data.mem + nch * nEvents);
-
-			query.set_buffer("mat", buf);
-			query.submit();
-			query.finalize();
-		}
-	}
-
-	void delete_tile_meta(tiledb::Array &array)
-	{
-		tiledb_datatype_t v_type;
-		uint32_t v_num;
-		const void* v;
-		uint64_t num = array.metadata_num();
-		vector<string> key(num);
-		for (uint64_t i = 0; i < num; ++i) {
-			array.get_metadata_from_index(i, &key[i], &v_type, &v_num, &v);
-
-		}
-		array.close();
-		array.open(TILEDB_WRITE);
-		for(auto i : key)
-			array.delete_metadata(i);
-
-	}
-
-	void CytoFrame::write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new) const
-	{
-		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
-
-		tiledb::VFS vfs(ctx);
-		auto array_uri = (fs::path(uri) / "pdata").string();
-		if(is_new)
-		{
-			if(vfs.is_dir(array_uri))
-				throw(domain_error("Can't  because it already exists!"));
-			//dummy array
-			tiledb::Domain domain(ctx);
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "pd", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
-			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-			schema.set_domain(domain);
-			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
-	//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
-
-			tiledb::Array::create(array_uri, schema);
-		}
-		tiledb::Array array(ctx, array_uri, TILEDB_READ);
-		delete_tile_meta(array);
-
-		for(auto it : pheno_data_)
-			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());//TODO:switch to TILEDB_STRING_UTF16
-		//TODO:switch to TILEDB_STRING_UTF16
-
-	}
-
-	void CytoFrame::write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new) const
-	{
-		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
-
-		tiledb::VFS vfs(ctx);
-		auto array_uri = (fs::path(uri) / "keywords").string();
-		if(is_new)
-		{
-			if(vfs.is_dir(array_uri))
-				throw(domain_error("Can't  because it already exists!"));
-			tiledb::Domain domain(ctx);
-			//dummy array
-			domain.add_dimension(tiledb::Dimension::create<int>(ctx, "kw", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
-			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-			schema.set_domain(domain);
-			schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
-	//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
-
-			tiledb::Array::create(array_uri, schema);
-		}
-		tiledb::Array array(ctx, array_uri, TILEDB_READ);
-		delete_tile_meta(array);
-
-		for(auto it : keys_)
-		{
-//			if(it.first == "$BEGINDATA"||it.second=="2589"||it.second=="")
-//				cout << it.first << ":" << it.second << endl;;
-			array.put_metadata(it.first, TILEDB_CHAR, it.second.size(), it.second.c_str());
-		}//TODO:switch to TILEDB_STRING_UTF16
-//		array.consolidate_metadata(ctx, array_uri);
-	}
-	void CytoFrame::write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new) const
-	{
-		auto ctx = *(static_pointer_cast<tiledb::Context>(cytoctx.get_ctxptr()));
-
-		auto array_uri = (fs::path(uri) / "params").string();
-
-		int nch = n_cols();
-		tiledb::VFS vfs(ctx);
-		if(is_new)
-		{
-			if(vfs.is_dir(array_uri))
-				throw(domain_error("Can't  because it already exists!"));
-			tiledb::Domain domain(ctx);
-			auto a1 = tiledb::Dimension::create<int>(ctx, "params", {1, nch==0?1:nch}, 1); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
-			domain.add_dimension(a1); // @suppress("Invalid arguments")
-
-			tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-			schema.set_domain(domain);
-			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "min"));
-			schema.add_attribute(tiledb::Attribute::create<float>(ctx, "max"));
-			tiledb::Array::create(array_uri, schema);
-		}
-		if(nch>0)
-		{
-
-			tiledb::Array array(ctx, array_uri, TILEDB_WRITE);
-			tiledb::Query query(ctx, array);
-			query.set_layout(TILEDB_GLOBAL_ORDER);
-			vector<float> min_vec(nch);
-			for(int i = 0; i < nch; i++)
-				min_vec[i] = params[i].min;
-			query.set_buffer("min", min_vec);
-			vector<float> max_vec(nch);
-			for(int i = 0; i < nch; i++)
-				max_vec[i] = params[i].max;
-			query.set_buffer("max", max_vec);
-	//		vector<char> ch_vec;
-	//		vector<uint64_t> off(nch, 0);
-	//		//need this to preserve the channel order
-	//		for(int i = 0; i < nch; i++)
-	//		{
-	//			auto nchar = params[i].channel.size();
-	//			if(i > 0)
-	//				off[i] = off[i-1] + params[i-1].channel.size();
-	//			ch_vec.resize(ch_vec.size() + nchar);
-	//			memcpy(&ch_vec[off[i]], &params[i].channel[0], nchar * sizeof(char));
-	//		}
-	//		query.set_buffer("channel", off, ch_vec);
-			query.submit();
-			query.finalize();
-
-			//attach marker as meta since val-length writing to arry attr is not feasible
-			//due to empty markers do not meet the strict ascending buffer offset requirement
-			array.close();
-			array.open(TILEDB_READ);
-			delete_tile_meta(array);
-			for(auto it : params)
-			{
-				array.put_metadata(it.channel, TILEDB_CHAR, it.marker.size(), it.marker.c_str());
-			}
-
-			//hack to preserve channel order
-			array_uri = (fs::path(uri) / "channel_idx").string();
-			if(!vfs.is_dir(array_uri))
-			{
-				tiledb::Domain domain(ctx);
-				//dummy array
-				domain.add_dimension(tiledb::Dimension::create<int>(ctx, "cidx", {1, 2}, 1)); // @suppress("Invalid arguments") // @suppress("Symbol is not resolved")
-				tiledb::ArraySchema schema(ctx, TILEDB_DENSE);
-				schema.set_domain(domain);
-				schema.add_attribute(tiledb::Attribute::create<double>(ctx, "a1"));
-		//		schema.set_tile_order(TILEDB_COL_MAJOR).set_cell_order(TILEDB_COL_MAJOR);
-
-				tiledb::Array::create(array_uri, schema);
-			}
-			tiledb::Array array1(ctx, array_uri, TILEDB_READ);
-			delete_tile_meta(array1);
-
-			for(int i = 0; i < nch; i++)
-				array1.put_metadata(params[i].channel, TILEDB_INT32, 1, &i);
-			//TODO:switch to TILEDB_STRING_UTF16
-		}
-	}
-#else
-	void CytoFrame::write_tile(const string & uri, const CytoCtx & cytoctx) const
-	{
-		throw(domain_error("cytolib is not built with tiledb support!"));
-	}
-	void CytoFrame::write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new) const
-	{
-			throw(domain_error("cytolib is not built with tiledb support!"));
-		}
-	void CytoFrame::write_tile_data(const string & uri, const EVENT_DATA_VEC & _data
-			, const CytoCtx & cytoctx, bool is_new) const
-	{
-			throw(domain_error("cytolib is not built with tiledb support!"));
-		}
-//	void delete_tile_meta(tiledb::Array &array) const;
-	void CytoFrame::write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new) const
-	{
-			throw(domain_error("cytolib is not built with tiledb support!"));
-		}
-	void CytoFrame::write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new) const
-	{
-			throw(domain_error("cytolib is not built with tiledb support!"));
-		}
-	void CytoFrame::write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new) const
-	{
-			throw(domain_error("cytolib is not built with tiledb support!"));
-		}
-
-
-#endif
-
 
 
 	/**

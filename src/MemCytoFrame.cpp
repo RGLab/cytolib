@@ -211,47 +211,34 @@ namespace cytolib
 		config_ = frm.config_;
 		header_ = frm.header_;
 		data_ = frm.data_;
-
-	}
-	MemCytoFrame::MemCytoFrame(MemCytoFrame && frm):CytoFrame(frm)
-	{
-//		swap(pheno_data_, frm.pheno_data_);
-//		swap(keys_, frm.keys_);
-//		swap(params, frm.params);
-//		swap(channel_vs_idx, frm.channel_vs_idx);
-//		swap(marker_vs_idx, frm.marker_vs_idx);
-		swap(filename_, frm.filename_);
-		swap(config_, frm.config_);
-		swap(header_, frm.header_);
-		swap(data_, frm.data_);
+		rownames_ = frm.rownames_;
 	}
 	MemCytoFrame & MemCytoFrame::operator=(const MemCytoFrame & frm)
 	{
 		CytoFrame::operator=(frm);
-//		pheno_data_ = frm.pheno_data_;
-//		keys_ = frm.keys_;
-//		params = frm.params;
-//		channel_vs_idx = frm.channel_vs_idx;
-//		marker_vs_idx = frm.marker_vs_idx;
 		filename_ = frm.filename_;
 		config_ = frm.config_;
 		header_ = frm.header_;
 		data_ = frm.data_;
+		rownames_ = frm.rownames_;
 		return *this;
 	}
-	MemCytoFrame & MemCytoFrame::operator=(MemCytoFrame && frm)
+	MemCytoFrame::MemCytoFrame(MemCytoFrame && frm):CytoFrame(frm)
 	{
-		CytoFrame::operator=(frm);
-
-//		swap(pheno_data_, frm.pheno_data_);
-//		swap(keys_, frm.keys_);
-//		swap(params, frm.params);
-//		swap(channel_vs_idx, frm.channel_vs_idx);
-//		swap(marker_vs_idx, frm.marker_vs_idx);
 		swap(filename_, frm.filename_);
 		swap(config_, frm.config_);
 		swap(header_, frm.header_);
 		swap(data_, frm.data_);
+		swap(rownames_, frm.rownames_);	}
+
+	MemCytoFrame & MemCytoFrame::operator=(MemCytoFrame && frm)
+	{
+		CytoFrame::operator=(frm);
+		swap(filename_, frm.filename_);
+		swap(config_, frm.config_);
+		swap(header_, frm.header_);
+		swap(data_, frm.data_);
+		swap(rownames_, frm.rownames_);
 		return *this;
 	}
 	MemCytoFrame::MemCytoFrame(const string &filename, const FCS_READ_PARAM & config):filename_(filename),config_(config){
@@ -436,8 +423,8 @@ namespace cytolib
 	  		nSelected = which_lines[0];
 	  		which_lines.resize(nSelected);
 	  		std::default_random_engine generator(config.seed);
-	  		std::uniform_int_distribution<long> distribution(0, nrow - 1);
-	  		for(unsigned long i = 0; i < nSelected; i++)
+	  		std::uniform_int_distribution<int64_t> distribution(0, nrow - 1);
+	  		for(uint64_t i = 0; i < nSelected; i++)
 	  		{
 	  			which_lines[i] = distribution(generator);
 	  		}
@@ -458,7 +445,7 @@ namespace cytolib
 	  		auto nRowSizeBytes = nRowSize/8;
 	  		for(auto i : which_lines)
 	  		{
-	  			long pos =  header_.datastart + i * nRowSizeBytes;
+	  			int64_t pos =  header_.datastart + i * nRowSizeBytes;
 	  			if(pos > header_.dataend || pos < header_.datastart)
 	  				throw(domain_error("the index of which.lines exceeds the data boundary: " + to_string(i)));
 	  			in.seekg(pos);
@@ -471,8 +458,8 @@ namespace cytolib
 	  		//load entire data section with one disk IO
 
 			in.read(bufPtr, nBytes); //load the bytes from file
-			unsigned long events_read = (in.gcount() * 8 / nRowSize);
-			unsigned long events_expected = boost::lexical_cast<unsigned long>(keys_["$TOT"]);
+			uint64_t events_read = (in.gcount() * 8 / nRowSize);
+			uint64_t events_expected = boost::lexical_cast<uint64_t>(keys_["$TOT"]);
 			if(events_read != events_expected)//can't use nBytes derived from FCS header as the check point since it may have extra bytes than needed
 			{
 				throw(domain_error("file " + filename_+ " seems to be corrupted. \n The actual number of cells in data section ("
@@ -834,13 +821,13 @@ namespace cytolib
 		//##for DATA segment exceeding 99,999,999 byte.
 		 if(header_.FCSversion >= 3)
 		 {
-			 unsigned long datastart_h = header_.datastart - header_.additional;
-			 unsigned long dataend_h = header_.dataend - header_.additional;
+			 uint64_t datastart_h = header_.datastart - header_.additional;
+			 uint64_t dataend_h = header_.dataend - header_.additional;
 
 		//
 		//   # Let's not be too strick here as unfortunatelly, some files exported from FlowJo
 		//   # are missing the $BEGINDATA and $ENDDATA keywords and we still need to read those
-		   unsigned long datastart, dataend;
+		   uint64_t datastart, dataend;
 		   if(keys_.find("$BEGINDATA")==keys_.end())
 		   {
 		     if (datastart_h != 0)
@@ -937,6 +924,9 @@ namespace cytolib
 			else
 				params[i-1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
 
+			if(range_str == "flowCore_$P" + pid + "Rmax")
+				params[i-1].max += 1;
+
 
 			params[i-1].PnB = stoi(keys_["$P" + pid + "B"]);
 
@@ -1025,6 +1015,7 @@ namespace cytolib
 	void MemCytoFrame::realize_(uvec row_idx, uvec col_idx)
 	{
 		data_ = data_.rows(row_idx);
+		subset_rownames(row_idx);
 		data_ = data_.cols(col_idx);
 		subset_parameters(col_idx);
 	}
@@ -1032,97 +1023,19 @@ namespace cytolib
 	void MemCytoFrame::realize_(uvec idx, bool is_row_indexed)
 	{
 		if(is_row_indexed)
+		{
 			data_ = data_.rows(idx);
+			subset_rownames(idx);
+		}
 		else{
 			data_ = data_.cols(idx);
 			subset_parameters(idx);
 		}
 	}
 
-
-
-
-
-	void MemCytoFrame::append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
-		// Pre-checks
-
-		// Size checks
-		if( new_colnames.size() <= 0 | (new_colnames.size() != new_cols.n_cols))
-			throw(domain_error("Must have equal (nonzero) number of new column names and columns."));
-		if( new_cols.n_rows != data_.n_rows)
-			throw(domain_error("New columns must have same number of rows as existing columns."));
-
-		// Check validity of new channel names
-
-		// Check if new channel names duplicate any existing channels
-		vector<string> existing_channels = get_channels();
-		for(auto & name : new_colnames){
-			if(name.empty())
-				throw(domain_error("Channel names must be non-empty strings"));
-			if(get_col_idx(name, ColType::channel) != -1)
-				throw(domain_error("CytoFrame already contains this channel: " + name));
-		}
-		// Check for duplicates within the new colnames
-		vector<string> check_names(new_colnames.size());
-		std::copy(new_colnames.begin(), new_colnames.end(), check_names.begin());
-		std::sort(check_names.begin(), check_names.end());
-		if(std::unique(check_names.begin(), check_names.end()) != check_names.end())
-			throw(domain_error("Duplicate new channel names detected. New channel names must be unique."));
-
-		unsigned num_toadd = new_cols.n_cols;
-
-		// arma::min/max for column ranges
-		rowvec new_mins = min(new_cols, 0);
-		rowvec new_maxs = max(new_cols, 0);
-
-		// If ALL are good, go ahead and add them to the params with empty marker names
-		for(unsigned i = 0; i < num_toadd; i++){
-			cytoParam to_add;
-			to_add.channel = new_colnames[i];
-			to_add.marker = "";
-			to_add.min = new_mins(i);
-			to_add.max = new_maxs(i);
-			to_add.PnG = 1;
-			to_add.PnE[0] = to_add.PnE[1] = 0.0;
-			to_add.PnB = 32;
-			params.push_back(to_add);
-		}
-		build_hash();
-
-		// By the logic of CytoframeView::get_original_col_ids
-		// we should assume we assign the new indices starting right after data_.n_cols
-		vector<unsigned> new_idx(num_toadd);
-		for(unsigned i = 0, j = data_.n_cols+1; i < num_toadd; i++, j++)
-			new_idx[i] = j;
-
-		// Add new columns to end of data matrix
+	void MemCytoFrame::append_data_columns(const EVENT_DATA_VEC & new_cols)
+	{
 		data_.insert_cols(data_.n_cols, new_cols);
-
-		// Update keywords
-
-		// Some logic adapted from MemCytoFrame::read_fcs_header
-		KEY_WORDS::iterator it;
-		for(unsigned i = 0; i < num_toadd; i++){
-			string pid = to_string(new_idx[i]);
-			string range_str;
-
-			// Defaults that will be set through logic of old cf_append_cols
-			keys_["$P" + pid + "B"] = "32";
-			keys_["$P" + pid + "E"] = "0,0";
-			// PnG key not set to match old behavior
-
-			// Bump by 1, following logic of flowCore#187 and flowCore@654f0c3
-			keys_["$P" + pid + "R"] = to_string(int(ceil(new_maxs(i))) + 1);
-
-
-			if( keys_.find("transformation")!=keys_.end() &&  keys_["transformation"] == "custom"){
-				keys_["flowCore_$P" + pid + "Rmin"] = to_string(new_mins(i));
-				keys_["flowCore_$P" + pid + "Rmax"] = to_string(new_maxs(i));
-			}
-
-			keys_["$P" + pid + "N"] = new_colnames[i];
-		}
-
 	}
 
 
@@ -1142,6 +1055,45 @@ namespace cytolib
 		return data_.colptr(idx);
 	}
 
+	void MemCytoFrame::transform_data(const trans_local & trans) {
+		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+			PRINT("start transforming cytoframe data \n");
+		if(n_rows()==0)
+			throw(domain_error("data is not loaded yet!"));
+
+		vector<string> channels=get_channels();
+		int nEvents = n_rows();
+		/*
+		 * transforming each marker
+		 */
+		for(vector<string>::iterator it1=channels.begin();it1!=channels.end();it1++)
+		{
+
+			string curChannel=*it1;
+			auto param_range = get_range(curChannel, ColType::channel, RangeType::instrument);
+			TransPtr curTrans=trans.getTran(curChannel);
+
+			if(curTrans)
+			{
+				if(curTrans->gateOnly())
+					continue;
+
+				EVENT_DATA_TYPE * x = get_data_memptr(curChannel, ColType::channel);
+				if(g_loglevel>=GATING_HIERARCHY_LEVEL)
+				{
+					string type;
+					curTrans->getType(type);
+					PRINT("transforming "+curChannel+" with func:"+type+"\n");
+				}
+				curTrans->transforming(x,nEvents);
+				curTrans->transforming(&param_range.first, 1);
+				curTrans->transforming(&param_range.second, 1);
+			}
+
+			set_keyword("transformation", "custom");
+			set_range(curChannel, ColType::channel, param_range);
+		}
+	}
 };
 
 

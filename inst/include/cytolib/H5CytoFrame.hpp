@@ -126,6 +126,14 @@ public:
 		is_dirty_keys = true;
 
 	}
+	void rename_keyword(const string & old_key, const string & new_key){
+		CytoFrame::rename_keyword(old_key, new_key);
+		is_dirty_keys = true;
+	}
+	void remove_keyword(const string & key){
+		CytoFrame::remove_keyword(key);
+		is_dirty_keys = true;
+	}
 	void set_channel(const string & oldname, const string &newname, bool is_update_keywords = true)
 	{
 		CytoFrame::set_channel(oldname, newname, is_update_keywords);
@@ -141,10 +149,53 @@ public:
 		return res;
 	}
 
-	void append_columns(const vector<string> & new_colnames, const EVENT_DATA_VEC & new_cols){
-		throw(domain_error("append_columns not implemented for H5CytoFrame!"));
+	void append_data_columns(const EVENT_DATA_VEC & new_cols)
+	{
+		EVENT_DATA_VEC this_data = get_data();
+		this_data.insert_cols(this_data.n_cols, new_cols);
+		set_data(this_data);
 	}
+	vector<string> get_rownames() const
+	{
+		vector<string> rownames;
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
+		auto dsname = DATASET_ROWNAME;
+		if(file.exists(dsname))
+		{
+			auto dataset = file.openDataSet(dsname);
+			auto dataspace = dataset.getSpace();
 
+			unsigned nrow = n_rows();
+
+			hsize_t dimsm[] = {nrow};
+			DataSpace memspace(1,dimsm);
+			StrType str_type(H5::PredType::C_S1, H5T_VARIABLE);
+
+			// HDF5 only understands vector of char* :-(
+			std::vector<char*> rn_c_str(nrow);
+			dataset.read(rn_c_str.data(), str_type ,memspace, dataspace);
+
+			for (unsigned ii = 0; ii < rn_c_str.size(); ++ii)
+				rownames.push_back(string(rn_c_str[ii]));
+
+
+		}
+		return rownames;
+	}
+	void set_rownames(const vector<string> & rn)
+	{
+
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
+		check_write_permission();
+		write_h5_rownames(file, rn);
+	}
+	void del_rownames(){
+		H5File file(filename_, h5_flags(), FileCreatPropList::DEFAULT, access_plist_);
+		check_write_permission();
+
+		if(file.exists(DATASET_ROWNAME))
+			file.unlink(DATASET_ROWNAME);
+	}
 	void set_marker(const string & channelname, const string & markername)
 	{
 		CytoFrame::set_marker(channelname, markername);
@@ -214,7 +265,7 @@ public:
 	string get_uri() const{
 		return filename_;
 	}
-	void check_write_permission(){
+	void check_write_permission() const{
 		if(readonly_)
 			throw(domain_error("Can't write to the read-only H5CytoFrame object!"));
 
@@ -305,16 +356,21 @@ public:
 	 * protect the h5 from being overwritten accidentally
 	 * which will make the original cf object invalid
 	 */
-	void copy_overwrite_check(const string & dest) const
+	void copy_overwrite_check(const string & dest, bool overwrite) const
 	{
-		if(fs::equivalent(fs::path(filename_), fs::path(dest)))
-			throw(domain_error("Copying H5CytoFrame to itself is not supported! "+ dest));
+		// Check if trying to write to same file
+		if(fs::equivalent(fs::path(filename_), fs::path(dest))){
+			// First check if that is even allowed by this CytoFrame
+			check_write_permission();
+			// Then make sure it has been explicitly approved by the caller
+			if(!overwrite)
+				throw(domain_error("Copying H5CytoFrame to itself is not supported! "+ dest));
+		}
 	}
 
 	CytoFramePtr copy(const string & h5_filename = "", bool overwrite = false) const
 	{
-		if(!overwrite)
-			copy_overwrite_check(h5_filename);
+		copy_overwrite_check(h5_filename, overwrite);
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
@@ -331,9 +387,8 @@ public:
 	}
 	CytoFramePtr copy(uvec row_idx, uvec col_idx, const string & h5_filename = "", bool overwrite = false) const
 	{
+		copy_overwrite_check(h5_filename, overwrite);
 
-		if(!overwrite)
-			copy_overwrite_check(h5_filename);
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
@@ -347,9 +402,8 @@ public:
 
 	CytoFramePtr copy(uvec idx, bool is_row_indexed, const string & h5_filename = "", bool overwrite = false) const
 	{
+		copy_overwrite_check(h5_filename, overwrite);
 
-		if(!overwrite)
-			copy_overwrite_check(h5_filename);
 		string new_filename = h5_filename;
 		if(new_filename == "")
 		{
@@ -372,6 +426,19 @@ public:
 		check_write_permission();
 		set_data(_data);
 	}
+
+//	vector<string> get_rownames() const
+//	{
+
+//		return read_data(col_idx);
+
+//	}
+//	void set_rownames(const vector<string> & data_in)
+//	{
+//		if(n_rows()!=data_in.size())
+//			throw(domain_error("the input rownames size is different from the matrix size!"));
+
+//	}
 };
 
 };

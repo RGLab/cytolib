@@ -11,16 +11,18 @@
 #define INST_INCLUDE_CYTOLIB_CytoVFS_HPP_
 #include <string>
 #include <vector>
+#include <memory>
+#include <map>
 using namespace std;
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
 namespace cytolib
 {
-	extern const bool have_tiledb;
 /**
  * abstract layer so that the  tiledb:Context and tiledb::VFS is separated from
  * the rest code base and they can work when tiledb is disabled at compile time
+ * no longer needed since tiledb support is dropped
  */
 	class CytoCtx
 	{
@@ -32,6 +34,19 @@ namespace cytolib
 		void init_ctxptr();
 	public:
 			CytoCtx();
+
+			/**
+			 * API to be exposed to R
+			 * @return
+			 */
+			map<string, string> get_config() const{
+				map<string, string> res;
+				res["access_key_id"] = access_key_id_;
+				res["access_key"] = access_key_;
+				res["region"] = region_;
+				res["num_threads"] = to_string(num_threads_);
+				return res;
+			}
 			CytoCtx(const string & secret_id
 						, const string & secret_key
 						, const string & aws_region

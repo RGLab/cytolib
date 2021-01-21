@@ -23,21 +23,18 @@ using namespace std;
 
 namespace cytolib
 {
-	enum class FileFormat {TILE, H5, MEM};
+	enum class FileFormat {H5, MEM};
 	inline string fmt_to_str(FileFormat fmt)
 	{
 		switch(fmt)
 		{
 		case FileFormat::H5:
 			return "h5";
-		case FileFormat::TILE:
-			return "tile";
 		default:
 			return "mem";
 		}
 
 	}
-	FileFormat uri_backend_type(const string & path, const CytoVFS & vfs);
 	string s3_to_http(string uri);
 	void check_sample_guid(const string & sample_guid);
 	bool is_remote_path(const string &);

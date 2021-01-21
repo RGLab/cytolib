@@ -31,7 +31,7 @@ enum class TransformType {none, linearize, scale,linearize_with_PnG_scaling};
 enum class endianType {big, small, mixed};
 struct FCS_Header{
 	float FCSversion;
-	long textstart, textend, datastart, dataend, anastart, anaend, additional;
+	int64_t textstart, textend, datastart, dataend, anastart, anaend, additional;
 };
 
 //typedef unordered_map <string, string> KEY_WORDS;
@@ -74,6 +74,13 @@ public:
  pair <string, string> & operator [](const int & n){
 	 return kw[n];
  }
+ void erase(const string & key){
+	 iterator it = find(key);
+     if(it!=end())
+     	kw.erase(it);
+     else
+     	throw(domain_error("keyword not found: " + key));
+ };
 };
 
 

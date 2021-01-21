@@ -30,7 +30,7 @@ struct FCS_READ_DATA_PARAM{
 	 EVENT_DATA_TYPE decades, min_limit;
 	 TransformType transform;
 	 int num_threads; //number of cores to be used for parallel-read of data (channel / core)
-	 vector<long> which_lines; //select rows to be read in
+	 vector<int64_t> which_lines; //select rows to be read in
 	 int seed;
 	 bool isTransformed;//record the outcome after parsing
 	 FCS_READ_DATA_PARAM(){
