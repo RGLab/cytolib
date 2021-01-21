@@ -27,10 +27,8 @@ USERLIB = ${USERDIR}/libcytolib.a
 OBJECTS=dummy.o
 
 #needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
-RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e 'Rhdf5lib::pkgconfig("PKG_CXX_LIBS")')
 FSLIB = ${boost_fs_objs} ${boost_sys_objs}
 
-PKG_LIBS = $(FSLIB) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"`  
 
 
 all: $(SHLIB) 
