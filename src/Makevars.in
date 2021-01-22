@@ -43,5 +43,5 @@ $(boost_fs_objs): ${boost_sys_objs}
 
 
 clean:
-	rm -f $(OBJECTS) ${boost_fs_objs} ${boost_sys_objs} $(SHLIB)
+	rm -f $(OBJECTS) ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs} $(SHLIB)
  

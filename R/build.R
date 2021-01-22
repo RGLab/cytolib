@@ -21,8 +21,11 @@ CxxFlags <- function() {
 #' @importFrom RProtoBufLib LdFlags
 #' @importFrom RcppParallel RcppParallelLibs
 cytolib_LdFlags <- function() {
-   cat(res <- asBuildPath(system.file("lib/libcytolib.a", package = "cytolib")))
-}
+      libDir <- "lib/"
+      if (.Platform$OS.type == "windows")
+         libDir <- paste(libDir, .Platform$r_arch, "/", sep="")
+      cat(asBuildPath(system.file(paste(libDir, "libcytolib.a", sep = ""), package = "cytolib")))
+  }
 
 
 
