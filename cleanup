@@ -3,3 +3,4 @@
 "${R_HOME}/bin/Rscript" tools/config.R cleanup
 rm src/boost/libs/system/src/*.o
 rm src/boost/libs/filesystem/src/*.o
+rm src/*.o

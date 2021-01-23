@@ -14,6 +14,8 @@ boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
 boost_fs_objs=${boost_fs_src:.cpp=.o}
 
 PKG_CPPFLAGS =-DROUT -I../inst/include -DRCPP_PARALLEL_USE_TBB=1 -fpermissive -DBOOST_NO_AUTO_PTR 
+cytolib_src=${wildcard *.cpp}
+cytolib_objs=${cytolib_src:.cpp=.o}
 
 	
 #needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
@@ -24,6 +26,7 @@ PKG_LIBS =  ${boost_fs_objs} ${boost_sys_objs} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLI
 
 USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
 PKGLIB = ${USERDIR}/libcytolib.a
+OBJECTS=dummy.o
 
 
 all: $(SHLIB) 
@@ -32,17 +35,14 @@ $(SHLIB): $(PKGLIB)
 
 
 #expose static lib for other package to link to 
-$(PKGLIB): $(OBJECTS)
+$(PKGLIB): ${boost_fs_objs} ${cytolib_objs}
 	mkdir -p "${USERDIR}"
-	$(AR) rs "${PKGLIB}" $(OBJECTS) $(boost_fs_objs) ${boost_sys_objs}
+	$(AR) rs "${PKGLIB}" $(cytolib_objs) $(boost_fs_objs) ${boost_sys_objs}
 	
 
-
-$(OBJECTS): ${boost_fs_objs}
 
 $(boost_fs_objs): ${boost_sys_objs}
 
 
 clean:
-	rm -f $(OBJECTS) ${boost_fs_objs} ${boost_sys_objs}
- 
+	rm -f $(OBJECTS) ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs} $(SHLIB) 

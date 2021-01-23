@@ -2,3 +2,4 @@
 "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" tools/config.R cleanup
 rm src/boost/libs/system/src/*.o
 rm src/boost/libs/filesystem/src/*.o
+rm src/*.o
