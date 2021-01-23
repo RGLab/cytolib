@@ -35,13 +35,11 @@ $(SHLIB): $(PKGLIB)
 
 
 #expose static lib for other package to link to 
-$(PKGLIB): $(OBJECTS)
+$(PKGLIB): ${boost_fs_objs} ${cytolib_objs}
 	mkdir -p "${USERDIR}"
 	$(AR) rs "${PKGLIB}" $(cytolib_objs) $(boost_fs_objs) ${boost_sys_objs}
 	
 
-
-$(OBJECTS): ${boost_fs_objs}
 
 $(boost_fs_objs): ${boost_sys_objs}
 
