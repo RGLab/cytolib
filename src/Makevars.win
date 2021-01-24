@@ -18,10 +18,6 @@ cytolib_src=${wildcard *.cpp}
 cytolib_objs=${cytolib_src:.cpp=.o}
 
 	
-#needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
-RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e "Rhdf5lib::pkgconfig('PKG_CXX_LIBS')")
-PKG_LIBS =  ${boost_fs_objs} ${boost_sys_objs} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` -lws2_32  
-
 .PHONY: all clean 
 
 USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
