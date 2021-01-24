@@ -15,7 +15,7 @@ Imports:
 Depends:
     R (>= 3.4)
 Suggests: knitr
-LinkingTo: Rcpp, BH(>= 1.72.0-2), RProtoBufLib(>= 2.3.2),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1)
+LinkingTo: Rcpp, BH(>= 1.75.0.0), RProtoBufLib(>= 2.3.2),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1)
 biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing, DataRepresentation
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11
