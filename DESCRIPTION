@@ -4,7 +4,7 @@ Title: C++ infrastructure for representing and interacting with the gated cytome
 Version: 2.3.5
 Date: 2017-08-07
 Author: Mike Jiang
-Maintainer: Mike Jiang <wjiang2@fhcrc.org>, Jake Wagner <jpwagner@fhcrc.org>
+Maintainer: Mike Jiang <mike@ozette.ai>
 Description: This package provides the core data structure and API to represent and interact with the gated cytometry data.
 License: file LICENSE
 License_restricts_use: yes
