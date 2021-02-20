@@ -634,7 +634,7 @@ namespace cytolib
 			 *
 			 */
 			if(!node.isGated())
-				gating(cytoframe, u, recompute, computeTerminalBool, skip_faulty_node);
+				gating(cytoframe, pid, recompute, computeTerminalBool, skip_faulty_node);
 
 			parentIndice = INTINDICES(node.getIndices());
 
