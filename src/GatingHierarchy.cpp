@@ -6,6 +6,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/depth_first_search.hpp>
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
@@ -16,11 +17,10 @@ namespace cytolib
 		 CytoFramePtr ptr;
 
 		CytoVFS vfs(ctx);
-		 auto fmt = uri_backend_type(uri, vfs);
-		 bool is_exist = fmt == FileFormat::H5?vfs.is_file(uri):vfs.is_dir(uri);
+		 bool is_exist = vfs.is_file(uri);
 		if(!is_exist)
 		 throw(domain_error("cytoframe file missing for sample: " + uri));
-		if(fmt == FileFormat::H5&&is_remote_path(uri))
+		if(is_remote_path(uri))
 		{
 
 			 throw(domain_error("H5cytoframe doesn't support remote loading: " + uri));
@@ -29,14 +29,7 @@ namespace cytolib
 		else
 		{
 
-			if(fmt == FileFormat::H5)
 				ptr.reset(new H5CytoFrame(uri, readonly));
-			else
-	#ifdef HAVE_TILEDB
-				ptr.reset(new TileCytoFrame(uri, readonly, true, ctx));
-	#else
-			throw(domain_error("cytolib is not built with tiledb support!"));
-	#endif
 
 		}
 		return ptr;
@@ -332,11 +325,7 @@ namespace cytolib
 			frame_.set_readonly(false);//temporary unlock it
 			frame_.flush_meta();
 			frame_.set_readonly(flag);//restore the lock
-			string ext;
-			if(frame_.get_backend_type() == FileFormat::TILE)
-				ext = ".tile";
-			else
-				ext = ".h5";
+			string ext= ".h5";
 
 			frame_.convertToPb(*fr_pb, cf_filename + ext, h5_opt, ctx);
 		}
@@ -645,7 +634,7 @@ namespace cytolib
 			 *
 			 */
 			if(!node.isGated())
-				gating(cytoframe, u, recompute, computeTerminalBool, skip_faulty_node);
+				gating(cytoframe, pid, recompute, computeTerminalBool, skip_faulty_node);
 
 			parentIndice = INTINDICES(node.getIndices());
 
@@ -894,6 +883,44 @@ namespace cytolib
 		  }
 
 		};
+
+	class phylo_visitor : public boost::default_dfs_visitor
+	{
+	public:
+		phylo_visitor(phylo& p, VertexID start) : phylo_tree(p), starting_node(start), backtracking(false){}
+		phylo & phylo_tree;
+		VertexID starting_node;
+		bool backtracking;
+		template < typename Vertex, typename Graph >
+		void discover_vertex(Vertex u, const Graph & g)
+		{
+			// Only add to phylo node record if it's under the starting node
+			if(!backtracking){
+			    if(boost::out_degree(u,g) == 0)
+				phylo_tree.leaf_nodes.push_back(u);
+			    else
+				phylo_tree.internal_nodes.push_back(u);
+			}
+		}
+		template < typename Edge, typename Graph >
+		void tree_edge(Edge e, const Graph & g)
+		{
+			// Only add an edge if it's out of the starting_node or its descendants
+			if(!backtracking){
+				std::pair<VertexID, VertexID> this_edge(boost::source(e, g), boost::target(e, g));
+				phylo_tree.edges.push_back(this_edge);
+			}
+		}
+		template < typename Vertex, typename Graph >
+		void finish_vertex(Vertex u, const Graph & g)
+		{
+			// Once the subgraph under starting_node is fully searched, stop keeping track
+			// This restricts output to the original starting_node and its descendants
+			if(u == starting_node){
+				backtracking = true;
+			}
+		}
+	};
 
 	/**
 	 * retrieve all the node IDs
@@ -1538,6 +1565,25 @@ namespace cytolib
 
 	}
 
+	phylo GatingHierarchy::getPhylo(VertexID start, bool fullPath){
+		phylo out_phylo;
+		phylo_visitor vis(out_phylo, start);
+		// Have to construct the default ColorMap to be able to supply
+		// starting node due to depth_first_search arg order
+		auto indexmap = boost::get(boost::vertex_index, tree);
+		auto colormap = boost::make_vector_property_map<boost::default_color_type>(indexmap);
+
+		// Get the edges and leaves
+		boost::depth_first_search(tree, vis, colormap, start);
+		// Append full paths for leaf names
+		for(auto leaf : out_phylo.leaf_nodes)
+			out_phylo.leaf_names.push_back(getNodePath(leaf, fullPath));
+		// Append full paths for internal node names
+		for(auto node : out_phylo.internal_nodes)
+			out_phylo.internal_names.push_back(getNodePath(node, fullPath));
+		return out_phylo;
+	}
+
 	/*
 	 *
 	 * make sure to use this API always since since it is safe way to access tree nodes due to the validity check
@@ -1575,11 +1621,7 @@ namespace cytolib
 		res->trans = trans.copy();
 		if(is_copy_data)
 		{
-			string ext;
-			if(frame_.get_backend_type() == FileFormat::TILE)
-				ext = ".tile";
-			else
-				ext = ".h5";
+			string ext= ".h5";
 
 			if(is_realize_data)
 				res->frame_ = frame_.copy_realized(cf_filename + ext);

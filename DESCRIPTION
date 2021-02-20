@@ -1,10 +1,10 @@
 Package: cytolib
 Type: Package
 Title: C++ infrastructure for representing and interacting with the gated cytometry data
-Version: 2.1.19
+Version: 2.3.6
 Date: 2017-08-07
 Author: Mike Jiang
-Maintainer: Mike Jiang <wjiang2@fhcrc.org>, Jake Wagner <jpwagner@fhcrc.org>
+Maintainer: Mike Jiang <mike@ozette.ai>
 Description: This package provides the core data structure and API to represent and interact with the gated cytometry data.
 License: file LICENSE
 License_restricts_use: yes
@@ -15,7 +15,7 @@ Imports:
 Depends:
     R (>= 3.4)
 Suggests: knitr
-LinkingTo: Rcpp, BH(>= 1.72.0-2), RProtoBufLib(>= 1.99.8),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1)
+LinkingTo: Rcpp, BH(>= 1.75.0.0), RProtoBufLib(>= 2.3.2),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1)
 biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing, DataRepresentation
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11

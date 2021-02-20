@@ -28,7 +28,7 @@ struct FCS_READ_PARAM{
  */
 class MemCytoFrame: public CytoFrame{
 	EVENT_DATA_VEC data_;//col-major
-
+	vector<string> rownames_;
 	// below are cached for fcs parsing, should be of no usage once the data section is parsed
 	string filename_;
 	FCS_READ_PARAM config_;
@@ -54,6 +54,7 @@ public:
 	MemCytoFrame(const CytoFrame & frm):CytoFrame(frm)
 	{
 		data_ = frm.get_data();
+		rownames_ = frm.get_rownames();
 	}
 	/**
 	 * Constructor from the FCS file
@@ -127,12 +128,32 @@ public:
 	 */
 	void realize_(uvec row_idx, uvec col_idx);
 	void realize_(uvec idx, bool is_row_indexed);
-
+	void subset_rownames(uvec row_idx)
+	{
+		if(rownames_.size() > 0)
+		{
+			auto n = row_idx.size();
+			vector<string> tmp(n);
+			for(unsigned i = 0; i < n; i++)
+				tmp[i] = rownames_[row_idx[i]];
+			rownames_ = tmp;
+		}
+	}
 	/**
  * Caller will receive a copy of data
  * @return
  */
-
+	vector<string> get_rownames() const
+	{
+		return rownames_;
+	}
+	void set_rownames(const vector<string> & data_in)
+	{
+		if(n_rows()!=data_in.size())
+			throw(domain_error("the input rownames size is different from the matrix size!"));
+		rownames_ = data_in;
+	}
+	void del_rownames(){rownames_.clear();}
 	EVENT_DATA_VEC get_data() const
 	{
 		return data_;

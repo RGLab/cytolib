@@ -33,6 +33,7 @@ enum DataTypeLocation {MEM, H5};
 typedef unordered_map<string, string> PDATA;
 
 const H5std_string  DATASET_NAME( "data");
+const H5std_string  DATASET_ROWNAME( "rownames");
 
 /*
  * simple vector version of keyword type
@@ -157,14 +158,11 @@ public:
 	CompType get_h5_datatype_params(DataTypeLocation storage_type) const;
 	CompType get_h5_datatype_keys() const;
 	virtual void write_h5_params(H5File file) const;
-	void write_to_disk(const string & filename, FileFormat format = FileFormat::TILE
+	void write_to_disk(const string & filename, FileFormat format = FileFormat::H5
 				, const CytoCtx ctx = CytoCtx()) const
 		{
 
-			if(format == FileFormat::H5)
 				write_h5(filename);
-			else
-				write_tile(filename, ctx);
 
 		}
 
@@ -190,22 +188,50 @@ public:
 	}
 	virtual void write_h5_keys(H5File file) const;
 	virtual void write_h5_pheno_data(H5File file) const;
+	virtual void write_h5_rownames(H5File file, vector<string> rn) const
+	{
+		StrType str_type(H5::PredType::C_S1, H5T_VARIABLE);	//define variable-length string data type		hsize_t nSize = pheno_data_.size();
+		auto nSize = rn.size();
+		if(nSize > 0)
+		{
+
+			if(nSize!=n_rows())
+				throw runtime_error("rowname size is not consistent with data size!");
+
+			DataSet ds;
+			auto dsname = DATASET_ROWNAME;
+			if(file.exists(dsname))
+				ds = file.openDataSet(dsname);
+			else
+			{
+				hsize_t     str_dimsf[1] {nSize};
+				H5::DataSpace   dataspace(1, str_dimsf);
+				ds = file.createDataSet(dsname, str_type, dataspace);
+			}
+			 // HDF5 only understands vector of char* :-(
+			std::vector<const char*> rn_c_str;
+			for (unsigned ii = 0; ii < rn.size(); ++ii)
+				rn_c_str.push_back(rn[ii].c_str());
+			ds.write(rn_c_str.data(), str_type );
+			ds.flush(H5F_SCOPE_LOCAL);
+
+		}
+	}
+
 	/**
 	 * save the CytoFrame as HDF5 format
 	 *
 	 * @param filename the path of the output H5 file
 	 */
 	virtual void write_h5(const string & filename) const;
-	void write_tile(const string & uri, const CytoCtx & cytoctx = CytoCtx()) const;
-	void write_tile_data(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_data(const string & uri, const EVENT_DATA_VEC & _data, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_pd(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_kw(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
-	void write_tile_params(const string & uri, const CytoCtx & cytoctx, bool is_new = false) const;
 	/**
 	 * get the data of entire event matrix
 	 * @return
 	 */
+	//TODO: implement these for disk-based cytoframes
+	virtual vector<string> get_rownames() const=0;
+	virtual void set_rownames(const vector<string> & data_in)=0;
+	virtual void del_rownames()=0;
 	virtual EVENT_DATA_VEC get_data() const=0;
 	virtual EVENT_DATA_VEC get_data(uvec idx, bool is_col) const=0;
 	virtual EVENT_DATA_VEC get_data(uvec row_idx, uvec col_idx) const=0;
@@ -243,6 +269,31 @@ public:
 	virtual void set_keyword(const string & key, const string & value)
 	{
 		keys_[key] = value;
+	}
+
+	/**
+	 * Change the key of a single key-value pair
+	 * @param old_key old keyword name
+	 * @param new_key new keyword name
+	 */
+	virtual void rename_keyword(const string & old_key, const string & new_key)
+	{
+		KW_PAIR::iterator it = keys_.find(old_key);
+        if(it!=keys_.end())
+        	it->first = new_key;
+        else
+        	throw(domain_error("keyword not found: " + old_key));
+	}
+
+	/**
+	 *	Remove a single key-value pair.
+	 *	KW_PAIR is vector based, so this is not particularly efficient
+	 *	as later elements will need to be relocated, but it is faster
+	 *	than completely reconstructing the KW_PAIR object.
+	 *	@param key keyword to be removed
+	 */
+	virtual void remove_keyword(const string & key){
+		keys_.erase(key);
 	}
 
 	/**

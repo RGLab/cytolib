@@ -28,7 +28,6 @@ namespace cytolib
 		unordered_set<string> cf_samples;
 		unordered_set<string> pb_samples;
 		FileFormat fmt;
-		bool is_first_sample = true;
 		//search for h5
 		CytoVFS vfs(ctx);
 		for(auto & e : vfs.ls(path))
@@ -36,26 +35,9 @@ namespace cytolib
 			fs::path p(e);
 			string ext = p.extension().string();
 			string fn = p.stem().string();
-			if(ext == ".h5"||ext == ".tile")
+			if(ext == ".h5")
 			{
-				//init fmt for the first sample file
-				if(is_first_sample)
-				{
-					if(ext == ".h5")
-						fmt = FileFormat::H5;
-					else
-						fmt = FileFormat::TILE;
-					is_first_sample = false;
-				}
-				else
-				{
-					//consistency check
-					if((fmt == FileFormat::H5&&ext==".tile")||(fmt == FileFormat::TILE&&ext==".h5"))
-						throw(domain_error(errmsg + "Multiple file formats found!"));
-				}
-
-
-				cf_samples.insert(fn);
+					cf_samples.insert(fn);
 			}
 			else if(ext == ".pb")
 			{
@@ -225,14 +207,6 @@ namespace cytolib
 			, bool is_skip_data
 			, const CytoCtx & ctx)
 	{
-		/*
-		 * validity check for path
-		 */
-		if(is_remote_path(path))
-		{
-			if(begin()->second->get_cytoframe_view_ref().get_backend_type()!=FileFormat::TILE)
-				throw(logic_error("Only tiledb backend supports saving to remote path!"));
-		}
 
 		string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
 		CytoVFS vfs(ctx);
@@ -265,7 +239,7 @@ namespace cytolib
 						}
 
 					}
-					else if(ext == ".tile"||ext == ".h5"||ext == ".pb")
+					else if(ext == ".h5"||ext == ".pb")
 					{
 						string sample_uid = p.stem().string();
 						if(find(sample_uid) == end())
