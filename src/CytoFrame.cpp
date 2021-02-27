@@ -82,37 +82,48 @@ namespace cytolib
 	 * R*t(X) == t(Q)*t(A) (Q orthogonal)
 	 * that can now be solved efficiently for t(X) by back substitution, then transposed for X
 	 */
-	void CytoFrame::compensate(const compensation & comp)
-	{
-
-		int nMarker = comp.marker.size();
-		EVENT_DATA_VEC dat = get_data();
-		uvec indices(nMarker);
-		for(int i = 0; i < nMarker; i++)
-		{
-			int id = get_col_idx(comp.marker[i], ColType::channel);
-			if(id < 0)
-				throw(domain_error("compensation parameter '" + comp.marker[i] + "' not found in cytoframe parameters!"));
-
-			indices[i] = id;
-		}
-		arma::mat A(dat.memptr(), n_rows(), n_cols(), false, true);//point to the original data
-		// Try to avoid extra memory burden from copies by performing all of these transpositions in-place
-		inplace_trans(A);
-		mat B = comp.get_spillover_mat();
-		inplace_trans(B);
-		mat Q;
-		mat R;
-		qr_econ(Q, R, B);
-		inplace_trans(Q);
-		// Assign to rows representing t(X)
-		// Note: trimatu to tell Armadillo that R is upper-triangular
-		// so it goes straight to back-substitution
-		A.rows(indices) = solve(trimatu(R), Q*A.rows(indices));
-		// Need to transpose A back to proper orientation
-		// (which also takes care of transposing t(X) back to X)
-		inplace_trans(A);
-		set_data(dat);
+	void CytoFrame::compensate(const compensation& comp) {
+	  int nMarker = comp.marker.size();
+	  EVENT_DATA_VEC dat = get_data();
+	  arma::uvec indices(nMarker);
+	  for (int i = 0; i < nMarker; i++) {
+	    int id = get_col_idx(comp.marker[i], ColType::channel);
+	    if (id < 0)
+	      throw(std::domain_error("compensation parameter '" + comp.marker[i] +
+             "' not found in cytoframe parameters!"));
+	    
+	    indices[i] = id;
+	  }
+	  int nDetector = comp.detector.size();
+	  arma::uvec indices_detector(nDetector);
+	  for (int i = 0; i < nDetector; i++) {
+	    int id = get_col_idx(comp.detector[i], ColType::channel);
+	    if (id < 0)
+	      throw(std::domain_error("compensation parameter '" + comp.marker[i] +
+             "' not found in cytoframe parameters!"));
+	    
+	    indices_detector[i] = id;
+	  }
+	  arma::mat A(dat.memptr(), n_rows(), n_cols(), false,
+               true);  // point to the original data
+	  // Try to avoid extra memory burden from copies by performing
+	  // all of these transpositions in-place
+	  inplace_trans(A);
+	  arma::mat B = comp.get_spillover_mat();
+	  // B.print("comp");
+	  inplace_trans(B); //B is marker by detector 
+	  arma::mat Q;
+	  arma::mat R;
+	  qr_econ(Q, R, B);
+	  inplace_trans(Q);
+	  // Assign to rows representing t(X)
+	  // Note: trimatu to tell Armadillo that R is upper-triangular
+	  // so it goes straight to back-substitution
+	  A.rows(indices) = solve(trimatu(R), Q * A.rows(indices_detector));
+	  // Need to transpose A back to proper orientation
+	  //(which also takes care of transposing t(X) back to X)
+	  inplace_trans(A);
+	  set_data(dat);
 	}
 
 	void CytoFrame::scale_time_channel(string time_channel){

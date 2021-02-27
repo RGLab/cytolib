@@ -44,7 +44,7 @@ namespace cytolib
 		unsigned nDetector = detector.size();
 		if(spillOver.size()!=nDetector * nMarker)
 			throw(domain_error("invalid spillover matrix!"));
-		mat B(spillOver.data(), nMarker, nDetector);
+		mat B(spillOver.data(), nDetector, nMarker);
 		return B.t();
 	}
 	void compensation::update_channels(const CHANNEL_MAP & chnl_map){
