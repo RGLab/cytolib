@@ -21,19 +21,19 @@ cytolib_objs=${cytolib_src:.cpp=.o}
 .PHONY: all clean 
 
 USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
-PKGLIB = ${USERDIR}/libcytolib.a
+USERLIB = ${USERDIR}/libcytolib.a
 OBJECTS=dummy.o
 
 
 all: $(SHLIB) 
 
-$(SHLIB): $(PKGLIB)
+$(SHLIB): $(USERLIB)
 
 
 #expose static lib for other package to link to 
-$(PKGLIB): ${boost_fs_objs} ${cytolib_objs}
+$(USERLIB): ${boost_fs_objs} ${cytolib_objs}
 	mkdir -p "${USERDIR}"
-	$(AR) rs "${PKGLIB}" $(cytolib_objs) $(boost_fs_objs) ${boost_sys_objs}
+	$(AR) rs "${USERLIB}" $(cytolib_objs) $(boost_fs_objs) ${boost_sys_objs}
 	
 
 
