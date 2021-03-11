@@ -1,13 +1,15 @@
 # Copyright 2019 Fred Hutchinson Cancer Research Center
 # See the included LICENSE file for details on the licence that is granted to the user of this software.
-CXX_STD = CXX11
+#  GNUMakefile
+ 
 # Just a snippet to stop executing under other make(1) commands
 # that won't understand these lines
 ifneq (,)
 This makefile requires GNU Make.
 endif
 
-
+	
+CXX_STD = CXX11
 boost_sys_src=${wildcard boost/libs/system/src/*.cpp}
 boost_sys_objs=${boost_sys_src:.cpp=.o}
 boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
@@ -17,28 +19,28 @@ PKG_CPPFLAGS =-DROUT -I../inst/include -DRCPP_PARALLEL_USE_TBB=1 -fpermissive -D
 cytolib_src=${wildcard *.cpp}
 cytolib_objs=${cytolib_src:.cpp=.o}
 
-	
-.PHONY: all clean 
-
+BOOSTFSLIB = libboost_fs.a
 USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
 USERLIB = ${USERDIR}/libcytolib.a
+
 OBJECTS=dummy.o
+
+#needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
+FSLIB = ${boost_fs_objs} ${boost_sys_objs}
+
 
 
 all: $(SHLIB) 
 
 $(SHLIB): $(USERLIB)
 
-
-#expose static lib for other package to link to 
-$(USERLIB): ${boost_fs_objs} ${cytolib_objs}
+$(USERLIB): ${boost_fs_objs} ${cytolib_objs} 
 	mkdir -p "${USERDIR}"
-	$(AR) rs "${USERLIB}" $(cytolib_objs) $(boost_fs_objs) ${boost_sys_objs}
-	
-
+	$(AR) rs "${USERLIB}" ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs}
 
 $(boost_fs_objs): ${boost_sys_objs}
 
 
 clean:
-	rm -f $(OBJECTS) ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs} $(SHLIB) 
+	rm -f $(OBJECTS) ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs} $(SHLIB)
+ 
