@@ -177,13 +177,17 @@ public:
 				const pb::nodeProperties & np_pb = node_pb.node();
 
 				VertexID curChildID = i;
-				tree[curChildID] = nodeProperties(np_pb);
-
-				if(node_pb.has_parent()){
-					VertexID parentID = node_pb.parent();
-					boost::add_edge(parentID,curChildID,tree);
+				auto np = nodeProperties(np_pb);
+				tree[curChildID] = np;
+				
+				VertexID parentID = node_pb.parent();
+				// check if current node is root (since parent could be 0 for both /root and
+				// root/A for proto3 when its parent is absent)
+				// assumption is node A won't be named as 'root', will be enforced at name
+				// setter
+				if ((parentID == 0 && np.getName() != "root") || parentID > 0) {
+				  boost::add_edge(parentID, curChildID, tree);
 				}
-
 			}
 			//restore comp
 			comp = compensation(pb_gh.comp());
@@ -199,8 +203,6 @@ public:
 			{
 				CytoFramePtr ptr = load_cytoframe(uri, readonly, ctx);
 				pb::CytoFrame fr = *pb_gh.mutable_frame();
-				if(!fr.is_h5())
-					ptr.reset(new MemCytoFrame(*ptr));
 				frame_ = CytoFrameView(ptr);
 			}
 		}
