@@ -6,8 +6,8 @@
 namespace cytolib
 {
 
-	transformation::transformation():isGateOnly(false),type(CALTBL),isComputed(true){}
-	transformation::transformation(bool _isGate, unsigned short _type):isGateOnly(_isGate),type(_type),isComputed(true){}
+	transformation::transformation():isGateOnly(false),isDataOnly(false),type(CALTBL),isComputed(true){}
+	transformation::transformation(bool _isGate, unsigned short _type):isGateOnly(_isGate),isDataOnly(false),type(_type),isComputed(true){}
 	void transformation::transforming(EVENT_DATA_TYPE * input, int nSize){
 		if(!calTbl.isInterpolated()){
 			 /* calculate calibration table from the function
@@ -576,7 +576,7 @@ namespace cytolib
 	}
 
 	// Defines a scaleTrans solely on float scale factor (not as a ratio of ints)
-	scaleTrans::scaleTrans(EVENT_DATA_TYPE _scale_factor):linTrans(),t_scale(0), r_scale(0), scale_factor(_scale_factor){isGateOnly = true;}
+	scaleTrans::scaleTrans(EVENT_DATA_TYPE _scale_factor):linTrans(),t_scale(_scale_factor), r_scale(1), scale_factor(_scale_factor){isGateOnly = true;}
 
 	void scaleTrans::transforming(EVENT_DATA_TYPE * input, int nSize){
 		for(int i=0;i<nSize;i++)

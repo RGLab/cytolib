@@ -553,7 +553,17 @@ namespace cytolib
 		if(g_loglevel>=GATING_HIERARCHY_LEVEL)
 				PRINT("\nstart transform Gates \n");
 
-
+		// rm dataonly trans
+		auto trans1 = trans;
+		cytolib::trans_map transMap;
+		for (auto i : trans1.getTransMap()) {
+		  if (!i.second->dataOnly()) 
+		  {
+		    transMap[i.first] = i.second;
+		  }
+		}
+		trans1.setTransMap(transMap);
+		
 			VertexID_vec vertices=getVertices(0);
 
 			for(VertexID_vec::iterator it=vertices.begin();it!=vertices.end();it++)
@@ -571,10 +581,10 @@ namespace cytolib
 					if(gateType == CURLYQUADGATE)
 					{
 						CurlyQuadGate& curlyGate = dynamic_cast<CurlyQuadGate&>(*g);
-						curlyGate.interpolate(trans);//the interpolated polygon is in raw scale
+						curlyGate.interpolate(trans1);//the interpolated polygon is in raw scale
 					}
 					if(gateType!=BOOLGATE)
-						g->transforming(trans);
+						g->transforming(trans1);
 
 				}
 			}

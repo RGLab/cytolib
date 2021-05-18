@@ -61,6 +61,8 @@ class transformation{
 protected:
 	calibrationTable calTbl; //no longer have to store calTbl since we now can compute it from biexp even for mac workspace
 	bool isGateOnly;
+	bool isDataOnly;  // currently used to avoid linear transform time gate since
+	// gate is already stored in transformed scale
 	unsigned short type;//could have been avoided if it is not required by R API getTransformation that needs to extract concrete transformation
 	string name;
 	string channel;
@@ -85,6 +87,8 @@ public:
 	virtual bool isInterpolated();
 	virtual bool gateOnly();
 	virtual void setGateOnlyFlag(bool _flag);
+	virtual bool dataOnly() { return isDataOnly; };
+	virtual void setDataOnlyFlag(bool _flag){isDataOnly = _flag;};
 	virtual bool computed();
 	virtual void setComputeFlag(bool _flag);
 	virtual string getName();
