@@ -260,7 +260,7 @@ public:
 /*
  * This class is dedicated to scale the EllipsoidGate
  */
-class scaleTrans:public linTrans{
+class scaleTrans:public transformation{
 public:
 	int t_scale; //transformed scale
 	int r_scale; // raw scale

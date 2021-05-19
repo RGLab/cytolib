@@ -564,19 +564,19 @@ namespace cytolib
 
 
 
-	scaleTrans::scaleTrans():linTrans(),t_scale(256), r_scale(262144){
-		isGateOnly = true;
-		scale_factor = t_scale/(EVENT_DATA_TYPE)r_scale;
+	scaleTrans::scaleTrans():transformation(true, SCALE),t_scale(256), r_scale(262144){
+	  calTbl.setInterpolated(true);
+	  scale_factor = t_scale/(EVENT_DATA_TYPE)r_scale;
 	}
-	scaleTrans::scaleTrans(int _t_scale, int _r_scale):linTrans(),t_scale(_t_scale), r_scale(_r_scale){
-		isGateOnly = true;
-		if((_r_scale == 0) || (_t_scale == 0))
+	scaleTrans::scaleTrans(int _t_scale, int _r_scale):transformation(true, SCALE),t_scale(_t_scale), r_scale(_r_scale){
+	  calTbl.setInterpolated(true);
+	  if((_r_scale == 0) || (_t_scale == 0))
 			throw(domain_error("Illegal arguments provided to scaleTrans constructor: t_scale and r_scale must be nonzero"));
 		scale_factor = t_scale/(EVENT_DATA_TYPE)r_scale;
 	}
 
 	// Defines a scaleTrans solely on float scale factor (not as a ratio of ints)
-	scaleTrans::scaleTrans(EVENT_DATA_TYPE _scale_factor):linTrans(),t_scale(_scale_factor), r_scale(1), scale_factor(_scale_factor){isGateOnly = true;}
+	scaleTrans::scaleTrans(EVENT_DATA_TYPE _scale_factor):transformation(true, SCALE),t_scale(1), r_scale(1), scale_factor(_scale_factor){calTbl.setInterpolated(true);}
 
 	void scaleTrans::transforming(EVENT_DATA_TYPE * input, int nSize){
 		for(int i=0;i<nSize;i++)
@@ -595,7 +595,7 @@ namespace cytolib
 		st_pb->set_r_scale(r_scale);
 	}
 
-	scaleTrans::scaleTrans(const pb::transformation & trans_pb):linTrans(trans_pb){
+	scaleTrans::scaleTrans(const pb::transformation & trans_pb):transformation(trans_pb){
 		const pb::scaleTrans & st_pb = trans_pb.st();
 		scale_factor = st_pb.scale_factor();
 		t_scale = st_pb.t_scale();
