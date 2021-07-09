@@ -9,11 +9,10 @@
 
 #ifndef INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_
 #define INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_
-#include <armadillo>
-using namespace arma;
 
 #include "readFCSHeader.hpp"
 #include "compensation.hpp"
+using namespace arma;
 #include <boost/lexical_cast.hpp>
 #include <cytolib/global.hpp>
 #include <unordered_map>
