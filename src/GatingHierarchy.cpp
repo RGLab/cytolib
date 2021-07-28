@@ -1432,7 +1432,8 @@ namespace cytolib
 		nodePath.push_front(sNodePath);
 
 		//init searching routes
-		VertexID_vec leafIDs=getDescendants(0,leafName);
+		VertexID_vec leafIDs;
+		if (!fullPath) leafIDs = getDescendants(0, leafName);//only invoke getDescendants call when non-full-path is requested since it gets expensive for large tree
 
 		//start to trace back to ancestors
 		while(u > 0)
