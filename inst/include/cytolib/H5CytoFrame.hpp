@@ -20,18 +20,18 @@ namespace cytolib {
  * Instead, data is read from H5 file on demand, which is more memory efficient.
  */
 class H5CytoFrame : public CytoFrame {
- protected:
+protected:
   string filename_;
-  hsize_t dims[2];  // dataset dimensions
-  bool readonly_;   // whether allow the public API to modify it, can't rely on
-                    // h5 flag mechanism since
+  hsize_t dims[2]; // dataset dimensions
+  bool readonly_;  // whether allow the public API to modify it, can't rely on
+                   // h5 flag mechanism since
   //					its behavior is uncerntain for multiple
   // opennings flags indicating if cached meta data needs to be flushed to h5
   bool is_dirty_params;
   bool is_dirty_keys;
   bool is_dirty_pdata;
   FileAccPropList
-      access_plist_;  // used to custom fapl, especially for s3 backend
+      access_plist_; // used to custom fapl, especially for s3 backend
   EVENT_DATA_VEC read_data(uvec col_idx) const;
   int h5_flags() const {
     if (get_readonly())
@@ -40,7 +40,7 @@ class H5CytoFrame : public CytoFrame {
       return H5F_ACC_RDWR;
   };
 
- public:
+public:
   void flush_meta();
   void flush_params();
 
@@ -122,7 +122,8 @@ class H5CytoFrame : public CytoFrame {
                    bool is_update_keywords = true) {
     CytoFrame::set_channel(oldname, newname, is_update_keywords);
     is_dirty_params = true;
-    if (is_update_keywords) is_dirty_keys = true;
+    if (is_update_keywords)
+      is_dirty_keys = true;
   }
   int set_channels(const vector<string> &channels) {
     int res = CytoFrame::set_channels(channels);
@@ -171,7 +172,8 @@ class H5CytoFrame : public CytoFrame {
                 access_plist_);
     check_write_permission();
 
-    if (file.exists(DATASET_ROWNAME)) file.unlink(DATASET_ROWNAME);
+    if (file.exists(DATASET_ROWNAME))
+      file.unlink(DATASET_ROWNAME);
   }
   void set_marker(const string &channelname, const string &markername) {
     CytoFrame::set_marker(channelname, markername);
@@ -182,7 +184,8 @@ class H5CytoFrame : public CytoFrame {
                  bool is_update_keywords = true) {
     CytoFrame::set_range(colname, ctype, new_range, is_update_keywords);
     is_dirty_params = true;
-    if (is_update_keywords) is_dirty_keys = true;
+    if (is_update_keywords)
+      is_dirty_keys = true;
   }
   void set_pheno_data(const string &name, const string &value) {
     CytoFrame::set_pheno_data(name, value);
@@ -203,9 +206,7 @@ class H5CytoFrame : public CytoFrame {
    */
   H5CytoFrame(const string &fcs_filename, FCS_READ_PARAM &config,
               const string &h5_filename, bool readonly = false)
-      : filename_(h5_filename),
-        is_dirty_params(false),
-        is_dirty_keys(false),
+      : filename_(h5_filename), is_dirty_params(false), is_dirty_keys(false),
         is_dirty_pdata(false) {
     MemCytoFrame fr(fcs_filename, config);
     fr.read_fcs();
@@ -217,15 +218,11 @@ class H5CytoFrame : public CytoFrame {
    * @param _filename H5 file path
    */
   H5CytoFrame(const string &h5_filename, bool readonly = true, bool init = true)
-      : CytoFrame(),
-        filename_(h5_filename),
-        readonly_(readonly),
-        is_dirty_params(false),
-        is_dirty_keys(false),
-        is_dirty_pdata(false) {
+      : CytoFrame(), filename_(h5_filename), readonly_(readonly),
+        is_dirty_params(false), is_dirty_keys(false), is_dirty_pdata(false) {
     access_plist_ = FileAccPropList::DEFAULT;
-    if (init)  // optionally delay load for the s3 derived cytoframe which needs
-               // to reset fapl before load
+    if (init) // optionally delay load for the s3 derived cytoframe which needs
+              // to reset fapl before load
       init_load();
   }
   void init_load() {
@@ -266,29 +263,32 @@ class H5CytoFrame : public CytoFrame {
 
       if (!fs::equivalent(fs::path(filename_).parent_path(), dest)) {
         switch (h5_opt) {
-          case CytoFileOption::copy: {
-            if (fs::exists(h5path)) fs::remove(h5path);
-            fs::copy(filename_, h5_filename);
-            break;
-          }
-          case CytoFileOption::move: {
-            if (fs::exists(h5path)) fs::remove(h5path);
-            fs::rename(filename_, h5_filename);
-            break;
-          }
-          case CytoFileOption::link: {
-            throw(logic_error(
-                "'link' option for H5CytoFrame is no longer supported!"));
-            fs::create_hard_link(filename_, h5_filename);
-            break;
-          }
-          case CytoFileOption::symlink: {
-            if (fs::exists(h5path)) fs::remove(h5path);
-            fs::create_symlink(filename_, h5_filename);
-            break;
-          }
-          default:
-            throw(logic_error("invalid h5_opt!"));
+        case CytoFileOption::copy: {
+          if (fs::exists(h5path))
+            fs::remove(h5path);
+          fs::copy(filename_, h5_filename);
+          break;
+        }
+        case CytoFileOption::move: {
+          if (fs::exists(h5path))
+            fs::remove(h5path);
+          fs::rename(filename_, h5_filename);
+          break;
+        }
+        case CytoFileOption::link: {
+          throw(logic_error(
+              "'link' option for H5CytoFrame is no longer supported!"));
+          fs::create_hard_link(filename_, h5_filename);
+          break;
+        }
+        case CytoFileOption::symlink: {
+          if (fs::exists(h5path))
+            fs::remove(h5path);
+          fs::create_symlink(filename_, h5_filename);
+          break;
+        }
+        default:
+          throw(logic_error("invalid h5_opt!"));
         }
       }
     }
@@ -303,7 +303,8 @@ class H5CytoFrame : public CytoFrame {
   EVENT_DATA_VEC get_data() const {
     unsigned n = n_cols();
     uvec col_idx(n);
-    for (unsigned i = 0; i < n; i++) col_idx[i] = i;
+    for (unsigned i = 0; i < n; i++)
+      col_idx[i] = i;
     return read_data(col_idx);
   }
   /**
@@ -365,7 +366,7 @@ class H5CytoFrame : public CytoFrame {
     }
     MemCytoFrame fr(*this);
     fr.copy(row_idx, col_idx)
-        ->write_h5(new_filename);  // this flushes the meta data as well
+        ->write_h5(new_filename); // this flushes the meta data as well
     return CytoFramePtr(new H5CytoFrame(new_filename, false));
   }
 
@@ -382,7 +383,7 @@ class H5CytoFrame : public CytoFrame {
     }
     MemCytoFrame fr(*this);
     fr.copy(idx, is_row_indexed)
-        ->write_h5(new_filename);  // this flushes the meta data as well
+        ->write_h5(new_filename); // this flushes the meta data as well
     return CytoFramePtr(new H5CytoFrame(new_filename, false));
   }
 
@@ -407,11 +408,11 @@ class H5CytoFrame : public CytoFrame {
   //	{
   //		if(n_rows()!=data_in.size())
   //			throw(domain_error("the input rownames size is different
-  //from the matrix size!"));
+  // from the matrix size!"));
 
   //	}
 };
 
-};  // namespace cytolib
+}; // namespace cytolib
 
 #endif /* INST_INCLUDE_CYTOLIB_H5CYTOFRAME_HPP_ */

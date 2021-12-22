@@ -23,7 +23,7 @@ class CytoFrameView {
   bool is_row_indexed_ = false;
   bool is_col_indexed_ = false;
 
- public:
+public:
   CytoFrameView(){};
   CytoFrameView(CytoFramePtr ptr) : ptr_(ptr){};
   CytoFramePtr get_cytoframe_ptr() const;
@@ -58,7 +58,8 @@ class CytoFrameView {
       return vector<string>();
     else {
       vector<string> res(n);
-      for (unsigned i = 0; i < n; i++) res[i] = orig[row_idx_[i]];
+      for (unsigned i = 0; i < n; i++)
+        res[i] = orig[row_idx_[i]];
       return res;
     }
   }
@@ -85,15 +86,15 @@ class CytoFrameView {
       // update it
 
       if (n_rows() != n)
-        throw(
-            domain_error("The length of the input rownames is different from "
-                         "the cytoframeview!"));
+        throw(domain_error("The length of the input rownames is different from "
+                           "the cytoframeview!"));
       else {
         if (is_row_indexed_) {
           if (data_orig.size() == 0)
             data_orig.resize(get_cytoframe_ptr()->n_rows());
 
-          for (unsigned i = 0; i < n; i++) data_orig[row_idx_[i]] = data_in[i];
+          for (unsigned i = 0; i < n; i++)
+            data_orig[row_idx_[i]] = data_in[i];
         } else
           data_orig = data_in;
       }
@@ -123,9 +124,8 @@ class CytoFrameView {
             fs::remove_all(oldh5);
         }
       } else
-        throw(
-            domain_error("Only 'copy' or 'move' option is supported for the "
-                         "indexed CytoFrameView object!"));
+        throw(domain_error("Only 'copy' or 'move' option is supported for the "
+                           "indexed CytoFrameView object!"));
     } else
       get_cytoframe_ptr()->convertToPb(fr_pb, cf_filename, h5_opt, ctx);
   };
@@ -239,9 +239,8 @@ class CytoFrameView {
    * @param rtype either RangeType::data or RangeType::instrument
    * @return
    */
-  pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> get_range(const string &colname,
-                                                   ColType ctype,
-                                                   RangeType rtype) const {
+  pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE>
+  get_range(const string &colname, ColType ctype, RangeType rtype) const {
     return get_cytoframe_ptr()->get_range(colname, ctype, rtype);
   }
 
@@ -329,6 +328,6 @@ class CytoFrameView {
   CytoFrameView copy(const string &cf_filename = "") const;
 };
 
-}  // namespace cytolib
+} // namespace cytolib
 
 #endif /* INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_ */

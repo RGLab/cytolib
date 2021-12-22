@@ -36,7 +36,8 @@ string s3_to_http(string uri) {
   boost::replace_first(uri, "s3://", "");
   vector<string> tokens;
   boost::split(tokens, uri, boost::is_any_of("/"));
-  if (tokens.size() == 0) throw(domain_error("invalid s3 path: " + uri));
+  if (tokens.size() == 0)
+    throw(domain_error("invalid s3 path: " + uri));
 
   uri = "https://" + tokens[0] + ".s3.amazonaws.com";
   for (int i = 1; i < tokens.size(); i++) {
@@ -102,7 +103,7 @@ string generate_timestamp() {
  * @return
  */
 string generate_uid() { return to_string(boost::uuids::random_generator()()); }
-string generate_uid_old(int len)  //(pseudo guid)
+string generate_uid_old(int len) //(pseudo guid)
 {
   //		int t = time(NULL);//this only returns second-wise precision,
   // not sufficient for distinguishing multiple gatingsets that are generated
@@ -152,7 +153,7 @@ tm str_to_tm(string s) {
   time_t rawtime;
   time(&rawtime);
   struct tm *timeinfo =
-      localtime(&rawtime);  // The returned value points to an internal object
+      localtime(&rawtime); // The returned value points to an internal object
   // init time member to avoid random values for day,month,year
   tm t = *timeinfo;
   t.tm_hour = boost::lexical_cast<int>(time_vec[0]);
@@ -180,4 +181,4 @@ TM_ext parse_time_with_fractional_seconds(const string s_time) {
     res.fractional_secs = 0;
   return res;
 }
-};  // namespace cytolib
+}; // namespace cytolib

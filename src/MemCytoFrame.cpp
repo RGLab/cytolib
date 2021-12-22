@@ -116,7 +116,7 @@ void MemCytoFrame::string_to_keywords(string txt, bool emptyValue) {
    *	when empty value is allowed, we have to take the assumption that there
    *is no double delimiters in any keys or values,
    */
-  if (!emptyValue)  // replace the double delimiter with the odd char
+  if (!emptyValue) // replace the double delimiter with the odd char
     boost::replace_all(txt, doubleDelimiter, soddChar);
   std::vector<std::string> tokens;
   boost::split(tokens, txt, [delimiter](char c) { return c == delimiter; });
@@ -124,11 +124,11 @@ void MemCytoFrame::string_to_keywords(string txt, bool emptyValue) {
 
   unsigned j = isDelimiterEnd
                    ? tokens.size() - 2
-                   : tokens.size() - 1;  // last token, skip the last empty one
-                                         // when end with delimiter
+                   : tokens.size() - 1; // last token, skip the last empty one
+                                        // when end with delimiter
   string key;
   for (unsigned i = 1; i <= j;
-       i++) {  // counter, start with 1 to skip the first empty tokens
+       i++) { // counter, start with 1 to skip the first empty tokens
     std::string token = tokens[i];
     boost::trim(token);
     //				PRINT( token + " ");
@@ -142,7 +142,7 @@ void MemCytoFrame::string_to_keywords(string txt, bool emptyValue) {
 
       boost::replace_all(
           token, soddChar,
-          string(1, delimiter));  // unescape the double delimiter to single one
+          string(1, delimiter)); // unescape the double delimiter to single one
       //				std::PRINT( token;
     }
     //				PRINT("\n");
@@ -155,9 +155,9 @@ void MemCytoFrame::string_to_keywords(string txt, bool emptyValue) {
             "Empty keyword name detected!If it is due to the double delimiters "
             "in keyword value, please set emptyValue to FALSE and try again!");
 
-      key = token;  // set key
+      key = token; // set key
     } else {
-      keys_[key] = token;  // set value
+      keys_[key] = token; // set value
       //				PRINT( token + " ");
     }
   }
@@ -186,9 +186,9 @@ void MemCytoFrame::parse_fcs_text_section(ifstream &in, bool emptyValue) {
   //	    txt <- iconv(rawToChar(txt), "", "latin1", sub="byte")
   int nTxt = header_.textend - header_.textstart + 1;
   char *tmp = new char[nTxt + 1];
-  in.read(tmp, nTxt);  // can't use in.get since it will stop at newline '\n'
-                       // which could be present in FCS TXT
-  tmp[nTxt] = '\0';    // make it as c_string
+  in.read(tmp, nTxt); // can't use in.get since it will stop at newline '\n'
+                      // which could be present in FCS TXT
+  tmp[nTxt] = '\0';   // make it as c_string
   string txt(tmp);
   delete[] tmp;
   boost::trim_right_if(txt, boost::is_any_of(" \t\r\n"));
@@ -252,7 +252,8 @@ void MemCytoFrame::convertToPb(pb::CytoFrame &fr_pb, const string &h5_filename,
                                CytoFileOption h5_opt,
                                const CytoCtx &ctx) const {
   fr_pb.set_is_h5(false);
-  if (h5_opt != CytoFileOption::skip) write_h5(h5_filename);
+  if (h5_opt != CytoFileOption::skip)
+    write_h5(h5_filename);
 }
 
 unsigned MemCytoFrame::n_rows() const {
@@ -345,9 +346,8 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
     }
   }
   if (dattype != "I" && multiSize)
-    throw(
-        domain_error("Sorry, Numeric data type expects the same bitwidth for "
-                     "all parameters!"));
+    throw(domain_error("Sorry, Numeric data type expects the same bitwidth for "
+                       "all parameters!"));
 
   //		bool splitInt;
   //		if(dattype=="I"){
@@ -377,7 +377,8 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
       else
         PRINT("Beckma Coulter CPX data.\nCorrected for invalid bitwidth 10.\n");
 
-      for (auto &p : params) p.PnB = 16;
+      for (auto &p : params)
+        p.PnB = 16;
     }
   }
 
@@ -392,9 +393,9 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
   //>
   // 2
   //		  //# we set it to TRUE automatically then to avoid warning
-  //flooded by readBin
+  // flooded by readBin
   //		  //# It shouldn't cause data clipping since we haven't found
-  //any use case where datatype is unsigned integer with size > 16bits
+  // any use case where datatype is unsigned integer with size > 16bits
   // isSigned =
   //!(params[0].PnB == 8 ||params[0].PnB == 16);
   //		}
@@ -438,9 +439,9 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
     nBytes = nrow * nRowSize / 8;
   }
   unique_ptr<char[]> buf(
-      new char[nBytes]);  // we need to rearrange dat from row-major to
-                          // col-major thus need a separate buf anyway (even for
-                          // float)
+      new char[nBytes]); // we need to rearrange dat from row-major to
+                         // col-major thus need a separate buf anyway (even for
+                         // float)
   char *bufPtr = buf.get();
   if (nSelected > 0) {
     char *thisBufPtr = bufPtr;
@@ -458,12 +459,12 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
   } else {
     // load entire data section with one disk IO
 
-    in.read(bufPtr, nBytes);  // load the bytes from file
+    in.read(bufPtr, nBytes); // load the bytes from file
     uint64_t events_read = (in.gcount() * 8 / nRowSize);
     uint64_t events_expected = boost::lexical_cast<uint64_t>(keys_["$TOT"]);
-    if (events_read != events_expected)  // can't use nBytes derived from FCS
-                                         // header as the check point since it
-                                         // may have extra bytes than needed
+    if (events_read != events_expected) // can't use nBytes derived from FCS
+                                        // header as the check point since it
+                                        // may have extra bytes than needed
     {
       throw(domain_error("file " + filename_ +
                          " seems to be corrupted. \n The actual number of "
@@ -560,42 +561,43 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
       size_t idx_bits = r * nRowSize + bits_offset;
       char *p = bufPtr + idx_bits / 8;
       thisSize /= 8;
-      if (isbyteswap) std::reverse(p, p + thisSize);
+      if (isbyteswap)
+        std::reverse(p, p + thisSize);
 
       if (dattype == "I") {
         switch (thisSize) {
-          case sizeof(BYTE):  // 1 byte
-          {
-            outElement = static_cast<EVENT_DATA_TYPE>(*p);
-          }
+        case sizeof(BYTE): // 1 byte
+        {
+          outElement = static_cast<EVENT_DATA_TYPE>(*p);
+        }
 
-          break;
-          case sizeof(unsigned short):  // 2 bytes
-          {
-            outElement = static_cast<EVENT_DATA_TYPE>(
-                *reinterpret_cast<unsigned short *>(p));
-          }
+        break;
+        case sizeof(unsigned short): // 2 bytes
+        {
+          outElement = static_cast<EVENT_DATA_TYPE>(
+              *reinterpret_cast<unsigned short *>(p));
+        }
 
-          break;
-          case sizeof(unsigned):  // 4 bytes
-          {
-            outElement =
-                static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned *>(p));
-          }
+        break;
+        case sizeof(unsigned): // 4 bytes
+        {
+          outElement =
+              static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<unsigned *>(p));
+        }
 
-          break;
-          case sizeof(uint64_t):  // 8 bytes
-          {
-            outElement =
-                static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));
-          }
+        break;
+        case sizeof(uint64_t): // 8 bytes
+        {
+          outElement =
+              static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<uint64_t *>(p));
+        }
 
-          break;
-          default: {
-            std::string serror = "unsupported byte width :";
-            serror.append(std::to_string(thisSize));
-            throw std::range_error(serror.c_str());
-          }
+        break;
+        default: {
+          std::string serror = "unsupported byte width :";
+          serror.append(std::to_string(thisSize));
+          throw std::range_error(serror.c_str());
+        }
         }
         // apply bitmask for integer data
 
@@ -606,22 +608,21 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
 
       } else {
         switch (thisSize) {
-          case sizeof(float): {
-            outElement = *reinterpret_cast<float *>(p);
-          }
+        case sizeof(float): {
+          outElement = *reinterpret_cast<float *>(p);
+        }
 
-          break;
-          case sizeof(double): {
-            outElement =
-                static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<double *>(p));
-          }
+        break;
+        case sizeof(double): {
+          outElement =
+              static_cast<EVENT_DATA_TYPE>(*reinterpret_cast<double *>(p));
+        }
 
-          break;
-          default:
-            std::string serror =
-                "Unsupported bitwidths for numerical data type:";
-            serror.append(std::to_string(thisSize));
-            throw std::range_error(serror.c_str());
+        break;
+        default:
+          std::string serror = "Unsupported bitwidths for numerical data type:";
+          serror.append(std::to_string(thisSize));
+          throw std::range_error(serror.c_str());
         }
       }
 
@@ -642,9 +643,9 @@ void MemCytoFrame::read_fcs_data(ifstream &in,
       // # in read.FCS(). This does linearization for log-stored parameters and
       // also division by 				# gain
       //($PnG value) for linearly stored parameters. This is how the
-      // channel-to-scale 				# transformation should be
-      // done according to the FCS specification (and according to
-      // # Gating-ML 2.0), but lots of software tools are ignoring the $PnG
+      // channel-to-scale 				# transformation should
+      // be done according to the FCS specification (and according to #
+      // Gating-ML 2.0), but lots of software tools are ignoring the $PnG
       // division. I added it 				# so that it is only
       // done when specifically asked for so that read.FCS remains backwards
       // # compatible with previous versions.
@@ -749,7 +750,8 @@ void MemCytoFrame::read_fcs_header() {
  */
 void MemCytoFrame::read_fcs_header(ifstream &in,
                                    const FCS_READ_HEADER_PARAM &config) {
-  if (g_loglevel >= GATING_HIERARCHY_LEVEL) PRINT("Parsing FCS header \n");
+  if (g_loglevel >= GATING_HIERARCHY_LEVEL)
+    PRINT("Parsing FCS header \n");
 
   // search the stream for the header and txt of the nth DataSet
   int nOffset = 0, nNextdata = 0;
@@ -757,8 +759,8 @@ void MemCytoFrame::read_fcs_header(ifstream &in,
   // non C-style index: starting from 1
   for (int i = 1; i <= n; i++) {
     nOffset += nNextdata;
-    parse_fcs_header(in, nOffset);                       // read the header
-    parse_fcs_text_section(in, config.isEmptyKeyValue);  // read the txt section
+    parse_fcs_header(in, nOffset);                      // read the header
+    parse_fcs_text_section(in, config.isEmptyKeyValue); // read the txt section
 
     if (keys_.find("$NEXTDATA") != keys_.end()) {
       string nd = keys_["$NEXTDATA"];
@@ -799,9 +801,8 @@ void MemCytoFrame::read_fcs_header(ifstream &in,
     if (keys_.find("$BEGINDATA") == keys_.end()) {
       if (datastart_h != 0) {
         datastart = datastart_h;
-        PRINT(
-            "warning:Missing the required $BEGINDATA keyword! Reading data "
-            "based on information in the FCS HEADER only.\n");
+        PRINT("warning:Missing the required $BEGINDATA keyword! Reading data "
+              "based on information in the FCS HEADER only.\n");
       } else
         throw(domain_error(
             "Don't know where the data segment begins, there was no $BEGINDATA "
@@ -830,9 +831,9 @@ void MemCytoFrame::read_fcs_header(ifstream &in,
 
     //   # when both are present and they don't agree with each other
     if (datastart_h != datastart) {
-      if (datastart_h == 0)  //#use the TEXT when header_ is 0
+      if (datastart_h == 0) //#use the TEXT when header_ is 0
         header_.datastart = datastart + header_.additional;
-      else {  //#trust the header when it is non-zero
+      else { //#trust the header when it is non-zero
         string msg =
             "The HEADER and the TEXT segment define different starting point (";
         msg.append(boost::lexical_cast<string>(header_.datastart) + ":" +
@@ -848,10 +849,10 @@ void MemCytoFrame::read_fcs_header(ifstream &in,
     //   #both are present and they don't agree
     if (dataend_h != dataend) {
       if (dataend_h == 0 ||
-          dataend_h == 99999999)  //#use TEXT when either header_ is 0 or TEXT
-                                  // is 99999999
+          dataend_h == 99999999) //#use TEXT when either header_ is 0 or TEXT
+                                 // is 99999999
         header_.dataend = dataend + header_.additional;
-      else {  //#otherwise trust the header
+      else { //#otherwise trust the header
         string msg =
             "The HEADER and the TEXT segment define different ending point (";
         msg.append(boost::lexical_cast<string>(header_.dataend) + ":" +
@@ -890,7 +891,8 @@ void MemCytoFrame::read_fcs_header(ifstream &in,
     else
       params[i - 1].max = boost::lexical_cast<EVENT_DATA_TYPE>(it->second);
 
-    if (range_str == "flowCore_$P" + pid + "Rmax") params[i - 1].max += 1;
+    if (range_str == "flowCore_$P" + pid + "Rmax")
+      params[i - 1].max += 1;
 
     params[i - 1].PnB = stoi(keys_["$P" + pid + "B"]);
 
@@ -904,7 +906,7 @@ void MemCytoFrame::read_fcs_header(ifstream &in,
       params[i - 1].PnE[0] = stof(tokens[0]);
       params[i - 1].PnE[1] = stof(tokens[1]);
       if (params[i - 1].PnE[0] > 0 &&
-          params[i - 1].PnE[1] == 0)  // correct f2 for legacy FCS 2.0
+          params[i - 1].PnE[1] == 0) // correct f2 for legacy FCS 2.0
         params[i - 1].PnE[1] = 1;
     }
 
@@ -930,7 +932,8 @@ void MemCytoFrame::read_fcs_header(ifstream &in,
     }
 
     it = keys_.find("$P" + pid + "S");
-    if (it != keys_.end()) params[i - 1].marker = keys_["$P" + pid + "S"];
+    if (it != keys_.end())
+      params[i - 1].marker = keys_["$P" + pid + "S"];
   }
 
   // Disambiguate duplicates by appending -<N>
@@ -1001,14 +1004,16 @@ void MemCytoFrame::append_data_columns(const EVENT_DATA_VEC &new_cols) {
 EVENT_DATA_TYPE *MemCytoFrame::get_data_memptr(const string &colname,
                                                ColType type) {
   int idx = get_col_idx(colname, type);
-  if (idx < 0) throw(domain_error("colname not found: " + colname));
+  if (idx < 0)
+    throw(domain_error("colname not found: " + colname));
   return data_.colptr(idx);
 }
 
 void MemCytoFrame::transform_data(const trans_local &trans) {
   if (g_loglevel >= GATING_HIERARCHY_LEVEL)
     PRINT("start transforming cytoframe data \n");
-  if (n_rows() == 0) throw(domain_error("data is not loaded yet!"));
+  if (n_rows() == 0)
+    throw(domain_error("data is not loaded yet!"));
 
   vector<string> channels = get_channels();
   int nEvents = n_rows();
@@ -1023,7 +1028,8 @@ void MemCytoFrame::transform_data(const trans_local &trans) {
     TransPtr curTrans = trans.getTran(curChannel);
 
     if (curTrans) {
-      if (curTrans->gateOnly()) continue;
+      if (curTrans->gateOnly())
+        continue;
 
       EVENT_DATA_TYPE *x = get_data_memptr(curChannel, ColType::channel);
       if (g_loglevel >= GATING_HIERARCHY_LEVEL) {
@@ -1040,4 +1046,4 @@ void MemCytoFrame::transform_data(const trans_local &trans) {
     set_range(curChannel, ColType::channel, param_range);
   }
 }
-};  // namespace cytolib
+}; // namespace cytolib

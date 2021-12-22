@@ -1,3 +1,1 @@
-void dummy_RProtobuf_fun()
-{
-}
+void dummy_RProtobuf_fun() {}

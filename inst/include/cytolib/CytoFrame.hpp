@@ -41,20 +41,20 @@ const H5std_string DATASET_ROWNAME("rownames");
  * data type
  */
 struct KEY_WORDS_SIMPLE {
-  const char* key;
-  const char* value;
-  KEY_WORDS_SIMPLE(const char* k, const char* v) : key(k), value(v){};
+  const char *key;
+  const char *value;
+  KEY_WORDS_SIMPLE(const char *k, const char *v) : key(k), value(v){};
 };
 
 class CytoFrame;
 typedef shared_ptr<CytoFrame> CytoFramePtr;
 struct KeyHash {
-  std::size_t operator()(const string& k) const {
+  std::size_t operator()(const string &k) const {
     return std::hash<std::string>()(boost::to_lower_copy(k));
   }
 };
 struct KeyEqual {
-  bool operator()(const string& u, const string& v) const {
+  bool operator()(const string &u, const string &v) const {
     return boost::to_lower_copy(u) == boost::to_lower_copy(v);
   }
 };
@@ -63,13 +63,13 @@ typedef unordered_map<string, int, KeyHash, KeyEqual> PARAM_MAP;
  * The class representing a single FCS file
  */
 class CytoFrame {
- protected:
+protected:
   PDATA pheno_data_;
-  KEY_WORDS keys_;           // keyword pairs parsed from FCS Text section
-  vector<cytoParam> params;  // parameters coerced from keywords and computed
-                             // from data for quick query
-  PARAM_MAP channel_vs_idx;  // hash map for query by channel
-  PARAM_MAP marker_vs_idx;   // hash map for query by marker
+  KEY_WORDS keys_;          // keyword pairs parsed from FCS Text section
+  vector<cytoParam> params; // parameters coerced from keywords and computed
+                            // from data for quick query
+  PARAM_MAP channel_vs_idx; // hash map for query by channel
+  PARAM_MAP marker_vs_idx;  // hash map for query by marker
 
   CytoFrame(){};
   virtual bool is_hashed() const { return channel_vs_idx.size() == n_cols(); }
@@ -80,18 +80,18 @@ class CytoFrame {
    */
   virtual void build_hash();
 
- public:
+public:
   virtual ~CytoFrame(){};
   //	virtual void close_h5() =0;
-  CytoFrame(const CytoFrame& frm);
+  CytoFrame(const CytoFrame &frm);
 
-  CytoFrame& operator=(const CytoFrame& frm);
+  CytoFrame &operator=(const CytoFrame &frm);
 
-  CytoFrame& operator=(CytoFrame&& frm);
+  CytoFrame &operator=(CytoFrame &&frm);
 
-  CytoFrame(CytoFrame&& frm);
+  CytoFrame(CytoFrame &&frm);
 
-  compensation get_compensation(const string& key = "$SPILLOVER") {
+  compensation get_compensation(const string &key = "$SPILLOVER") {
     compensation comp;
 
     if (keys_.find(key) != keys_.end()) {
@@ -120,23 +120,23 @@ class CytoFrame {
     return comp;
   }
 
-  virtual void convertToPb(pb::CytoFrame& fr_pb, const string& cf_filename,
+  virtual void convertToPb(pb::CytoFrame &fr_pb, const string &cf_filename,
                            CytoFileOption h5_opt,
-                           const CytoCtx& ctx = CytoCtx()) const = 0;
+                           const CytoCtx &ctx = CytoCtx()) const = 0;
 
   virtual void set_readonly(bool flag) {}
   virtual bool get_readonly() const { return false; }
-  virtual void compensate(const compensation& comp);
+  virtual void compensate(const compensation &comp);
 
   virtual void scale_time_channel(string time_channel = "time");
   /**
    * getter from cytoParam vector
    * @return
    */
-  const vector<cytoParam>& get_params() const { return params; }
-  virtual void set_params(const vector<cytoParam>& _params) {
+  const vector<cytoParam> &get_params() const { return params; }
+  virtual void set_params(const vector<cytoParam> &_params) {
     params = _params;
-    build_hash();  // update idx table
+    build_hash(); // update idx table
   }
   //	virtual void writeFCS(const string & filename);
 
@@ -144,7 +144,7 @@ class CytoFrame {
   CompType get_h5_datatype_params(DataTypeLocation storage_type) const;
   CompType get_h5_datatype_keys() const;
   virtual void write_h5_params(H5File file) const;
-  void write_to_disk(const string& filename, FileFormat format = FileFormat::H5,
+  void write_to_disk(const string &filename, FileFormat format = FileFormat::H5,
                      const CytoCtx ctx = CytoCtx()) const {
     write_h5(filename);
   }
@@ -158,11 +158,10 @@ class CytoFrame {
    * Convert string to cstr in keys/pdata for writing to h5
    * @return
    */
-  template <class T>
-  vector<KEY_WORDS_SIMPLE> to_kw_vec(const T& x) const {
+  template <class T> vector<KEY_WORDS_SIMPLE> to_kw_vec(const T &x) const {
     // convert to vector
     vector<KEY_WORDS_SIMPLE> keyVec;
-    for (const auto& e : x) {
+    for (const auto &e : x) {
       keyVec.push_back(KEY_WORDS_SIMPLE(e.first.c_str(), e.second.c_str()));
     }
     return keyVec;
@@ -171,8 +170,8 @@ class CytoFrame {
   virtual void write_h5_pheno_data(H5File file) const;
   virtual void write_h5_rownames(H5File file, vector<string> rn) const {
     StrType str_type(H5::PredType::C_S1,
-                     H5T_VARIABLE);  // define variable-length string data type
-                                     // hsize_t nSize = pheno_data_.size();
+                     H5T_VARIABLE); // define variable-length string data type
+                                    // hsize_t nSize = pheno_data_.size();
     auto nSize = rn.size();
     if (nSize > 0) {
       if (nSize != n_rows())
@@ -188,7 +187,7 @@ class CytoFrame {
         ds = file.createDataSet(dsname, str_type, dataspace);
       }
       // HDF5 only understands vector of char* :-(
-      std::vector<const char*> rn_c_str;
+      std::vector<const char *> rn_c_str;
       for (unsigned ii = 0; ii < rn.size(); ++ii)
         rn_c_str.push_back(rn[ii].c_str());
       ds.write(rn_c_str.data(), str_type);
@@ -201,14 +200,14 @@ class CytoFrame {
    *
    * @param filename the path of the output H5 file
    */
-  virtual void write_h5(const string& filename) const;
+  virtual void write_h5(const string &filename) const;
   /**
    * get the data of entire event matrix
    * @return
    */
   // TODO: implement these for disk-based cytoframes
   virtual vector<string> get_rownames() const = 0;
-  virtual void set_rownames(const vector<string>& data_in) = 0;
+  virtual void set_rownames(const vector<string> &data_in) = 0;
   virtual void del_rownames() = 0;
   virtual EVENT_DATA_VEC get_data() const = 0;
   virtual EVENT_DATA_VEC get_data(uvec idx, bool is_col) const = 0;
@@ -217,29 +216,29 @@ class CytoFrame {
     return get_data(get_col_idx(cols, col_type), true);
   }
 
-  virtual void set_data(const EVENT_DATA_VEC&) = 0;
-  virtual void set_data(EVENT_DATA_VEC&&) = 0;
+  virtual void set_data(const EVENT_DATA_VEC &) = 0;
+  virtual void set_data(EVENT_DATA_VEC &&) = 0;
   /**
    * extract all the keyword pairs
    *
    * @return a vector of pairs of strings
    */
-  virtual const KEY_WORDS& get_keywords() const { return keys_; }
-  virtual void set_keywords(const KEY_WORDS& keys) { keys_ = keys; }
+  virtual const KEY_WORDS &get_keywords() const { return keys_; }
+  virtual void set_keywords(const KEY_WORDS &keys) { keys_ = keys; }
   /**
    * extract the value of the single keyword by keyword name
    *
    * @param key keyword name
    * @return keyword value as a string
    */
-  virtual string get_keyword(const string& key) const;
+  virtual string get_keyword(const string &key) const;
 
   /**
    * set the value of the single keyword
    * @param key keyword name
    * @param value keyword value
    */
-  virtual void set_keyword(const string& key, const string& value) {
+  virtual void set_keyword(const string &key, const string &value) {
     keys_[key] = value;
   }
 
@@ -248,7 +247,7 @@ class CytoFrame {
    * @param old_key old keyword name
    * @param new_key new keyword name
    */
-  virtual void rename_keyword(const string& old_key, const string& new_key) {
+  virtual void rename_keyword(const string &old_key, const string &new_key) {
     KW_PAIR::iterator it = keys_.find(old_key);
     if (it != keys_.end())
       it->first = new_key;
@@ -263,7 +262,7 @@ class CytoFrame {
    *	than completely reconstructing the KW_PAIR object.
    *	@param key keyword to be removed
    */
-  virtual void remove_keyword(const string& key) { keys_.erase(key); }
+  virtual void remove_keyword(const string &key) { keys_.erase(key); }
 
   /**
    * get the number of columns(or parameters)
@@ -289,10 +288,11 @@ class CytoFrame {
    * @return
    */
   virtual vector<string> get_channels() const;
-  virtual void set_channel(const string& oldname, const string& newname,
+  virtual void set_channel(const string &oldname, const string &newname,
                            bool is_update_keywords = true) {
     int id = get_col_idx(oldname, ColType::channel);
-    if (id < 0) throw(domain_error("colname not found: " + oldname));
+    if (id < 0)
+      throw(domain_error("colname not found: " + oldname));
     if (oldname != newname) {
       if (g_loglevel >= GATING_HIERARCHY_LEVEL)
         PRINT(oldname + "-->" + newname + "\n");
@@ -306,8 +306,9 @@ class CytoFrame {
       // update keywords(linear time, not sure how to improve it other than
       // optionally skip it
       if (is_update_keywords) {
-        for (auto& it : keys_)
-          if (it.second == oldname) it.second = newname;
+        for (auto &it : keys_)
+          if (it.second == oldname)
+            it.second = newname;
 
         for (auto k : spillover_keys) {
           auto s = get_keyword(k);
@@ -319,14 +320,15 @@ class CytoFrame {
       }
     }
   }
-  virtual void set_channels(const CHANNEL_MAP& chnl_map) {
-    for (auto& it : chnl_map) {
-      try  // catch the unmatched col error so that it can proceed the rest
+  virtual void set_channels(const CHANNEL_MAP &chnl_map) {
+    for (auto &it : chnl_map) {
+      try // catch the unmatched col error so that it can proceed the rest
       {
         set_channel(it.first, it.second);
-      } catch (const domain_error& e) {
+      } catch (const domain_error &e) {
         string msg = e.what();
-        if (msg.find("colname not found") == string::npos) throw(e);
+        if (msg.find("colname not found") == string::npos)
+          throw(e);
       }
     }
   }
@@ -337,7 +339,7 @@ class CytoFrame {
    * duplication checks
    * @param channels
    */
-  virtual int set_channels(const vector<string>& channels) {
+  virtual int set_channels(const vector<string> &channels) {
     auto old = get_channels();
 
     auto n1 = n_cols();
@@ -358,7 +360,7 @@ class CytoFrame {
     for (unsigned i = 0; i < n1; i++) {
       auto kn = "$P" + to_string(i + 1) + "N";
       set_keyword(kn, channels[i]);
-    }  // TODO: also sync other keywords that contains channel info
+    } // TODO: also sync other keywords that contains channel info
 
     // spillover
     for (auto k : spillover_keys) {
@@ -368,15 +370,15 @@ class CytoFrame {
         // differently from the one in spillover keywords parse the channels
         // info from keyword
         auto comp = compensation(s);
-        for (auto& c : comp.marker) {
+        for (auto &c : comp.marker) {
           auto it = find(old.begin(), old.end(), c);
           if (it == old.end()) {
             return -1;
-            //						throw(domain_error(c + " is in spillover
-            //matrix but not found in cytoframe!"));
+            //						throw(domain_error(c + " is in
+            //spillover matrix but not found in cytoframe!"));
           }
           auto idx = std::distance(old.begin(), it);
-          c = channels[idx];  // set it to the equivalent new value
+          c = channels[idx]; // set it to the equivalent new value
         }
         // recollapse it to text
         s = comp.to_string();
@@ -390,14 +392,14 @@ class CytoFrame {
    * Add named columns to the data. This will also appropriately update some
    * keywords and params.
    */
-  void append_columns(const vector<string>& new_colnames,
-                      const EVENT_DATA_VEC& new_cols);
+  void append_columns(const vector<string> &new_colnames,
+                      const EVENT_DATA_VEC &new_cols);
 
   /**
    * Append columns to data matrix. Necessary re-sizing is handled by set_data
    * for each backend.
    */
-  virtual void append_data_columns(const EVENT_DATA_VEC& new_cols) = 0;
+  virtual void append_data_columns(const EVENT_DATA_VEC &new_cols) = 0;
 
   /**
    * get all the marker names
@@ -409,7 +411,7 @@ class CytoFrame {
    * @param channel
    * @return
    */
-  string get_marker(const string& channel);
+  string get_marker(const string &channel);
 
   /**
    * get the numeric index for the given column
@@ -417,10 +419,10 @@ class CytoFrame {
    * @param type the type of column
    * @return
    */
-  virtual int get_col_idx(const string& colname, ColType type) const;
+  virtual int get_col_idx(const string &colname, ColType type) const;
   uvec get_col_idx(vector<string> colnames, ColType col_type) const;
 
-  virtual void set_marker(const string& channelname, const string& markername);
+  virtual void set_marker(const string &channelname, const string &markername);
 
   /**
    * Update the instrument range (typically after data transformation)
@@ -428,7 +430,7 @@ class CytoFrame {
    * @param ctype
    * @param new_range
    */
-  virtual void set_range(const string& colname, ColType ctype,
+  virtual void set_range(const string &colname, ColType ctype,
                          pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> new_range,
                          bool is_update_keywords = true);
   /**
@@ -438,8 +440,8 @@ class CytoFrame {
    * @param rtype either RangeType::data or RangeType::instrument
    * @return
    */
-  virtual pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE> get_range(
-      const string& colname, ColType ctype, RangeType rtype) const;
+  virtual pair<EVENT_DATA_TYPE, EVENT_DATA_TYPE>
+  get_range(const string &colname, ColType ctype, RangeType rtype) const;
   /**
    * Compute the time step from keyword either "$TIMESTEP" or "$BTIM",
    * "$TIMESTEP" is preferred when it is present This is used to convert time
@@ -449,13 +451,13 @@ class CytoFrame {
    */
   EVENT_DATA_TYPE get_time_step(const string time_channel) const;
 
-  virtual CytoFramePtr copy(const string& cf_filename = "",
+  virtual CytoFramePtr copy(const string &cf_filename = "",
                             bool overwrite = false) const = 0;
   virtual CytoFramePtr copy(uvec idx, bool is_row_indexed,
-                            const string& cf_filename = "",
+                            const string &cf_filename = "",
                             bool overwrite = false) const = 0;
   virtual CytoFramePtr copy(uvec row_idx, uvec col_idx,
-                            const string& cf_filename = "",
+                            const string &cf_filename = "",
                             bool overwrite = false) const = 0;
   virtual FileFormat get_backend_type() const = 0;
 
@@ -463,14 +465,14 @@ class CytoFrame {
   virtual void flush_meta(){};
   virtual void load_meta(){};
 
-  const PDATA& get_pheno_data() const { return pheno_data_; }
-  string get_pheno_data(const string& name) const;
-  virtual void set_pheno_data(const string& name, const string& value) {
+  const PDATA &get_pheno_data() const { return pheno_data_; }
+  string get_pheno_data(const string &name) const;
+  virtual void set_pheno_data(const string &name, const string &value) {
     pheno_data_[name] = value;
   }
-  virtual void set_pheno_data(const PDATA& _pd) { pheno_data_ = _pd; }
-  virtual void del_pheno_data(const string& name) { pheno_data_.erase(name); }
+  virtual void set_pheno_data(const PDATA &_pd) { pheno_data_ = _pd; }
+  virtual void del_pheno_data(const string &name) { pheno_data_.erase(name); }
 };
-};  // namespace cytolib
+}; // namespace cytolib
 
 #endif /* INST_INCLUDE_CYTOLIB_CYTOFRAME_HPP_ */

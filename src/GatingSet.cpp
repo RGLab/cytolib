@@ -11,7 +11,8 @@ namespace fs = std::filesystem;
 
 namespace cytolib {
 GatingHierarchyPtr GatingSet::get_first_gh() const {
-  if (size() == 0) throw(range_error("Empty GatingSet!"));
+  if (size() == 0)
+    throw(range_error("Empty GatingSet!"));
   return begin()->second;
 }
 GatingSet::GatingSet(string path, bool is_skip_data, bool readonly,
@@ -25,7 +26,7 @@ GatingSet::GatingSet(string path, bool is_skip_data, bool readonly,
   FileFormat fmt;
   // search for h5
   CytoVFS vfs(ctx);
-  for (auto& e : vfs.ls(path)) {
+  for (auto &e : vfs.ls(path)) {
     fs::path p(e);
     string ext = p.extension().string();
     string fn = p.stem().string();
@@ -49,7 +50,7 @@ GatingSet::GatingSet(string path, bool is_skip_data, bool readonly,
     if (pb_samples.size() == 1) {
       auto id =
           *(pb_samples
-                .begin());  // check if pb file seems like a guid of a legacy gs
+                .begin()); // check if pb file seems like a guid of a legacy gs
       if (cf_samples.find(id) == cf_samples.end()) {
         is_legacy = true;
       } else
@@ -59,9 +60,8 @@ GatingSet::GatingSet(string path, bool is_skip_data, bool readonly,
   }
 
   if (is_legacy) {
-    cout << path +
-                " seems to be the legacy archive and it is recommended to "
-                "convert to the new format by saving it to the new folder!"
+    cout << path + " seems to be the legacy archive and it is recommended to "
+                   "convert to the new format by saving it to the new folder!"
          << endl;
     deserialize_legacy(path, is_skip_data, readonly, select_samples,
                        print_lib_ver);
@@ -94,17 +94,20 @@ GatingSet::GatingSet(string path, bool is_skip_data, bool readonly,
       PRINT("The GatingSet was archived by:\n");
       PRINT("cytolib: ");
       string cv = pbGS.cytolib_verion();
-      if (cv == "") cv = "unknown";
+      if (cv == "")
+        cv = "unknown";
       PRINT(cv);
       PRINT("\n");
       PRINT("protobuf: ");
       string pv = pbGS.pb_verion();
-      if (pv == "") pv = "unknown";
+      if (pv == "")
+        pv = "unknown";
       PRINT(pv);
       PRINT("\n");
       PRINT("HDF5: ");
       string hv = pbGS.h5_verion();
-      if (hv == "") hv = "unknown";
+      if (hv == "")
+        hv = "unknown";
       PRINT(hv);
       PRINT("\n");
     }
@@ -177,7 +180,7 @@ GatingSet::GatingSet(string path, bool is_skip_data, bool readonly,
  * is loaded from legacy pb archive without actual data associated)
  */
 void GatingSet::serialize_pb(string path, CytoFileOption cf_opt,
-                             bool is_skip_data, const CytoCtx& ctx) {
+                             bool is_skip_data, const CytoCtx &ctx) {
   string errmsg = "Not a valid GatingSet archiving folder! " + path + "\n";
   CytoVFS vfs(ctx);
   if (vfs.is_dir(path)) {
@@ -186,7 +189,7 @@ void GatingSet::serialize_pb(string path, CytoFileOption cf_opt,
       fs::path gs_pb_file;
       unordered_set<string> cf_samples;
       unordered_set<string> pb_samples;
-      for (auto& e : files) {
+      for (auto &e : files) {
         fs::path p(e);
         string ext = p.extension().string();
         if (ext == ".gs") {
@@ -226,7 +229,7 @@ void GatingSet::serialize_pb(string path, CytoFileOption cf_opt,
         }
       }
 
-      for (const auto& it : ghs_) {
+      for (const auto &it : ghs_) {
         auto sn = it.first;
         if (cf_samples.find(sn) == cf_samples.end())
           throw(domain_error(errmsg +
@@ -268,7 +271,7 @@ void GatingSet::serialize_pb(string path, CytoFileOption cf_opt,
   gs_pb.set_guid(uid_);
 
   const vector<string> sample_names = get_sample_uids();
-  for (auto& sn : sample_names) {
+  for (auto &sn : sample_names) {
     gs_pb.add_samplename(sn);
   }
 
@@ -287,7 +290,7 @@ void GatingSet::serialize_pb(string path, CytoFileOption cf_opt,
   // limit we now go one step further to save each message to individual file
   // due to the single string buffer used by lite-message won't be enough to
   // hold the all samples for large dataset
-  for (auto& sn : sample_names) {
+  for (auto &sn : sample_names) {
     auto gh = getGatingHierarchy(sn);
     auto src_uri = gh->get_cytoframe_view_ref().get_uri();
     if (is_remote_path(path) || is_remote_path(src_uri))
@@ -319,7 +322,7 @@ void GatingSet::serialize_pb(string path, CytoFileOption cf_opt,
  * @param format
  * @param isPB
  */
-GatingSet::GatingSet(string pb_file, const GatingSet& gs_data) : GatingSet() {
+GatingSet::GatingSet(string pb_file, const GatingSet &gs_data) : GatingSet() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   ifstream input(pb_file.c_str(), ios::in | ios::binary);
   if (!input) {
@@ -345,8 +348,8 @@ GatingSet::GatingSet(string pb_file, const GatingSet& gs_data) : GatingSet() {
     map<intptr_t, TransPtr> trans_tbl;
 
     for (int i = 0; i < pbGS.trans_tbl_size(); i++) {
-      const pb::TRANS_TBL& trans_tbl_pb = pbGS.trans_tbl(i);
-      const pb::transformation& trans_pb = trans_tbl_pb.trans();
+      const pb::TRANS_TBL &trans_tbl_pb = pbGS.trans_tbl(i);
+      const pb::transformation &trans_pb = trans_tbl_pb.trans();
       intptr_t old_address = (intptr_t)trans_tbl_pb.trans_address();
 
       /*
@@ -356,42 +359,42 @@ GatingSet::GatingSet(string pb_file, const GatingSet& gs_data) : GatingSet() {
        */
 
       switch (i) {
-        case 0:
-          trans_tbl[old_address] = TransPtr(new biexpTrans());
+      case 0:
+        trans_tbl[old_address] = TransPtr(new biexpTrans());
+        break;
+      case 1:
+        trans_tbl[old_address] = TransPtr(new linTrans());
+        break;
+      default: {
+        switch (trans_pb.trans_type()) {
+        case pb::PB_CALTBL:
+          trans_tbl[old_address] = TransPtr(new transformation(trans_pb));
           break;
-        case 1:
-          trans_tbl[old_address] = TransPtr(new linTrans());
+        case pb::PB_BIEXP:
+          trans_tbl[old_address] = TransPtr(new biexpTrans(trans_pb));
           break;
-        default: {
-          switch (trans_pb.trans_type()) {
-            case pb::PB_CALTBL:
-              trans_tbl[old_address] = TransPtr(new transformation(trans_pb));
-              break;
-            case pb::PB_BIEXP:
-              trans_tbl[old_address] = TransPtr(new biexpTrans(trans_pb));
-              break;
-            case pb::PB_FASIGNH:
-              trans_tbl[old_address] = TransPtr(new fasinhTrans(trans_pb));
-              break;
-            case pb::PB_FLIN:
-              trans_tbl[old_address] = TransPtr(new flinTrans(trans_pb));
-              break;
-            case pb::PB_LIN:
-              trans_tbl[old_address] = TransPtr(new linTrans(trans_pb));
-              break;
-            case pb::PB_LOG:
-              trans_tbl[old_address] = TransPtr(new logTrans(trans_pb));
-              break;
-            case pb::PB_LOGICLE:
-              trans_tbl[old_address] = TransPtr(new logicleTrans(trans_pb));
-              break;
-            case pb::PB_SCALE:
-              trans_tbl[old_address] = TransPtr(new scaleTrans(trans_pb));
-              break;
-            default:
-              throw(domain_error("unknown type of transformation archive!"));
-          }
+        case pb::PB_FASIGNH:
+          trans_tbl[old_address] = TransPtr(new fasinhTrans(trans_pb));
+          break;
+        case pb::PB_FLIN:
+          trans_tbl[old_address] = TransPtr(new flinTrans(trans_pb));
+          break;
+        case pb::PB_LIN:
+          trans_tbl[old_address] = TransPtr(new linTrans(trans_pb));
+          break;
+        case pb::PB_LOG:
+          trans_tbl[old_address] = TransPtr(new logTrans(trans_pb));
+          break;
+        case pb::PB_LOGICLE:
+          trans_tbl[old_address] = TransPtr(new logicleTrans(trans_pb));
+          break;
+        case pb::PB_SCALE:
+          trans_tbl[old_address] = TransPtr(new scaleTrans(trans_pb));
+          break;
+        default:
+          throw(domain_error("unknown type of transformation archive!"));
         }
+      }
       }
     }
     /*
@@ -400,8 +403,8 @@ GatingSet::GatingSet(string pb_file, const GatingSet& gs_data) : GatingSet() {
 
     //			for(int i = 0; i < pbGS.gtrans_size(); i++){
     //				const pb::trans_local & trans_local_pb =
-    // pbGS.gtrans(i); 				gTrans.push_back(trans_global(trans_local_pb,
-    // trans_tbl));
+    // pbGS.gtrans(i);
+    // gTrans.push_back(trans_global(trans_local_pb, trans_tbl));
     //			}
     // read gating hierarchy messages
     for (int i = 0; i < pbGS.samplename_size(); i++) {
@@ -439,12 +442,12 @@ GatingSet::GatingSet(string pb_file, const GatingSet& gs_data) : GatingSet() {
  * up to caller to free the memory
  */
 GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data,
-                          const string& new_cf_dir) const {
+                          const string &new_cf_dir) const {
   GatingSet gs;
   fs::path cf_dir;
   if (is_copy_data)
     cf_dir = gs.generate_cytoframe_folder(fs::path(new_cf_dir).string());
-  for (const string& sn : get_sample_uids()) {
+  for (const string &sn : get_sample_uids()) {
     GatingHierarchyPtr gh = getGatingHierarchy(sn);
 
     if (g_loglevel >= GATING_HIERARCHY_LEVEL)
@@ -462,11 +465,11 @@ GatingSet GatingSet::copy(bool is_copy_data, bool is_realize_data,
  * copying compensation and transformation,more options can be allowed in future
  * like providing different comp and trans
  */
-GatingSet::GatingSet(const GatingHierarchy& gh_template, const GatingSet& cs,
+GatingSet::GatingSet(const GatingHierarchy &gh_template, const GatingSet &cs,
                      bool execute, string comp_source)
     : GatingSet() {
   auto samples = cs.get_sample_uids();
-  for (const string& sn : samples) {
+  for (const string &sn : samples) {
     if (g_loglevel >= GATING_HIERARCHY_LEVEL)
       PRINT("\n... start cloning GatingHierarchy for: " + sn + "... \n");
     auto gh = gh_template.copy(false, false, "");
@@ -519,16 +522,16 @@ GatingSet::GatingSet(const GatingHierarchy& gh_template, const GatingSet& cs,
  * assign the flow data from the source gs
  * @param gs typically it is a root-only GatingSet that only carries cytoFrames
  */
-void GatingSet::set_cytoset(const GatingSet& gs) {
+void GatingSet::set_cytoset(const GatingSet &gs) {
   if (!gs.is_cytoFrame_only())
     throw(domain_error("The input gs is not data-only object! "));
 
-  for (const string& sn : get_sample_uids()) {
-    const auto& it = gs.find(sn);
+  for (const string &sn : get_sample_uids()) {
+    const auto &it = gs.find(sn);
     if (it == gs.end())
       throw(domain_error("Sample '" + sn +
                          "' is missing from the data to be assigned!"));
-    GatingHierarchy& gh = *ghs_[sn];
+    GatingHierarchy &gh = *ghs_[sn];
     gh.set_cytoframe_view(it->second->get_cytoframe_view_ref());
   }
 };
@@ -541,7 +544,7 @@ void GatingSet::set_cytoset(const GatingSet& gs) {
 GatingSet GatingSet::get_cytoset() {
   GatingSet gs;
 
-  for (const string& sn : get_sample_uids()) {
+  for (const string &sn : get_sample_uids()) {
     GatingHierarchyPtr gh = getGatingHierarchy(sn);
 
     gs.add_cytoframe_view(sn, gh->get_cytoframe_view_ref());
@@ -556,14 +559,14 @@ GatingSet GatingSet::get_cytoset() {
  */
 GatingSet GatingSet::get_cytoset(string node_path) {
   GatingSet gs;
-  for (const string& sn : get_sample_uids()) {
+  for (const string &sn : get_sample_uids()) {
     GatingHierarchyPtr gh = getGatingHierarchy(sn);
 
-    CytoFrameView& fr = gs.add_cytoframe_view(sn, gh->get_cytoframe_view());
+    CytoFrameView &fr = gs.add_cytoframe_view(sn, gh->get_cytoframe_view());
     // subset by node
     auto u = gh->getNodeID(node_path);
     gh->check_ungated_bool_node(u);
-    nodeProperties& node = gh->getNodeProperty(u);
+    nodeProperties &node = gh->getNodeProperty(u);
     fr.rows_(node.getIndices_u());
   }
   return gs;
@@ -588,9 +591,9 @@ GatingHierarchyPtr GatingSet::getGatingHierarchy(string sample_uid) const {
  * update channel information stored in GatingSet
  * @param chnl_map the mapping between the old and new channel names
  */
-void GatingSet::set_channels(const CHANNEL_MAP& chnl_map) {
+void GatingSet::set_channels(const CHANNEL_MAP &chnl_map) {
   // update gh
-  for (auto& it : ghs_) {
+  for (auto &it : ghs_) {
     if (g_loglevel >= GATING_HIERARCHY_LEVEL)
       PRINT("\nupdate channels for GatingHierarchy:" + it.first + "\n");
     it.second->set_channels(chnl_map);
@@ -603,7 +606,7 @@ void GatingSet::set_channels(const CHANNEL_MAP& chnl_map) {
  * @param sample_uids
  * @return
  */
-GatingSet GatingSet::sub_samples(const vector<string>& sample_uids) const {
+GatingSet GatingSet::sub_samples(const vector<string> &sample_uids) const {
   GatingSet res(*this);
   res.sub_samples_(sample_uids);
   res.uid_ = generate_uid();
@@ -615,11 +618,11 @@ GatingSet GatingSet::sub_samples(const vector<string>& sample_uids) const {
  * @param sample_uids
  * @return
  */
-void GatingSet::sub_samples_(const vector<string>& sample_uids) {
+void GatingSet::sub_samples_(const vector<string> &sample_uids) {
   ghMap ghs_new;
   // validity check
-  for (const auto& uid : sample_uids) {
-    const auto& it = find(uid);
+  for (const auto &uid : sample_uids) {
+    const auto &it = find(uid);
     if (it == end())
       throw(domain_error("The data to be assigned is missing sample: " + uid));
     else
@@ -636,7 +639,7 @@ void GatingSet::sub_samples_(const vector<string>& sample_uids) {
  * @return
  */
 void GatingSet::cols_(vector<string> colnames, ColType col_type) {
-  for (auto& it : ghs_) {
+  for (auto &it : ghs_) {
     if (!it.second->is_cytoFrame_only())
       throw(domain_error(
           "Can't subset by cols when gh is not data-only object! "));
@@ -649,8 +652,8 @@ void GatingSet::cols_(vector<string> colnames, ColType col_type) {
  * @param sample_uid
  * @param frame_ptr
  */
-CytoFrameView& GatingSet::add_cytoframe_view(string sample_uid,
-                                             const CytoFrameView& frame_view) {
+CytoFrameView &GatingSet::add_cytoframe_view(string sample_uid,
+                                             const CytoFrameView &frame_view) {
   if (!is_cytoFrame_only())
     throw(domain_error(
         "Can't add cytoframes to gs when it is not data-only object! "));
@@ -668,7 +671,7 @@ CytoFrameView& GatingSet::add_cytoframe_view(string sample_uid,
  * @param frame_ptr
  */
 void GatingSet::update_cytoframe_view(string sample_uid,
-                                      const CytoFrameView& frame_view) {
+                                      const CytoFrameView &frame_view) {
   if (find(sample_uid) == end())
     throw(domain_error("Can't update the cytoframe since it doesn't exists: " +
                        sample_uid));
@@ -682,13 +685,15 @@ void GatingSet::update_cytoframe_view(string sample_uid,
  * @param _old
  * @param _new
  */
-void GatingSet::set_sample_uid(const string& _old, const string& _new) {
+void GatingSet::set_sample_uid(const string &_old, const string &_new) {
   check_sample_guid(_new);
   if (_old.compare(_new) != 0) {
     auto it = find(_new);
-    if (it != end()) throw(range_error(_new + " already exists!"));
+    if (it != end())
+      throw(range_error(_new + " already exists!"));
     it = find(_old);
-    if (it == end()) throw(range_error(_old + " not found!"));
+    if (it == end())
+      throw(range_error(_old + " not found!"));
 
     ghs_[_new] = it->second;
     erase(_old);
@@ -698,9 +703,10 @@ void GatingSet::set_sample_uid(const string& _old, const string& _new) {
     if (it1 != sample_names_.end())
       throw(range_error(_new + " already exists!"));
     it1 = std::find(sample_names_.begin(), sample_names_.end(), _old);
-    if (it1 == sample_names_.end()) throw(range_error(_old + " not found!"));
+    if (it1 == sample_names_.end())
+      throw(range_error(_old + " not found!"));
     *it1 = _new;
   }
 };
 
-};  // namespace cytolib
+}; // namespace cytolib

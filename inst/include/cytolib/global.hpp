@@ -26,10 +26,10 @@ namespace cytolib {
 enum class FileFormat { H5, MEM };
 inline string fmt_to_str(FileFormat fmt) {
   switch (fmt) {
-    case FileFormat::H5:
-      return "h5";
-    default:
-      return "mem";
+  case FileFormat::H5:
+    return "h5";
+  default:
+    return "mem";
   }
 }
 string s3_to_http(string uri);
@@ -45,11 +45,11 @@ void PRINT(string a);
 void PRINT(const char *a);
 
 extern vector<string> spillover_keys;
-extern unsigned short g_loglevel;  // debug print is turned off by default
-extern bool my_throw_on_error;  // can be toggle off to get a partially parsed
-                                // gating tree for debugging purpose
+extern unsigned short g_loglevel; // debug print is turned off by default
+extern bool my_throw_on_error;    // can be toggle off to get a partially parsed
+                                  // gating tree for debugging purpose
 
-const int bsti = 1;  // Byte swap test integer
+const int bsti = 1; // Byte swap test integer
 #define is_host_big_endian() ((*(char *)&bsti) == 0)
 
 enum class ColType { channel, marker, unknown };
@@ -119,7 +119,7 @@ struct TM_ext {
     time_t rawtime;
     time(&rawtime);
     struct tm *timeinfo =
-        localtime(&rawtime);  // The returned value points to an internal object
+        localtime(&rawtime); // The returned value points to an internal object
     // init time member to avoid random values for day,month,year
     _time = *timeinfo;
   }
@@ -137,6 +137,6 @@ TM_ext parse_time_with_fractional_seconds(const string s_time);
 #else
 #define gettime() clock() / (double)(CLOCKS_PER_SEC / 1000)
 #endif
-};  // namespace cytolib
+}; // namespace cytolib
 
 #endif /* GLOBAL_HPP_ */

@@ -30,7 +30,7 @@ class CytoCtx {
   shared_ptr<void> ctxptr_;
   void init_ctxptr();
 
- public:
+public:
   CytoCtx();
 
   /**
@@ -45,8 +45,8 @@ class CytoCtx {
     res["num_threads"] = to_string(num_threads_);
     return res;
   }
-  CytoCtx(const string& secret_id, const string& secret_key,
-          const string& aws_region, int num_threads = 1);
+  CytoCtx(const string &secret_id, const string &secret_key,
+          const string &aws_region, int num_threads = 1);
   shared_ptr<void> get_ctxptr() const { return ctxptr_; };
 };
 
@@ -59,10 +59,10 @@ class CytoCtx {
 class CytoVFS {
   shared_ptr<void> vfsptr_;
 
- public:
+public:
   CytoVFS(CytoCtx ctx);
-  void write_buf(const string& file, const string& buf);
-  vector<char> read_buf(const string& file);
+  void write_buf(const string &file, const string &buf);
+  vector<char> read_buf(const string &file);
   vector<string> ls(string p) const;
   bool is_dir(string p) const;
   bool is_file(string p) const;
@@ -72,5 +72,5 @@ class CytoVFS {
   int file_size(string p);
 };
 
-}  // namespace cytolib
+} // namespace cytolib
 #endif /* INST_INCLUDE_CYTOLIB_CytoVFS_HPP_ */
