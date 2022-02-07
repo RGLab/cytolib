@@ -116,6 +116,9 @@ namespace cytolib
 				case pb::PB_LOG:
 					tp[tp_pb.name()].reset(new logTrans(trans_pb));
 					break;
+				case pb::PB_LOGGML2:
+				  tp[tp_pb.name()].reset(new logGML2Trans(trans_pb));
+				  break;
 				case pb::PB_LOGICLE:
 					tp[tp_pb.name()].reset(new logicleTrans(trans_pb));
 					break;
