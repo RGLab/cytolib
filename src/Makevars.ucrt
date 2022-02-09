@@ -18,7 +18,7 @@ PKG_CPPFLAGS =-DROUT -I../inst/include -DRCPP_PARALLEL_USE_TBB=1 -fpermissive -D
 	
 #needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
 RHDF5_LIBS= $(shell "${R_HOME}/bin/Rscript" -e "Rhdf5lib::pkgconfig('PKG_CXX_LIBS')")
-PKG_LIBS =  ${boost_fs_objs} ${boost_sys_objs} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` -lws2_32  
+PKG_LIBS =  ${boost_fs_objs} ${boost_sys_objs} $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) `${R_HOME}/bin/Rscript -e "RProtoBufLib:::LdFlags()"` $(RHDF5_LIBS) `${R_HOME}/bin/Rscript -e "RcppParallel::RcppParallelLibs()"` -lws2_32  -lbcrypt
 
 .PHONY: all clean 
 
