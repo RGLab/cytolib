@@ -232,8 +232,16 @@ namespace cytolib
 				break;
 			}
 		case LOGICALGATE://skip any gating operation since the indice is already set once the gate is added
-		case CLUSTERGATE:
-			node.computeStats();
+		case CLUSTERGATE:{
+		  auto curIndices = node.getIndices();
+		  std::transform(curIndices.begin(), curIndices.end(),
+                   parentIndice.getIndices().begin(), curIndices.begin(),
+                   std::logical_and<bool>());
+		  
+		  node.setIndices(curIndices);
+		  node.computeStats();
+		}
+			
 			return;
 		default:
 			{
