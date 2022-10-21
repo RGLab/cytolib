@@ -18,7 +18,7 @@
 #include <iostream>
 #include <algorithm>
 using namespace std;
-#include <armadillo>
+#include <cytolib/armadillo>
 using namespace arma;
 
 #include "datatype.hpp"
