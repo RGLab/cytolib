@@ -6,8 +6,8 @@ Date: 2017-08-07
 Author: Mike Jiang
 Maintainer: Mike Jiang <mike@ozette.ai>
 Description: This package provides the core data structure and API to represent and interact with the gated cytometry data.
-License: file LICENSE
-License_restricts_use: yes
+License: AGPL-3.0-only  
+License_restricts_use: no 
 LazyLoad: yes
 Imports:
 	RcppParallel,
