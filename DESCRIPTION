@@ -6,18 +6,17 @@ Date: 2017-08-07
 Author: Mike Jiang
 Maintainer: Mike Jiang <mike@ozette.ai>
 Description: This package provides the core data structure and API to represent and interact with the gated cytometry data.
-License: file LICENSE
-License_restricts_use: yes
+License: AGPL-3.0-only  
+License_restricts_use: no 
 LazyLoad: yes
 Imports:
-	RcppParallel,
     RProtoBufLib
 Depends:
     R (>= 3.4)
 Suggests: knitr, rmarkdown
-LinkingTo: Rcpp, BH(>= 1.75.0.0), RProtoBufLib(>= 2.3.5),Rhdf5lib, RcppArmadillo, RcppParallel(>= 4.4.2-1)
+LinkingTo: BH(>= 1.75.0.0), RProtoBufLib(>= 2.3.5),Rhdf5lib
 biocViews: ImmunoOncology, FlowCytometry, DataImport, Preprocessing, DataRepresentation
 VignetteBuilder: knitr
 SystemRequirements: GNU make, C++11
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.2
 Biarch: TRUE

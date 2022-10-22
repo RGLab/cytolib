@@ -19,7 +19,6 @@ CxxFlags <- function() {
 #'   PKG_LIBS += $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" -e "cytolib::cytolib_LdFlags()")
 #' @export
 #' @importFrom RProtoBufLib LdFlags
-#' @importFrom RcppParallel RcppParallelLibs
 cytolib_LdFlags <- function() {
       libDir <- "lib/"
       if (.Platform$OS.type == "windows")
