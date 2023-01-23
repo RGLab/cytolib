@@ -12,8 +12,9 @@
 
 #include <boost/filesystem/config.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem/detail/path_traits.hpp> // codecvt_error_category()
 #include <boost/scoped_array.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/system/error_category.hpp> // for BOOST_SYSTEM_HAS_CONSTEXPR
 #include <boost/assert.hpp>
 #include <algorithm>
 #include <iterator>
@@ -39,10 +40,11 @@
 #include "atomic_tools.hpp"
 #include "private_config.hpp"
 
+#include <boost/filesystem/detail/header.hpp> // must be the last #include
+
 namespace fs = boost::filesystem;
 
 using boost::filesystem::path;
-using boost::system::error_code;
 
 //--------------------------------------------------------------------------------------//
 //                                                                                      //
@@ -150,25 +152,6 @@ inline void first_element(string_type const& src, size_type& element_pos, size_t
 namespace boost {
 namespace filesystem {
 
-BOOST_FILESYSTEM_DECL void path::append_v3(path const& p)
-{
-    if (!p.empty())
-    {
-        if (BOOST_LIKELY(this != &p))
-        {
-            if (!detail::is_directory_separator(*p.m_pathname.begin()))
-                append_separator_if_needed();
-            m_pathname += p.m_pathname;
-        }
-        else
-        {
-            // self-append
-            path rhs(p);
-            append_v3(rhs);
-        }
-    }
-}
-
 BOOST_FILESYSTEM_DECL void path::append_v3(const value_type* begin, const value_type* end)
 {
     if (begin != end)
@@ -182,69 +165,9 @@ BOOST_FILESYSTEM_DECL void path::append_v3(const value_type* begin, const value_
         else
         {
             // overlapping source
-            path rhs(begin, end);
-            append_v3(rhs);
+            string_type rhs(begin, end);
+            append_v3(rhs.data(), rhs.data() + rhs.size());
         }
-    }
-}
-
-BOOST_FILESYSTEM_DECL void path::append_v4(path const& p)
-{
-    if (!p.empty())
-    {
-        if (BOOST_LIKELY(this != &p))
-        {
-            const size_type that_size = p.m_pathname.size();
-            size_type that_root_name_size = 0;
-            size_type that_root_dir_pos = find_root_directory_start(p.m_pathname.c_str(), that_size, that_root_name_size);
-
-            // if (p.is_absolute())
-            if
-            (
-#if defined(BOOST_WINDOWS_API) && !defined(UNDER_CE)
-                that_root_name_size > 0 &&
-#endif
-                that_root_dir_pos < that_size
-            )
-            {
-            return_assign:
-                assign(p);
-                return;
-            }
-
-            size_type this_root_name_size = 0;
-            find_root_directory_start(m_pathname.c_str(), m_pathname.size(), this_root_name_size);
-
-            if
-            (
-                that_root_name_size > 0 &&
-                (that_root_name_size != this_root_name_size || std::memcmp(m_pathname.c_str(), p.m_pathname.c_str(), this_root_name_size * sizeof(value_type)) != 0)
-            )
-            {
-                goto return_assign;
-            }
-
-            if (that_root_dir_pos < that_size)
-            {
-                // Remove root directory (if any) and relative path to replace with those from p
-                m_pathname.erase(m_pathname.begin() + this_root_name_size, m_pathname.end());
-            }
-
-            const value_type* const that_path = p.m_pathname.c_str() + that_root_name_size;
-            if (!detail::is_directory_separator(*that_path))
-                append_separator_if_needed();
-            m_pathname.append(that_path, that_size - that_root_name_size);
-        }
-        else
-        {
-            // self-append
-            path rhs(p);
-            append_v4(rhs);
-        }
-    }
-    else if (has_filename_v4())
-    {
-        m_pathname.push_back(preferred_separator);
     }
 }
 
@@ -298,8 +221,8 @@ BOOST_FILESYSTEM_DECL void path::append_v4(const value_type* begin, const value_
         else
         {
             // overlapping source
-            path rhs(begin, end);
-            append_v4(rhs);
+            string_type rhs(begin, end);
+            append_v4(rhs.data(), rhs.data() + rhs.size());
         }
     }
     else if (has_filename_v4())
@@ -319,12 +242,12 @@ BOOST_FILESYSTEM_DECL path path::generic_path() const
 
 #endif // BOOST_WINDOWS_API
 
-BOOST_FILESYSTEM_DECL int path::compare_v3(path const& p) const BOOST_NOEXCEPT
+BOOST_FILESYSTEM_DECL int path::compare_v3(path const& p) const
 {
     return detail::lex_compare_v3(begin(), end(), p.begin(), p.end());
 }
 
-BOOST_FILESYSTEM_DECL int path::compare_v4(path const& p) const BOOST_NOEXCEPT
+BOOST_FILESYSTEM_DECL int path::compare_v4(path const& p) const
 {
     return detail::lex_compare_v4(begin(), end(), p.begin(), p.end());
 }
@@ -386,10 +309,11 @@ BOOST_FILESYSTEM_DECL path& path::remove_trailing_separator()
     return *this;
 }
 
-BOOST_FILESYSTEM_DECL path& path::replace_extension(path const& new_extension)
+BOOST_FILESYSTEM_DECL void path::replace_extension_v3(path const& new_extension)
 {
     // erase existing extension, including the dot, if any
-    m_pathname.erase(m_pathname.size() - extension().m_pathname.size());
+    size_type ext_pos = m_pathname.size() - extension_v3().m_pathname.size();
+    m_pathname.erase(m_pathname.begin() + ext_pos, m_pathname.end());
 
     if (!new_extension.empty())
     {
@@ -398,8 +322,21 @@ BOOST_FILESYSTEM_DECL path& path::replace_extension(path const& new_extension)
             m_pathname.push_back(dot);
         m_pathname.append(new_extension.m_pathname);
     }
+}
 
-    return *this;
+BOOST_FILESYSTEM_DECL void path::replace_extension_v4(path const& new_extension)
+{
+    // erase existing extension, including the dot, if any
+    size_type ext_pos = m_pathname.size() - find_extension_v4_size();
+    m_pathname.erase(m_pathname.begin() + ext_pos, m_pathname.end());
+
+    if (!new_extension.empty())
+    {
+        // append new_extension, adding the dot if necessary
+        if (new_extension.m_pathname[0] != dot)
+            m_pathname.push_back(dot);
+        m_pathname.append(new_extension.m_pathname);
+    }
 }
 
 //  decomposition  -------------------------------------------------------------------//
@@ -565,9 +502,8 @@ BOOST_FILESYSTEM_DECL path path::extension_v3() const
     return pos == string_type::npos ? path() : path(name.m_pathname.c_str() + pos);
 }
 
-BOOST_FILESYSTEM_DECL path path::extension_v4() const
+BOOST_FILESYSTEM_DECL string_type::size_type path::find_extension_v4_size() const
 {
-    path ext;
     const size_type size = m_pathname.size();
     size_type root_name_size = 0;
     find_root_directory_start(m_pathname.c_str(), size, root_name_size);
@@ -590,10 +526,10 @@ BOOST_FILESYSTEM_DECL path path::extension_v4() const
         }
 
         if (ext_pos > filename_pos)
-            ext.assign(m_pathname.c_str() + ext_pos, m_pathname.c_str() + size);
+            return size - ext_pos;
     }
 
-    return ext;
+    return 0u;
 }
 
 //  lexical operations  --------------------------------------------------------------//
@@ -1512,36 +1448,15 @@ void __cdecl destroy_path_globals()
     g_path_locale = NULL;
 }
 
-#if _MSC_VER < 1300 || _MSC_VER > 1900 // 1300 == VC++ 7.0, 1900 == VC++ 14.0
-typedef void (__cdecl* init_func_ptr_t)();
-#define BOOST_FILESYSTEM_INIRETSUCCESS_V
-#define BOOST_FILESYSTEM_INIT_FUNC void __cdecl
-#else
-typedef int (__cdecl* init_func_ptr_t)();
-#define BOOST_FILESYSTEM_INIRETSUCCESS_V 0
-#define BOOST_FILESYSTEM_INIT_FUNC int __cdecl
-#endif
-
 BOOST_FILESYSTEM_INIT_FUNC init_path_globals()
 {
+#if !defined(BOOST_SYSTEM_HAS_CONSTEXPR)
+    // codecvt_error_category needs to be called early to dynamic-initialize the error category instance
+    boost::filesystem::codecvt_error_category();
+#endif
     std::atexit(&destroy_path_globals);
-    return BOOST_FILESYSTEM_INIRETSUCCESS_V;
+    return BOOST_FILESYSTEM_INITRETSUCCESS_V;
 }
-
-#if defined(__has_attribute)
-#if __has_attribute(__used__)
-#define BOOST_FILESYSTEM_ATTRIBUTE_RETAIN __attribute__((__used__))
-#endif
-#endif
-
-#if !defined(BOOST_FILESYSTEM_ATTRIBUTE_RETAIN) && defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__) >= 402
-#define BOOST_FILESYSTEM_ATTRIBUTE_RETAIN __attribute__((__used__))
-#endif
-
-#if !defined(BOOST_FILESYSTEM_ATTRIBUTE_RETAIN)
-#define BOOST_FILESYSTEM_NO_ATTRIBUTE_RETAIN
-#define BOOST_FILESYSTEM_ATTRIBUTE_RETAIN
-#endif
 
 #if _MSC_VER >= 1400
 
@@ -1573,12 +1488,7 @@ struct globals_retainer
     globals_retainer() { m_p_init_path_globals = &p_init_path_globals; }
 };
 BOOST_ATTRIBUTE_UNUSED
-static const globals_retainer g_globals_retainer
-#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
-    {};
-#else // !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
-    = globals_retainer();
-#endif // !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
+static const globals_retainer g_globals_retainer;
 #endif // defined(BOOST_FILESYSTEM_NO_ATTRIBUTE_RETAIN)
 
 #else // defined(_MSC_VER)
@@ -1691,3 +1601,5 @@ BOOST_FILESYSTEM_DECL path const& dot_dot_path()
 } // namespace detail
 } // namespace filesystem
 } // namespace boost
+
+#include <boost/filesystem/detail/footer.hpp>
