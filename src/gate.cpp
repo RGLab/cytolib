@@ -119,13 +119,13 @@ namespace cytolib
 	}
 	
 	// MultiRangeGate
-	void MultiRangeGate::ConvertToPb(proto::Gate& gate_pb) const {
-	  Gate::ConvertToPb(gate_pb);
-	  gate_pb.set_type(proto::MULTI_RANGE_GATE);
+	void MultiRangeGate::convertToPb(pb::gate& gate_pb)  {
+	  gate::convertToPb(gate_pb);
+	  gate_pb.set_type(pb::MULTI_RANGE_GATE);
 	  auto mrg = gate_pb.mutable_mrg();
 	  mrg->set_name(name_);
 	  for (const std::pair<float, float> prg : ranges_) {
-	    proto::Range range_msg;
+	    pb::Range range_msg;
 	    range_msg.set_min(prg.first);
 	    range_msg.set_max(prg.second);
 	    (*(*mrg).add_ranges()).Swap(&range_msg);
@@ -148,14 +148,14 @@ namespace cytolib
 	  ranges_ = merged;
 	}
 	
-	IndexVector MultiRangeGate::gating(MemCytoFrame& fdata,
-                                    IndexVector& parentInd) {
-	  IndexVector res;
+	INDICE_TYPE MultiRangeGate::gating(MemCytoFrame& fdata,
+                                    INDICE_TYPE& parentInd) {
+	  INDICE_TYPE res;
 	  int nEvents = parentInd.size();
 	  res.reserve(nEvents);
 	  
-	  const EventDataType* data_1d =
-	    fdata.get_data_memptr(name_, ColType::kChannel);
+	  const EVENT_DATA_TYPE* data_1d =
+	    fdata.get_data_memptr(name_, ColType::channel);
 	  // the ranges should be already sorted and merged, but if we're inserting
 	  // gates to an already constructed multirange gate
 	  // we need to sort and merge again.
@@ -164,10 +164,9 @@ namespace cytolib
 	  // compare computation cost and decide how to perform gating
 	  if (num_regions > 2 * log(nEvents)) {
 	    // The implementation with pre-sorting data, complexity O(2*n*logn+n)
-	    OZ_MSG(Log::POP) << "sorting " << name_;
 	    int region_idx = 0;
 	    int vec_idx = 0;
-	    std::vector<EventDataType> data_1d_vec(data_1d, data_1d + nEvents);
+	    std::vector<EVENT_DATA_TYPE> data_1d_vec(data_1d, data_1d + nEvents);
 	    std::vector<int> p(nEvents);
 	    std::iota(p.begin(), p.end(), 0);
 	    std::sort(p.begin(), p.end(), [&data_1d_vec](int i1, int i2) {
@@ -176,17 +175,17 @@ namespace cytolib
 	    std::sort(data_1d_vec.begin(), data_1d_vec.end());
 	    while (region_idx < num_regions && vec_idx < nEvents) {
 	      auto region = ranges_[region_idx];
-	      EventDataType ev = data_1d_vec[vec_idx];
+	      EVENT_DATA_TYPE ev = data_1d_vec[vec_idx];
 	      if (ev > region.second) {
 	        region_idx++;
 	      } else {
-	        if ((neg_ && ev < region.first) || (!neg_ && ev >= region.first)) {
+	        if ((neg && ev < region.first) || (!neg && ev >= region.first)) {
 	          res.push_back(vec_idx);
 	        }
 	        vec_idx++;
 	      }
 	    }
-	    IndexVector res_permuted(res.size());
+	    INDICE_TYPE res_permuted(res.size());
 	    std::transform(res.begin(), res.end(), res_permuted.begin(),
                     [&p](int i) { return p[i]; });
 	    return res_permuted;
@@ -203,7 +202,7 @@ namespace cytolib
 	          // one interval
 	        }
 	      }
-	      if (isIn != neg_) {
+	      if (isIn != neg) {
 	        res.push_back(i);
 	      }
 	    }
@@ -213,21 +212,20 @@ namespace cytolib
 	
 	// MultiRangeGate transforming
 	void MultiRangeGate::transforming(trans_local& trans) {
-	  if (is_transformed_) {
+	  if (isTransformed) {
 	    return;
 	  }
 	  for (auto rgi = 0; rgi <= ranges_.size(); rgi++) {
-	    EventDataType vert[2] = {ranges_[rgi].first, ranges_[rgi].second};
+	    EVENT_DATA_TYPE vert[2] = {ranges_[rgi].first, ranges_[rgi].second};
 	    
 	    TransPtr cur_trans = trans.getTran(name_);
 	    if (cur_trans) {
-	      OZ_MSG(Log::POP) << "transforming " << name_;
 	      cur_trans->transforming(vert, 2);
 	      ranges_[rgi].first = vert[0];
 	      ranges_[rgi].second = vert[1];
 	    }
 	  }
-	  is_transformed_ = true;
+	  isTransformed = true;
 	}
 	
 	

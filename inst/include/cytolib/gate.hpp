@@ -41,6 +41,7 @@ const EVENT_DATA_TYPE pi = 3.1415926535897;
 #define CURLYQUADGATE 7
 #define CLUSTERGATE 8
 #define QUADGATE 9
+#define MULTIRANGEGATE 10
 
 #define AND 1
 #define OR 2
@@ -192,19 +193,19 @@ public:
 	void shiftGate();
 };
 
-class MultiRangeGate final : public Gate {
+class MultiRangeGate final : public gate {
 public:
   MultiRangeGate()
     : ranges_(std::vector<std::pair<float, float>>{{0.0f, 0.0f}}),
       name_("Time") {}
-  std::shared_ptr<Gate> clone() const override {
+  std::shared_ptr<gate> clone() const  {
     return std::make_shared<MultiRangeGate>(*this);
   }
   MultiRangeGate(std::vector<std::pair<float, float>> ranges, std::string name)
     : ranges_(ranges), name_(name) {
     SortAndMergeRanges();
   }
-  explicit MultiRangeGate(const cytolib::IndexVector& indexVector,
+  explicit MultiRangeGate(const INDICE_TYPE& indexVector,
                           const  std::vector<float>& data, std::string name) {
     name_ = name;
     
@@ -212,7 +213,7 @@ public:
       ranges_ = std::vector<std::pair<float, float>>();
       return;
     }
-    IndexVector sortedIndexVector = indexVector;
+    INDICE_TYPE sortedIndexVector = indexVector;
     std::sort(sortedIndexVector.begin(), sortedIndexVector.end());
     uint32_t rangeStart = sortedIndexVector[0];
     uint32_t rangeEnd = rangeStart;
@@ -232,15 +233,9 @@ public:
     auto end = data[rangeEnd];
     ranges_.emplace_back(start, end);
   }
-  explicit MultiRangeGate(const proto::Gate& gate_pb) {
+  explicit MultiRangeGate(const pb::gate& gate_pb) {
     name_ = gate_pb.mrg().name();
-    for (const proto::Range range : gate_pb.mrg().ranges()) {
-      // check that rg params name matches name_
-      if (name_ != "Time") {
-        OZ_ERROR() << "MultiRangeGate name: " << name_
-                   << " is not Time. Time is the only supported MultiRangeGate "
-        "name at the moment";
-      }
+    for (const pb::Range range : gate_pb.mrg().ranges()) {
       
       ranges_.push_back(std::pair<float, float>{range.min(), range.max()});
     }
@@ -249,43 +244,31 @@ public:
   void setRanges(std::vector<std::pair<float, float>>& ranges) {
     ranges_ = ranges;
   }
-  void transforming(trans_local& trans) override;
+  void transforming(trans_local& trans) ;
   std::vector<std::pair<float, float>> getRanges() { return ranges_; }
-  GateType getType() const override { return GateType::MULTI_RANGE_GATE; }
-  void ConvertToPb(proto::Gate& gate_pb) const override;
-  IndexVector gating(MemCytoFrame& fdata, IndexVector& parentInd) override;
-  std::vector<std::string> getParamNames() const override {
+  unsigned short getType() const  { return MULTIRANGEGATE; }
+  void convertToPb(pb::gate& gate_pb)  ;
+  INDICE_TYPE gating(MemCytoFrame& fdata, INDICE_TYPE& parentInd) ;
+  std::vector<std::string> getParamNames() const  {
     return std::vector<std::string>{name_};
   }
   
-  // unimplemented
   
-  //   void extend(MemCytoFrame& fdata, float extend_val) override;
-  //   void extend(float extend_val, float extend_to) override;
-  //   void gain(std::map<std::string, float>& gains) override;
-  //   void setParam(const ParamRange& param) { param_ = param; }
-  //   void update_channels(const CHANNEL_MAP& chnl_map) override {
-  //     param_.update_channels(chnl_map);
-  //   };
-  VerticesVector getVertices() const override {
-    // convert ranges_ to VerticesVector
-    VerticesVector v;
+  vertices_vector getVertices() const  {
+    // convert ranges_ to vertices_vector
+    vertices_vector v;
     for (auto range : ranges_) {
       v.x.push_back(range.first);
       v.y.push_back(range.second);
     }
     return v;
   }
-  //   void setShift(std::vector<EventDataType> shift) override { shift_ =
-  //   shift; }
-  //   std::vector<EventDataType> getShift() const override { return shift_; }
-  //   void shiftGate() override;
-  
+ 
 private:
   void SortAndMergeRanges();
   std::vector<std::pair<float, float>> ranges_;
   std::string name_;
-}
+};
 /*
  * TODO:using #include <boost/multi_array.hpp> instead to make it easier to convert to R data structure hopefully.
  *
