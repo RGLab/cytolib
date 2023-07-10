@@ -1,2 +1,2 @@
 //auto-generate cytolibConfig.h
-#define CYTOLIB_VERSION "2.9.2"
+#define CYTOLIB_VERSION "2.13.0"

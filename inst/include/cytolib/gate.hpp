@@ -41,6 +41,7 @@ const EVENT_DATA_TYPE pi = 3.1415926535897;
 #define CURLYQUADGATE 7
 #define CLUSTERGATE 8
 #define QUADGATE 9
+#define MULTIRANGEGATE 11
 
 #define AND 1
 #define OR 2
@@ -192,7 +193,82 @@ public:
 	void shiftGate();
 };
 
-
+class MultiRangeGate final : public gate {
+public:
+  MultiRangeGate()
+    : ranges_(std::vector<std::pair<float, float>>{{0.0f, 0.0f}}),
+      name_("Time") {}
+  std::shared_ptr<gate> clone() const  {
+    return std::make_shared<MultiRangeGate>(*this);
+  }
+  MultiRangeGate(std::vector<std::pair<float, float>> ranges, std::string name)
+    : ranges_(ranges), name_(name) {
+    SortAndMergeRanges();
+  }
+  explicit MultiRangeGate(const INDICE_TYPE& indexVector,
+                          const  std::vector<float>& data, std::string name) {
+    name_ = name;
+    
+    if (indexVector.empty()) {
+      ranges_ = std::vector<std::pair<float, float>>();
+      return;
+    }
+    INDICE_TYPE sortedIndexVector = indexVector;
+    std::sort(sortedIndexVector.begin(), sortedIndexVector.end());
+    uint32_t rangeStart = sortedIndexVector[0];
+    uint32_t rangeEnd = rangeStart;
+    for (size_t i = 1; i < sortedIndexVector.size(); ++i) {
+      uint32_t currentIndex = sortedIndexVector[i];
+      if (currentIndex == rangeEnd + 1) {
+        rangeEnd = currentIndex;
+      } else {
+        auto start = data[rangeStart];
+        auto end = data[rangeEnd];
+        ranges_.emplace_back(start, end);
+        rangeStart = currentIndex;
+        rangeEnd = rangeStart;
+      }
+    }
+    auto start = data[rangeStart];
+    auto end = data[rangeEnd];
+    ranges_.emplace_back(start, end);
+  }
+  explicit MultiRangeGate(const pb::gate& gate_pb) {
+    name_ = gate_pb.mrg().name();
+    for (const pb::Range range : gate_pb.mrg().ranges()) {
+      
+      ranges_.push_back(std::pair<float, float>{range.min(), range.max()});
+    }
+    SortAndMergeRanges();
+  }
+  void setRanges(std::vector<std::pair<float, float>>& ranges) {
+    ranges_ = ranges;
+  }
+  void transforming(trans_local& trans) ;
+  std::vector<std::pair<float, float>> getRanges() { return ranges_; }
+  unsigned short getType() const  { return MULTIRANGEGATE; }
+  void convertToPb(pb::gate& gate_pb)  ;
+  INDICE_TYPE gating(MemCytoFrame& fdata, INDICE_TYPE& parentInd) ;
+  std::vector<std::string> getParamNames() const  {
+    return std::vector<std::string>{name_};
+  }
+  
+  
+  vertices_vector getVertices() const  {
+    // convert ranges_ to vertices_vector
+    vertices_vector v;
+    for (auto range : ranges_) {
+      v.x.push_back(range.first);
+      v.y.push_back(range.second);
+    }
+    return v;
+  }
+ 
+private:
+  void SortAndMergeRanges();
+  std::vector<std::pair<float, float>> ranges_;
+  std::string name_;
+};
 /*
  * TODO:using #include <boost/multi_array.hpp> instead to make it easier to convert to R data structure hopefully.
  *

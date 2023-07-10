@@ -47,7 +47,8 @@ namespace cytolib
 		 */
 		if(np_pb.has_thisgate()){
 			const pb::gate & gate_pb = np_pb.thisgate();
-			switch(gate_pb.type())
+		  auto gate_type =gate_pb.type();
+			switch(gate_type)
 			{
 			case pb::RANGE_GATE:
 				thisGate = gatePtr(new rangeGate(gate_pb));
@@ -76,8 +77,11 @@ namespace cytolib
 			case pb::QUAD_GATE:
 				thisGate = gatePtr(new quadGate(gate_pb));
 				break;
+			case pb::MULTI_RANGE_GATE:
+			  thisGate = gatePtr(new MultiRangeGate(gate_pb));
+			  break;
 			default:
-				throw(domain_error("unknown type of gate archive!"));
+				throw(domain_error("unknown type of gate archive!" + std::to_string(gate_type)));
 			}
 
 		}
