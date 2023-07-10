@@ -41,7 +41,7 @@ const EVENT_DATA_TYPE pi = 3.1415926535897;
 #define CURLYQUADGATE 7
 #define CLUSTERGATE 8
 #define QUADGATE 9
-#define MULTIRANGEGATE 10
+#define MULTIRANGEGATE 11
 
 #define AND 1
 #define OR 2
