@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include <queue>
 #include <cytolib/global.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
+#include <filesystem>
+namespace fs = std::filesystem;
 
 namespace cytolib
 {

@@ -62,7 +62,7 @@ namespace cytolib
 	string generate_unique_filename(const string & dir, const string & prefix, const string & suffix);
 
 	string generate_unique_dir(const string & dir, const string & prefix);
-	void recursive_copy(const fs::path &src, const fs::path &dst);
+	
 
 	/**
 	 * Generate time stamp as string

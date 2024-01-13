@@ -19,9 +19,10 @@ using namespace arma;
 
 #include <H5Cpp.h>
 using namespace H5;
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
+
+#include <filesystem>
+namespace fs = std::filesystem;
 namespace cytolib
 {
 enum class RangeType {instrument, data};
