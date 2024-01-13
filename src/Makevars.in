@@ -10,24 +10,16 @@ endif
 
 	
 CXX_STD = CXX11
-boost_sys_src=${wildcard boost/libs/system/src/*.cpp}
-boost_sys_objs=${boost_sys_src:.cpp=.o}
-boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
-boost_fs_objs=${boost_fs_src:.cpp=.o}
 
-PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR -DBOOST_FILESYSTEM_NO_CXX20_ATOMIC_REF -DBOOST_FILESYSTEM_SINGLE_THREADED #the last to flagsare needed to compile bundled boost file system library 1.78
+PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
 
 cytolib_src=${wildcard *.cpp}
 cytolib_objs=${cytolib_src:.cpp=.o}
 
-BOOSTFSLIB = libboost_fs.a
 USERDIR = ${R_PACKAGE_DIR}/lib${R_ARCH}
 USERLIB = ${USERDIR}/libcytolib.a
 
 OBJECTS=dummy.o
-
-#needs to wrap in $(shell) to strip the quotes returned by rhdf5lib::pkgconfig
-FSLIB = ${boost_fs_objs} ${boost_sys_objs}
 
 
 
@@ -35,13 +27,12 @@ all: $(SHLIB)
 
 $(SHLIB): $(USERLIB)
 
-$(USERLIB): ${boost_fs_objs} ${cytolib_objs} 
+$(USERLIB):  ${cytolib_objs} 
 	mkdir -p "${USERDIR}"
-	$(AR) rs "${USERLIB}" ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs}
+	$(AR) rs "${USERLIB}" ${cytolib_objs}
 
-$(boost_fs_objs): ${boost_sys_objs}
 
 
 clean:
-	rm -f $(OBJECTS) ${cytolib_objs} ${boost_fs_objs} ${boost_sys_objs} $(SHLIB)
+	rm -f $(OBJECTS) ${cytolib_objs} $(SHLIB)
  

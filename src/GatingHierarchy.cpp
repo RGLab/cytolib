@@ -7,8 +7,8 @@
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/depth_first_search.hpp>
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
+#include <filesystem>
+namespace fs = std::filesystem;
 
 namespace cytolib
 {
