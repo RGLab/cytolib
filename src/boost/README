@@ -1,4 +1,4 @@
-source files are copied from boost_1_81,compiles with the headers from BH package
+source files are copied from boost_1_84,compiles with the headers from BH package
 bundle procedure:
 simply copy source files from lib/filesystem and lib/system subfolders
 

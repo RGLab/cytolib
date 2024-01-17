@@ -15,7 +15,8 @@ boost_sys_objs=${boost_sys_src:.cpp=.o}
 boost_fs_src=${wildcard boost/libs/filesystem/src/*.cpp}
 boost_fs_objs=${boost_fs_src:.cpp=.o}
 
-PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR -DBOOST_FILESYSTEM_NO_CXX20_ATOMIC_REF -DBOOST_FILESYSTEM_SINGLE_THREADED #the last to flagsare needed to compile bundled boost file system library 1.78
+
+PKG_CPPFLAGS =-DROUT -I../inst/include -w -Wfatal-errors -DBOOST_NO_AUTO_PTR -DBOOST_FILESYSTEM_NO_CXX20_ATOMIC_REF -DBOOST_FILESYSTEM_SINGLE_THREADED #the last to flagsare needed to compile bundled boost file system library 1.78
 
 cytolib_src=${wildcard *.cpp}
 cytolib_objs=${cytolib_src:.cpp=.o}
