@@ -11,10 +11,9 @@
 #define INST_INCLUDE_CYTOLIB_CYTOFRAMEVIEW_HPP_
 #include "MemCytoFrame.hpp"
 #include "H5CytoFrame.hpp"
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
-
-#include <filesystem>
-namespace fs = std::filesystem;
 namespace cytolib
 {
 class CytoFrameView{

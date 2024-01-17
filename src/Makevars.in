@@ -9,9 +9,9 @@ This makefile requires GNU Make.
 endif
 
 	
-CXX_STD = CXX17
+CXX_STD = CXX11
 
-PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR -w -Wfatal-errors
+PKG_CPPFLAGS =-DROUT -I../inst/include -DBOOST_NO_AUTO_PTR
 
 cytolib_src=${wildcard *.cpp}
 cytolib_objs=${cytolib_src:.cpp=.o}
