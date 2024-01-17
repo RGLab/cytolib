@@ -4,8 +4,8 @@
 #include <cytolib/H5CytoFrame.hpp>
 #include <cytolib/MemCytoFrame.hpp>
 #include <cytolib/cytolibConfig.h>
-#include <filesystem>
-namespace fs = std::filesystem;
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 
 namespace cytolib
