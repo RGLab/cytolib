@@ -35,7 +35,7 @@ namespace cytolib
 #define LOGGML2 7
 #define SCALE 8
 /* case insensitive compare predicate*/
-struct ciLessBoost : std::binary_function<std::string, std::string, bool>
+struct ciLessBoost : std::function<bool(std::string, std::string)>
 {
     bool operator() (const std::string & s1, const std::string & s2) const {
         return lexicographical_compare(s1, s2, boost::is_iless());
